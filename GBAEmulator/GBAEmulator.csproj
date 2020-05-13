@@ -68,6 +68,7 @@
     <Compile Include="CPU\CPU.BIOS.cs" />
     <Compile Include="CPU\CPU.cs" />
     <Compile Include="CPU\CPU.Exceptions.cs" />
+    <Compile Include="CPU\CPU.Instructions.ARM.cs" />
     <Compile Include="CPU\CPU.Instructions.cs" />
     <Compile Include="CPU\CPU.Memory.cs" />
     <Compile Include="Visual.cs">

@@ -26,10 +26,20 @@ namespace GBAEmulator.CPU
         private void PipelineFlush()
         {
             this.Pipeline.Clear();
-            this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
-            this.PC++;
-            this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
-            this.PC++;
+            if (this.state == State.ARM)
+            {
+                this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
+                this.PC++;
+                this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
+                this.PC++;
+            }
+            else
+            {
+                this.Pipeline.Enqueue(this.GetAt<ushort>(this.PC));
+                this.PC++;
+                this.Pipeline.Enqueue(this.GetAt<ushort>(this.PC));
+                this.PC++;
+            }
         }
     }
 }

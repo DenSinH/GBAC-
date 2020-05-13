@@ -27,7 +27,8 @@ namespace GBAEmulator.CPU
         proceeds to the FIQ vector. A normal return from FIQ will cause the data abort handler
         to resume execution. Placing data abort at a higher priority than FIQ is necessary to
         ensure that the transfer error does not escape detection. The time for this exception
-        entry should be added to worst-case FIQ latency calculations.        */
+        entry should be added to worst-case FIQ latency calculations.
+        */
         uint ResetVector = 0x0;
         uint UndefVector = 0x4;
         uint SWIVector = 0x8;
