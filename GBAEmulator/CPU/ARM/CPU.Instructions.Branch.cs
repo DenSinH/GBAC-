@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
 
         private void BX(uint Instruction)
@@ -31,6 +31,7 @@ namespace GBAEmulator.CPU
             TrueOffset <<= 2;
 
             this.PC = (uint)(this.PC + TrueOffset);
+            this.PipelineFlush();
 
             // 2S + 1N cycles
         }

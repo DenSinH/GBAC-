@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
         private bool Condition(byte field)
         {
@@ -48,9 +48,9 @@ namespace GBAEmulator.CPU
             {
                 return;
             }
-
+            
             // todo: array of length 4096 based on bits 27-20 and 7-4 with enum then switch the enum for instruction
-            switch ((Instruction & 0x0a00_0000) >> 25)
+            switch ((Instruction & 0x0c00_0000) >> 26)
             {
                 case 0b00:
                     // Data Processing / Multiply / Multiply Long / Single Data Swap / Branch & Exchange / Halfword Data Transfer

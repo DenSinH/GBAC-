@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
         /*
             3.9.10 Exception priorities

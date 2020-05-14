@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
         /* Normatt's GBA BIOS */
         private const int BIOS_SIZE = 0x4000;

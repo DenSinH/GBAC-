@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
         /* BIOS is defined in CPU.BIOS.cs */
         private byte[] eWRAM = new byte[0x40000];       // 256kB External Work RAM

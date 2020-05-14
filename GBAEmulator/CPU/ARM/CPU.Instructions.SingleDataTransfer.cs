@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
         private void SingleDataTransfer(uint Instruction)
         {
@@ -22,10 +22,6 @@ namespace GBAEmulator.CPU
             Rd = (byte)((Instruction & 0x0000_f000) >> 12);
 
             Address = this.Registers[Rn];  // Base register
-            if (Rn == 15)
-            {
-                Address -= 4;  // PC is always 12 bits ahead instead of 8 for mine.
-            }
 
             /*
              The 8 shift control bits are described in the data processing instructions section.
@@ -40,58 +36,7 @@ namespace GBAEmulator.CPU
                 byte ShiftAmount = (byte)(this.Registers[(Instruction & 0xf00) >> 8] & 0xff);
 
                 // todo: are cpsr flags affected?
-                if (ShiftAmount == 0)
-                {
-                    switch ((Instruction & 0x60) >> 4)  // Shift type
-                    {
-                        case 0b00:  // Logical Left
-                            // No shift applied
-                            break;
-                        case 0b01:  // Logical Right
-                            // Interpreted as LSR#32
-                            ShiftAmount = 32;
-                            break;
-                        case 0b10:  // Arithmetic Right
-                            // Interpreted as ASR#32
-                            ShiftAmount = 32;
-                            break;
-                        case 0b11:  // Rotate Right
-                            // Interpreted as RRX#1
-                            byte newC = (byte)(Offset & 0x01);
-                            Offset = (Offset >> 1) | (uint)(this.C << 31);
-                            // this.C = newC;
-                            // Leave ShiftAmount = 0 so that no additional shift is applied
-                            break;
-                    }
-                }
-
-                // We have set the shift amount accordingly above if necessary
-                // if the shift amount was specified by a register that was 0 in the last byte, no shift was applied, 
-                //     and the flags are not affected
-                if (ShiftAmount != 0)
-                {
-                    switch ((Instruction & 0x60) >> 4)  // Shift type
-                    {
-                        case 0b00:  // Logical Left
-                            Offset <<= ShiftAmount;
-                            break;
-                        case 0b01:  // Logical Right
-                            Offset >>= ShiftAmount;
-                            break;
-                        case 0b10:  // Arithmetic Right
-                            bool Bit31 = (Offset & 0x8000_0000) > 0;
-                            Offset >>= ShiftAmount;
-                            if (Bit31)
-                            {
-                                Offset |= (uint)(((1 << ShiftAmount) - 1) << (32 - ShiftAmount));
-                            }
-                            break;
-                        case 0b11:  // Rotate Right
-                            ShiftAmount &= 0x0f;  // mod 32 gives same result
-                            Offset = (uint)((Offset >> ShiftAmount) | ((Offset & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
-                            break;
-                    }
-                }
+                Offset = ARMShiftRegisterBasedOperand(Offset, true, (byte)((Instruction & 0x60) >> 4), ShiftAmount, false);
             }
             else
             {

@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
 		/* ARM / THUMB state */
         private uint[] Registers = new uint[16];  // active registers; R15 = PC

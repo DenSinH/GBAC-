@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
         /*
          From https://problemkaputt.de/gbatek.htm#armopcodespsrtransfermrsmsr:

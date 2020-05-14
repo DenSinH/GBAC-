@@ -1,13 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
+        public void TestGBASuiteARM()
+        {
+            this.LoadRom("../../Tests/GBASuite/arm.gba");
+            this.SkipBios();
 
+            StreamReader file = new StreamReader("../../Tests/GBASuite/arm.log");
+            string line;
+            string[] splitline;
+            bool[] equal = new bool[19];  // don't care about cycles yet
+            equal[0] = true;  // PC is slightly off for me as I don't track the address of the current instruction
+
+            while (true)
+            {
+                this.Step();
+                if (this.Pipeline.Count > 0)
+                {
+                    line = file.ReadLine();
+                    if (line == null)
+                    {
+                        return;
+                    }
+
+                    splitline = line.Split(',');
+                    // equal[0] = splitline[0].Equals(this.PC.ToString("X8"));
+                    equal[1] = splitline[1].Equals("0x" + this.Pipeline.Peek().ToString("X8"));
+                    equal[2] = splitline[2].Equals("0x" + this.CPSR.ToString("X8"));
+                    for (int i = 0; i < 16; i++)
+                        equal[3 + i] = splitline[3 + i].Equals("0x" + this.Registers[i].ToString("X8"));
+
+                    for (int i = 0; i < 19; i++)
+                    {
+                        if (!equal[i])
+                        {
+                            Console.WriteLine("ERROR: " + line);
+                            Console.Write(string.Format("Mistake in {0}:  ", i));
+                            break;
+                        }
+                    }
+
+                    Console.WriteLine(string.Format("0x{0:X8},0x{1:X8},0x{2:X8},", this.PC, this.Pipeline.Peek(), this.CPSR)
+                    + string.Join(",", this.Registers.Select(x => "0x" + x.ToString("X8")).ToArray()));
+                    Console.ReadKey();
+                }
+            }
+        }
     }
 }

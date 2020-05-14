@@ -2,8 +2,83 @@
 
 namespace GBAEmulator.CPU
 {
-    partial class CPU
+    partial class ARM7TDMI
     {
+
+        private uint ARMShiftRegisterBasedOperand(uint Op2, bool ImmediateShift, byte ShiftType, byte ShiftAmount, bool SetConditions)
+        {
+            // Special cases for 0 shift
+            if (ShiftAmount == 0 && ImmediateShift)
+            {
+                switch (ShiftType)  // Shift type
+                {
+                    case 0b00:  // Logical Left
+                                // No shift applied
+                        break;
+                    case 0b01:  // Logical Right
+                                // Interpreted as LSR#32
+                        ShiftAmount = 32;
+                        break;
+                    case 0b10:  // Arithmetic Right
+                                // Interpreted as ASR#32
+                        ShiftAmount = 32;
+                        break;
+                    case 0b11:  // Rotate Right
+                                // Interpreted as RRX#1
+                        byte newC = (byte)(Op2 & 0x01);
+                        Op2 = (Op2 >> 1) | (uint)(this.C << 31);
+                        this.C = newC;
+                        // Leave ShiftAmount = 0 so that no additional shift is applied
+                        break;
+                }
+            }
+
+            // We have set the shift amount accordingly above if necessary
+            // if the shift amount was specified by a register that was 0 in the last byte, no shift was applied, 
+            //     and the flags are not affected
+            if (ShiftAmount != 0)
+            {
+                switch (ShiftType)  // Shift type
+                {
+                    case 0b00:  // Logical Left
+                        if (SetConditions)
+                        {
+                            C = (byte)((Op2 >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
+                        }
+                        Op2 <<= ShiftAmount;
+                        break;
+                    case 0b01:  // Logical Right
+                        if (SetConditions)
+                        {
+                            C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
+                        }
+                        Op2 >>= ShiftAmount;
+                        break;
+                    case 0b10:  // Arithmetic Right
+                        if (SetConditions)
+                        {
+                            C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                        }
+                        bool Bit31 = (Op2 & 0x8000_0000) > 0;
+                        Op2 >>= ShiftAmount;
+                        if (Bit31)
+                        {
+                            Op2 |= (uint)(((1 << ShiftAmount) - 1) << (32 - ShiftAmount));
+                        }
+                        break;
+                    case 0b11:  // Rotate Right
+                        if (SetConditions)
+                        {
+                            C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                        }
+                        ShiftAmount &= 0x1f;  // mod 32 gives same result
+                        Op2 = (uint)((Op2 >> ShiftAmount) | ((Op2 & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
+                        break;
+                }
+            }
+
+            return Op2;
+        }
 
         private void DataProcessing(uint Instruction)
         {
@@ -45,83 +120,12 @@ namespace GBAEmulator.CPU
                      prefetching. If the shift amount is specified in the instruction, the PC will be 8 bytes
                      ahead. If a register is used to specify the shift amount the PC will be 12 bytes ahead.
                     */
-                    if (ImmediateShift)
-                    {
-                        Op2 -= 4;  // Correcet for PC, for me it is always 12 bytes ahead in ARM mode, because of the prefetch
-                    }
 
                 }
                 // Shift amount is either bottom byte of register or immediate value
                 byte ShiftAmount = (byte)(ImmediateShift ? ((Instruction & 0xf80) >> 7) : this.Registers[(Instruction & 0xf00) >> 8] & 0xff);
 
-                if (ShiftAmount == 0 && ImmediateShift)
-                {
-                    switch ((Instruction & 0x60) >> 4)  // Shift type
-                    {
-                        case 0b00:  // Logical Left
-                            // No shift applied
-                            break;
-                        case 0b01:  // Logical Right
-                            // Interpreted as LSR#32
-                            ShiftAmount = 32;
-                            break;
-                        case 0b10:  // Arithmetic Right
-                            // Interpreted as ASR#32
-                            ShiftAmount = 32;
-                            break;
-                        case 0b11:  // Rotate Right
-                            // Interpreted as RRX#1
-                            byte newC = (byte)(Op2 & 0x01);
-                            Op2 = (Op2 >> 1) | (uint)(this.C << 31);
-                            this.C = newC;
-                            // Leave ShiftAmount = 0 so that no additional shift is applied
-                            break;
-                    }
-                }
-
-                // We have set the shift amount accordingly above if necessary
-                // if the shift amount was specified by a register that was 0 in the last byte, no shift was applied, 
-                //     and the flags are not affected
-                if (ShiftAmount != 0)
-                {
-                    switch ((Instruction & 0x60) >> 4)  // Shift type
-                    {
-                        case 0b00:  // Logical Left
-                            if (SetConditions)
-                            {
-                                C = (byte)((Op2 >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
-                            }
-                            Op2 <<= ShiftAmount;
-                            break;
-                        case 0b01:  // Logical Right
-                            if (SetConditions)
-                            {
-                                C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
-                            }
-                            Op2 >>= ShiftAmount;
-                            break;
-                        case 0b10:  // Arithmetic Right
-                            if (SetConditions)
-                            {
-                                C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
-                            }
-                            bool Bit31 = (Op2 & 0x8000_0000) > 0;
-                            Op2 >>= ShiftAmount;
-                            if (Bit31)
-                            {
-                                Op2 |= (uint)(((1 << ShiftAmount) - 1) << (32 - ShiftAmount));
-                            }
-                            break;
-                        case 0b11:  // Rotate Right
-                            if (SetConditions)
-                            {
-                                C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
-                            }
-                            ShiftAmount &= 0x0f;  // mod 32 gives same result
-                            Op2 = (uint)((Op2 >> ShiftAmount) | ((Op2 & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
-                            break;
-                    }
-                }
+                Op2 = ARMShiftRegisterBasedOperand(Op2, ImmediateShift, (byte)((Instruction & 0x60) >> 4), ShiftAmount, SetConditions);
             }
             else
             {
@@ -135,7 +139,7 @@ namespace GBAEmulator.CPU
                     {
                         C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                     }
-                    ShiftAmount &= 0x0f;  // mod 32 gives same result
+                    ShiftAmount &= 0x1f;  // mod 32 gives same result
                     Op2 = (uint)((Op2 >> ShiftAmount) | ((Op2 & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
                 }
             }
