@@ -29,16 +29,16 @@ namespace GBAEmulator.CPU
             if (this.state == State.ARM)
             {
                 this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
-                this.PC++;
+                this.PC += 4;
                 this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
-                this.PC++;
+                this.PC += 4;
             }
             else
             {
                 this.Pipeline.Enqueue(this.GetAt<ushort>(this.PC));
-                this.PC++;
+                this.PC += 2;
                 this.Pipeline.Enqueue(this.GetAt<ushort>(this.PC));
-                this.PC++;
+                this.PC += 2;
             }
         }
     }

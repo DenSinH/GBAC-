@@ -42,88 +42,119 @@ namespace GBAEmulator.CPU
                     throw new Exception(string.Format("Condition field {0:b4} reserved/invalid", field));
             }
         }
-        private void ExecuteARM(uint instruction)
+        private void ExecuteARM(uint Instruction)
         {
-            if (!Condition((byte)((instruction & 0xf000_0000) >> 28)))
+            if (!Condition((byte)((Instruction & 0xf000_0000) >> 28)))
             {
                 return;
             }
 
-            switch ((instruction & 0x0a00_0000) >> 25)
+            // todo: array of length 4096 based on bits 27-20 and 7-4 with enum then switch the enum for instruction
+            switch ((Instruction & 0x0a00_0000) >> 25)
             {
                 case 0b00:
                     // Data Processing / Multiply / Multiply Long / Single Data Swap / Branch & Exchange / Halfword Data Transfer
-                    if ((instruction & 0x0fa0_00f0) == 0x0000_0090)
+                    if ((Instruction & 0x0fc0_00f0) == 0x0000_0090)
                     {
                         // Multiply
+                        this.Multiply(Instruction);
                     }
-                    else if ((instruction & 0x0fe80_00f0) == 0x0080_0090)
+                    else if ((Instruction & 0x0f80_00f0) == 0x0080_0090)
                     {
                         // Multiply Long
+                        this.MultiplyLong(Instruction);
                     }
-                    else if ((instruction & 0x0fb0_0ff0) == 0x0100_0090)
+                    else if ((Instruction & 0x0fb0_0ff0) == 0x0100_0090)
                     {
                         // Single Data Swap
+                        throw new NotImplementedException();
                     }
-                    else if ((instruction & 0x0fff_fff0) == 0x012f_ff10)
+                    else if ((Instruction & 0x0fff_fff0) == 0x012f_ff10)
                     {
                         // Branch and Exchange
+                        this.BX(Instruction);
                     }
-                    else if ((instruction & 0x0e40_0f90) == 0x0000_0090)
+                    else if ((Instruction & 0x0e40_0f90) == 0x0000_0090)
                     {
                         // Halfword Data Transfer: Register Offset
+                        throw new NotImplementedException();
                     }
-                    else if ((instruction & 0x0e40_0090) == 0x0040_0090)
+                    else if ((Instruction & 0x0e40_0090) == 0x0040_0090)
                     {
                         // Halfword Data Transfer: Immediate Offset
+                        throw new NotImplementedException();
+                    }
+                    else if ((Instruction & 0x0fbf_0fff) == 0x010f_0000)
+                    {
+                        // MRS (transfer PSR contents to a register)
+                        this.MRS(Instruction);
+                    }
+                    else if ((Instruction & 0x0fbf_fff0) == 0x0129_f000)
+                    {
+                        // MSR (transfer register contents to PSR)
+                        this.MSR_all(Instruction);
+                    }
+                    else if ((Instruction & 0x0dbf_f000) == 0x0128_f000)
+                    {
+                        // MSR (transfer register contents or immediate value to PSR flag bits only)
+                        this.MSR_flags(Instruction);
                     }
                     else
                     {
-                        // Data Processing / PSR Transfer
+                        // Data Processing
+                        this.DataProcessing(Instruction);
                     }
                     return;
 
                 case 0b01:
                     // Single Data Transfer / Undefined
-                    if ((instruction & 0x0e00_0010) == 0x0600_0010)
+                    if ((Instruction & 0x0e00_0010) == 0x0600_0010)
                     {
                         // Undefined
+                        throw new NotImplementedException();
                     }
                     else
                     {
                         // Single Data Transfer
+                        this.SingleDataTransfer(Instruction);
                     }
                     return;
 
                 case 0b10:
                     // Block Data Transfer / Branch
-                    if ((instruction & 0x0e00_0000) == 0x0800_0000)
+                    if ((Instruction & 0x0e00_0000) == 0x0800_0000)
                     {
                         // Block Data Transfer
+                        throw new NotImplementedException();
                     }
                     else
                     {
                         // Branch
+                        this.Branch(Instruction);
                     }
                     return;
 
                 case 0b11:
                     // Coprocessor Data (Transfer/Operation) / Coprocessor Register Transfer / SWI
-                    if ((instruction & 0x0e00_0000) == 0x0c00_0000)
+                    if ((Instruction & 0x0e00_0000) == 0x0c00_0000)
                     {
                         // Coprocessor Data Transfer
+                        throw new NotImplementedException();
                     }
-                    else if ((instruction & 0x0f00_0010) == 0x0e00_0000)
+                    else if ((Instruction & 0x0f00_0010) == 0x0e00_0000)
                     {
                         // Coprocessor Data Operation
+                        throw new NotImplementedException();
                     }
-                    else if ((instruction & 0x0f00_0010) == 0x0e00_0010)
+                    else if ((Instruction & 0x0f00_0010) == 0x0e00_0010)
                     {
                         // Coprocessor Register Transfer
+                        throw new NotImplementedException();
                     }
                     else
                     {
                         //SWI
+                        throw new NotImplementedException();
                     }
                     return;
             }

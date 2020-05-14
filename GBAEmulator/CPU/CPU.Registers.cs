@@ -39,6 +39,57 @@ namespace GBAEmulator.CPU
             }
         }
 
+        private void SetNZ(uint Result)
+        {
+            this.N = (byte)(((Result & 0x8000_0000) > 0) ? 1 : 0);
+            this.Z = (byte)((Result == 0) ? 1 : 0);
+        }
+
+        private uint SPSR
+        {
+            get
+            {
+                switch (mode)
+                {
+                    case Mode.FIQ:
+                        return SPSR_fiq;
+                    case Mode.Supervisor:
+                        return SPSR_svc;
+                    case Mode.Abort:
+                        return SPSR_abt;
+                    case Mode.IRQ:
+                        return SPSR_irq;
+                    case Mode.Undefined:
+                        return SPSR_und;
+                    default:
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (mode)
+                {
+                    case Mode.FIQ:
+                        SPSR_fiq = value;
+                        return;
+                    case Mode.Supervisor:
+                        SPSR_svc = value;
+                        return;
+                    case Mode.Abort:
+                        SPSR_abt = value;
+                        return;
+                    case Mode.IRQ:
+                        SPSR_irq = value;
+                        return;
+                    case Mode.Undefined:
+                        SPSR_und = value;
+                        return;
+                    default:
+                        return;
+                }
+            }
+        }
+
         private uint PC  // same for ARM and THUMB
         {
             get => Registers[15];

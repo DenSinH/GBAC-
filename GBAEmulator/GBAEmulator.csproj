@@ -64,13 +64,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CPU\ARM\CPU.Instructions.DataProcessing.cs" />
+    <Compile Include="CPU\ARM\CPU.Instructions.Multiply.cs" />
+    <Compile Include="CPU\ARM\CPU.Instructions.PSRTransfer.cs" />
+    <Compile Include="CPU\ARM\CPU.Instructions.SingleDataTransfer.cs" />
     <Compile Include="CPU\CPU.Aux.cs" />
     <Compile Include="CPU\CPU.BIOS.cs" />
     <Compile Include="CPU\CPU.cs" />
     <Compile Include="CPU\CPU.Exceptions.cs" />
-    <Compile Include="CPU\CPU.Instructions.ARM.cs" />
+    <Compile Include="CPU\ARM\CPU.Instructions.Branch.cs" />
     <Compile Include="CPU\CPU.Instructions.cs" />
     <Compile Include="CPU\CPU.Memory.cs" />
+    <Compile Include="CPU\CPU.Testing.cs" />
     <Compile Include="Visual.cs">
       <SubType>Form</SubType>
     </Compile>
