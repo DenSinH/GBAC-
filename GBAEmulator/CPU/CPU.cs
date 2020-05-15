@@ -35,6 +35,9 @@ namespace GBAEmulator.CPU
 
             // need banked registers for CPSR initialization
             this.CPSR = 0x0000005F;
+
+            this.InitARM();
+            this.InitTHUMB();
         }
 
         public void LoadRom(string FileName)

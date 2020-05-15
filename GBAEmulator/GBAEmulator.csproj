@@ -79,7 +79,14 @@
     <Compile Include="CPU\ARM\CPU.ARM.cs" />
     <Compile Include="CPU\CPU.Memory.cs" />
     <Compile Include="CPU\CPU.Testing.cs" />
+    <Compile Include="CPU\THUMB\CPU.THUMB.AddSubtract.cs" />
+    <Compile Include="CPU\THUMB\CPU.THUMB.ALUOperations.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.cs" />
+    <Compile Include="CPU\THUMB\CPU.THUMB.HiReg_BX.cs" />
+    <Compile Include="CPU\THUMB\CPU.THUMB.LoadStore.cs" />
+    <Compile Include="CPU\THUMB\CPU.THUMB.MovCmpAddSubImmediate.cs" />
+    <Compile Include="CPU\THUMB\CPU.THUMB.MoveShiftedRegister.cs" />
+    <Compile Include="CPU\THUMB\CPU.THUMB.PCRealtiveLoad.cs" />
     <Compile Include="Visual.cs">
       <SubType>Form</SubType>
     </Compile>

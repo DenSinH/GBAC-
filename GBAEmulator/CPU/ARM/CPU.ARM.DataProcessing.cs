@@ -43,21 +43,21 @@ namespace GBAEmulator.CPU
                     case 0b00:  // Logical Left
                         if (SetConditions)
                         {
-                            C = (byte)((Op >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
+                            this.C = (byte)((Op >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
                         }
                         Op <<= ShiftAmount;
                         break;
                     case 0b01:  // Logical Right
                         if (SetConditions)
                         {
-                            C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
+                            this.C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
                         }
                         Op >>= ShiftAmount;
                         break;
                     case 0b10:  // Arithmetic Right
                         if (SetConditions)
                         {
-                            C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                            this.C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                         }
                         bool Bit31 = (Op & 0x8000_0000) > 0;
                         Op >>= ShiftAmount;
@@ -69,7 +69,7 @@ namespace GBAEmulator.CPU
                     case 0b11:  // Rotate Right
                         if (SetConditions)
                         {
-                            C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                            this.C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                         }
                         ShiftAmount &= 0x1f;  // mod 32 gives same result
                         Op = (uint)((Op >> ShiftAmount) | ((Op & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
@@ -139,7 +139,7 @@ namespace GBAEmulator.CPU
                 {
                     if (SetConditions)
                     {
-                        C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                        this.C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                     }
                     ShiftAmount &= 0x1f;  // mod 32 gives same result
                     Op2 = (uint)((Op2 >> ShiftAmount) | ((Op2 & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
