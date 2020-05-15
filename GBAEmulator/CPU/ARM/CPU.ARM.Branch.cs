@@ -8,6 +8,8 @@ namespace GBAEmulator.CPU
         private void BX(uint Instruction)
         {
             // Branch & Exchange instruction
+            this.Log("BX");
+
             byte Rn = (byte)(Instruction & 0x0f);
             this.state = (State)(this.Registers[Rn] & 0x01);
             this.PC = this.Registers[Rn] - (this.Registers[Rn] & 0x01);
@@ -19,6 +21,7 @@ namespace GBAEmulator.CPU
         private void Branch(uint Instruction)
         {
             // Branch / Branch with Link
+            this.Log("Branch");
 
             if ((Instruction & 0x0100_0000) > 0)  // Link bit
             {

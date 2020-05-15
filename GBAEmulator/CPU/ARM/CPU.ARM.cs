@@ -4,6 +4,10 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        // todo: SWI, Coprocessor instructions, Undefined
+
+        
+
         private bool ARMCondition(byte field)
         {
             switch (field)
@@ -59,62 +63,52 @@ namespace GBAEmulator.CPU
                     if ((Instruction & 0x0fc0_00f0) == 0x0000_0090)
                     {
                         // Multiply
-                        this.Log("Multiply");
                         this.Multiply(Instruction);
                     }
                     else if ((Instruction & 0x0f80_00f0) == 0x0080_0090)
                     {
                         // Multiply Long
-                        this.Log("Multiply long");
                         this.MultiplyLong(Instruction);
                     }
                     else if ((Instruction & 0x0fb0_0ff0) == 0x0100_0090)
                     {
                         // Single Data Swap
-                        this.Log("Single data swap");
                         this.SWP(Instruction);
                     }
                     else if ((Instruction & 0x0fff_fff0) == 0x012f_ff10)
                     {
                         // Branch and Exchange
-                        this.Log("BX");
                         this.BX(Instruction);
                     }
                     else if ((Instruction & 0x0e40_0f90) == 0x0000_0090)
                     {
                         // Halfword Data Transfer: Register Offset
-                        this.Log("Halfword Data Transfer");
                         this.Halfword_SignedDataTransfer(Instruction);
                     }
                     else if ((Instruction & 0x0e40_0090) == 0x0040_0090)
                     {
                         // Halfword Data Transfer: Immediate Offset
-                        this.Log("Halfword Data Transfer");
                         this.Halfword_SignedDataTransfer(Instruction);
                     }
                     else if ((Instruction & 0x0fbf_0fff) == 0x010f_0000)
                     {
                         // MRS (transfer PSR contents to a register)
-                        this.Log("MRS");
                         this.MRS(Instruction);
                     }
                     else if ((Instruction & 0x0fbf_fff0) == 0x0129_f000)
                     {
                         // MSR (transfer register contents to PSR)
-                        this.Log("MSR_all");
                         this.MSR_all(Instruction);
                     }
                     else if (((Instruction & 0x0fbf_fff0) == 0x0128_f000) || ((Instruction & 0x0fbf_f000) == 0x0328_f000))
                     {
                         // MSR (transfer register contents or immediate value to PSR flag bits only)
                         // I is not set / I is set
-                        this.Log("MSR_flags");
                         this.MSR_flags(Instruction);
                     }
                     else
                     {
                         // Data Processing
-                        this.Log("Data Processing");
                         this.DataProcessing(Instruction);
                     }
                     return;
@@ -129,7 +123,6 @@ namespace GBAEmulator.CPU
                     else
                     {
                         // Single Data Transfer
-                        this.Log("Single Data Transfer");
                         this.SingleDataTransfer(Instruction);
                     }
                     return;
@@ -139,12 +132,11 @@ namespace GBAEmulator.CPU
                     if ((Instruction & 0x0e00_0000) == 0x0800_0000)
                     {
                         // Block Data Transfer
-                        throw new NotImplementedException();
+                        this.BlockDataTransfer(Instruction);
                     }
                     else
                     {
                         // Branch
-                        this.Log("Branch");
                         this.Branch(Instruction);
                     }
                     return;

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace GBAEmulator.CPU
 {
@@ -7,11 +7,28 @@ namespace GBAEmulator.CPU
 		/* ARM / THUMB state */
         private uint[] Registers = new uint[16];  // active registers; R15 = PC
         private uint[] SystemBank, FIQBank, SupervisorBank, AbortBank, IRQBank, UndefinedBank;
+        private Dictionary<Mode, uint[]> BankedRegisters;
         private uint SPSR_fiq, SPSR_svc, SPSR_abt, SPSR_irq, SPSR_und;  // Saved Processor Status Registers
 
         private byte N, Z, C, V, I, F;
         Mode mode = Mode.User;
         private uint SR_RESERVED;
+
+        private void ChangeMode(Mode NewMode)
+        {
+            if (NewMode == this.mode)
+                return;
+
+            bool FIQInvolved = (this.mode == Mode.FIQ) || (NewMode == Mode.FIQ);
+            
+            // Bank current registers
+            for (int i = FIQInvolved ? 8 : 13; i <= 14; i++)
+            {
+                this.BankedRegisters[this.mode][i] = this.Registers[i];
+                this.Registers[i] = this.BankedRegisters[NewMode][i];
+            }
+            this.mode = NewMode;
+        }
 
         private uint CPSR
         {
@@ -35,7 +52,9 @@ namespace GBAEmulator.CPU
                 I = (byte)((value >> 7) & 0x01);
                 F = (byte)((value >> 6) & 0x01);
                 this.state = (State)((value >> 6) & 0x01);
-                mode = (Mode)(value & 0x1f);
+
+                if ((value & 0x1f) != (byte)this.mode)
+                    this.ChangeMode((Mode)(value & 0x1f));
             }
         }
 

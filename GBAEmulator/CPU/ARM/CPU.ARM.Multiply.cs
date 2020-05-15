@@ -6,6 +6,8 @@ namespace GBAEmulator.CPU
     {
         private void Multiply(uint Instruction)
         {
+            this.Log("Multiply");
+
             bool Accumulate, SetCondition;
             byte Rd, Rn, Rs, Rm;
 
@@ -37,6 +39,8 @@ namespace GBAEmulator.CPU
 
         private void MultiplyLong(uint Instruction)
         {
+            this.Log("Multiply long");
+
             /*
              • R15 must not be used as an operand or as a destination register.
              • RdHi, RdLo, and Rm must all specify different registers.

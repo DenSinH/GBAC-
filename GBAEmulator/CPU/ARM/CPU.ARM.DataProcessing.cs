@@ -82,6 +82,8 @@ namespace GBAEmulator.CPU
 
         private void DataProcessing(uint Instruction)
         {
+            this.Log("Data Processing");
+
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             byte OpCode = (byte)((Instruction & 0x01e0_0000) >> 21);
             bool SetConditions = (Instruction & 0x0010_0000) > 0;
