@@ -41,20 +41,42 @@ namespace GBAEmulator.CPU
 
         private void PipelineFlush()
         {
-            // Has to be called when running! 
             this.Pipeline.Clear();
         }
 
         private void Step()
         {
-            // Only ARM mode for now
-            this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
-            this.PC += 4;
-
-            if (this.Pipeline.Count == 2)
+            if (this.state == State.ARM)
             {
-                this.ExecuteARM(this.Pipeline.Dequeue());
+                this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
+                this.PC += 4;
+
+                if (this.Pipeline.Count == 2)
+                {
+                    this.ExecuteARM(this.Pipeline.Dequeue());
+                }
             }
+            else
+            {
+                this.Pipeline.Enqueue(this.GetAt<ushort>(this.PC));
+                this.PC += 2;
+
+                if (this.Pipeline.Count == 2)
+                {
+                    throw new NotImplementedException();
+                    // this.ExecuteTHUMB(this.Pipeline.Dequeue());
+                }
+            }
+        }
+
+        private void Error(string message)
+        {
+            Console.Error.WriteLine("Error: " + message);
+        }
+
+        private void Log(string message)
+        {
+            Console.WriteLine(message);
         }
     }
 }

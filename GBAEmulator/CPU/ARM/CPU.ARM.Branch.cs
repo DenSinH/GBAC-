@@ -8,9 +8,9 @@ namespace GBAEmulator.CPU
         private void BX(uint Instruction)
         {
             // Branch & Exchange instruction
-            uint Rn = this.Registers[Instruction & 0x0f];
-            this.state = (State)(Rn & 0x01);
-            this.PC = Rn;
+            byte Rn = (byte)(Instruction & 0x0f);
+            this.state = (State)(this.Registers[Rn] & 0x01);
+            this.PC = this.Registers[Rn] - (this.Registers[Rn] & 0x01);
             this.PipelineFlush();
 
             // 2S + 1N cycles

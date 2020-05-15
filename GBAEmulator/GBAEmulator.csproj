@@ -64,16 +64,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CPU\ARM\CPU.Instructions.DataProcessing.cs" />
-    <Compile Include="CPU\ARM\CPU.Instructions.Multiply.cs" />
-    <Compile Include="CPU\ARM\CPU.Instructions.PSRTransfer.cs" />
-    <Compile Include="CPU\ARM\CPU.Instructions.SingleDataTransfer.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.BlockDataTransfer.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.DataProcessing.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.DataTransfer.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.Multiply.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.PSRTransfer.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.SingleDataTransfer.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.SWP.cs" />
     <Compile Include="CPU\CPU.Aux.cs" />
     <Compile Include="CPU\CPU.BIOS.cs" />
     <Compile Include="CPU\CPU.cs" />
     <Compile Include="CPU\CPU.Exceptions.cs" />
-    <Compile Include="CPU\ARM\CPU.Instructions.Branch.cs" />
-    <Compile Include="CPU\CPU.Instructions.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.Branch.cs" />
+    <Compile Include="CPU\ARM\CPU.ARM.cs" />
     <Compile Include="CPU\CPU.Memory.cs" />
     <Compile Include="CPU\CPU.Testing.cs" />
     <Compile Include="Visual.cs">

@@ -6,14 +6,15 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        public void TestGBASuiteARM()
+        public void TestGBASuite(string state)
         {
-            this.LoadRom("../../Tests/GBASuite/arm.gba");
+            this.LoadRom(string.Format("../../Tests/GBASuite/{0}.gba", state));
             this.SkipBios();
 
-            StreamReader file = new StreamReader("../../Tests/GBASuite/arm.log");
+            StreamReader file = new StreamReader(string.Format("../../Tests/GBASuite/{0}.log", state));
             string line;
             string[] splitline;
+            // address,instruction,cpsr,r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,cycles
             bool[] equal = new bool[19];  // don't care about cycles yet
             equal[0] = true;  // PC is slightly off for me as I don't track the address of the current instruction
 
@@ -39,8 +40,8 @@ namespace GBAEmulator.CPU
                     {
                         if (!equal[i])
                         {
-                            Console.WriteLine("ERROR: " + line);
-                            Console.Write(string.Format("Mistake in {0}:  ", i));
+                            Console.WriteLine(          "ERROR logfile: " + line);
+                            Console.Write(string.Format("Mistake in {0}: ", i.ToString("d2")));
                             break;
                         }
                     }

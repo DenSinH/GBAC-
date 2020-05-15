@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
 
-        private uint ARMShiftRegisterBasedOperand(uint Op2, bool ImmediateShift, byte ShiftType, byte ShiftAmount, bool SetConditions)
+        private uint ARMShiftRegisterBasedOperand(uint Op, bool ImmediateShift, byte ShiftType, byte ShiftAmount, bool SetConditions)
         {
             // Special cases for 0 shift
             if (ShiftAmount == 0 && ImmediateShift)
@@ -25,8 +25,8 @@ namespace GBAEmulator.CPU
                         break;
                     case 0b11:  // Rotate Right
                                 // Interpreted as RRX#1
-                        byte newC = (byte)(Op2 & 0x01);
-                        Op2 = (Op2 >> 1) | (uint)(this.C << 31);
+                        byte newC = (byte)(Op & 0x01);
+                        Op = (Op >> 1) | (uint)(this.C << 31);
                         this.C = newC;
                         // Leave ShiftAmount = 0 so that no additional shift is applied
                         break;
@@ -43,41 +43,41 @@ namespace GBAEmulator.CPU
                     case 0b00:  // Logical Left
                         if (SetConditions)
                         {
-                            C = (byte)((Op2 >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
+                            C = (byte)((Op >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
                         }
-                        Op2 <<= ShiftAmount;
+                        Op <<= ShiftAmount;
                         break;
                     case 0b01:  // Logical Right
                         if (SetConditions)
                         {
-                            C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
+                            C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
                         }
-                        Op2 >>= ShiftAmount;
+                        Op >>= ShiftAmount;
                         break;
                     case 0b10:  // Arithmetic Right
                         if (SetConditions)
                         {
-                            C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                            C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                         }
-                        bool Bit31 = (Op2 & 0x8000_0000) > 0;
-                        Op2 >>= ShiftAmount;
+                        bool Bit31 = (Op & 0x8000_0000) > 0;
+                        Op >>= ShiftAmount;
                         if (Bit31)
                         {
-                            Op2 |= (uint)(((1 << ShiftAmount) - 1) << (32 - ShiftAmount));
+                            Op |= (uint)(((1 << ShiftAmount) - 1) << (32 - ShiftAmount));
                         }
                         break;
                     case 0b11:  // Rotate Right
                         if (SetConditions)
                         {
-                            C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                            C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                         }
                         ShiftAmount &= 0x1f;  // mod 32 gives same result
-                        Op2 = (uint)((Op2 >> ShiftAmount) | ((Op2 & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
+                        Op = (uint)((Op >> ShiftAmount) | ((Op & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
                         break;
                 }
             }
 
-            return Op2;
+            return Op;
         }
 
         private void DataProcessing(uint Instruction)
@@ -120,7 +120,7 @@ namespace GBAEmulator.CPU
                      prefetching. If the shift amount is specified in the instruction, the PC will be 8 bytes
                      ahead. If a register is used to specify the shift amount the PC will be 12 bytes ahead.
                     */
-
+                    Op2 += 4;  // My PC is always 8 bytes ahead of the instruction.
                 }
                 // Shift amount is either bottom byte of register or immediate value
                 byte ShiftAmount = (byte)(ImmediateShift ? ((Instruction & 0xf80) >> 7) : this.Registers[(Instruction & 0xf00) >> 8] & 0xff);
@@ -146,7 +146,7 @@ namespace GBAEmulator.CPU
 
             uint Result;
             ulong temp;
-
+            
             switch ((Instruction & 0x01e0_0000) >> 21)
             {
                 case 0b0000:  // AND
@@ -213,25 +213,23 @@ namespace GBAEmulator.CPU
                     break;
                 case 0b1000:  // TST
                     Result = Op1 & Op2;
+                    SetConditions = true;
                     break;
                 case 0b1001:  // TEQ
                     Result = Op1 ^ Op2;
+                    SetConditions = true;
                     break;
                 case 0b1010:  // CMP
                     Result = Op1 - Op2;
-                    if (SetConditions)
-                    {
-                        this.C = (byte)(Op2 <= Op1 ? 1 : 0);
-                        this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
-                    }
+                    SetConditions = true;
+                    this.C = (byte)(Op2 <= Op1 ? 1 : 0);
+                    this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
                     break;
                 case 0b1011:  // CMN
                     Result = Op1 + Op2;
-                    if (SetConditions)
-                    {
-                        this.C = (byte)(Op1 + Op2 > 0xffff_ffff ? 1 : 0);
-                        this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
-                    }
+                    SetConditions = true;
+                    this.C = (byte)(Op1 + Op2 > 0xffff_ffff ? 1 : 0);
+                    this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
                     break;
                 case 0b1100:  // ORR
                     Result = Op1 | Op2;

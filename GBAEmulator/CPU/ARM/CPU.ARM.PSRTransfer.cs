@@ -86,11 +86,11 @@ namespace GBAEmulator.CPU
 
             if ((Instruction & 0x0040_0000) > 0)  // destination PSR bit
             {
-                SPSR = (SPSR & 0xffff_ff00) | (Operand & 0x0000_00ff);
+                SPSR = (SPSR & 0x00ff_ffff) | (Operand & 0xff00_0000);
             }
             else
             {
-                CPSR = (CPSR & 0xffff_ff00) | (Operand & 0x0000_00ff);
+                CPSR = (CPSR & 0x00ff_ffff) | (Operand & 0xff00_0000);
             }
         }
     }
