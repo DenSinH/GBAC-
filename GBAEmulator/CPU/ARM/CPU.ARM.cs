@@ -13,6 +13,7 @@ namespace GBAEmulator.CPU
         {
             for (uint Instruction = 0; Instruction < 0x1000; Instruction++)
             {
+                // Bits 27-20 and 7-4 of an instruction
                 switch ((Instruction & 0xc00) >> 10)
                 {
                     case 0b00:
@@ -47,22 +48,22 @@ namespace GBAEmulator.CPU
                             // Halfword Data Transfer: Immediate Offset
                             this.ARMInstructions[Instruction] = this.Halfword_SignedDataTransfer;
                         }
-                        else if ((Instruction & 0xfbf) == 0x100)
-                        {
-                            // MRS (transfer PSR contents to a register)
-                            this.ARMInstructions[Instruction] = this.MRS;
-                        }
-                        else if ((Instruction & 0xfbf) == 0x120)
-                        {
-                            // MSR (transfer register contents to PSR)
-                            this.ARMInstructions[Instruction] = this.MSR_all;
-                        }
-                        else if (((Instruction & 0xfbf) == 0x120) || ((Instruction & 0xfb0) == 0x320))
-                        {
-                            // MSR (transfer register contents or immediate value to PSR flag bits only)
-                            // I is not set / I is set
-                            this.ARMInstructions[Instruction] = this.MSR_flags;
-                        }
+                        //else if ((Instruction & 0xfbf) == 0x100)
+                        //{
+                        //    // MRS (transfer PSR contents to a register)
+                        //    this.ARMInstructions[Instruction] = this.MRS;
+                        //}
+                        //else if ((Instruction & 0xfbf) == 0x120)
+                        //{
+                        //    // MSR (transfer register contents to PSR)
+                        //    this.ARMInstructions[Instruction] = this.MSR_all;
+                        //}
+                        //else if (((Instruction & 0xfbf) == 0x120) || ((Instruction & 0xfb0) == 0x320))
+                        //{
+                        //    // MSR (transfer register contents or immediate value to PSR flag bits only)
+                        //    // I is not set / I is set
+                        //    this.ARMInstructions[Instruction] = this.MSR_flags;
+                        //}
                         else
                         {
                             // Data Processing

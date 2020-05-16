@@ -10,7 +10,7 @@ namespace GBAEmulator.CPU
             byte opcode, Rd, Offset8;
             uint Result;
 
-            opcode = (byte)((Instruction & 1800) >> 11);
+            opcode = (byte)((Instruction & 0x1800) >> 11);
             Rd = (byte)((Instruction & 0x0700) >> 8);  // Source/Destination register
             Offset8 = (byte)(Instruction & 0x00ff);
 

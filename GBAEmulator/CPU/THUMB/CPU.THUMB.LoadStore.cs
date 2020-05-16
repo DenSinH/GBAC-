@@ -15,7 +15,7 @@ namespace GBAEmulator.CPU
             Rb = (byte)((Instruction & 0x0038) >> 3);  // Base Register
             Rd = (byte)(Instruction & 0x0007);         // Source/Destination Register
 
-            if ((Instruction & 0x0200) > 0)
+            if ((Instruction & 0x0200) == 0)
             {
                 // Load/Store with register offset
                 this.Log("THUMB Load/Store with register offset");
@@ -24,8 +24,10 @@ namespace GBAEmulator.CPU
                 LoadFromMemory = (Instruction & 0x0800) > 0;
                 ByteQuantity = (Instruction & 0x0400) > 0;
 
+                Console.WriteLine(ByteQuantity);
+
                 uint Address = this.Registers[Rb] + this.Registers[Ro];
-                if (LoadFromMemory)
+                if (!LoadFromMemory)
                 {
                     if (ByteQuantity)
                         this.SetAt<byte>(Address, (byte)this.Registers[Rd]);

@@ -26,8 +26,10 @@ namespace GBAEmulator.CPU
 
             For me, PC is always 4 ahead in THUMB mode, so I don't need to account for this offset
             */
+            if (Rd == 15)
+                Op1 &= 0xffff_fffe;
             if (Rs == 15)
-                Op2 &= 0xffff_fffe; 
+                Op2 &= 0xffff_fffe;
 
             /*
              In this group only CMP (Op = 01) sets the CPSR condition codes.
@@ -39,6 +41,12 @@ namespace GBAEmulator.CPU
             {
                 case 0b00:
                     this.Registers[Rd] = Op1 + Op2;
+                    if (Rd == 15)
+                    {
+                        this.PipelineFlush();
+                        // todo: do this?
+                        this.PC &= 0xffff_fffe;
+                    }
                     break;
                 case 0b01:
                     Result = Op1 - Op2;
@@ -47,6 +55,12 @@ namespace GBAEmulator.CPU
                     break;
                 case 0b10:
                     this.Registers[Rd] = Op2;
+                    if (Rd == 15)
+                    {
+                        this.PipelineFlush();
+                        // todo: do this?
+                        this.PC &= 0xffff_fffe;
+                    }
                     break;
                 case 0b11:
                     this.BX(Instruction);

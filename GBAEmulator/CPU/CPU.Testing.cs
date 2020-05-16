@@ -17,7 +17,7 @@ namespace GBAEmulator.CPU
             // address,instruction,cpsr,r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,cycles
             bool[] equal = new bool[19];  // don't care about cycles yet
             equal[0] = true;  // PC is slightly off for me as I don't track the address of the current instruction
-
+            
             int step = 0;
             while (true)
             {

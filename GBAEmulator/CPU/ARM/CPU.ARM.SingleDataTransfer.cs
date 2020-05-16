@@ -38,7 +38,7 @@ namespace GBAEmulator.CPU
                 byte ShiftAmount = (byte)(this.Registers[(Instruction & 0xf00) >> 8] & 0xff);
 
                 // todo: are cpsr flags affected?
-                Offset = ARMShiftRegisterBasedOperand(Offset, true, (byte)((Instruction & 0x60) >> 4), ShiftAmount, false);
+                Offset = ShiftOperand(Offset, true, (byte)((Instruction & 0x60) >> 4), ShiftAmount, false);
             }
             else
             {
@@ -69,6 +69,9 @@ namespace GBAEmulator.CPU
                     // todo: actually garbage?
                     this.Registers[Rd] = this.GetAt<uint>(Address);
                 }
+
+                if (Rd == 15)
+                    this.PipelineFlush();
             }
             else
             {

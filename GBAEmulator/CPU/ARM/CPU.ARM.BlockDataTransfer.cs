@@ -140,6 +140,9 @@ namespace GBAEmulator.CPU
                     if (!PreIndex)
                         CurrentAddress += 4;
                 }
+
+                if (Register == 15)
+                    this.PipelineFlush();  // Flush pipeline when changing PC
             }
 
             if (PSR_ForceUser)

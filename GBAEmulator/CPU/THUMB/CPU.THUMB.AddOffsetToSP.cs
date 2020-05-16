@@ -10,7 +10,7 @@ namespace GBAEmulator.CPU
             bool Sign;
             uint SWord7;
 
-            Sign = (Instruction & 0x0800) > 0;
+            Sign = (Instruction & 0x0080) > 0;
             SWord7 = (uint)(Instruction & 0x007f) << 2;
 
             if (Sign)

@@ -20,7 +20,7 @@ namespace GBAEmulator.CPU
             Condition = (byte)((Instruction & 0x0f00) >> 8);
             SOffset8 = (uint)(Instruction & 0x00ff) << 1;
 
-            int SignedOffset = (int)(((SOffset8 & 0x100) > 0) ? -(SOffset8 & 0xff) : (SOffset8 & 0xff));
+            int SignedOffset = (int)(((SOffset8 & 0x100) > 0) ? ((int)SOffset8 - 0x200) : (int)SOffset8);
 
             /*
              Cond = 1110 is undefined, and should not be used.
@@ -42,7 +42,7 @@ namespace GBAEmulator.CPU
                 if (this.ARMCondition(Condition))
                 {
                     this.PC = (uint)(this.PC + SignedOffset);
-                    this.PC |= 1;  // THUMB mode bit
+                    this.PipelineFlush();
                 }
             }
         }
@@ -56,13 +56,14 @@ namespace GBAEmulator.CPU
              the Offset11 field.
             */
             ushort Offset11 = (ushort)((Instruction & 0x07ff) << 1);
-            int TrueOffset = ((Offset11 & 0x0800) > 0) ? -(Offset11 & 0x07ff) : (Offset11 & 0x07ff);
-            this.PC = (uint)(this.PC + TrueOffset);
-            this.PC |= 1;  // THUMB mode bit
+            int TrueOffset = ((Offset11 & 0x0800) > 0) ? (Offset11 - 0x1000) : Offset11;
+            this.PC = (uint)(this.PC + TrueOffset) & 0xffff_fffe;
+            this.PipelineFlush();
         }
 
         private void LongBranchWithLink(ushort Instruction)
         {
+            this.Log("THUMB Long Branch With Link");
             bool H;
             uint Offset;
 
@@ -72,14 +73,18 @@ namespace GBAEmulator.CPU
             if (!H)
             {
                 // First Instruction - LR = PC+4+(nn SHL 12)
-                LR = PC + (Offset << 12) + 4;
+                // PC + 4 is just because it's 2 instructions ahead in the above description
+                int TrueOffset = (int)((Offset & 0x400) > 0 ? ((int)Offset - 0x800) : (int)Offset);
+                Console.WriteLine(TrueOffset.ToString("x"));
+                LR = (uint)(PC + (TrueOffset << 12));
             }
             else
             {
                 // Second Instruction - PC = LR + (nn SHL 1), and LR = PC+2 OR 1
-                uint temp = PC;
+                uint temp = PC - 2;  // PC is 4 instructions ahead, 
                 PC = LR + (Offset << 1);
-                LR = (temp + 2) | 1;
+                LR = temp | 1;
+                this.PipelineFlush();
             }
         }
     }

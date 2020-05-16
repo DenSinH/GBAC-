@@ -32,6 +32,7 @@ namespace GBAEmulator.CPU
                 {
                     PC = this.GetAt<uint>(SP);
                     SP += 4;
+                    this.PipelineFlush();
                 }
             }
             else

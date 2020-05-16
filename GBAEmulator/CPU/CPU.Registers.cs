@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GBAEmulator.CPU
 {
@@ -20,7 +21,8 @@ namespace GBAEmulator.CPU
                 return;
 
             bool FIQInvolved = (this.mode == Mode.FIQ) || (NewMode == Mode.FIQ);
-            
+
+            Console.WriteLine("new mode" + NewMode);
             // Bank current registers
             for (int i = FIQInvolved ? 8 : 13; i <= 14; i++)
             {
@@ -68,7 +70,7 @@ namespace GBAEmulator.CPU
         {
             get
             {
-                switch (mode)
+                switch (this.mode)
                 {
                     case Mode.FIQ:
                         return SPSR_fiq;
@@ -81,12 +83,13 @@ namespace GBAEmulator.CPU
                     case Mode.Undefined:
                         return SPSR_und;
                     default:
+                        this.Error(string.Format("No SPSR for mode {0}", this.mode));
                         return 0;
                 }
             }
             set
             {
-                switch (mode)
+                switch (this.mode)
                 {
                     case Mode.FIQ:
                         SPSR_fiq = value;
@@ -104,6 +107,7 @@ namespace GBAEmulator.CPU
                         SPSR_und = value;
                         return;
                     default:
+                        this.Error(string.Format("No SPSR for mode {0}", this.mode));
                         return;
                 }
             }
@@ -135,7 +139,7 @@ namespace GBAEmulator.CPU
 		private uint LR
         {
             get => Registers[14];
-            set => Registers[15] = value;
+            set => Registers[14] = value;
         }
 		
     }

@@ -116,14 +116,14 @@ namespace GBAEmulator.CPU
         }
 
         /* Storing the functions that get / set specific data length values from memory */
-        private static Action<byte[], uint, IConvertible>[] SetData =
+        private static readonly Action<byte[], uint, IConvertible>[] SetData =
         {
                 (byte[] memory, uint address, IConvertible value) => { memory[address] = (byte)value; },
                 (byte[] memory, uint address, IConvertible value) => SetHalfWordAt(memory, address, (ushort)value),
                 (byte[] memory, uint address, IConvertible value) => SetWordAt(memory, address, (uint)value)
         };
 
-        private static Func<byte[], uint, IConvertible>[] GetData =
+        private static readonly Func<byte[], uint, IConvertible>[] GetData =
         {
                 (byte[] memory, uint address) => memory[address],
                 (byte[] memory, uint address) => GetHalfWordAt(memory, address),

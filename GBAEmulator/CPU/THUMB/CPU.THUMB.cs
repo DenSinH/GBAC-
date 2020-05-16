@@ -9,6 +9,7 @@ namespace GBAEmulator.CPU
 
         private void InitTHUMB()
         {
+            // Top 6 bits for hashing
             for (byte i = 0; i < 64; i++)
             {
                 if ((i & 0b111110) == 0b000110)
@@ -17,6 +18,8 @@ namespace GBAEmulator.CPU
                     this.THUMBInstructions[i] = this.MoveShiftedRegister;
                 else if ((i & 0b111000) == 0b001000)
                     this.THUMBInstructions[i] = this.MovCmpAddSubImmediate;
+                else if (i == 0b010000)
+                    this.THUMBInstructions[i] = this.ALUOperations;
                 else if ((i & 0b111111) == 0b010001)
                     this.THUMBInstructions[i] = this.HiReg_BX;
                 else if ((i & 0b111110) == 0b010010)
@@ -42,8 +45,11 @@ namespace GBAEmulator.CPU
                     this.THUMBInstructions[i] = this.ConditionalBranch;
                 else if ((i & 0b111110) == 0b111000)
                     this.THUMBInstructions[i] = this.UnconditionalBranch;
-                else
+                else if ((i & 0b111100) == 0b111100)
                     this.THUMBInstructions[i] = this.LongBranchWithLink;
+                else
+                    // todo: undefined
+                    this.THUMBInstructions[i] = (ushort _) => throw new NotImplementedException("Undefined THUMB instruction");
             }
             // initialize THUMB instructions
         }
