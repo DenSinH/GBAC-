@@ -6,6 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void ALUOperations(ushort Instruction)
         {
+            this.Log("THUMB ALU Operations");
             byte Opcode, Rs, Rd;
             uint Result;
 
@@ -48,15 +49,13 @@ namespace GBAEmulator.CPU
                     break;
                 case 0b0101:  // ADC
                     Result = Op1 + Op2 + this.C;
-                    this.C = (byte)(Op1 + Op2 + this.C > 0xffff_ffff ? 1 : 0);
-                    this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ (Op2 + C))) >> 31);
+                    this.SetCVAdd(Op1, (ulong)Op2 + this.C, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0110:  // SBC
                     uint temp = Op2 - C + 1;
                     Result = (uint)(Op1 - temp);
-                    this.C = (byte)(temp <= Op1 ? 1 : 0);
-                    this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
+                    this.SetCVSub(Op1, temp, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0111:  // ROR
@@ -74,13 +73,11 @@ namespace GBAEmulator.CPU
                     break;
                 case 0b1010:  // CMP
                     Result = Op1 - Op2;
-                    this.C = (byte)(Op2 <= Op1 ? 1 : 0);
-                    this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
+                    this.SetCVSub(Op1, Op2, Result);
                     break;
                 case 0b1011:  // CMN
                     Result = Op1 + Op2;
-                    this.C = (byte)(Op1 + Op2 > 0xffff_ffff ? 1 : 0);
-                    this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
+                    this.SetCVAdd(Op1, Op2, Result);
                     break;
                 case 0b1100:  // ORR
                     Result = Op1 | Op2;

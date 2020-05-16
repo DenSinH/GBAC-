@@ -161,7 +161,7 @@ namespace GBAEmulator.CPU
                 case 0b1110:  // AL
                     return true;
                 default:
-                    throw new Exception(string.Format("Condition field {0:b4} reserved/invalid", field));
+                    throw new Exception(string.Format("Condition field {0} reserved/invalid", field));
             }
         }
 

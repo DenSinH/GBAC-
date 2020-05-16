@@ -79,8 +79,7 @@ namespace GBAEmulator.CPU
 
                 if (this.Pipeline.Count == 2)
                 {
-                    throw new NotImplementedException();
-                    // this.ExecuteTHUMB(this.Pipeline.Dequeue());
+                    this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
                 }
             }
         }

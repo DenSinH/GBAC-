@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void Halfword_SignedDataTransfer(uint Instruction)
         {
-            this.Log("Halfword Data Transfer");
+            this.Log("ARM Halfword Data Transfer");
             bool PreIndex, Up, WriteBack, LoadFromMemory;
             byte Rn, Rd, SH;
             uint Address, Offset;

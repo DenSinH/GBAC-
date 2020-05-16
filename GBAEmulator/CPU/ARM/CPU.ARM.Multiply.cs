@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void Multiply(uint Instruction)
         {
-            this.Log("Multiply");
+            this.Log("ARM Multiply");
 
             bool Accumulate, SetCondition;
             byte Rd, Rn, Rs, Rm;
@@ -39,7 +39,7 @@ namespace GBAEmulator.CPU
 
         private void MultiplyLong(uint Instruction)
         {
-            this.Log("Multiply long");
+            this.Log("ARM Multiply long");
 
             /*
              • R15 must not be used as an operand or as a destination register.

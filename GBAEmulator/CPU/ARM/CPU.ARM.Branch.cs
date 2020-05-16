@@ -8,12 +8,18 @@ namespace GBAEmulator.CPU
         private void BX(uint Instruction)
         {
             // Branch & Exchange instruction
-            this.Log("BX");
-
             byte Rn = (byte)(Instruction & 0x0f);
-            this.state = (State)(this.Registers[Rn] & 0x01);
-            this.PC = this.Registers[Rn] - (this.Registers[Rn] & 0x01);
+            uint Target = this.Registers[Rn];
+            this.state = (State)(Target & 0x01);
+            this.PC = Target & 0xffff_fffc;  // Allow for pre-fetch
             this.PipelineFlush();
+
+            //if (this.state == State.ARM)
+            //    this.PC -= 4;
+            //else
+            //    this.PC -= 2;
+
+            this.Log("ARM BX: new state: " + this.state);
 
             // 2S + 1N cycles
         }
@@ -21,11 +27,11 @@ namespace GBAEmulator.CPU
         private void Branch(uint Instruction)
         {
             // Branch / Branch with Link
-            this.Log("Branch");
+            this.Log("ARM Branch");
 
             if ((Instruction & 0x0100_0000) > 0)  // Link bit
             {
-                this.Registers[14] = this.PC - 2;  // Allow for prefetch, PC is 3 ahead (Prefetch /Decode/ Execute), just prefetched this + 3
+                this.Registers[14] = (this.PC & 0xffff_fffc) - 4;  // PC is 8 ahead (Prefetch /Decode/ Execute), should be 4
             }
 
             uint Offset = Instruction & 0xff_ffff;  // 24 bit offset

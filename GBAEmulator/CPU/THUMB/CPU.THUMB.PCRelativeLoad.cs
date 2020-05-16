@@ -6,6 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void PCRelativeLoad(ushort Instruction)
         {
+            this.Log("THUMB PC relative load");
             byte Rd;
             uint Address;
 

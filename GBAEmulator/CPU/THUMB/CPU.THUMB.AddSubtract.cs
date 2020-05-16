@@ -6,6 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void AddSubtract(ushort Instruction)
         {
+            this.Log("THUMB Add Subtract");
             bool ImmediateOperand, Sub;
             byte Rs, Rd;
             uint Operand, Result;
@@ -28,14 +29,12 @@ namespace GBAEmulator.CPU
             if (Sub)
             {
                 Result = this.Registers[Rs] - Operand;
-                this.C = (byte)(Operand <= this.Registers[Rs] ? 1 : 0);
-                this.V = (byte)(((this.Registers[Rs] ^ Operand) & (~Operand ^ Result)) >> 31);
+                this.SetCVSub(this.Registers[Rs], Operand, Result);
             }
             else
             {
                 Result = this.Registers[Rs] + Operand;
-                this.C = (byte)(this.Registers[Rs] + Operand > 0xffff_ffff ? 1 : 0);
-                this.V = (byte)((this.Registers[Rs] ^ Result) & (~(this.Registers[Rs] ^ Operand)) >> 31);
+                this.SetCVAdd(this.Registers[Rs], Operand, Result);
             }
             this.Registers[Rd] = Result;
 

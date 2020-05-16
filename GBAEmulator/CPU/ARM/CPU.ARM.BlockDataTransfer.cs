@@ -7,7 +7,7 @@ namespace GBAEmulator.CPU
     {
         private void BlockDataTransfer(uint Instruction)
         {
-            this.Log("Block Data Transfer");
+            this.Log("ARM Block Data Transfer");
 
             bool PreIndex, Up, PSR_ForceUser, WriteBack, LoadFromMemory;
             byte Rn;  // Base register

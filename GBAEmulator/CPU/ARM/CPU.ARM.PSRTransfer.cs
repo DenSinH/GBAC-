@@ -43,7 +43,7 @@ namespace GBAEmulator.CPU
            */
         private void MRS(uint Instruction)
         {
-            this.Log("MRS");
+            this.Log("ARM MRS");
             byte Rd = (byte)((Instruction & 0xf000) >> 12);
             if ((Instruction & 0x0040_0000) > 0)  // source PSR bit
             {
@@ -57,7 +57,7 @@ namespace GBAEmulator.CPU
 
         private void MSR_all(uint Instruction)
         {
-            this.Log("MSR_all");
+            this.Log("ARM MSR_all");
             byte Rd = (byte)((Instruction & 0xf000) >> 12);
             if ((Instruction & 0x0040_0000) > 0)  // destination PSR bit
             {
@@ -71,7 +71,7 @@ namespace GBAEmulator.CPU
 
         private void MSR_flags(uint Instruction)
         {
-            this.Log("MSR_flags");
+            this.Log("ARM MSR_flags");
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             uint Operand;
 

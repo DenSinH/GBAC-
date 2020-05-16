@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void SingleDataTransfer(uint Instruction)
         {
-            this.Log("Single Data Transfer");
+            this.Log("ARM Single Data Transfer");
 
             bool RegisterOffset, PreIndex, Up, ByteQuantity, WriteBack, LoadFromMemory;
             byte Rn, Rd;

@@ -6,14 +6,15 @@ namespace GBAEmulator.CPU
     {
         private void HiReg_BX(ushort Instruction)
         {
+            this.Log("THUMB Hi Register Operations / BX");
             byte Opcode, Rs, Rd;
             bool H1, H2;
 
             Opcode = (byte)((Instruction & 0x0300) >> 8);
             H1 = (Instruction & 0x0080) > 0;
             H2 = (Instruction & 0x0040) > 0;
-            Rs = (byte)(((Instruction & 0x0038) >> 3) | (H1 ? 8 : 0));  // Source Register
-            Rd = (byte)((Instruction & 0x0007) | (H2 ? 8 : 0));  // Destination Register
+            Rs = (byte)(((Instruction & 0x0038) >> 3) | (H2 ? 8 : 0));  // Source Register
+            Rd = (byte)((Instruction & 0x0007) | (H1 ? 8 : 0));  // Destination Register
 
             uint Op1, Op2, Result;
             Op1 = this.Registers[Rd];
@@ -25,7 +26,7 @@ namespace GBAEmulator.CPU
 
             For me, PC is always 4 ahead in THUMB mode, so I don't need to account for this offset
             */
-            if (Op2 == 15)
+            if (Rs == 15)
                 Op2 &= 0xffff_fffe; 
 
             /*
@@ -41,8 +42,7 @@ namespace GBAEmulator.CPU
                     break;
                 case 0b01:
                     Result = Op1 - Op2;
-                    this.C = (byte)(Op2 <= Op1 ? 1 : 0);
-                    this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
+                    this.SetCVSub(Op1, Op2, Result);
                     this.SetNZ(Result);
                     break;
                 case 0b10:
@@ -52,7 +52,6 @@ namespace GBAEmulator.CPU
                     this.BX(Instruction);
                     break;
             }
-
         }
     }
 }

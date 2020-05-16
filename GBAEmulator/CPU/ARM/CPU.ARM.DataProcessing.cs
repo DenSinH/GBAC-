@@ -38,51 +38,87 @@ namespace GBAEmulator.CPU
             //     and the flags are not affected
             if (ShiftAmount != 0)
             {
+                byte newC = this.C;
                 switch (ShiftType)  // Shift type
                 {
                     case 0b00:  // Logical Left
-                        if (SetConditions)
+                        newC = (byte)((Op >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
+                        if (ShiftAmount >= 32)
                         {
-                            this.C = (byte)((Op >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
+                            Op = 0;
                         }
-                        Op <<= ShiftAmount;
+                        else
+                        {
+                            Op <<= ShiftAmount;
+                        }
                         break;
                     case 0b01:  // Logical Right
-                        if (SetConditions)
+                        newC = this.C;
+
+                        if (ShiftAmount < 32)
                         {
-                            this.C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
+                            newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
+                            Op >>= ShiftAmount;
                         }
-                        Op >>= ShiftAmount;
+                        else if (ShiftAmount == 32)
+                        {
+                            newC = (byte)((Op >> 31) & 0x01);
+                            Op = 0;
+                        }
+                        else
+                        {
+                            newC = 0;
+                            Op = 0;
+                        }
                         break;
                     case 0b10:  // Arithmetic Right
-                        if (SetConditions)
+                        if (ShiftAmount < 32)
                         {
-                            this.C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                            newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                            bool Bit31 = (Op & 0x8000_0000) > 0;
+                            Op >>= ShiftAmount;
+                            if (Bit31)
+                            {
+                                Op |= (uint)(((1 << ShiftAmount) - 1) << (32 - ShiftAmount));
+                            }
                         }
-                        bool Bit31 = (Op & 0x8000_0000) > 0;
-                        Op >>= ShiftAmount;
-                        if (Bit31)
+                        else
                         {
-                            Op |= (uint)(((1 << ShiftAmount) - 1) << (32 - ShiftAmount));
+                            Op = (Op & 0x8000_0000) > 0 ? 0xffff_ffff : 0;
+                            newC = (byte)(Op & 0x01);
                         }
+
                         break;
                     case 0b11:  // Rotate Right
-                        if (SetConditions)
-                        {
-                            this.C = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
-                        }
+                        newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                         ShiftAmount &= 0x1f;  // mod 32 gives same result
                         Op = (uint)((Op >> ShiftAmount) | ((Op & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
                         break;
                 }
-            }
 
+                if (SetConditions)
+                {
+                    C = newC;
+                }
+            }
             return Op;
+        }
+
+        private void SetCVAdd(ulong Op1, ulong Op2, uint Result)
+        {
+            this.C = (byte)((ulong)Op1 + Op2 > 0xffff_ffff ? 1 : 0);
+            this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
+        }
+
+        private void SetCVSub(ulong Op1, ulong Op2, uint Result)
+        {
+            this.C = (byte)(Op2 <= Op1 ? 1 : 0);
+            this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
         }
 
         private void DataProcessing(uint Instruction)
         {
-            this.Log("Data Processing");
+            this.Log("ARM Data Processing");
 
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             byte OpCode = (byte)((Instruction & 0x01e0_0000) >> 21);
@@ -108,6 +144,7 @@ namespace GBAEmulator.CPU
             if (Rd == 15)
             {
                 SetConditions = false;
+                this.PipelineFlush();
             }
 
             if (!ImmediateOperand)
@@ -163,8 +200,7 @@ namespace GBAEmulator.CPU
                     Result = Op1 - Op2;
                     if (SetConditions)
                     {
-                        this.C = (byte)(Op2 <= Op1 ? 1 : 0);
-                        this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
+                        this.SetCVSub(Op1, Op2, Result);
                     }
                     this.Registers[Rd] = Result;
                     break;
@@ -172,16 +208,14 @@ namespace GBAEmulator.CPU
                     Result = Op2 - Op1;
                     if (SetConditions)
                     {
-                        this.C = (byte)(Op1 <= Op2 ? 1 : 0);
-                        this.V = (byte)(((Op2 ^ Op1) & (~Op1 ^ Result)) >> 31);
+                        this.SetCVSub(Op2, Op1, Result);
                     }
                     break;
                 case 0b0100:  // ADD
                     Result = Op1 + Op2;
                     if (SetConditions)
                     {
-                        this.C = (byte)(Op1 + Op2 > 0xffff_ffff ? 1 : 0);
-                        this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
+                        this.SetCVAdd(Op1, Op2, Result);
                     }
                     this.Registers[Rd] = Result;
                     break;
@@ -189,17 +223,16 @@ namespace GBAEmulator.CPU
                     Result = Op1 + Op2 + C;
                     if (SetConditions)
                     {
-                        this.C = (byte)(Op1 + Op2 + C > 0xffff_ffff ? 1 : 0);
-                        this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ (Op2 + C))) >> 31);
+                        this.SetCVAdd(Op1, (ulong)Op2 + C, Result);
                     }
+                    this.Registers[Rd] = Result;
                     break;
                 case 0b0110:  // SBC
                     temp = Op2 - C + 1;
                     Result = (uint)(Op1 - temp);
                     if (SetConditions)
                     {
-                        this.C = (byte)(temp <= Op1 ? 1 : 0);
-                        this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
+                        this.SetCVSub(Op1, temp, Result);
                     }
                     this.Registers[Rd] = Result;
                     break;
@@ -208,8 +241,7 @@ namespace GBAEmulator.CPU
                     Result = (uint)(Op2 - temp);
                     if (SetConditions)
                     {
-                        this.C = (byte)(temp <= Op2 ? 1 : 0);
-                        this.V = (byte)(((Op2 ^ Op1) & (~Op1 ^ Result)) >> 31);
+                        this.SetCVSub(Op2, temp, Result);
                     }
                     this.Registers[Rd] = Result;
                     break;
@@ -224,14 +256,12 @@ namespace GBAEmulator.CPU
                 case 0b1010:  // CMP
                     Result = Op1 - Op2;
                     SetConditions = true;
-                    this.C = (byte)(Op2 <= Op1 ? 1 : 0);
-                    this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
+                    this.SetCVSub(Op1, Op2, Result);
                     break;
                 case 0b1011:  // CMN
                     Result = Op1 + Op2;
                     SetConditions = true;
-                    this.C = (byte)(Op1 + Op2 > 0xffff_ffff ? 1 : 0);
-                    this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
+                    this.SetCVAdd(Op1, Op2, Result);
                     break;
                 case 0b1100:  // ORR
                     Result = Op1 | Op2;
