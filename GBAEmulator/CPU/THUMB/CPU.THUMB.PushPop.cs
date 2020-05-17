@@ -31,7 +31,7 @@ namespace GBAEmulator.CPU
 
                 if (PCLR)
                 {
-                    PC = this.GetAt<uint>(SP);
+                    PC = this.GetAt<uint>(SP) & 0xffff_fffe;
                     SP += 4;
                     this.PipelineFlush();
                 }

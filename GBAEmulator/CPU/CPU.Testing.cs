@@ -29,6 +29,7 @@ namespace GBAEmulator.CPU
                     line = file.ReadLine();
                     if (line == null)
                     {
+                        Console.WriteLine("DONE!");
                         return;
                     }
 

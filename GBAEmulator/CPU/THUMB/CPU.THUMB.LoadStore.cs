@@ -88,7 +88,7 @@ namespace GBAEmulator.CPU
                     {
                         if ((Address & 0x01) == 1)  // misaligned
                         {
-                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address - 1);
+                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address);
                         }
                         else
                         {
@@ -109,7 +109,7 @@ namespace GBAEmulator.CPU
             ByteQuantity = (Instruction & 0x1000) > 0;
             LoadFromMemory = (Instruction & 0x0800) > 0;
             Offset5 = (byte)((Instruction & 0x07c0) >> 6);  // Offset value
-            Rb = (byte)((Instruction & 0x07c0) >> 6);       // Base Register
+            Rb = (byte)((Instruction & 0x0038) >> 3);       // Base Register
             Rd = (byte)(Instruction & 0x0007);              // Source/Destination Register
 
             /*
@@ -173,7 +173,7 @@ namespace GBAEmulator.CPU
                 if ((Address & 0x01) == 0)  // aligned
                     this.Registers[Rd] = this.GetAt<ushort>(Address);
                 else
-                    this.Registers[Rd] = (uint)(this.GetAt<byte>(Address) << 24) | this.GetAt<byte>(Address + 1);
+                    this.Registers[Rd] = (uint)(this.GetAt<byte>(Address - 1) << 24) | this.GetAt<byte>(Address);
             }
             else
             {
@@ -270,7 +270,10 @@ namespace GBAEmulator.CPU
                  Empty Rlist: R15 loaded/stored (ARMv4 only), and Rb=Rb+40h (ARMv4-v5).
                 */
                 if (LoadFromMemory)
-                    PC = this.GetAt<uint>(Address) | 1;
+                {
+                    PC = this.GetAt<uint>(Address);
+                    this.PipelineFlush();
+                }
                 else
                     this.SetAt<uint>(Address, PC + 2);  // My PC is 4 ahead, but it should be 6 in this case
 
@@ -287,7 +290,7 @@ namespace GBAEmulator.CPU
                         Address += 4;
                     }
                 }
-                // No writeback in this case
+                this.Registers[Rb] = Address;
             }
             else
             {

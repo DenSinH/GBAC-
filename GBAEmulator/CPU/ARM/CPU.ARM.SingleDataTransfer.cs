@@ -30,10 +30,11 @@ namespace GBAEmulator.CPU
              However, the register specified shift amounts are not available in this instruction class
              (Manual)
             */
-
+            
             if (RegisterOffset)
             {
                 Offset = this.Registers[Instruction & 0x0f];
+                Console.WriteLine("Rm"  + Offset.ToString("x"));
                 // However, the register specified shift amounts are not available in this instruction class
                 byte ShiftAmount = (byte)((Instruction & 0xf80) >> 7);
 
@@ -57,6 +58,14 @@ namespace GBAEmulator.CPU
                 }
             }
 
+            Console.WriteLine(Address.ToString("x"));
+            Console.WriteLine(LoadFromMemory);
+            Console.WriteLine(Rn);
+            Console.WriteLine(Rd);
+            Console.WriteLine(Offset.ToString("x"));
+            Console.WriteLine(ByteQuantity);
+            Console.WriteLine(WriteBack);
+
             if (LoadFromMemory)
             {
                 if (ByteQuantity)
@@ -68,6 +77,8 @@ namespace GBAEmulator.CPU
                     // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
                     uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
                     byte RotateAmount = (byte)((Address & 0x03) << 3);
+                    Console.WriteLine("RES" + Result.ToString("x"));
+                    Console.WriteLine(RotateAmount);
 
                     // ROR result for misaligned adresses
                     if (RotateAmount != 0)
@@ -88,23 +99,25 @@ namespace GBAEmulator.CPU
                  We reset this to 8 at the beginning, so we will have to undo that now here
                  */
                 if (Rn == 15)
-                {
                     Address += 4;
-                }
+
+                uint Value = this.Registers[Rd];
+                if (Rd == 15)
+                    Value += 4; 
+
 
                 if (ByteQuantity)
                 {
-                    this.SetAt<byte>(Address, (byte)(this.Registers[Rd] & 0x00ff));
+                    this.SetAt<byte>(Address, (byte)(Value & 0x00ff));
                 }
                 else
                 {
                     Address &= 0xffff_fffc;  // forced align for STR
-                    this.SetAt<uint>(Address, this.Registers[Rd]);
+                    this.SetAt<uint>(Address, Value);
                 }
-
             }
 
-            if (WriteBack || !PreIndex)
+            if ((WriteBack || !PreIndex) && !(Rn == Rd && LoadFromMemory))
             {
                 if (!PreIndex)
                 {

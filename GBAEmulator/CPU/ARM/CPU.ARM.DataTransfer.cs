@@ -93,7 +93,7 @@ namespace GBAEmulator.CPU
                     {
                         if ((Address & 0x01) == 1)
                         {
-                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address - 1);
+                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address);
                         }
                         else
                         {

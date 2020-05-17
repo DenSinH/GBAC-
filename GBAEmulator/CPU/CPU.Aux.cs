@@ -41,7 +41,8 @@
                                 // Interpreted as RRX#1
                         byte newC = (byte)(Op & 0x01);
                         Op = (Op >> 1) | (uint)(this.C << 31);
-                        this.C = newC;
+                        if (SetConditions)
+                            this.C = newC;
                         // Leave ShiftAmount = 0 so that no additional shift is applied
                         break;
                 }
