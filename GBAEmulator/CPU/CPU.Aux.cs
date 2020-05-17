@@ -124,5 +124,12 @@
             this.C = (byte)(Op2 <= Op1 ? 1 : 0);
             this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
         }
+
+        private uint ROR(uint Operand, byte RotateAmount)
+        {
+            RotateAmount &= 0x1f;
+            return (uint)((Operand >> RotateAmount) |
+                                           ((Operand & ((1 << RotateAmount) - 1)) << (32 - RotateAmount)));
+        }
     }
 }

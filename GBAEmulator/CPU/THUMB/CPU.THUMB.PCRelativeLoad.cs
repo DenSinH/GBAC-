@@ -21,8 +21,16 @@ namespace GBAEmulator.CPU
 
             My PC is always 4 bytes ahead, so I don't have to account for this difference.
             */
-            Address = (this.PC & 0xffff_fffc) + (uint)((Instruction & 0x00ff) << 2);
-            this.Registers[Rd] = this.GetAt<uint>(Address);
+            Address = (this.PC & 0xffff_fffe) + (uint)((Instruction & 0x00ff) << 2);
+            uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+
+            byte RotateAmount = (byte)((Address & 0x03) << 3);
+
+            // ROR result for misaligned addresses
+            if (RotateAmount != 0)
+                Result = this.ROR(Result, RotateAmount);
+
+            this.Registers[Rd] = Result;
         }
     }
 }

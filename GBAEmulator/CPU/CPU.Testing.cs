@@ -19,8 +19,10 @@ namespace GBAEmulator.CPU
             equal[0] = true;  // PC is slightly off for me as I don't track the address of the current instruction
             
             int step = 0;
+            bool mistake;
             while (true)
             {
+                mistake = false;
                 this.Step();
                 if (this.Pipeline.Count > 0)
                 {
@@ -43,6 +45,7 @@ namespace GBAEmulator.CPU
                         {
                             Console.WriteLine(          "ERROR logfile: " + line);
                             Console.Write(string.Format("Mistake in {0}: ", i.ToString("d2")));
+                            mistake = true;
                             break;
                         }
                     }
@@ -51,7 +54,9 @@ namespace GBAEmulator.CPU
                     + string.Join(",", this.Registers.Select(x => "0x" + x.ToString("X8")).ToArray()));
 
                     Console.WriteLine(step++);
-                    Console.ReadKey();
+
+                    if (mistake)
+                        Console.ReadKey();
                 }
             }
         }

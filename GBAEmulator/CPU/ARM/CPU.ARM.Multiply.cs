@@ -28,7 +28,8 @@ namespace GBAEmulator.CPU
                 this.Registers[Rd] = this.Registers[Rm] * this.Registers[Rs];
             }
 
-            this.SetNZ(this.Registers[Rd]);
+            if (SetCondition)
+                this.SetNZ(this.Registers[Rd]);
 
             /*
              Execution Time: 1S+mI for MUL, and 1S+(m+1)I for MLA.
@@ -60,13 +61,13 @@ namespace GBAEmulator.CPU
             {
                 if (Signed)
                 {
-                    long Result = (int)this.Registers[Rs] * (int)this.Registers[Rm];
+                    long Result = (long)(int)this.Registers[Rs] * (long)(int)this.Registers[Rm];
                     this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
                     this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
                 }
                 else
                 {
-                    ulong Result = this.Registers[Rs] * this.Registers[Rm];
+                    ulong Result = (ulong)this.Registers[Rs] * (ulong)this.Registers[Rm];
                     this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
                     this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
                 }
@@ -75,22 +76,25 @@ namespace GBAEmulator.CPU
             {
                 if (Signed)
                 {
-                    long RdHiRdLo = (this.Registers[RdHi] << 32) | (this.Registers[RdLo]);
-                    long Result = (int)this.Registers[Rs] * (int)this.Registers[Rm] + RdHiRdLo;
+                    long RdHiRdLo = ((long)(int)this.Registers[RdHi] << 32) | (long)(int)(this.Registers[RdLo]);
+                    long Result = (long)(int)this.Registers[Rs] * (long)(int)this.Registers[Rm] + RdHiRdLo;
                     this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
                     this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
                 }
                 else
                 {
-                    ulong RdHiRdLo = (this.Registers[RdHi] << 32) | (this.Registers[RdLo]);
-                    ulong Result = this.Registers[Rs] * this.Registers[Rm] + RdHiRdLo;
+                    ulong RdHiRdLo = ((ulong)this.Registers[RdHi] << 32) | (ulong)(this.Registers[RdLo]);
+                    ulong Result = (ulong)this.Registers[Rs] * (ulong)this.Registers[Rm] + RdHiRdLo;
                     this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
                     this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
                 }
             }
 
-            this.N = (byte)(((this.Registers[RdHi] & 0x8000_0000) > 0) ? 1 : 0);
-            this.Z = (byte)(((this.Registers[RdHi] == 1) && (this.Registers[RdLo] == 0)) ? 1 : 0);
+            if (SetCondition)
+            {
+                this.N = (byte)(((this.Registers[RdHi] & 0x8000_0000) > 0) ? 1 : 0);
+                this.Z = (byte)(((this.Registers[RdHi] == 0) && (this.Registers[RdLo] == 0)) ? 1 : 0);
+            }
 
             /*
              Execution Time: 1S+(m+1)I for MULL, and 1S+(m+2)I for MLAL.

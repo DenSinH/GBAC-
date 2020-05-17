@@ -24,22 +24,34 @@ namespace GBAEmulator.CPU
                 LoadFromMemory = (Instruction & 0x0800) > 0;
                 ByteQuantity = (Instruction & 0x0400) > 0;
 
-                Console.WriteLine(ByteQuantity);
-
                 uint Address = this.Registers[Rb] + this.Registers[Ro];
+
                 if (!LoadFromMemory)
                 {
                     if (ByteQuantity)
                         this.SetAt<byte>(Address, (byte)this.Registers[Rd]);
                     else
+                    {
+                        Address &= 0xffff_fffc;  // Forced align for STR
                         this.SetAt<uint>(Address, this.Registers[Rd]);
+                    }
                 }
                 else
                 {
                     if (ByteQuantity)
                         this.Registers[Rd] = this.GetAt<byte>(Address);
                     else
-                        this.Registers[Rd] = this.GetAt<uint>(Address);
+                    {
+                        uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                        byte RotateAmount = (byte)((Address & 0x03) << 3);
+
+                        // ROR result for misaligned addresses
+                        if (RotateAmount != 0)
+                            Result = this.ROR(Result, RotateAmount);
+
+                        this.Registers[Rd] = Result;
+                    }
+                        
                 }
             }
             else
@@ -56,16 +68,33 @@ namespace GBAEmulator.CPU
                 if (!SignExtended)
                 {
                     if (!HFlag)
+                    {
+                        Address &= 0xffff_fffe;  // force align STRH
                         this.SetAt<ushort>(Address, (ushort)this.Registers[Rd]);
+                    }
                     else
-                        this.Registers[Rd] = this.GetAt<ushort>(Address);
+                    {
+                        if ((Address & 0x01) == 0)  // aligned
+                            this.Registers[Rd] = this.GetAt<ushort>(Address);
+                        else
+                            this.Registers[Rd] = (uint)(this.GetAt<byte>(Address - 1) << 24) | this.GetAt<byte>(Address);
+                    }
                 }
                 else
                 {
                     if (!HFlag)
                         this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address);
                     else
-                        this.Registers[Rd] = (uint)(short)this.GetAt<ushort>(Address);
+                    {
+                        if ((Address & 0x01) == 1)  // misaligned
+                        {
+                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address - 1);
+                        }
+                        else
+                        {
+                            this.Registers[Rd] = (uint)(short)this.GetAt<ushort>(Address);
+                        }
+                    }
                 }
 
             }
@@ -73,6 +102,7 @@ namespace GBAEmulator.CPU
 
         private void LoadStoreImmediate(ushort Instruction)
         {
+            this.Log("Load/Store with immediate offset");
             bool ByteQuantity, LoadFromMemory;
             byte Offset5, Rb, Rd;
 
@@ -97,19 +127,32 @@ namespace GBAEmulator.CPU
                 if (ByteQuantity)
                     this.Registers[Rd] = this.GetAt<byte>(Address);
                 else
-                    this.Registers[Rd] = this.GetAt<uint>(Address);
+                {
+                    uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                    byte RotateAmount = (byte)((Address & 0x03) << 3);
+
+                    // ROR result for misaligned adresses
+                    if (RotateAmount != 0)
+                        Result = this.ROR(Result, RotateAmount);
+
+                    this.Registers[Rd] = Result;
+                }
             }
             else
             {
                 if (ByteQuantity)
                     this.SetAt<byte>(Address, (byte)this.Registers[Rd]);
                 else
+                {
+                    Address &= 0xffff_fffe;  // force align
                     this.SetAt<uint>(Address, this.Registers[Rd]);
+                }
             }
         }
 
         private void LoadStoreHalfword(ushort Instruction)
         {
+            this.Log("Load/Store Halfword");
             bool LoadFromMemory;
             byte Offset5, Rb, Rd;
             
@@ -126,13 +169,22 @@ namespace GBAEmulator.CPU
             uint Address = this.Registers[Rb] + Offset5;
 
             if (LoadFromMemory)
-                this.Registers[Rd] = this.GetAt<ushort>(Address);
+            {
+                if ((Address & 0x01) == 0)  // aligned
+                    this.Registers[Rd] = this.GetAt<ushort>(Address);
+                else
+                    this.Registers[Rd] = (uint)(this.GetAt<byte>(Address) << 24) | this.GetAt<byte>(Address + 1);
+            }
             else
+            {
+                Address &= 0xffff_fffe;  // force align
                 this.SetAt<ushort>(Address, (ushort)this.Registers[Rd]);
+            }
         }
 
         private void LoadStoreSPRelative(ushort Instruction)
         {
+            this.Log("Load/Store SP-relative");
             bool LoadFromMemory;
             byte Rd;
             uint Word8;
@@ -144,15 +196,31 @@ namespace GBAEmulator.CPU
              (ie bits 1:0 set to 0), since the assembler places #Imm >> 2 in the Word8 field.
             */
             Word8 = (uint)(Instruction & 0x00ff) << 2;
+            uint Address = SP + Word8;
 
             if (LoadFromMemory)
-                this.Registers[Rd] = this.GetAt<uint>(SP + Word8);
+            {
+                // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
+                uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                byte RotateAmount = (byte)((Address & 0x03) << 3);
+
+                // ROR result for misaligned adresses
+                if (RotateAmount != 0)
+                    Result = this.ROR(Result, RotateAmount);
+
+                this.Registers[Rd] = Result;
+            }
             else
+            {
+                Address &= 0xffff_fffc;  // force align
                 this.SetAt<uint>(SP + Word8, this.Registers[Rd]);
+            }
         }
 
         private void LoadAddress(ushort Instruction)
         {
+            this.Log("Load Address");
+             
             bool Source;
             byte Rd;
             uint Word8;
@@ -185,6 +253,8 @@ namespace GBAEmulator.CPU
 
         private void MultipleLoadStore(ushort Instruction)
         {
+            this.Log("Multiple Load/Store");
+             
             bool LoadFromMemory;
             byte Rb, RList;
 
@@ -192,7 +262,7 @@ namespace GBAEmulator.CPU
             Rb = (byte)((Instruction & 0x0700) >> 8);
             RList = (byte)(Instruction & 0x00ff);
 
-            uint Address = this.Registers[Rb];
+            uint Address = this.Registers[Rb] & 0xffff_fffc;  // force align
             if (RList == 0)
             {
                 /*

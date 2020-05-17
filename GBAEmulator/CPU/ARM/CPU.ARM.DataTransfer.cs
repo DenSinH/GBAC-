@@ -55,13 +55,19 @@ namespace GBAEmulator.CPU
                     The supplied address should always be on a
                     halfword boundary. If bit 0 of the supplied address is HIGH then the ARM7TDMI will
                     load an unpredictable value.
+
+                    GBATek: LDRH Rd,[odd]   -->  LDRH Rd,[odd-1] ROR 8  ;read to bit0-7 and bit24-31
                     */
                     if (LoadFromMemory)
                     {
-                        this.Registers[Rd] = this.GetAt<ushort>(Address);
+                        if ((Address & 0x01) == 0)  // aligned
+                            this.Registers[Rd] = this.GetAt<ushort>(Address);
+                        else
+                            this.Registers[Rd] = (uint)(this.GetAt<byte>(Address - 1) << 24) | this.GetAt<byte>(Address);
                     }
                     else
                     {
+                        Address &= 0xffff_fffe;  // force align
                         this.SetAt<ushort>(Address, (ushort)this.Registers[Rd]);
                     }
                     break;
@@ -80,10 +86,19 @@ namespace GBAEmulator.CPU
                     The supplied address should always be on a
                     halfword boundary. If bit 0 of the supplied address is HIGH then the ARM7TDMI will
                     load an unpredictable value.
+
+                    GBATek: LDRSH Rd,[odd]  -->  LDRSB Rd,[odd]         ;sign-expand BYTE value
                     */
                     if (LoadFromMemory)
                     {
-                        this.Registers[Rd] = (uint)(short)this.GetAt<ushort>(Address);
+                        if ((Address & 0x01) == 1)
+                        {
+                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address - 1);
+                        }
+                        else
+                        {
+                            this.Registers[Rd] = (uint)(short)this.GetAt<ushort>(Address);
+                        }
                     }
                     else
                     {

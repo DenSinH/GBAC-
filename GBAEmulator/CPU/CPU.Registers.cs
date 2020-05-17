@@ -84,7 +84,7 @@ namespace GBAEmulator.CPU
                         return SPSR_und;
                     default:
                         this.Error(string.Format("No SPSR for mode {0}", this.mode));
-                        return 0;
+                        return this.CPSR;
                 }
             }
             set

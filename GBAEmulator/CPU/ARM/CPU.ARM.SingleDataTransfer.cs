@@ -34,11 +34,11 @@ namespace GBAEmulator.CPU
             if (RegisterOffset)
             {
                 Offset = this.Registers[Instruction & 0x0f];
-                // Shift amount is either bottom byte of register or immediate value
-                byte ShiftAmount = (byte)(this.Registers[(Instruction & 0xf00) >> 8] & 0xff);
+                // However, the register specified shift amounts are not available in this instruction class
+                byte ShiftAmount = (byte)((Instruction & 0xf80) >> 7);
 
-                // todo: are cpsr flags affected?
-                Offset = ShiftOperand(Offset, true, (byte)((Instruction & 0x60) >> 4), ShiftAmount, false);
+                // CPSR flags are not affected. (GBATek)
+                Offset = ShiftOperand(Offset, true, (byte)((Instruction & 0x60) >> 5), ShiftAmount, false);
             }
             else
             {
@@ -66,8 +66,14 @@ namespace GBAEmulator.CPU
                 else
                 {
                     // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
-                    // todo: actually garbage?
-                    this.Registers[Rd] = this.GetAt<uint>(Address);
+                    uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                    byte RotateAmount = (byte)((Address & 0x03) << 3);
+
+                    // ROR result for misaligned adresses
+                    if (RotateAmount != 0)
+                        Result = this.ROR(Result, RotateAmount);
+
+                    this.Registers[Rd] = Result;
                 }
 
                 if (Rd == 15)
@@ -92,8 +98,10 @@ namespace GBAEmulator.CPU
                 }
                 else
                 {
+                    Address &= 0xffff_fffc;  // forced align for STR
                     this.SetAt<uint>(Address, this.Registers[Rd]);
                 }
+
             }
 
             if (WriteBack || !PreIndex)

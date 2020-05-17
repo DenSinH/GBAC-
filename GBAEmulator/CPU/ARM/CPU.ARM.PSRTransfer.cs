@@ -4,6 +4,30 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        private void PossiblePSRTransfer(uint Instruction)
+        {
+            if ((Instruction & 0x0fbf_0fff) == 0x010f_0000)
+            {
+                // MRS (transfer PSR contents to a register)
+                this.MRS(Instruction);
+                return;
+            }
+            else if ((Instruction & 0x0fb0_fff0) == 0x0120_f000 || (Instruction & 0x0fb0_f000) == 0x0320_f000)
+            {
+                // MSR (transfer register contents to PSR)
+                this.MSR(Instruction);
+                return;
+            }
+            else
+            {
+#if DEBUG
+                this.Log("Ambiguous Dataprocessing reached");
+#endif
+                this.DataProcessing(Instruction);
+                return;
+            }
+        }
+
         /*
          From https://problemkaputt.de/gbatek.htm#armopcodespsrtransfermrsmsr:
             
@@ -55,17 +79,78 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private void MSR_all(uint Instruction)
+        private void MSR(uint Instruction)
         {
-            this.Log("ARM MSR_all");
-            byte Rd = (byte)((Instruction & 0xf000) >> 12);
-            if ((Instruction & 0x0040_0000) > 0)  // destination PSR bit
+            this.Log("ARM MSR");
+            bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
+            uint Operand;
+            bool f, s, x, c;
+
+            f = (Instruction & 0x0008_0000) > 0;
+            s = (Instruction & 0x0004_0000) > 0;
+            x = (Instruction & 0x0002_0000) > 0;
+            c = (Instruction & 0x0001_0000) > 0;
+
+#if DEBUG
+            if (s || x)
             {
-                SPSR = (SPSR & 0x00ff_ff00) | (this.Registers[Rd] & 0xff00_00ff);
+                this.Log(string.Format("Dangerous PSR transfer: {0}, reserved bits ignored", Instruction.ToString("x8")));
+            }
+#endif
+            uint BitMask = 0;
+            if (f)
+                BitMask |= 0xff00_0000;
+            if (c)
+                BitMask |= 0x0000_00ff;
+
+            if (ImmediateOperand)
+            {
+                Operand = Instruction & 0x00ff;
+                // Rotate in steps of 2
+                byte ShiftAmount = (byte)((Instruction & 0x0f00) >> 7);  // * 2 so >> 7 instead of >> 8
+                Operand = (uint)((Operand >> ShiftAmount) | ((Operand & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
             }
             else
             {
-                CPSR = (CPSR & 0x00ff_ff00) | (this.Registers[Rd] & 0xff00_00ff);
+                Operand = this.Registers[Instruction & 0x0f];
+            }
+
+            if ((Instruction & 0x0040_0000) > 0)  // destination PSR bit
+            {
+                SPSR = (SPSR & (~BitMask)) | (Operand & BitMask);
+            }
+            else
+            {
+                CPSR = (CPSR & (~BitMask)) | (Operand & BitMask);
+            }
+        }
+
+        /*
+        private void MSR_all(uint Instruction)
+        {
+            this.Log("ARM MSR_all");
+            bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
+            uint Operand;
+
+            if (ImmediateOperand)
+            {
+                Operand = Instruction & 0x00ff;
+                // Rotate in steps of 2
+                byte ShiftAmount = (byte)((Instruction & 0x0f00) >> 7);  // * 2 so >> 7 instead of >> 8
+                Operand = (uint)((Operand >> ShiftAmount) | ((Operand & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
+            }
+            else
+            {
+                Operand = this.Registers[Instruction & 0x0f];
+            }
+
+            if ((Instruction & 0x0040_0000) > 0)  // destination PSR bit
+            {
+                SPSR = (SPSR & 0x00ff_ff00) | (Operand & 0xff00_00ff);
+            }
+            else
+            {
+                CPSR = (CPSR & 0x00ff_ff00) | (Operand & 0xff00_00ff);
             }
         }
 
@@ -96,5 +181,6 @@ namespace GBAEmulator.CPU
                 CPSR = (CPSR & 0x00ff_ffff) | (Operand & 0xff00_0000);
             }
         }
+        */
     }
 }

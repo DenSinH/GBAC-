@@ -10,7 +10,7 @@ namespace GBAEmulator
         public static void Run()
         {
             ARM7TDMI cpu = new ARM7TDMI();
-            cpu.TestGBASuite("thumb");
+            cpu.TestGBASuite("arm");
         }
 
         /// <summary>

@@ -19,43 +19,43 @@ namespace GBAEmulator.CPU
         {
             // Byte: 6; UInt16: 8; UInt32: 10 (worked out pretty well!)
             byte GetDataIndex = (byte)((byte)(Type.GetTypeCode(typeof(T)) - 6) >> 1);
-            switch ((address & 0x0f00_0000) >> 6)
+            switch ((address & 0x0f00_0000) >> 24)
             {
                 case 0:
                 case 1:
                     // BIOS region
-                    return (T)GetData[GetDataIndex](this.BIOS, address & 0x3fff);
+                    return (T)__GetData__[GetDataIndex](this.BIOS, address & 0x3fff);
                 case 2:
                     // eWRAM mirrors
-                    return (T)GetData[GetDataIndex](this.eWRAM, address & 0x3ffff);
+                    return (T)__GetData__[GetDataIndex](this.eWRAM, address & 0x3ffff);
                 case 3:
                     // iWRAM mirrors
-                    return (T)GetData[GetDataIndex](this.iWRAM, address & 0x7fff);
+                    return (T)__GetData__[GetDataIndex](this.iWRAM, address & 0x7fff);
                 case 4:
                     // IORAM mirrors
-                    return (T)GetData[GetDataIndex](this.IORAM, address & 0x3ff);
+                    return (T)__GetData__[GetDataIndex](this.IORAM, address & 0x3ff);
                 case 5:
                     // PaletteRAM mirrors
-                    return (T)GetData[GetDataIndex](this.PaletteRAM, address & 0x3ff);
+                    return (T)__GetData__[GetDataIndex](this.PaletteRAM, address & 0x3ff);
                 case 6:
                     // VRAM mirrors
                     if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        return (T)GetData[GetDataIndex](this.VRAM, address & 0xffff);
+                        return (T)__GetData__[GetDataIndex](this.VRAM, address & 0xffff);
                     }
-                    return (T)GetData[GetDataIndex](this.VRAM, 0x10000 | (address & 0x7fff));
+                    return (T)__GetData__[GetDataIndex](this.VRAM, 0x10000 | (address & 0x7fff));
                 case 7:
                     // OAM mirrors
-                    return (T)GetData[GetDataIndex](this.OAM, address & 0x3ff);
+                    return (T)__GetData__[GetDataIndex](this.OAM, address & 0x3ff);
                 case 0xe:
                     // SRAM is not mirrored (?)
-                    return (T)GetData[GetDataIndex](this.GamePakSRAM, address & 0xffff);
+                    return (T)__GetData__[GetDataIndex](this.GamePakSRAM, address & 0xffff);
                 case 0xf:
                     throw new IndexOutOfRangeException(string.Format("Index {0:x8} out of bounds for getting CPU Memory", address));
                 default:
                     // Other regions are Game Pak at different speeds
-                    return (T)GetData[GetDataIndex](this.GamePak, address & 0x1ff_ffff);
+                    return (T)__GetData__[GetDataIndex](this.GamePak, address & 0x1ff_ffff);
             }
         }
 
@@ -63,87 +63,87 @@ namespace GBAEmulator.CPU
         {
             // Byte: 6; UInt16: 8; UInt32: 10 (worked out pretty well!)
             byte SetDataIndex = (byte)((byte)(Type.GetTypeCode(typeof(T)) - 6) >> 1);
-            switch ((address & 0x0f00_0000) >> 6)
+            switch ((address & 0x0f00_0000) >> 24)
             {
                 case 0:
                 case 1:
                     // BIOS region
-                    SetData[SetDataIndex](this.BIOS, address & 0x3fff, value);
+                    __SetData__[SetDataIndex](this.BIOS, address & 0x3fff, value);
                     return;
                 case 2:
                     // eWRAM mirrors
-                    SetData[SetDataIndex](this.eWRAM, address & 0x3ffff, value);
+                    __SetData__[SetDataIndex](this.eWRAM, address & 0x3ffff, value);
                     return;
                 case 3:
                     // iWRAM mirrors
-                    SetData[SetDataIndex](this.iWRAM, address & 0x7fff, value);
+                    __SetData__[SetDataIndex](this.iWRAM, address & 0x7fff, value);
                     return;
                 case 4:
                     // IORAM mirrors
-                    SetData[SetDataIndex](this.IORAM, address & 0x3ff, value);
+                    __SetData__[SetDataIndex](this.IORAM, address & 0x3ff, value);
                     return;
                 case 5:
                     // PaletteRAM mirrors
-                    SetData[SetDataIndex](this.PaletteRAM, address & 0x3ff, value);
+                    __SetData__[SetDataIndex](this.PaletteRAM, address & 0x3ff, value);
                     return;
                 case 6:
                     // VRAM mirrors
                     if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        SetData[SetDataIndex](this.VRAM, address & 0xffff, value);
+                        __SetData__[SetDataIndex](this.VRAM, address & 0xffff, value);
                     }
                     else
                     {
-                        SetData[SetDataIndex](this.VRAM, 0x10000 | (address & 0x7fff), value);
+                        __SetData__[SetDataIndex](this.VRAM, 0x10000 | (address & 0x7fff), value);
                     }
                     return;
                 case 7:
                     // OAM mirrors
-                    SetData[SetDataIndex](this.OAM, address & 0x3ff, value);
+                    __SetData__[SetDataIndex](this.OAM, address & 0x3ff, value);
                     return;
                 case 0xe:
                     // SRAM is not mirrored (?)
-                    SetData[SetDataIndex](this.GamePakSRAM, address & 0xffff, value);
+                    __SetData__[SetDataIndex](this.GamePakSRAM, address & 0xffff, value);
                     return;
                 case 0xf:
                     throw new IndexOutOfRangeException(string.Format("Index {0:x8} out of bounds for setting CPU Memory", address));
                 default:
                     // Other regions are Game Pak at different speeds
-                    SetData[SetDataIndex](this.GamePak, address & 0x1ff_ffff, value);
+                    __SetData__[SetDataIndex](this.GamePak, address & 0x1ff_ffff, value);
                     return;
             }
         }
 
         /* Storing the functions that get / set specific data length values from memory */
-        private static readonly Action<byte[], uint, IConvertible>[] SetData =
+        private static readonly Action<byte[], uint, IConvertible>[] __SetData__ =
         {
                 (byte[] memory, uint address, IConvertible value) => { memory[address] = (byte)value; },
-                (byte[] memory, uint address, IConvertible value) => SetHalfWordAt(memory, address, (ushort)value),
-                (byte[] memory, uint address, IConvertible value) => SetWordAt(memory, address, (uint)value)
+                (byte[] memory, uint address, IConvertible value) => __SetHalfWordAt__(memory, address, (ushort)value),
+                (byte[] memory, uint address, IConvertible value) => __SetWordAt__(memory, address, (uint)value)
         };
 
-        private static readonly Func<byte[], uint, IConvertible>[] GetData =
+        private static readonly Func<byte[], uint, IConvertible>[] __GetData__ =
         {
                 (byte[] memory, uint address) => memory[address],
-                (byte[] memory, uint address) => GetHalfWordAt(memory, address),
-                (byte[] memory, uint address) => GetWordAt(memory, address)
+                (byte[] memory, uint address) => __GetHalfWordAt__(memory, address),
+                (byte[] memory, uint address) => __GetWordAt__(memory, address)
         };
 
-        private static ushort GetHalfWordAt(byte[] memory, uint address)
+        private static ushort __GetHalfWordAt__(byte[] memory, uint address)
         {
             // assumes memory address does not wrap!
             return (ushort)((memory[address + 1] << 8) | memory[address]);
         }
 
-        private static void SetHalfWordAt(byte[] memory, uint address, ushort value)
+        private static void __SetHalfWordAt__(byte[] memory, uint address, ushort value)
         {
             // assumes memory address does not wrap!
             memory[address + 1] = (byte)((value & 0xff00) >> 8);
             memory[address] = (byte)(value & 0x00ff);
         }
 
-        private static uint GetWordAt(byte[] memory, uint address)
+        private static uint __GetWordAt__(byte[] memory, uint address)
         {
             // assumes memory address does not wrap!
             return (uint)(
@@ -154,7 +154,7 @@ namespace GBAEmulator.CPU
                     );
         }
 
-        private static void SetWordAt(byte[] memory, uint address, uint value)
+        private static void __SetWordAt__(byte[] memory, uint address, uint value)
         {
             // assumes memory address does not wrap!
             memory[address + 3] = (byte)((value & 0xff00_0000) >> 24);

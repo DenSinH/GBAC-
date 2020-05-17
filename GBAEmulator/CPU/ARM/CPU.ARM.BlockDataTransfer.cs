@@ -51,9 +51,9 @@ namespace GBAEmulator.CPU
 
              So because our PC is always ahead by exactly 8, we must increase this value by 4
             */
-
-            // todo: misaligned addresses
+            
             uint StartAddress = this.Registers[Rn];
+            StartAddress &= 0xffff_fffc;  // force align
             // R15 should not be used as the base register in any LDM or STM instruction
 
             if (RegisterList == 0)  // Invalid Register lists (see https://problemkaputt.de/gbatek.htm#armopcodesmemoryblockdatatransferldmstm)

@@ -6,33 +6,14 @@ namespace GBAEmulator.CPU
     {
         private void DataProcessing(uint Instruction)
         {
-            if ((Instruction & 0x0fbf_0fff) == 0x010f_0000)
-            {
-                // MRS (transfer PSR contents to a register)
-                this.MRS(Instruction);
-                return;
-            }
-            else if ((Instruction & 0x0fbf_fff0) == 0x0129_f000)
-            {
-                // MSR (transfer register contents to PSR)
-                this.MSR_all(Instruction);
-                return;
-            }
-            else if ((Instruction & 0x0fbf_fff0) == 0x0128_f000 || (Instruction & 0x0fbf_f000) == 0x0328_f000)
-            {
-                // MSR (transfer register contents or immediate value to PSR flag bits only)
-                // I is not set / I is set
-                this.MSR_flags(Instruction);
-                return;
-            }
-
             this.Log("ARM Data Processing");
 
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             byte OpCode = (byte)((Instruction & 0x01e0_0000) >> 21);
             bool SetConditions = (Instruction & 0x0010_0000) > 0;
 
-            uint Op1 = Registers[(Instruction & 0x000f_0000) >> 16];
+            byte Rn = (byte)((Instruction & 0x000f_0000) >> 16);
+            uint Op1 = Registers[Rn];
             byte Target = (byte)((Instruction & 0x0000_f000) >> 12);
             uint Op2;
 
@@ -49,6 +30,7 @@ namespace GBAEmulator.CPU
              not be used in User mode
             */
             byte Rd = (byte)((Instruction & 0x0000_f000) >> 12);  // Destination register
+            
             if (Rd == 15)
             {
                 SetConditions = false;
@@ -57,19 +39,21 @@ namespace GBAEmulator.CPU
 
             if (!ImmediateOperand)
             {
-                Op2 = this.Registers[Instruction & 0x0f];  // Register Rm;
+                byte Rm = (byte)(Instruction & 0x0f);
+                Op2 = this.Registers[Rm];
 
                 bool ImmediateShift = (Instruction & 0x10) == 0;
-                if ((Instruction & 0x0f) == 15)  // PC
-                {
-                    /*
+                /*
                      The PC value will be the address of the instruction, plus 8 or 12 bytes due to instruction
                      prefetching. If the shift amount is specified in the instruction, the PC will be 8 bytes
                      ahead. If a register is used to specify the shift amount the PC will be 12 bytes ahead.
                     */
-                    if (!ImmediateShift)
-                        Op2 += 4;  // My PC is always 8 bytes ahead of the instruction.
-                }
+                if (Rm == 15 && !ImmediateShift)  // PC
+                    Op2 += 4;  // My PC is always 8 bytes ahead of the instruction.
+
+                if (Rn == 15 && !ImmediateShift)
+                    Op1 += 4; // Same thing
+
                 // Shift amount is either bottom byte of register or immediate value
                 byte ShiftAmount = (byte)(ImmediateShift ? ((Instruction & 0xf80) >> 7) : this.Registers[(Instruction & 0xf00) >> 8] & 0xff);
 
@@ -149,7 +133,6 @@ namespace GBAEmulator.CPU
                     Result = Op1 ^ Op2;
                     break;
                 case 0b1010:  // CMP
-                    Console.WriteLine("{0:X}, {1:X}, {2}", Op1, Op2, Op1 - Op2);
                     Result = Op1 - Op2;
                     if (SetConditions)
                         this.SetCVSub(Op1, Op2, Result);

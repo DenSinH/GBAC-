@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GBAEmulator.CPU
 {
@@ -84,11 +85,15 @@ namespace GBAEmulator.CPU
             }
         }
 
+        [Conditional("DEBUG")]
+        [Conditional("VERBOSE")]
         private void Error(string message)
         {
             Console.Error.WriteLine("Error: " + message);
         }
 
+        [Conditional("DEBUG")]
+        [Conditional("VERBOSE")]
         private void Log(string message)
         {
             Console.WriteLine(message);

@@ -11,6 +11,7 @@ namespace GBAEmulator.CPU
             bool LoadFromMemory, PCLR;
             byte RList;
 
+            // todo: force word alignment?
             LoadFromMemory = (Instructions & 0x0800) > 0;
             PCLR = (Instructions & 0x0100) > 0;
             RList = (byte)(Instructions & 0x00ff);
