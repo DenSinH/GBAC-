@@ -34,7 +34,6 @@ namespace GBAEmulator.CPU
             if (RegisterOffset)
             {
                 Offset = this.Registers[Instruction & 0x0f];
-                Console.WriteLine("Rm"  + Offset.ToString("x"));
                 // However, the register specified shift amounts are not available in this instruction class
                 byte ShiftAmount = (byte)((Instruction & 0xf80) >> 7);
 
@@ -58,14 +57,6 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            Console.WriteLine(Address.ToString("x"));
-            Console.WriteLine(LoadFromMemory);
-            Console.WriteLine(Rn);
-            Console.WriteLine(Rd);
-            Console.WriteLine(Offset.ToString("x"));
-            Console.WriteLine(ByteQuantity);
-            Console.WriteLine(WriteBack);
-
             if (LoadFromMemory)
             {
                 if (ByteQuantity)
@@ -77,13 +68,11 @@ namespace GBAEmulator.CPU
                     // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
                     uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
                     byte RotateAmount = (byte)((Address & 0x03) << 3);
-                    Console.WriteLine("RES" + Result.ToString("x"));
-                    Console.WriteLine(RotateAmount);
 
                     // ROR result for misaligned adresses
                     if (RotateAmount != 0)
                         Result = this.ROR(Result, RotateAmount);
-
+                    
                     this.Registers[Rd] = Result;
                 }
 
@@ -103,8 +92,7 @@ namespace GBAEmulator.CPU
 
                 uint Value = this.Registers[Rd];
                 if (Rd == 15)
-                    Value += 4; 
-
+                    Value += 4;
 
                 if (ByteQuantity)
                 {

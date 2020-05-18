@@ -44,7 +44,7 @@ namespace GBAEmulator.CPU
                     Address -= Offset;
                 }
             }
-
+            
             switch (SH)
             {
                 case 0b00:  // SWP instruction, caught in single data swap, so we never get here
@@ -107,7 +107,7 @@ namespace GBAEmulator.CPU
                     break;
             }
 
-            if (WriteBack || !PreIndex)
+            if ((WriteBack || !PreIndex) && !(Rn == Rd && LoadFromMemory))
             {
                 if (!PreIndex)
                 {

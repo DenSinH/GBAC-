@@ -28,7 +28,7 @@ namespace GBAEmulator.CPU
                             // Multiply Long
                             this.ARMInstructions[Instruction] = this.MultiplyLong;
                         }
-                        else if ((Instruction & 0xfb0_0ff) == 0x109)
+                        else if ((Instruction & 0xfbf) == 0x109)
                         {
                             // Single Data Swap
                             this.ARMInstructions[Instruction] = this.SWP;
@@ -38,7 +38,7 @@ namespace GBAEmulator.CPU
                             // Branch and Exchange
                             this.ARMInstructions[Instruction] = this.BX;
                         }
-                        else if ((Instruction & 0xe40_0f9) == 0x009)
+                        else if ((Instruction & 0xe49) == 0x009)
                         {
                             // Halfword Data Transfer: Register Offset
                             this.ARMInstructions[Instruction] = this.Halfword_SignedDataTransfer;

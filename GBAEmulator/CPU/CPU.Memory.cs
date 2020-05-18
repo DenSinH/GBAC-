@@ -8,12 +8,15 @@ namespace GBAEmulator.CPU
         /* BIOS is defined in CPU.BIOS.cs */
         private byte[] eWRAM = new byte[0x40000];       // 256kB External Work RAM
         private byte[] iWRAM = new byte[0x8000];        // 32kB Internal Work RAM
-        private byte[] IORAM = new byte[400];           // 1kB IO RAM
+        private byte[] IORAM = new byte[0x400];           // 1kB IO RAM
         private byte[] PaletteRAM = new byte[0x400];    // 1kB Palette RAM
         private byte[] VRAM = new byte[0x18000];        // 96kB VRAM
         private byte[] OAM = new byte[0x400];           // 1kB OAM
         private byte[] GamePak = new byte[0x200_0000];   // Game Pak (up to) 32MB (0x0800_0000 - 0x0a00_0000, then mirrored)
         private byte[] GamePakSRAM = new byte[0x10000]; // Game Pak Flash ROM (for saving game data)
+
+
+        // todo: speed up using another lookup table for the memory region (byte[][16] = {BIOS, BIOS, eWRAM, etc...})
 
         private T GetAt<T>(uint address) where T : IConvertible
         {

@@ -161,6 +161,7 @@ namespace GBAEmulator.CPU
                 default:
                     throw new Exception("This cannot happen");
             }
+
             // Setting NZ flags if necessary
             if (SetConditions)
             {
@@ -168,7 +169,6 @@ namespace GBAEmulator.CPU
             }
             else if (Rd == 15)
             {
-                this.Registers[Rd] = Result;
                 // Special cases for writing to PC
                 if ((Instruction & 0x0010_0000) > 0)  // S bit
                 {

@@ -38,7 +38,7 @@ namespace GBAEmulator.CPU
                 if (RotateAmount != 0)
                     MemoryContent = this.ROR(MemoryContent, RotateAmount);
 
-                this.SetAt<uint>(Address, this.Registers[Rm]);
+                this.SetAt<uint>(Address & 0xffff_fffc, this.Registers[Rm]);  // force align
                 this.Registers[Rd] = MemoryContent;
             }
         }

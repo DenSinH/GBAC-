@@ -22,7 +22,8 @@ namespace GBAEmulator.CPU
 
             bool FIQInvolved = (this.mode == Mode.FIQ) || (NewMode == Mode.FIQ);
 
-            Console.WriteLine("new mode" + NewMode);
+            this.Log("new mode: " + NewMode);
+
             // Bank current registers
             for (int i = FIQInvolved ? 8 : 13; i <= 14; i++)
             {

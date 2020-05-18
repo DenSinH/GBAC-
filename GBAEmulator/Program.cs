@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
+
 using GBAEmulator.CPU;
 
 namespace GBAEmulator
@@ -10,7 +11,10 @@ namespace GBAEmulator
         public static void Run()
         {
             ARM7TDMI cpu = new ARM7TDMI();
+
             cpu.TestGBASuite("arm");
+            cpu.TestReadWrite();
+            cpu.TestReadWrite();
         }
 
         /// <summary>

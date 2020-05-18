@@ -20,9 +20,7 @@ namespace GBAEmulator.CPU
             }
             else
             {
-#if DEBUG
                 this.Log("Ambiguous Dataprocessing reached");
-#endif
                 this.DataProcessing(Instruction);
                 return;
             }

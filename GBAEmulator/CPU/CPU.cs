@@ -84,16 +84,14 @@ namespace GBAEmulator.CPU
                 }
             }
         }
-
+        
         [Conditional("DEBUG")]
-        [Conditional("VERBOSE")]
         private void Error(string message)
         {
             Console.Error.WriteLine("Error: " + message);
         }
-
+        
         [Conditional("DEBUG")]
-        [Conditional("VERBOSE")]
         private void Log(string message)
         {
             Console.WriteLine(message);

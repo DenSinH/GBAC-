@@ -53,13 +53,17 @@ namespace GBAEmulator.CPU
             */
             
             uint StartAddress = this.Registers[Rn];
+            uint OriginalAddress = StartAddress;
             StartAddress &= 0xffff_fffc;  // force align
             // R15 should not be used as the base register in any LDM or STM instruction
 
             if (RegisterList == 0)  // Invalid Register lists (see https://problemkaputt.de/gbatek.htm#armopcodesmemoryblockdatatransferldmstm)
             {
                 if (LoadFromMemory)
+                {
                     this.PC = this.GetAt<uint>(StartAddress);
+                    this.PipelineFlush();
+                }
                 else
                 {
                     if (Up)
@@ -79,11 +83,11 @@ namespace GBAEmulator.CPU
                 }
 
                 if (WriteBack)
-                    this.Registers[Rn] = Up ? StartAddress + 0x40 : StartAddress - 0x40;
+                    this.Registers[Rn] = Up ? OriginalAddress + 0x40 : OriginalAddress - 0x40;
             }
             else
             {
-                Queue<byte> RegisterQueue = new Queue<byte>(16);
+                Queue<byte> RegisterQueue = new Queue<byte>(16);  // at most 16 registers to store
                 for (byte i = 0; i < 16; i++)
                 {
                     if ((RegisterList & (1 << i)) > 0)
@@ -114,6 +118,7 @@ namespace GBAEmulator.CPU
                         else
                             this.SetAt<uint>(CurrentAddress, this.Registers[Rn]);
                         CurrentAddress += 4;
+                        OriginalAddress = (uint)(OriginalAddress + (Up? 4 : -4));  // for writeback
                         RegisterQueue.Dequeue();
                     }
                 }
@@ -122,7 +127,7 @@ namespace GBAEmulator.CPU
                 // In case of a load, Rn is overwritten with the loaded value, so we can do it here too
                 // If no registers were loaded/stored, the writeback was already handled
                 if (WriteBack)
-                    this.Registers[Rn] = StartAddress;
+                    this.Registers[Rn] = Up ? (uint)(OriginalAddress + 4 * RegisterQueue.Count) : (uint)(OriginalAddress - 4 * RegisterQueue.Count);
 
                 byte Register = 0;
                 while (RegisterQueue.Count > 0)
@@ -133,16 +138,22 @@ namespace GBAEmulator.CPU
 
                     if (LoadFromMemory)
                         this.Registers[Register] = this.GetAt<uint>(CurrentAddress);
-                    else  
-                        // PC is 8 ahead, while it should be 12
-                        this.SetAt<uint>(CurrentAddress, this.Registers[Register + ((Register == 15) ? 0 : 4)]);
+                    else
+                        this.SetAt<uint>(CurrentAddress, this.Registers[Register]);
 
                     if (!PreIndex)
                         CurrentAddress += 4;
                 }
 
                 if (Register == 15)
-                    this.PipelineFlush();  // Flush pipeline when changing PC
+                {
+                    if (LoadFromMemory)
+                        this.PipelineFlush();  // Flush pipeline when changing PC
+                    else
+                        // PC is 8 ahead, while it should be 12
+                        this.SetAt<uint>(CurrentAddress - (uint)((!PreIndex) ? 4 : 0), this.Registers[15] + 4);
+                }
+                    
             }
 
             if (PSR_ForceUser)
