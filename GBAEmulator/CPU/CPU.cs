@@ -37,6 +37,12 @@ namespace GBAEmulator.CPU
             // need banked registers for CPSR initialization
             this.CPSR = 0x0000005F;
 
+            this.__MemoryRegions__ = new byte[15][]
+            {
+                this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, this.IORAM, this.PaletteRAM, this.VRAM, this.OAM,
+                this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM
+            };
+
             this.InitARM();
             this.InitTHUMB();
         }
@@ -65,7 +71,7 @@ namespace GBAEmulator.CPU
         {
             if (this.state == State.ARM)
             {
-                this.Pipeline.Enqueue(this.GetAt<uint>(this.PC));
+                this.Pipeline.Enqueue(this.GetWordAt(this.PC));
                 this.PC += 4;
 
                 if (this.Pipeline.Count == 2)
@@ -75,7 +81,7 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                this.Pipeline.Enqueue(this.GetAt<ushort>(this.PC));
+                this.Pipeline.Enqueue(this.GetHalfWordAt(this.PC));
                 this.PC += 2;
 
                 if (this.Pipeline.Count == 2)

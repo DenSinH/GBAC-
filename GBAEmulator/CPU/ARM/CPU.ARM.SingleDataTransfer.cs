@@ -61,12 +61,12 @@ namespace GBAEmulator.CPU
             {
                 if (ByteQuantity)
                 {
-                    this.Registers[Rd] = this.GetAt<byte>(Address);
+                    this.Registers[Rd] = this.GetByteAt(Address);
                 }
                 else
                 {
                     // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
-                    uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                    uint Result = this.GetWordAt(Address & 0xffff_fffc);
                     byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                     // ROR result for misaligned adresses
@@ -96,12 +96,12 @@ namespace GBAEmulator.CPU
 
                 if (ByteQuantity)
                 {
-                    this.SetAt<byte>(Address, (byte)(Value & 0x00ff));
+                    this.SetByteAt(Address, (byte)(Value & 0x00ff));
                 }
                 else
                 {
                     Address &= 0xffff_fffc;  // forced align for STR
-                    this.SetAt<uint>(Address, Value);
+                    this.SetWordAt(Address, Value);
                 }
             }
 

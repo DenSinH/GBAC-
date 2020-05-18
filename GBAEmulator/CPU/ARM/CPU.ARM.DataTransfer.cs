@@ -61,20 +61,20 @@ namespace GBAEmulator.CPU
                     if (LoadFromMemory)
                     {
                         if ((Address & 0x01) == 0)  // aligned
-                            this.Registers[Rd] = this.GetAt<ushort>(Address);
+                            this.Registers[Rd] = this.GetHalfWordAt(Address);
                         else
-                            this.Registers[Rd] = (uint)(this.GetAt<byte>(Address - 1) << 24) | this.GetAt<byte>(Address);
+                            this.Registers[Rd] = (uint)(this.GetByteAt(Address - 1) << 24) | this.GetByteAt(Address);
                     }
                     else
                     {
                         Address &= 0xffff_fffe;  // force align
-                        this.SetAt<ushort>(Address, (ushort)this.Registers[Rd]);
+                        this.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
                     }
                     break;
                 case 0b10:  // Signed byte
                     if (LoadFromMemory)
                     {
-                        this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address);
+                        this.Registers[Rd] = (uint)(sbyte)this.GetByteAt(Address);
                     }
                     else
                     {
@@ -93,11 +93,11 @@ namespace GBAEmulator.CPU
                     {
                         if ((Address & 0x01) == 1)
                         {
-                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address);
+                            this.Registers[Rd] = (uint)(sbyte)this.GetByteAt(Address);
                         }
                         else
                         {
-                            this.Registers[Rd] = (uint)(short)this.GetAt<ushort>(Address);
+                            this.Registers[Rd] = (uint)(short)this.GetHalfWordAt(Address);
                         }
                     }
                     else

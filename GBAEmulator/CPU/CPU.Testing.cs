@@ -74,8 +74,8 @@ namespace GBAEmulator.CPU
             Stopwatch sw = Stopwatch.StartNew();
             for (int i = 0; i < times; i++)
             {
-                this.SetAt<byte>(0x8000000 + (uint)i, (byte)i);
-                this.GetAt<byte>(0x8000000 + (uint)i);
+                this.SetByteAt(0x8000000 + (uint)i, (byte)i);
+                this.GetByteAt(0x8000000 + (uint)i);
             }
             sw.Stop();
 
@@ -91,6 +91,16 @@ namespace GBAEmulator.CPU
             sw.Stop();
 
             Console.WriteLine(sw.ElapsedMilliseconds + " ms passed for " + times + " direct reads/writes");
+
+            TypeCode T;
+            sw = Stopwatch.StartNew();
+            for (int i = 0; i < times; i++)
+            {
+                T = Type.GetTypeCode(typeof(byte));
+            }
+            sw.Stop();
+
+            Console.WriteLine(sw.ElapsedMilliseconds + " ms passed for " + times + " typcode findings");
         }
 
     }

@@ -24,14 +24,14 @@ namespace GBAEmulator.CPU
                     if ((RList & (1 << i)) > 0)
                     {
                         // Pop from stack
-                        this.Registers[i] = this.GetAt<uint>(SP);
+                        this.Registers[i] = this.GetWordAt(SP);
                         SP += 4;
                     }
                 }
 
                 if (PCLR)
                 {
-                    PC = this.GetAt<uint>(SP) & 0xffff_fffe;
+                    PC = this.GetWordAt(SP) & 0xffff_fffe;
                     SP += 4;
                     this.PipelineFlush();
                 }
@@ -56,7 +56,7 @@ namespace GBAEmulator.CPU
                 uint Address = SP;
                 while (RegisterQueue.Count > 0)
                 {
-                    this.SetAt<uint>(Address, this.Registers[RegisterQueue.Dequeue()]);
+                    this.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
             }

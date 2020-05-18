@@ -24,21 +24,21 @@ namespace GBAEmulator.CPU
             uint MemoryContent;
             if (ByteQuantity)
             {
-                MemoryContent = this.GetAt<byte>(this.Registers[Rn]);
-                this.SetAt<byte>(this.Registers[Rn], (byte)this.Registers[Rm]);
+                MemoryContent = this.GetByteAt(this.Registers[Rn]);
+                this.SetByteAt(this.Registers[Rn], (byte)this.Registers[Rm]);
                 this.Registers[Rd] = MemoryContent;
             }
             else
             {
                 uint Address = this.Registers[Rn];
-                MemoryContent = this.GetAt<uint>(Address & 0xffff_fffc);
+                MemoryContent = this.GetWordAt(Address & 0xffff_fffc);
                 byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                 // ROR result for misaligned addresses
                 if (RotateAmount != 0)
                     MemoryContent = this.ROR(MemoryContent, RotateAmount);
 
-                this.SetAt<uint>(Address & 0xffff_fffc, this.Registers[Rm]);  // force align
+                this.SetWordAt(Address & 0xffff_fffc, this.Registers[Rm]);  // force align
                 this.Registers[Rd] = MemoryContent;
             }
         }

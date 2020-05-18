@@ -29,20 +29,20 @@ namespace GBAEmulator.CPU
                 if (!LoadFromMemory)
                 {
                     if (ByteQuantity)
-                        this.SetAt<byte>(Address, (byte)this.Registers[Rd]);
+                        this.SetByteAt(Address, (byte)this.Registers[Rd]);
                     else
                     {
                         Address &= 0xffff_fffc;  // Forced align for STR
-                        this.SetAt<uint>(Address, this.Registers[Rd]);
+                        this.SetWordAt(Address, this.Registers[Rd]);
                     }
                 }
                 else
                 {
                     if (ByteQuantity)
-                        this.Registers[Rd] = this.GetAt<byte>(Address);
+                        this.Registers[Rd] = this.GetByteAt(Address);
                     else
                     {
-                        uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                        uint Result = this.GetWordAt(Address & 0xffff_fffc);
                         byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                         // ROR result for misaligned addresses
@@ -70,29 +70,29 @@ namespace GBAEmulator.CPU
                     if (!HFlag)
                     {
                         Address &= 0xffff_fffe;  // force align STRH
-                        this.SetAt<ushort>(Address, (ushort)this.Registers[Rd]);
+                        this.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
                     }
                     else
                     {
                         if ((Address & 0x01) == 0)  // aligned
-                            this.Registers[Rd] = this.GetAt<ushort>(Address);
+                            this.Registers[Rd] = this.GetHalfWordAt(Address);
                         else
-                            this.Registers[Rd] = (uint)(this.GetAt<byte>(Address - 1) << 24) | this.GetAt<byte>(Address);
+                            this.Registers[Rd] = (uint)(this.GetByteAt(Address - 1) << 24) | this.GetByteAt(Address);
                     }
                 }
                 else
                 {
                     if (!HFlag)
-                        this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address);
+                        this.Registers[Rd] = (uint)(sbyte)this.GetByteAt(Address);
                     else
                     {
                         if ((Address & 0x01) == 1)  // misaligned
                         {
-                            this.Registers[Rd] = (uint)(sbyte)this.GetAt<byte>(Address);
+                            this.Registers[Rd] = (uint)(sbyte)this.GetByteAt(Address);
                         }
                         else
                         {
-                            this.Registers[Rd] = (uint)(short)this.GetAt<ushort>(Address);
+                            this.Registers[Rd] = (uint)(short)this.GetHalfWordAt(Address);
                         }
                     }
                 }
@@ -125,10 +125,10 @@ namespace GBAEmulator.CPU
             if (LoadFromMemory)
             {
                 if (ByteQuantity)
-                    this.Registers[Rd] = this.GetAt<byte>(Address);
+                    this.Registers[Rd] = this.GetByteAt(Address);
                 else
                 {
-                    uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                    uint Result = this.GetWordAt(Address & 0xffff_fffc);
                     byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                     // ROR result for misaligned adresses
@@ -141,11 +141,11 @@ namespace GBAEmulator.CPU
             else
             {
                 if (ByteQuantity)
-                    this.SetAt<byte>(Address, (byte)this.Registers[Rd]);
+                    this.SetByteAt(Address, (byte)this.Registers[Rd]);
                 else
                 {
                     Address &= 0xffff_fffe;  // force align
-                    this.SetAt<uint>(Address, this.Registers[Rd]);
+                    this.SetWordAt(Address, this.Registers[Rd]);
                 }
             }
         }
@@ -171,14 +171,14 @@ namespace GBAEmulator.CPU
             if (LoadFromMemory)
             {
                 if ((Address & 0x01) == 0)  // aligned
-                    this.Registers[Rd] = this.GetAt<ushort>(Address);
+                    this.Registers[Rd] = this.GetHalfWordAt(Address);
                 else
-                    this.Registers[Rd] = (uint)(this.GetAt<byte>(Address - 1) << 24) | this.GetAt<byte>(Address);
+                    this.Registers[Rd] = (uint)(this.GetByteAt(Address - 1) << 24) | this.GetByteAt(Address);
             }
             else
             {
                 Address &= 0xffff_fffe;  // force align
-                this.SetAt<ushort>(Address, (ushort)this.Registers[Rd]);
+                this.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
             }
         }
 
@@ -201,7 +201,7 @@ namespace GBAEmulator.CPU
             if (LoadFromMemory)
             {
                 // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
-                uint Result = this.GetAt<uint>(Address & 0xffff_fffc);
+                uint Result = this.GetWordAt(Address & 0xffff_fffc);
                 byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                 // ROR result for misaligned adresses
@@ -213,7 +213,7 @@ namespace GBAEmulator.CPU
             else
             {
                 Address &= 0xffff_fffc;  // force align
-                this.SetAt<uint>(SP + Word8, this.Registers[Rd]);
+                this.SetWordAt(SP + Word8, this.Registers[Rd]);
             }
         }
 
@@ -271,11 +271,11 @@ namespace GBAEmulator.CPU
                 */
                 if (LoadFromMemory)
                 {
-                    PC = this.GetAt<uint>(Address);
+                    PC = this.GetWordAt(Address);
                     this.PipelineFlush();
                 }
                 else
-                    this.SetAt<uint>(Address, PC + 2);  // My PC is 4 ahead, but it should be 6 in this case
+                    this.SetWordAt(Address, PC + 2);  // My PC is 4 ahead, but it should be 6 in this case
 
                 // Writeback
                 this.Registers[Rb] += 0x40;
@@ -286,7 +286,7 @@ namespace GBAEmulator.CPU
                 {
                     if ((RList & (1 << i)) > 0)
                     {
-                        this.Registers[i] = this.GetAt<uint>(Address);
+                        this.Registers[i] = this.GetWordAt(Address);
                         Address += 4;
                     }
                 }
@@ -306,7 +306,7 @@ namespace GBAEmulator.CPU
                 // we know that the queue is not empty, because RList != 0
                 if (RegisterQueue.Peek() == Rb)
                 {
-                    this.SetAt<uint>(Address, this.Registers[Rb]);
+                    this.SetWordAt(Address, this.Registers[Rb]);
                     Address += 4;
                     RegisterQueue.Dequeue();
                 }
@@ -316,7 +316,7 @@ namespace GBAEmulator.CPU
 
                 while (RegisterQueue.Count > 0)
                 {
-                    this.SetAt<uint>(Address, this.Registers[RegisterQueue.Dequeue()]);
+                    this.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
             }
