@@ -49,13 +49,14 @@ namespace GBAEmulator.CPU
                     this.THUMBInstructions[i] = this.LongBranchWithLink;
                 else
                     // todo: undefined
-                    this.THUMBInstructions[i] = (ushort _) => throw new NotImplementedException("Undefined THUMB instruction");
+                    this.THUMBInstructions[i] = (ushort _) => throw new NotImplementedException("Undefined THUMB instruction: " + _.ToString("x4"));
             }
             // initialize THUMB instructions
         }
 
         private void ExecuteTHUMB(ushort Instruction)
         {
+            this.Log(string.Format("THUMB: {0:x4}: PC: {1:x8}", Instruction, this.PC));
             this.THUMBInstructions[(Instruction & 0xfc00) >> 10](Instruction);
         }
     }

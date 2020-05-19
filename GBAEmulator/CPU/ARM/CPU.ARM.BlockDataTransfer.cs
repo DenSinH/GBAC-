@@ -7,7 +7,7 @@ namespace GBAEmulator.CPU
     {
         private void BlockDataTransfer(uint Instruction)
         {
-            this.Log("ARM Block Data Transfer");
+            this.Log("Block Data Transfer");
 
             bool PreIndex, Up, PSR_ForceUser, WriteBack, LoadFromMemory;
             byte Rn;  // Base register
@@ -47,7 +47,7 @@ namespace GBAEmulator.CPU
 
             /*
              Whenever R15 is stored to memory the stored value is the address of the STM
-             instruction plus 12.
+             instruction plus 12. (manual)
 
              So because our PC is always ahead by exactly 8, we must increase this value by 4
             */

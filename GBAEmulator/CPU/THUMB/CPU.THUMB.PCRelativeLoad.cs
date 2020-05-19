@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void PCRelativeLoad(ushort Instruction)
         {
-            this.Log("THUMB PC relative load");
+            this.Log("PC relative load");
             byte Rd;
             uint Address;
 
@@ -18,6 +18,7 @@ namespace GBAEmulator.CPU
 
             The value of the PC will be 4 bytes greater than the address of this instruction, but bit
             1 of the PC is forced to 0 to ensure it is word aligned.
+            (manual)
 
             My PC is always 4 bytes ahead, so I don't have to account for this difference.
             */

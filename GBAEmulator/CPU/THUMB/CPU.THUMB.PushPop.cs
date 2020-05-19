@@ -7,7 +7,7 @@ namespace GBAEmulator.CPU
     {
         private void PushPopRegisters(ushort Instructions)
         {
-            this.Log("THUMB Push/Pop registers");
+            this.Log("Push/Pop registers");
             bool LoadFromMemory, PCLR;
             byte RList;
 

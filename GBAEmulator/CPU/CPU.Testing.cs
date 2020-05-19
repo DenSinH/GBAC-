@@ -70,7 +70,7 @@ namespace GBAEmulator.CPU
 
         public void TestReadWrite()
         {
-            int times = 100000;
+            int times = 10000000;
             Stopwatch sw = Stopwatch.StartNew();
             for (int i = 0; i < times; i++)
             {

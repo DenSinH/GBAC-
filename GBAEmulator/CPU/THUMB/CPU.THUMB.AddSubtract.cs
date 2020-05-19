@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void AddSubtract(ushort Instruction)
         {
-            this.Log("THUMB Add Subtract");
+            this.Log("Add Subtract");
             bool ImmediateOperand, Sub;
             byte Rs, Rd;
             uint Operand, Result;

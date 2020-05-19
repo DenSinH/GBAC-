@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void MoveShiftedRegister(ushort Instruction)
         {
-            this.Log("THUMB Move shifted register");
+            this.Log("Move shifted register");
             byte Opcode, Offset5, Rs, Rd;
             Opcode = (byte)((Instruction & 0x1800) >> 11);
             Offset5 = (byte)((Instruction & 0x07c0) >> 6);

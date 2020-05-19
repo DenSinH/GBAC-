@@ -65,7 +65,7 @@ namespace GBAEmulator.CPU
            */
         private void MRS(uint Instruction)
         {
-            this.Log("ARM MRS");
+            this.Log("MRS");
             byte Rd = (byte)((Instruction & 0xf000) >> 12);
             if ((Instruction & 0x0040_0000) > 0)  // source PSR bit
             {
@@ -79,7 +79,7 @@ namespace GBAEmulator.CPU
 
         private void MSR(uint Instruction)
         {
-            this.Log("ARM MSR");
+            this.Log("MSR");
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             uint Operand;
             bool f, s, x, c;
@@ -122,63 +122,5 @@ namespace GBAEmulator.CPU
                 CPSR = (CPSR & (~BitMask)) | (Operand & BitMask);
             }
         }
-
-        /*
-        private void MSR_all(uint Instruction)
-        {
-            this.Log("ARM MSR_all");
-            bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
-            uint Operand;
-
-            if (ImmediateOperand)
-            {
-                Operand = Instruction & 0x00ff;
-                // Rotate in steps of 2
-                byte ShiftAmount = (byte)((Instruction & 0x0f00) >> 7);  // * 2 so >> 7 instead of >> 8
-                Operand = (uint)((Operand >> ShiftAmount) | ((Operand & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
-            }
-            else
-            {
-                Operand = this.Registers[Instruction & 0x0f];
-            }
-
-            if ((Instruction & 0x0040_0000) > 0)  // destination PSR bit
-            {
-                SPSR = (SPSR & 0x00ff_ff00) | (Operand & 0xff00_00ff);
-            }
-            else
-            {
-                CPSR = (CPSR & 0x00ff_ff00) | (Operand & 0xff00_00ff);
-            }
-        }
-
-        private void MSR_flags(uint Instruction)
-        {
-            this.Log("ARM MSR_flags");
-            bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
-            uint Operand;
-
-            if (ImmediateOperand)
-            {
-                Operand = Instruction & 0x00ff;
-                // Rotate in steps of 2
-                byte ShiftAmount = (byte)((Instruction & 0x0f00) >> 7);  // * 2 so >> 7 instead of >> 8
-                Operand = (uint)((Operand >> ShiftAmount) | ((Operand & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
-            }
-            else
-            {
-                Operand = this.Registers[Instruction & 0x0f];
-            }
-
-            if ((Instruction & 0x0040_0000) > 0)  // destination PSR bit
-            {
-                SPSR = (SPSR & 0x00ff_ffff) | (Operand & 0xff00_0000);
-            }
-            else
-            {
-                CPSR = (CPSR & 0x00ff_ffff) | (Operand & 0xff00_0000);
-            }
-        }
-        */
     }
 }

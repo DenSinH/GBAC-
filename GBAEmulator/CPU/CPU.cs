@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+
 namespace GBAEmulator.CPU
 {
     public partial class ARM7TDMI
@@ -12,8 +13,12 @@ namespace GBAEmulator.CPU
         */
         State state;
         readonly Queue<uint> Pipeline = new Queue<uint>(3);
-        public ARM7TDMI()
+        GBA gba;
+
+        public ARM7TDMI(GBA gba)
         {
+            this.gba = gba;
+
             this.SystemBank = new uint[16];
             this.FIQBank = new uint[16];
             this.SupervisorBank = new uint[16];
@@ -39,12 +44,13 @@ namespace GBAEmulator.CPU
 
             this.__MemoryRegions__ = new byte[15][]
             {
-                this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, this.IORAM, this.PaletteRAM, this.VRAM, this.OAM,
+                this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
                 this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM
             };
 
             this.InitARM();
             this.InitTHUMB();
+            this.InitRegisters();
         }
 
         public void LoadRom(string FileName)
@@ -67,7 +73,7 @@ namespace GBAEmulator.CPU
             this.Pipeline.Clear();
         }
 
-        private void Step()
+        public void Step()
         {
             if (this.state == State.ARM)
             {

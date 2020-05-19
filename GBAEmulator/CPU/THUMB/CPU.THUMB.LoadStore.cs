@@ -18,7 +18,7 @@ namespace GBAEmulator.CPU
             if ((Instruction & 0x0200) == 0)
             {
                 // Load/Store with register offset
-                this.Log("THUMB Load/Store with register offset");
+                this.Log("Load/Store with register offset");
                 bool LoadFromMemory, ByteQuantity;
 
                 LoadFromMemory = (Instruction & 0x0800) > 0;
@@ -116,6 +116,7 @@ namespace GBAEmulator.CPU
              For word accesses (B = 0), the value specified by #Imm is a full 7-bit address, but must
              be word-aligned (ie with bits 1:0 set to 0), since the assembler places #Imm >> 2 in
              the Offset5 field.
+             (manual)
             */
             if (!ByteQuantity)
                 Offset5 <<= 2;
@@ -268,6 +269,7 @@ namespace GBAEmulator.CPU
                 /*
                  Strange Effects on Invalid Rlist's
                  Empty Rlist: R15 loaded/stored (ARMv4 only), and Rb=Rb+40h (ARMv4-v5).
+                 (GBATek)
                 */
                 if (LoadFromMemory)
                 {

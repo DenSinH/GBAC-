@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void MovCmpAddSubImmediate(ushort Instruction)
         {
-            this.Log("THUMB MOV/CMP/ADD/SUB Immediate");
+            this.Log("MOV/CMP/ADD/SUB Immediate");
             byte opcode, Rd, Offset8;
             uint Result;
 

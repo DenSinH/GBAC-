@@ -6,11 +6,13 @@ namespace GBAEmulator.CPU
     {
         private void ConditionalBranch(ushort Instruction)
         {
-            this.Log("THUMB Conditional Branch");
+            this.Log("Conditional Branch");
             /*
              The instructions in this group all perform a conditional Branch depending on the state
              of the CPSR condition codes. The branch offset must take account of the prefetch
              operation, which causes the PC to be 1 word (4 bytes) ahead of the current instruction
+
+             (manual)
 
              My PC is always 4 bytes ahead in THUMB mode, so I don't need to account for this.
             */
@@ -49,11 +51,12 @@ namespace GBAEmulator.CPU
 
         private void UnconditionalBranch(ushort Instruction)
         {
-            this.Log("THUMB Unconditional Branch");
+            this.Log("Unconditional Branch");
             /*
              The address specified by label is a full 12-bit two’s complement address, but must
              always be halfword aligned (ie bit 0 set to 0), since the assembler places label >> 1 in
              the Offset11 field.
+             (manual)
             */
             ushort Offset11 = (ushort)((Instruction & 0x07ff) << 1);
             int TrueOffset = ((Offset11 & 0x0800) > 0) ? (Offset11 - 0x1000) : Offset11;
@@ -63,7 +66,7 @@ namespace GBAEmulator.CPU
 
         private void LongBranchWithLink(ushort Instruction)
         {
-            this.Log("THUMB Long Branch With Link");
+            this.Log("Long Branch With Link");
             bool H;
             uint Offset;
 
@@ -75,7 +78,6 @@ namespace GBAEmulator.CPU
                 // First Instruction - LR = PC+4+(nn SHL 12)
                 // PC + 4 is just because it's 2 instructions ahead in the above description
                 int TrueOffset = (int)((Offset & 0x400) > 0 ? ((int)Offset - 0x800) : (int)Offset);
-                Console.WriteLine(TrueOffset.ToString("x"));
                 LR = (uint)(PC + (TrueOffset << 12));
             }
             else

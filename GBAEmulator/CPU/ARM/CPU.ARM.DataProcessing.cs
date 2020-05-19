@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void DataProcessing(uint Instruction)
         {
-            this.Log("ARM Data Processing");
+            this.Log("Data Processing");
 
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             byte OpCode = (byte)((Instruction & 0x01e0_0000) >> 21);
@@ -28,6 +28,8 @@ namespace GBAEmulator.CPU
              the SPSR corresponding to the current mode is moved to the CPSR. This allows state
              changes which atomically restore both PC and CPSR. This form of instruction should
              not be used in User mode
+
+             (manual)
             */
             byte Rd = (byte)((Instruction & 0x0000_f000) >> 12);  // Destination register
             
@@ -44,10 +46,11 @@ namespace GBAEmulator.CPU
 
                 bool ImmediateShift = (Instruction & 0x10) == 0;
                 /*
-                     The PC value will be the address of the instruction, plus 8 or 12 bytes due to instruction
-                     prefetching. If the shift amount is specified in the instruction, the PC will be 8 bytes
-                     ahead. If a register is used to specify the shift amount the PC will be 12 bytes ahead.
-                    */
+                The PC value will be the address of the instruction, plus 8 or 12 bytes due to instruction
+                prefetching. If the shift amount is specified in the instruction, the PC will be 8 bytes
+                ahead. If a register is used to specify the shift amount the PC will be 12 bytes ahead.
+                (manual)
+                */
                 if (Rm == 15 && !ImmediateShift)  // PC
                     Op2 += 4;  // My PC is always 8 bytes ahead of the instruction.
 

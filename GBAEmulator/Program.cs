@@ -2,19 +2,13 @@
 using System.Threading;
 using System.Windows.Forms;
 
-using GBAEmulator.CPU;
-
 namespace GBAEmulator
 {
     static class Program
     {
-        public static void Run()
+        public static void Run(GBA gba)
         {
-            ARM7TDMI cpu = new ARM7TDMI();
-
-            cpu.TestGBASuite("arm");
-            cpu.TestReadWrite();
-            cpu.TestReadWrite();
+            gba.Run();
         }
 
         /// <summary>
@@ -23,12 +17,15 @@ namespace GBAEmulator
         [STAThread]
         static void Main()
         {
-            Thread t = new Thread(Run);
+            ushort[] display = new ushort[240 * 160];
+            GBA gba = new GBA(display);
+
+            Thread t = new Thread(() => Run(gba));
             t.Start();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Visual());
+            Application.Run(new Visual(gba));
         }
     }
 }

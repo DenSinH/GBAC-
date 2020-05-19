@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void AddOffsetToSP(ushort Instruction)
         {
-            this.Log("THUMB Add offset to SP");
+            this.Log("Add offset to SP");
             bool Sign;
             uint SWord7;
 

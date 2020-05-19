@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void SingleDataTransfer(uint Instruction)
         {
-            this.Log("ARM Single Data Transfer");
+            this.Log("Single Data Transfer");
 
             bool RegisterOffset, PreIndex, Up, ByteQuantity, WriteBack, LoadFromMemory;
             byte Rn, Rd;
@@ -83,7 +83,8 @@ namespace GBAEmulator.CPU
             {
                 /*
                  When R15 is the source register (Rd) of a register store (STR) instruction, the stored
-                 value will be address of the instruction plus 12. (Manual)
+                 value will be address of the instruction plus 12. 
+                 (Manual)
 
                  We reset this to 8 at the beginning, so we will have to undo that now here
                  */

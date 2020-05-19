@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void HiReg_BX(ushort Instruction)
         {
-            this.Log("THUMB Hi Register Operations / BX");
+            this.Log("Hi Register Operations / BX");
             byte Opcode, Rs, Rd;
             bool H1, H2;
 
@@ -23,6 +23,7 @@ namespace GBAEmulator.CPU
              If R15 is used as an operand, the value will be the address of the instruction + 4 with
              bit 0 cleared. Executing a BX PC in THUMB state from a non-word aligned address
              will result in unpredictable execution.
+             (manual)
 
             For me, PC is always 4 ahead in THUMB mode, so I don't need to account for this offset
             */
@@ -35,6 +36,8 @@ namespace GBAEmulator.CPU
              In this group only CMP (Op = 01) sets the CPSR condition codes.
              The action of H1= 0, H2 = 0 for Op = 00 (ADD), Op =01 (CMP) and Op = 10 (MOV) is
              undefined, and should not be used.
+
+            (manual)
             */
 
             switch (Opcode)
@@ -44,7 +47,6 @@ namespace GBAEmulator.CPU
                     if (Rd == 15)
                     {
                         this.PipelineFlush();
-                        // todo: do this?
                         this.PC &= 0xffff_fffe;
                     }
                     break;
@@ -58,12 +60,11 @@ namespace GBAEmulator.CPU
                     if (Rd == 15)
                     {
                         this.PipelineFlush();
-                        // todo: do this?
                         this.PC &= 0xffff_fffe;
                     }
                     break;
                 case 0b11:
-                    this.BX(Instruction);
+                    this.BX(Rs);  // rest of instruction does not matter for BX, we do not read that part
                     break;
             }
         }

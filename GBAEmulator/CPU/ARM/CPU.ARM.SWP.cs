@@ -11,7 +11,7 @@ namespace GBAEmulator.CPU
 
         private void SWP(uint Instruction)
         {
-            this.Log("ARM Single data swap");
+            this.Log("Single data swap");
 
             bool ByteQuantity;
             byte Rn, Rd, Rm;

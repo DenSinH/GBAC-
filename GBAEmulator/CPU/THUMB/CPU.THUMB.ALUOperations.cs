@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         private void ALUOperations(ushort Instruction)
         {
-            this.Log("THUMB ALU Operations");
+            this.Log("ALU Operations");
             byte Opcode, Rs, Rd;
             uint Result;
 

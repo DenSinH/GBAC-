@@ -13,13 +13,8 @@ namespace GBAEmulator.CPU
             this.state = (State)(Target & 0x01);
             this.PC = Target & 0xffff_fffc;  // Allow for pre-fetch
             this.PipelineFlush();
-
-            //if (this.state == State.ARM)
-            //    this.PC -= 4;
-            //else
-            //    this.PC -= 2;
-
-            this.Log("ARM BX: new state: " + this.state);
+            
+            this.Log("BX: new state: " + this.state);
 
             // 2S + 1N cycles
         }
