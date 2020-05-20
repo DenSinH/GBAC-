@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
 		/* ARM / THUMB state */
-        private uint[] Registers = new uint[16];  // active registers; R15 = PC
+        public uint[] Registers = new uint[16];  // active registers; R15 = PC
         private uint[] SystemBank, FIQBank, SupervisorBank, AbortBank, IRQBank, UndefinedBank;
         private Dictionary<Mode, uint[]> BankedRegisters;
         private uint SPSR_fiq, SPSR_svc, SPSR_abt, SPSR_irq, SPSR_und;  // Saved Processor Status Registers

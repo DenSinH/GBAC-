@@ -86,6 +86,7 @@ namespace GBAEmulator.CPU
                 uint temp = PC - 2;  // PC is 4 instructions ahead, 
                 PC = LR + (Offset << 1);
                 LR = temp | 1;
+                PC &= 0xffff_fffe;
                 this.PipelineFlush();
             }
         }

@@ -8,7 +8,7 @@ namespace GBAEmulator
 {
     partial class PPU
     {
-        int scanline = 0;
+        public int scanline = 0;
         
         public bool IsVBlank
         {
@@ -22,7 +22,7 @@ namespace GBAEmulator
             {
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[240 * scanline + x] = this.gba.cpu.GetPaletteEntry(this.gba.cpu.VRAM[240 * scanline + x]);
+                    this.Display[240 * scanline + x] = this.gba.cpu.GetPaletteEntry((uint)2 * this.gba.cpu.VRAM[240 * scanline + x]);
                 }
             }
 

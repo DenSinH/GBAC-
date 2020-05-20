@@ -12,6 +12,7 @@ namespace GBAEmulator
     {
         private Bitmap Backbuffer;
         private GCHandle _rawBitmap;
+        private ushort[] _display;
 
         private const int width = 240;
         private const int height = 160;
@@ -25,6 +26,7 @@ namespace GBAEmulator
             this.Size = new Size((int)(scale * width), (int)(scale * height));
 
             this.gba = gba;
+            this._display = new ushort[width * height];
 
             // disable resizing
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -65,7 +67,7 @@ namespace GBAEmulator
             {
                 // no image scaling for crisp pixels!
                 e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                e.Graphics.DrawImage(this.Backbuffer, 0, 0, this.Size.Width, this.Size.Height);
+                e.Graphics.DrawImage(this.Backbuffer, 0, 0, this.Size.Width - 16, this.Size.Height);
             }
         }
 
@@ -76,6 +78,19 @@ namespace GBAEmulator
             Backbuffer = new Bitmap(ClientSize.Width, ClientSize.Height);
         }
 
+        private void LoadDisplay()
+        {
+            // converting BRG555 to RGB555
+            for (byte x = 0; x < width; x++)
+            {
+                for (byte y = 0; y < height; y++)
+                {
+                    ushort BRGEntry = this.gba.display[width * y + x];
+                    this._display[width * y + x] = (ushort)(((BRGEntry & 0x001f) << 10) | (BRGEntry & 0x03e0) | ((BRGEntry & 0x7c00) >> 10));
+                }
+            }
+        }
+
         private void Draw()
         {
 
@@ -83,9 +98,11 @@ namespace GBAEmulator
             if (Backbuffer != null)
             {
                 this.Backbuffer?.Dispose();
+                this.LoadDisplay();
+
                 //lock (this.gba.display)
                 //{
-                _rawBitmap = GCHandle.Alloc(this.gba.display, GCHandleType.Pinned);
+                _rawBitmap = GCHandle.Alloc(this._display, GCHandleType.Pinned);
                 this.Backbuffer = new Bitmap(width, height, width * 2,
                             PixelFormat.Format16bppRgb555, _rawBitmap.AddrOfPinnedObject());
                 //}
@@ -97,6 +114,8 @@ namespace GBAEmulator
 
         private void Tick(object sender, EventArgs e)
         {
+            //Console.WriteLine(this.gba.cpu.Registers[1].ToString("x8") + " " + this.gba.cpu.Registers[1].ToString("x8"));
+            //Console.ReadKey();
             Draw();
         }
 

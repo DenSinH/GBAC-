@@ -29,7 +29,7 @@ namespace GBAEmulator
             cpu.TestReadWrite();
         }
 
-        private void RunFrame()
+        private void RunLine()
         {
             /*
             subject	    length	cycles
@@ -44,13 +44,13 @@ namespace GBAEmulator
             from: https://www.coranac.com/tonc/text/video.htm
              */
             int cycle;
-
-            // CHECK VBLANK
-            // CLEAR HBLANK
+            
+            this.cpu.DISPSTAT.SetVBlank(this.ppu.IsVBlank);  // set VBlank to correct value
+            this.cpu.DISPSTAT.SetHBlank(false);
             for (cycle = 0; cycle < 960; cycle++)
                 this.cpu.Step();
 
-            // SET HBLANK
+            this.cpu.DISPSTAT.SetHBlank(true);
             this.ppu.HackyMode4Scanline();
 
             for (cycle = 0; cycle < 272; cycle++)
@@ -59,12 +59,12 @@ namespace GBAEmulator
 
         public void Run()
         {
-            cpu.LoadRom("../../Tests/GBASuite/thumb.gba");
+            cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
             cpu.SkipBios();
 
             while (true)
             {
-                this.RunFrame();
+                this.RunLine();
             }
         }
     }

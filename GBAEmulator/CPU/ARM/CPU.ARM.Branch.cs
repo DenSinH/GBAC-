@@ -11,7 +11,10 @@ namespace GBAEmulator.CPU
             byte Rn = (byte)(Instruction & 0x0f);
             uint Target = this.Registers[Rn];
             this.state = (State)(Target & 0x01);
-            this.PC = Target & 0xffff_fffc;  // Allow for pre-fetch
+            if (this.state == State.ARM)
+                this.PC = Target & 0xffff_fffc;  // Allow for pre-fetch
+            else
+                this.PC = Target & 0xffff_fffe;
             this.PipelineFlush();
             
             this.Log("BX: new state: " + this.state);

@@ -26,8 +26,8 @@ namespace GBAEmulator.CPU
         {
             // Address within palette memory
             return (ushort)(
-                (PaletteRAM[Address] << 8) |
-                PaletteRAM[Address + 1]
+                PaletteRAM[Address] |
+                (PaletteRAM[Address + 1] << 8)
                 );
         }
 

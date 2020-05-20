@@ -79,6 +79,7 @@
     <Compile Include="CPU\ARM\CPU.ARM.cs" />
     <Compile Include="CPU\CPU.Memory.cs" />
     <Compile Include="CPU\CPU.Memory.IO.cs" />
+    <Compile Include="CPU\CPU.Memory.IO.IORegisters.base.cs" />
     <Compile Include="CPU\CPU.Memory.IO.IORegisters.cs" />
     <Compile Include="CPU\CPU.Testing.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.AddOffsetToSP.cs" />

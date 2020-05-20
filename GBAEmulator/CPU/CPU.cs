@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 
 namespace GBAEmulator.CPU
@@ -84,6 +85,10 @@ namespace GBAEmulator.CPU
                 {
                     this.ExecuteARM(this.Pipeline.Dequeue());
                 }
+                else
+                {
+                    this.Log("Filling Pipeline");
+                }
             }
             else
             {
@@ -94,6 +99,16 @@ namespace GBAEmulator.CPU
                 {
                     this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
                 }
+                else
+                {
+                    this.Log("Filling Pipeline");
+                }
+            }
+
+            if (this.Registers[1] < 0x100 || this.Registers[1] > 0x400000)
+            {
+                this.ShowInfo();
+                // Console.ReadKey();
             }
         }
         
@@ -106,7 +121,17 @@ namespace GBAEmulator.CPU
         [Conditional("DEBUG")]
         private void Log(string message)
         {
-            Console.WriteLine(message);
+            if (this.Registers[1] < 0x100 || this.Registers[1] > 0x400000)
+            {
+                Console.WriteLine(message);
+            }
+            // Console.WriteLine(message);
+        }
+
+        [Conditional("DEBUG")]
+        private void ShowInfo()
+        {
+            Console.WriteLine(string.Join(",", this.Registers.Select(x => "0x" + x.ToString("X8")).ToArray()));
         }
     }
 }
