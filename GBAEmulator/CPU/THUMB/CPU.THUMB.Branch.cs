@@ -6,6 +6,13 @@ namespace GBAEmulator.CPU
     {
         private void ConditionalBranch(ushort Instruction)
         {
+            if ((Instruction & 0xff00) == 0xdf00)
+            {
+                // "ambiguity"
+                this.SWIInstruction(Instruction);
+                return;
+            }
+
             this.Log("Conditional Branch");
             /*
              The instructions in this group all perform a conditional Branch depending on the state

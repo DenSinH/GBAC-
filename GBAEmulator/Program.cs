@@ -21,6 +21,7 @@ namespace GBAEmulator
             GBA gba = new GBA(display);
 
             Thread t = new Thread(() => Run(gba));
+            t.SetApartmentState(ApartmentState.STA);
             t.Start();
 
             Application.EnableVisualStyles();

@@ -30,6 +30,26 @@ namespace GBAEmulator.CPU
                 this.BankedRegisters[this.mode][i] = this.Registers[i];
                 this.Registers[i] = this.BankedRegisters[NewMode][i];
             }
+
+            switch (NewMode)
+            {
+                case Mode.FIQ:
+                    SPSR_fiq = this.CPSR;
+                    break;
+                case Mode.Supervisor:
+                    SPSR_svc = this.CPSR;
+                    break;
+                case Mode.Abort:
+                    SPSR_abt = this.CPSR;
+                    break;
+                case Mode.IRQ:
+                    SPSR_irq = this.CPSR;
+                    break;
+                case Mode.Undefined:
+                    SPSR_und = this.CPSR;
+                    break;
+            }
+            
             this.mode = NewMode;
         }
 
@@ -54,7 +74,7 @@ namespace GBAEmulator.CPU
                 SR_RESERVED = ((value >> 8) & 0x0f_ffff);
                 I = (byte)((value >> 7) & 0x01);
                 F = (byte)((value >> 6) & 0x01);
-                this.state = (State)((value >> 6) & 0x01);
+                this.state = (State)((value >> 5) & 0x01);
 
                 if ((value & 0x1f) != (byte)this.mode)
                     this.ChangeMode((Mode)(value & 0x1f));
@@ -108,7 +128,6 @@ namespace GBAEmulator.CPU
                         SPSR_und = value;
                         return;
                     default:
-                        this.Error(string.Format("No SPSR for mode {0}", this.mode));
                         return;
                 }
             }

@@ -77,7 +77,7 @@ namespace GBAEmulator.CPU
             {
                 if (Signed)
                 {
-                    long RdHiRdLo = ((long)(int)this.Registers[RdHi] << 32) | (long)(int)(this.Registers[RdLo]);
+                    long RdHiRdLo = ((long)this.Registers[RdHi] << 32) | (this.Registers[RdLo]);
                     long Result = (long)(int)this.Registers[Rs] * (long)(int)this.Registers[Rm] + RdHiRdLo;
                     this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
                     this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);

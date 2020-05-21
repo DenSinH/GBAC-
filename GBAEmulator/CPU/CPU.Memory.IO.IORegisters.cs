@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private class EmptyRegister : IORegister2 { }
+        private class EmptyRegister : IORegister2 { }  // basically default register (name might be a bit misleading)
 
         #region DISPCNT
         public class cDISPCNT : IORegister2
@@ -225,9 +221,23 @@ namespace GBAEmulator.CPU
         #region KEYINPUT
         private class cKeyInput : IORegister2
         {
+            Controller controller = new XInputController();
+
+            public cKeyInput()
+            {
+                try
+                {
+                    this.controller.PollKeysPressed();
+                }
+                catch (SharpDX.SharpDXException)
+                {
+                    this.controller = new KeyboardController();
+                }
+            }
+
             public override ushort Get()
             {
-                return 0xffff;
+                return (ushort)~this.controller.PollKeysPressed();
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh) { }

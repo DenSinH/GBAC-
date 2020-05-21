@@ -9,6 +9,7 @@ namespace GBAEmulator
     partial class PPU
     {
         public int scanline = 0;
+        public ulong frame = 0;
         
         public bool IsVBlank
         {
@@ -28,7 +29,10 @@ namespace GBAEmulator
 
             scanline++;
             if (scanline == 227)
+            {
                 scanline = 0;
+                frame++;
+            }
 
         }
     }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using GBAEmulator.CPU;
 
@@ -13,6 +9,8 @@ namespace GBAEmulator
         public ARM7TDMI cpu;
         public PPU ppu;
         public ushort[] display;
+
+        public bool ShutDown;
 
         public GBA(ushort[] display)
         {
@@ -59,10 +57,11 @@ namespace GBAEmulator
 
         public void Run()
         {
-            cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
+            // cpu.LoadRom("../../Tests/GBASuiteNew/thumb.gba");
+            cpu.LoadRom("../../roms/KirbyNightmare.gba");
             cpu.SkipBios();
 
-            while (true)
+            while (!this.ShutDown)
             {
                 this.RunLine();
             }

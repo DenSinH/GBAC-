@@ -120,7 +120,7 @@ namespace GBAEmulator.CPU
                         else
                         {
                             //SWI
-                            this.ARMInstructions[Instruction] = (uint _) => throw new NotImplementedException("SWI instruction");
+                            this.ARMInstructions[Instruction] = this.SWIInstruction;
                         }
                         break;
                 }
@@ -169,7 +169,7 @@ namespace GBAEmulator.CPU
 
         private void ExecuteARM(uint Instruction)
         {
-            this.Log(string.Format("ARM: {0:x8}: PC: {1:x8}", Instruction, this.PC));
+            this.Log(string.Format("ARM: {0:x8} :: PC: {1:x8} :: CPSR: {2:x8}", Instruction, this.PC - 8, this.CPSR));
 
             if (!ARMCondition((byte)((Instruction & 0xf000_0000) >> 28)))
             {

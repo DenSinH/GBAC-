@@ -9,6 +9,7 @@ namespace GBAEmulator.CPU
 
         private void InitTHUMB()
         {
+            // initialize THUMB instructions
             // Top 6 bits for hashing
             for (byte i = 0; i < 64; i++)
             {
@@ -25,7 +26,7 @@ namespace GBAEmulator.CPU
                 else if ((i & 0b111110) == 0b010010)
                     this.THUMBInstructions[i] = this.PCRelativeLoad;
                 else if ((i & 0b111100) == 0b010100)
-                    // Some instructions were combined to fit this in (7 and 8)
+                    // Some instructions were combined to fit this in (format 7 and 8)
                     this.THUMBInstructions[i] = this.LoadStoreRegOffset_SignExtended;
                 else if ((i & 0b111000) == 0b011000)
                     this.THUMBInstructions[i] = this.LoadStoreImmediate;
@@ -42,7 +43,7 @@ namespace GBAEmulator.CPU
                 else if ((i & 0b111100) == 0b110000)
                     this.THUMBInstructions[i] = this.MultipleLoadStore;
                 else if ((i & 0b111100) == 0b110100)
-                    this.THUMBInstructions[i] = this.ConditionalBranch;
+                    this.THUMBInstructions[i] = this.ConditionalBranch;  // also contains SWI
                 else if ((i & 0b111110) == 0b111000)
                     this.THUMBInstructions[i] = this.UnconditionalBranch;
                 else if ((i & 0b111100) == 0b111100)
@@ -51,12 +52,11 @@ namespace GBAEmulator.CPU
                     // todo: undefined
                     this.THUMBInstructions[i] = (ushort _) => throw new NotImplementedException("Undefined THUMB instruction: " + _.ToString("x4"));
             }
-            // initialize THUMB instructions
         }
 
         private void ExecuteTHUMB(ushort Instruction)
         {
-            this.Log(string.Format("THUMB: {0:x4}: PC: {1:x8}", Instruction, this.PC));
+            this.Log(string.Format("THUMB: {0:x8} :: PC: {1:x8} :: CPSR: {2:x8}", Instruction, this.PC - 4, this.CPSR));
             this.THUMBInstructions[(Instruction & 0xfc00) >> 10](Instruction);
         }
     }

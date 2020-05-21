@@ -263,7 +263,10 @@ namespace GBAEmulator.CPU
             Rb = (byte)((Instruction & 0x0700) >> 8);
             RList = (byte)(Instruction & 0x00ff);
 
-            uint Address = this.Registers[Rb] & 0xffff_fffc;  // force align
+            uint Address = this.Registers[Rb];
+            byte Misalignment = (byte)(Address & 0x03);  // store misalignment for writeback
+            Address = Address & 0xffff_fffc;  // force align
+
             if (RList == 0)
             {
                 /*
@@ -292,7 +295,7 @@ namespace GBAEmulator.CPU
                         Address += 4;
                     }
                 }
-                this.Registers[Rb] = Address;
+                this.Registers[Rb] = Address | Misalignment;  // return misalignment
             }
             else
             {
@@ -314,7 +317,7 @@ namespace GBAEmulator.CPU
                 }
 
                 // Writeback, we want to write Rb as the new value if it is not the first to be written
-                this.Registers[Rb] = Address + 4 * (uint)RegisterQueue.Count;
+                this.Registers[Rb] = (Address + 4 * (uint)RegisterQueue.Count) | Misalignment;
 
                 while (RegisterQueue.Count > 0)
                 {

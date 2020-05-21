@@ -17,6 +17,8 @@ namespace GBAEmulator.CPU
             byte Target = (byte)((Instruction & 0x0000_f000) >> 12);
             uint Op2;
 
+            byte OldC = this.C;
+
             /*
              When Rd is a register other than R15, the condition code flags in the CPSR may be
              updated from the ALU flags as described above.
@@ -70,12 +72,12 @@ namespace GBAEmulator.CPU
                 // Rotate right
                 if (ShiftAmount > 0)
                 {
-                    if (SetConditions)
-                    {
-                        this.C = (byte)((Op2 >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
-                    }
                     ShiftAmount &= 0x1f;  // mod 32 gives same result
                     Op2 = (uint)((Op2 >> ShiftAmount) | ((Op2 & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
+                    if (SetConditions)
+                    {
+                        this.C = (byte)(Op2 >> 31);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                    }
                 }
             }
 
@@ -110,20 +112,20 @@ namespace GBAEmulator.CPU
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0101:  // ADC
-                    Result = Op1 + Op2 + C;
+                    Result = Op1 + Op2 + OldC;
                     if (SetConditions)
-                        this.SetCVAdd(Op1, (ulong)Op2 + C, Result);
+                        this.SetCVAdd(Op1, (ulong)Op2 + OldC, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0110:  // SBC
-                    temp = Op2 - C + 1;
+                    temp = Op2 - OldC + 1;
                     Result = (uint)(Op1 - temp);
                     if (SetConditions)
                         this.SetCVSub(Op1, temp, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0111:  // RSC
-                    temp = Op1 - C + 1;
+                    temp = Op1 - OldC + 1;
                     Result = (uint)(Op2 - temp);
                     if (SetConditions)
                         this.SetCVSub(Op2, temp, Result);

@@ -38,10 +38,9 @@ namespace GBAEmulator.CPU
 
             I don't know what the top part means, but the bottom part we can do
             */
-            Mode OldMode = Mode.User;  // some random default value, it doesn't matter what we put here
+            Mode OldMode = this.mode;
             if (PSR_ForceUser)
             {
-                OldMode = this.mode;
                 this.ChangeMode(Mode.User);
             }
 

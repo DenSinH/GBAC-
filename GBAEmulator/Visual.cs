@@ -18,12 +18,15 @@ namespace GBAEmulator
         private const int height = 160;
         private const double scale = 2;
 
+        private const byte interval = 17; // ms
+        private double time;
+
         private GBA gba;
 
         public Visual(GBA gba)
         {
             InitializeComponent();
-            this.Size = new Size((int)(scale * width), (int)(scale * height));
+            this.ClientSize = new Size((int)(scale * width), (int)(scale * height));
 
             this.gba = gba;
             this._display = new ushort[width * height];
@@ -39,10 +42,10 @@ namespace GBAEmulator
                 ControlStyles.DoubleBuffer, true
             );
 
-            this.Text = "GBA Emulator";
+            this.Text = "GBAC-";
 
             System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-            timer.Interval = 17;
+            timer.Interval = interval;
             timer.Tick += new EventHandler(Tick);
             timer.Start();
 
@@ -52,12 +55,18 @@ namespace GBAEmulator
             this.KeyDown += new KeyEventHandler(Visual_KeyDown);
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            this.gba.ShutDown = true;
+            base.OnFormClosing(e);
+        }
+
         private void Visual_KeyDown(object sender, KeyEventArgs e)
         {
             // Debugging keys
-            if (e.KeyCode == Keys.O)
+            if (e.KeyCode == Keys.Q)
             {
-                Console.WriteLine("Oh!");
+                this.gba.cpu.ShowInfo();
             }
         }
 
@@ -67,7 +76,7 @@ namespace GBAEmulator
             {
                 // no image scaling for crisp pixels!
                 e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                e.Graphics.DrawImage(this.Backbuffer, 0, 0, this.Size.Width - 16, this.Size.Height);
+                e.Graphics.DrawImage(this.Backbuffer, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
             }
         }
 
@@ -117,6 +126,14 @@ namespace GBAEmulator
             //Console.WriteLine(this.gba.cpu.Registers[1].ToString("x8") + " " + this.gba.cpu.Registers[1].ToString("x8"));
             //Console.ReadKey();
             Draw();
+
+            time += interval;
+            this.Text = string.Format("GBAC- <{0:0.0} fps>", (1000 * this.gba.ppu.frame / this.time));
+            if (time > 2000)
+            {
+                this.gba.ppu.frame = 0;
+                this.time = 0;
+            }
         }
 
     }

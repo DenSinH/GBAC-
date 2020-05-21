@@ -594,9 +594,21 @@ namespace GBAEmulator.CPU
             // From Dillon
             this.Registers[0] = 0x08000000;
             this.Registers[1] = 0xEA;
+
+            /*
+            The three stack pointers are initially initialized at the TOP of the respective areas:
+                  SP_svc=03007FE0h
+                  SP_irq=03007FA0h
+                  SP_usr=03007F00h
+            (GBATek)
+             */
             this.SP = 0x03007F00;
-            this.SPSR_irq = 0x3007FA0;
-            this.SPSR_svc = 0x3007FE0;
+            this.FIQBank[13] = 0x03007F00;          // mode does not exist
+            this.SupervisorBank[13] = 0x03007FE0;
+            this.AbortBank[13] = 0x03007F00;        // mode does not exist
+            this.IRQBank[13] = 0x03007FA0;
+            this.UndefinedBank[13] = 0x03007F00;    // mode does not exist
+            
             this.PC = 0x08000000;
             this.CPSR = 0x6000001F;
         }
