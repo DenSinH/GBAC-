@@ -155,7 +155,7 @@ namespace GBAEmulator.CPU
                 get => (this._raw & 0x40) > 0;
             }
 
-            public bool Colors
+            public bool ColorMode
             {
                 get => (this._raw & 0x80) > 0;
             }
@@ -177,7 +177,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        cBGControl[] BGCNT = new cBGControl[4] { new cBGControl(), new cBGControl(), new cBGControl(), new cBGControl() };
+        public cBGControl[] BGCNT = new cBGControl[4] { new cBGControl(), new cBGControl(), new cBGControl(), new cBGControl() };
         #endregion
 
         #region BGScrolling
@@ -189,8 +189,8 @@ namespace GBAEmulator.CPU
             }
         }
 
-        cBGScrolling[] BGHOFS = new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
-        cBGScrolling[] BGVOFS = new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
+        public cBGScrolling[] BGHOFS = new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
+        public cBGScrolling[] BGVOFS = new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
         #endregion
 
         #region LCD I/O BG Rotation/Scaling

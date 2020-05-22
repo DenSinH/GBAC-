@@ -9,7 +9,7 @@ namespace GBAEmulator.CPU
         private byte[] eWRAM = new byte[0x40000];       // 256kB External Work RAM
         private byte[] iWRAM = new byte[0x8000];        // 32kB Internal Work RAM
         // 1kB IO RAM
-        private byte[] PaletteRAM = new byte[0x400];    // 1kB Palette RAM
+        public byte[] PaletteRAM = new byte[0x400];    // 1kB Palette RAM
         public byte[] VRAM = new byte[0x18000];        // 96kB VRAM
         private byte[] OAM = new byte[0x400];           // 1kB OAM
         private byte[] GamePak = new byte[0x200_0000];   // Game Pak (up to) 32MB (0x0800_0000 - 0x0a00_0000, then mirrored)
@@ -21,16 +21,7 @@ namespace GBAEmulator.CPU
             0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
             0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0xffff
         };
-
-        public ushort GetPaletteEntry(uint Address)
-        {
-            // Address within palette memory
-            return (ushort)(
-                PaletteRAM[Address] |
-                (PaletteRAM[Address + 1] << 8)
-                );
-        }
-
+        
         private uint GetWordAt(uint Address)
         {
             byte Section = (byte)((Address & 0x0f00_0000) >> 24);
