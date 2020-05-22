@@ -8,6 +8,9 @@ namespace GBAEmulator.CPU
 
         private void InitRegisters()
         {
+            this.DISPSTAT = new cDISPSTAT(this);
+            this.VCOUNT = new cVCOUNT(this);
+
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;
             this.IORAM[0x02] = this.IORAM[0x03] = new EmptyRegister();
             this.IORAM[0x04] = this.IORAM[0x05] = this.DISPSTAT;
@@ -54,7 +57,13 @@ namespace GBAEmulator.CPU
                 this.IORAM[2 * i] = this.IORAM[2 * i + 1] = new EmptyRegister();
             }
 
-            this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput();
+            cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
+            this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(KEYCNT, this);
+            this.IORAM[0x0132] = this.IORAM[0x0133] = KEYCNT;
+
+            this.IORAM[0x0208] = this.IORAM[0x0209] = this.IME;
+            this.IORAM[0x0200] = this.IORAM[0x0201] = this.IE;
+            this.IORAM[0x0202] = this.IORAM[0x0203] = this.IF;
         }
 
         private byte IOGetByteAt(uint address)
@@ -105,7 +114,7 @@ namespace GBAEmulator.CPU
             }
 
             reg.Set((ushort)(value << 8), false, true);
-            this.IORAM[address + 1].Set((ushort)(value & 0x00ff), true, false);
+            this.IORAM[address + 2].Set((ushort)(value & 0x00ff), true, false);
         }
 
         private uint IOGetWordAt(uint address)
@@ -119,8 +128,8 @@ namespace GBAEmulator.CPU
                 return (uint)(reg.Get() | (reg.Get() << 16));
             }
             uint result = (uint)(reg.Get() >> 8);
-            result |= ((uint)this.IORAM[address + 1].Get() << 8);
-            result |= ((uint)this.IORAM[address + 2].Get() << 24);
+            result |= ((uint)this.IORAM[address + 2].Get() << 8);
+            result |= ((uint)this.IORAM[address + 4].Get() << 24);
             return result;
 
         }
@@ -135,13 +144,13 @@ namespace GBAEmulator.CPU
             if (!offset)
             {
                 reg.Set((ushort)value, true, true);
-                this.IORAM[address + 1].Set((ushort)(value >> 16), true, true);
+                this.IORAM[address + 2].Set((ushort)(value >> 16), true, true);
             }
             else
             {
                 reg.Set((ushort)(value << 8), false, true);
-                this.IORAM[address + 1].Set((ushort)(value >> 8), true, true);
-                this.IORAM[address + 2].Set((ushort)(value >> 24), true, false);
+                this.IORAM[address + 2].Set((ushort)(value >> 8), true, true);
+                this.IORAM[address + 4].Set((ushort)(value >> 24), true, false);
             }
         }
     }

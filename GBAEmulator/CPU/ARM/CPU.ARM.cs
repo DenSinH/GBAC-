@@ -126,52 +126,12 @@ namespace GBAEmulator.CPU
                 }
             }
         }
-        
-
-        private bool ARMCondition(byte field)
-        {
-            switch (field)
-            {
-                case 0b0000:  // EQ
-                    return Z == 1;
-                case 0b0001:  // NE
-                    return Z == 0;
-                case 0b0010:  // CS
-                    return C == 1;
-                case 0b0011:  // CC
-                    return C == 0;
-                case 0b0100:  // MI
-                    return N == 1;
-                case 0b0101:  // PL
-                    return N == 0;
-                case 0b0110:  // VS
-                    return V == 1;
-                case 0b0111:  // VC
-                    return V == 0;
-                case 0b1000:  // HI
-                    return (C == 1) && (Z == 0);
-                case 0b1001:  // LS
-                    return (C == 0) && (Z == 1);
-                case 0b1010:  // GE
-                    return N == V;
-                case 0b1011:  // LT
-                    return N != V;
-                case 0b1100:  // GT
-                    return (Z == 0) && (N == V);
-                case 0b1101:  // LE
-                    return (Z == 1) || (N != V);
-                case 0b1110:  // AL
-                    return true;
-                default:
-                    throw new Exception(string.Format("Condition field {0} reserved/invalid", field));
-            }
-        }
 
         private void ExecuteARM(uint Instruction)
         {
             this.Log(string.Format("ARM: {0:x8} :: PC: {1:x8} :: CPSR: {2:x8}", Instruction, this.PC - 8, this.CPSR));
 
-            if (!ARMCondition((byte)((Instruction & 0xf000_0000) >> 28)))
+            if (!Condition((byte)((Instruction & 0xf000_0000) >> 28)))
             {
                 this.Log("Condition false");
                 return;

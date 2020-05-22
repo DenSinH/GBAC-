@@ -45,11 +45,13 @@ namespace GBAEmulator
             
             this.cpu.DISPSTAT.SetVBlank(this.ppu.IsVBlank);  // set VBlank to correct value
             this.cpu.DISPSTAT.SetHBlank(false);
+            this.cpu.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
+
             for (cycle = 0; cycle < 960; cycle++)
                 this.cpu.Step();
 
             this.cpu.DISPSTAT.SetHBlank(true);
-            this.ppu.HackyMode4Scanline();
+            this.ppu.DrawScanline();
 
             for (cycle = 0; cycle < 272; cycle++)
                 this.cpu.Step();
@@ -57,8 +59,8 @@ namespace GBAEmulator
 
         public void Run()
         {
-            // cpu.LoadRom("../../Tests/GBASuiteNew/thumb.gba");
-            cpu.LoadRom("../../roms/KirbyNightmare.gba");
+            // cpu.LoadRom("../../roms/KirbyNightmare.gba");
+            cpu.LoadRom("../../Tests/Tonc/brin_demo.gba");
             cpu.SkipBios();
 
             while (!this.ShutDown)

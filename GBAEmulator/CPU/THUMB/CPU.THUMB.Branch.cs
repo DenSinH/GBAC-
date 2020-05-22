@@ -48,7 +48,7 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                if (this.ARMCondition(Condition))
+                if (this.Condition(Condition))
                 {
                     this.PC = (uint)(this.PC + SignedOffset);
                     this.PipelineFlush();

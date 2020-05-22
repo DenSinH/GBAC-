@@ -79,6 +79,7 @@
     <Compile Include="CPU\ARM\CPU.ARM.PSRTransfer.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.SingleDataTransfer.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.SWP.cs" />
+    <Compile Include="CPU\CPU.IRQ.cs" />
     <Compile Include="CPU\CPU.SWI.cs" />
     <Compile Include="CPU\CPU.Aux.cs" />
     <Compile Include="CPU\CPU.BIOS.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="CPU\CPU.Memory.IO.IORegisters.base.cs" />
     <Compile Include="CPU\CPU.Memory.IO.IORegisters.cs" />
     <Compile Include="CPU\CPU.Testing.cs" />
+    <Compile Include="CPU\CPU.InterruptHandling.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.AddOffsetToSP.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.AddSubtract.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.ALUOperations.cs" />

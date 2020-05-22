@@ -42,7 +42,6 @@ namespace GBAEmulator.CPU
 
             // need banked registers for CPSR initialization
             this.CPSR = 0x0000005F;
-            Console.WriteLine(this.state);
 
             this.__MemoryRegions__ = new byte[15][]
             {
@@ -67,7 +66,7 @@ namespace GBAEmulator.CPU
                 current = fs.ReadByte();
                 i++;
             }
-            Console.WriteLine(string.Format("{0:x8} Bytes loaded (hex)", i));
+            this.Log(string.Format("{0:x8} Bytes loaded (hex)", i));
         }
 
         private void PipelineFlush()
@@ -77,6 +76,8 @@ namespace GBAEmulator.CPU
 
         public void Step()
         {
+            this.HandleIRQs();
+
             if (this.state == State.ARM)
             {
                 this.Pipeline.Enqueue(this.GetWordAt(this.PC));
@@ -107,8 +108,9 @@ namespace GBAEmulator.CPU
             }
 #if DEBUG
             this.ShowInfo();
+            if (this.Registers[12] != 0)
+                Console.ReadKey();
 #endif
-
         }
         
         [Conditional("DEBUG")]
@@ -120,11 +122,10 @@ namespace GBAEmulator.CPU
         [Conditional("DEBUG")]
         private void Log(string message)
         {
-            if (this.Registers[1] < 0x100 || this.Registers[1] > 0x400000)
+            if (this.PC != 0x0800_0194 && this.PC != 0x0800_0196 && this.PC != 0x0800_0198)
             {
                 Console.WriteLine(message);
             }
-            // Console.WriteLine(message);
         }
         
         public void ShowInfo()

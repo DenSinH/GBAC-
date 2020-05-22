@@ -16,19 +16,19 @@ namespace GBAEmulator.CPU
 
         public abstract class IORegister2 : IORegister
         {
-            protected ushort raw;
+            protected ushort _raw;
 
             public virtual ushort Get()
             {
-                return this.raw;
+                return this._raw;
             }
 
             public virtual void Set(ushort value, bool setlow, bool sethigh)
             {
                 if (setlow)
-                    this.raw = (ushort)((this.raw & 0xff00) | (value & 0x00ff));
-                else if (sethigh)
-                    this.raw = (ushort)((this.raw & 0x00ff) | (value & 0xff00));
+                    this._raw = (ushort)((this._raw & 0xff00) | (value & 0x00ff));
+                if (sethigh)
+                    this._raw = (ushort)((this._raw & 0x00ff) | (value & 0xff00));
             }
         }
 
