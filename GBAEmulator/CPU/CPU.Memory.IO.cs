@@ -64,6 +64,8 @@ namespace GBAEmulator.CPU
             this.IORAM[0x0208] = this.IORAM[0x0209] = this.IME;
             this.IORAM[0x0200] = this.IORAM[0x0201] = this.IE;
             this.IORAM[0x0202] = this.IORAM[0x0203] = this.IF;
+
+            this.IORAM[0x0300] = this.IORAM[0x0301] = this.HALTCNT;
         }
 
         private byte IOGetByteAt(uint address)

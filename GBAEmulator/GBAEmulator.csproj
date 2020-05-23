@@ -79,7 +79,7 @@
     <Compile Include="CPU\ARM\CPU.ARM.PSRTransfer.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.SingleDataTransfer.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.SWP.cs" />
-    <Compile Include="CPU\CPU.IRQ.cs" />
+    <Compile Include="CPU\CPU.Debug.cs" />
     <Compile Include="CPU\CPU.SWI.cs" />
     <Compile Include="CPU\CPU.Aux.cs" />
     <Compile Include="CPU\CPU.BIOS.cs" />

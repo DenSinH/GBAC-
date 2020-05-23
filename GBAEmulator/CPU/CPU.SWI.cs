@@ -12,7 +12,7 @@ namespace GBAEmulator.CPU
             LR = this.PC - (uint)((this.state == State.THUMB) ? 2 : 4);  // which is now LR_svc
             this.state = State.ARM;
 
-            this.PC = this.SWIVector;
+            this.PC = SWIVector;
             this.PipelineFlush();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace GBAEmulator.CPU
 {
@@ -6,7 +7,8 @@ namespace GBAEmulator.CPU
     {
         /* Normatt's GBA BIOS */
         private const int BIOS_SIZE = 0x4000;
-        private readonly byte[] BIOS = {
+        private byte[] BIOS;
+        private readonly byte[] NormattsBIOS = {
             0x0C, 0x00, 0x00, 0xEA, 0x15, 0x00, 0x00, 0xEA, 0x15, 0x00, 0x00, 0xEA, 0x13, 0x00, 0x00, 0xEA,
             0x12, 0x00, 0x00, 0xEA, 0x11, 0x00, 0x00, 0xEA, 0x00, 0x00, 0x00, 0xEA, 0xFF, 0xFF, 0xFF, 0xEA,
             0x0F, 0x50, 0x2D, 0xE9, 0x01, 0x03, 0xA0, 0xE3, 0x0F, 0xE0, 0xA0, 0xE1, 0x04, 0xF0, 0x10, 0xE5,
@@ -588,6 +590,35 @@ namespace GBAEmulator.CPU
             0xBB, 0x86, 0xC8, 0xBF, 0x2A, 0xF5, 0x2F, 0xCB, 0xCB, 0xFC, 0x44, 0xD7, 0x3A, 0xF0, 0x11, 0xE4,
             0x39, 0xBF, 0xA1, 0xF1, 0x64, 0x6B, 0x41, 0x52, 0x4D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
+
+        private bool InitBIOS()
+        {
+            FileStream fs;
+            try
+            {
+                
+                fs = File.OpenRead("../../CPU/bios/gba_bios.bin");
+            }
+            catch
+            {
+                this.BIOS = this.NormattsBIOS;
+                // fs = File.OpenRead("../../CPU/bios/NormattBIOS.bin");
+                Console.WriteLine("BIOS dump load failed, using Normatt''s BIOS...");
+                return false;
+            }
+
+            this.BIOS = new byte[0x4000];
+            int current = fs.ReadByte();
+            uint i = 0;
+
+            while (current != -1)
+            {
+                this.BIOS[i] = (byte)current;
+                current = fs.ReadByte();
+                i++;
+            }
+            return true;
+        }
 
         public void SkipBios()
         {

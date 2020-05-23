@@ -29,13 +29,13 @@ namespace GBAEmulator.CPU
         ensure that the transfer error does not escape detection. The time for this exception
         entry should be added to worst-case FIQ latency calculations.
         */
-        uint ResetVector = 0x0;
-        uint UndefVector = 0x4;
-        uint SWIVector = 0x8;
-        uint AbortPrefetchVector = 0xc;
-        uint AbortDataVector = 0x10;
-        uint ReservedVector = 0x14;
-        uint IRQVector = 0x18;
-        uint FIQVector = 0x1c;
+        const uint ResetVector = 0x0;
+        const uint UndefVector = 0x4;
+        const uint SWIVector = 0x8;
+        const uint AbortPrefetchVector = 0xc;
+        const uint AbortDataVector = 0x10;
+        const uint ReservedVector = 0x14;
+        const uint IRQVector = 0x18;
+        const uint FIQVector = 0x1c;
     }
 }

@@ -22,152 +22,152 @@ namespace GBAEmulator.CPU
             0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0xffff
         };
         
-        private uint GetWordAt(uint Address)
+        private uint GetWordAt(uint address)
         {
-            byte Section = (byte)((Address & 0x0f00_0000) >> 24);
+            byte Section = (byte)((address & 0x0f00_0000) >> 24);
             if (__MemoryRegions__[Section] != null)
-                return __GetWordAt__(this.__MemoryRegions__[Section], Address & __MemoryMasks__[Section]);
+                return __GetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section]);
 
 
             switch (Section)
             {
                 case 6:  // VRAM Mirrors
-                    if ((Address & 0x1ffff) < 0x10000)
+                    if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        return __GetWordAt__(this.VRAM, Address & 0xffff);
+                        return __GetWordAt__(this.VRAM, address & 0xffff);
                     }
-                    return __GetWordAt__(this.VRAM, 0x10000 | (Address & 0x7fff));
+                    return __GetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
                 case 4: // IORAM
-                    return this.IOGetWordAt(Address & 0x3ff);
+                    return this.IOGetWordAt(address & 0x3ff);
                 default:
                     throw new Exception("This cannot happen");
             }
             
         }
 
-        private void SetWordAt(uint Address, uint Value)
+        private void SetWordAt(uint address, uint value)
         {
-            byte Section = (byte)((Address & 0x0f00_0000) >> 24);
+            byte Section = (byte)((address & 0x0f00_0000) >> 24);
             if (__MemoryRegions__[Section] != null)
             {
-                __SetWordAt__(this.__MemoryRegions__[Section], Address & __MemoryMasks__[Section], Value);
+                __SetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
                 return;
             }
 
             switch (Section)
             {
                 case 6:  // VRAM Mirrors
-                    if ((Address & 0x1ffff) < 0x10000)
+                    if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        __SetWordAt__(this.VRAM, Address & 0xffff, Value);
+                        __SetWordAt__(this.VRAM, address & 0xffff, value);
                         return;
                     }
-                    __SetWordAt__(this.VRAM, 0x10000 | (Address & 0x7fff), Value);
+                    __SetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff), value);
                     return;
                 case 4: // IORAM
-                    this.IOSetWordAt(Address & 0x3ff, Value);
+                    this.IOSetWordAt(address & 0x3ff, value);
                     return;
                 default:
                     throw new Exception("This cannot happen");
             }
         }
 
-        private ushort GetHalfWordAt(uint Address)
+        private ushort GetHalfWordAt(uint address)
         {
-            byte Section = (byte)((Address & 0x0f00_0000) >> 24);
+            byte Section = (byte)((address & 0x0f00_0000) >> 24);
             if (__MemoryRegions__[Section] != null)
-                return __GetHalfWordAt__(this.__MemoryRegions__[Section], Address & __MemoryMasks__[Section]);
+                return __GetHalfWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section]);
 
             switch (Section)
             {
                 case 6:  // VRAM Mirrors
-                    if ((Address & 0x1ffff) < 0x10000)
+                    if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        return __GetHalfWordAt__(this.VRAM, Address & 0xffff);
+                        return __GetHalfWordAt__(this.VRAM, address & 0xffff);
                     }
-                    return __GetHalfWordAt__(this.VRAM, 0x10000 | (Address & 0x7fff));
+                    return __GetHalfWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
                 case 4: // IORAM
-                    return (ushort)this.IOGetHalfWordAt(Address & 0x3ff);
+                    return (ushort)this.IOGetHalfWordAt(address & 0x3ff);
                 default:
                     throw new Exception("This cannot happen");
             }
         }
 
-        private void SetHalfWordAt(uint Address, ushort Value)
+        private void SetHalfWordAt(uint address, ushort value)
         {
-            byte Section = (byte)((Address & 0x0f00_0000) >> 24);
+            byte Section = (byte)((address & 0x0f00_0000) >> 24);
             if (__MemoryRegions__[Section] != null)
             {
-                __SetHalfWordAt__(this.__MemoryRegions__[Section], Address & __MemoryMasks__[Section], Value);
+                __SetHalfWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
                 return;
             }
 
             switch (Section)
             {
                 case 6:  // VRAM Mirrors
-                    if ((Address & 0x1ffff) < 0x10000)
+                    if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        __SetHalfWordAt__(this.VRAM, Address & 0xffff, Value);
+                        __SetHalfWordAt__(this.VRAM, address & 0xffff, value);
                         return;
                     }
-                    __SetHalfWordAt__(this.VRAM, 0x10000 | (Address & 0x7fff), Value);
+                    __SetHalfWordAt__(this.VRAM, 0x10000 | (address & 0x7fff), value);
                     return;
                 case 4: // IORAM
-                    this.IOSetHalfWordAt(Address & 0x3ff, Value);  // for now
+                    this.IOSetHalfWordAt(address & 0x3ff, value);  // for now
                     return;
                 default:
                     throw new Exception("This cannot happen");
             }
         }
 
-        private byte GetByteAt(uint Address)
+        private byte GetByteAt(uint address)
         {
-            byte Section = (byte)((Address & 0x0f00_0000) >> 24);
+            byte Section = (byte)((address & 0x0f00_0000) >> 24);
             if (__MemoryRegions__[Section] != null)
-                return this.__MemoryRegions__[Section][Address & __MemoryMasks__[Section]];
+                return this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]];
 
             switch (Section)
             {
                 case 6:  // VRAM Mirrors
-                    if ((Address & 0x1ffff) < 0x10000)
+                    if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        return this.VRAM[Address & 0xffff];
+                        return this.VRAM[address & 0xffff];
                     }
-                    return this.VRAM[0x10000 | (Address & 0x7fff)];
+                    return this.VRAM[0x10000 | (address & 0x7fff)];
                 case 4: // IORAM
-                    return (byte)this.IOGetByteAt(Address & 0x3ff);
+                    return (byte)this.IOGetByteAt(address & 0x3ff);
                 default:
                     throw new Exception("This cannot happen");
             }
         }
 
-        private void SetByteAt(uint Address, byte Value)
+        private void SetByteAt(uint address, byte value)
         {
-            byte Section = (byte)((Address & 0x0f00_0000) >> 24);
+            byte Section = (byte)((address & 0x0f00_0000) >> 24);
             if (__MemoryRegions__[Section] != null)
             {
-                this.__MemoryRegions__[Section][Address & __MemoryMasks__[Section]] = Value;
+                this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]] = value;
                 return;
             }
 
             switch (Section)
             {
                 case 6:  // VRAM Mirrors
-                    if ((Address & 0x1ffff) < 0x10000)
+                    if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        this.VRAM[Address & 0xffff] = Value;
+                        this.VRAM[address & 0xffff] = value;
                         return;
                     }
-                    this.VRAM[0x10000 | (Address & 0x7fff)] = Value;
+                    this.VRAM[0x10000 | (address & 0x7fff)] = value;
                     return;
                 case 4: // IORAM
-                    this.IOSetByteAt(Address & 0x3ff, Value);
+                    this.IOSetByteAt(address & 0x3ff, value);
                     return;
                 default:
                     throw new Exception("This cannot happen");

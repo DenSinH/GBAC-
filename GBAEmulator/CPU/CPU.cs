@@ -20,6 +20,11 @@ namespace GBAEmulator.CPU
         {
             this.gba = gba;
 
+            this.InitBIOS();
+            this.InitARM();
+            this.InitTHUMB();
+            this.InitRegisters();
+
             this.SystemBank = new uint[16];
             this.FIQBank = new uint[16];
             this.SupervisorBank = new uint[16];
@@ -48,10 +53,6 @@ namespace GBAEmulator.CPU
                 this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
                 this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM
             };
-
-            this.InitARM();
-            this.InitTHUMB();
-            this.InitRegisters();
         }
 
         public void LoadRom(string FileName)
@@ -73,10 +74,22 @@ namespace GBAEmulator.CPU
         {
             this.Pipeline.Clear();
         }
-
+        
         public void Step()
         {
             this.HandleIRQs();
+
+            //if (this.HALTCNT.Halt || this.HALTCNT.Stop)
+            //{
+            //    Console.ReadKey();
+            //    return;
+            //}
+            //else if ((this.IF.raw & this.IE.raw) != 0)
+            //{
+            //    this.HALTCNT.Halt = false;
+            //    this.HALTCNT.Stop = false;
+            //}
+            //else
 
             if (this.state == State.ARM)
             {
@@ -106,26 +119,17 @@ namespace GBAEmulator.CPU
                     this.Log("Filling Pipeline");
                 }
             }
-        }
-        
-        [Conditional("DEaBUG")]
-        private void Error(string message)
-        {
-            Console.Error.WriteLine("Error: " + message);
-        }
-        
-        [Conditional("DEBaUG")]
-        private void Log(string message)
-        {
-            if (this.PC != 0x0800_0194 && this.PC != 0x0800_0196 && this.PC != 0x0800_0198)
-            {
-                Console.WriteLine(message);
-            }
-        }
-        
-        public void ShowInfo()
-        {
-            Console.WriteLine(string.Join(",", this.Registers.Select(x => "0x" + x.ToString("X8")).ToArray()));
+
+            // Console.ReadKey();
+
+            //if (this.Registers[15] != 0x0800_0190 && this.Registers[15] != 0x0800_0192 && this.Registers[15] != 0x0800_0194 && this.Registers[15] != 0x0800_0196)
+            //{
+            //    if (this.Registers[15] != 0x0800_01a4 && this.Registers[15] != 0x0800_01a6 && this.Registers[15] != 0x0800_01a8 && this.Registers[15] != 0x0800_01aa && this.Registers[15] != 0x0800_01ac)
+            //    {
+            //        this.ShowInfo();
+            //        Console.ReadKey();
+            //    }
+            //}
         }
     }
 }

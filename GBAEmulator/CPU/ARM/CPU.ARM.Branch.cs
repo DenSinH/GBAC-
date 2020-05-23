@@ -16,8 +16,6 @@ namespace GBAEmulator.CPU
             else
                 this.PC = Target & 0xffff_fffe;
             this.PipelineFlush();
-            
-            this.Log("BX: new state: " + this.state);
 
             // 2S + 1N cycles
         }

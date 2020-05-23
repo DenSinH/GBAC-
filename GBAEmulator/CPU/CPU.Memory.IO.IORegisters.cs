@@ -15,10 +15,7 @@ namespace GBAEmulator.CPU
             HBLankIntervalFree = 0x0020,
             OBJVRamMapping = 0x0040,
             ForcedBlank = 0x0080,
-            DisplayBG0 = 0x0100,
-            DisplayBG1 = 0x0200,
-            DisplayBG2 = 0x0400,
-            DisplayBG3 = 0x0800,
+
             DisplayOBJ = 0x1000,
             WindowDisplay0 = 0x2000,
             WindowDisplay1 = 0x4000,
@@ -34,9 +31,9 @@ namespace GBAEmulator.CPU
 
             public bool IsSet(DISPCNTFlags flag) => (this._raw & (ushort)flag) > 0;
 
-            public override void Set(ushort value, bool setlow, bool sethigh)
+            public bool DisplayBG(byte BG)
             {
-                base.Set(value, setlow, sethigh);
+                return (this._raw & (0x0100 << BG)) > 0;
             }
         }
 
@@ -99,6 +96,11 @@ namespace GBAEmulator.CPU
                     this._raw &= 0xfffd;
             }
 
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set(value, setlow, sethigh);
+            }
+
         }
 
         public cDISPSTAT DISPSTAT;
@@ -129,7 +131,7 @@ namespace GBAEmulator.CPU
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
-                throw new Exception("Cannot write to VCOUNT register");
+                this.cpu.Error("Cannot write to VCOUNT register");
             }
         }
 
@@ -173,7 +175,7 @@ namespace GBAEmulator.CPU
 
             public byte ScreenSize
             {
-                get => (byte)((this._raw & 0xc00) >> 14);
+                get => (byte)((this._raw & 0xc000) >> 14);
             }
         }
 
@@ -183,9 +185,9 @@ namespace GBAEmulator.CPU
         #region BGScrolling
         public class cBGScrolling : IORegister2
         {
-            public byte Offset
+            public ushort Offset
             {
-                get => (byte)(this._raw & 0x00ff);
+                get => (ushort)(this._raw & 0x01ff);  // 9 bit value
             }
         }
 
@@ -351,6 +353,30 @@ namespace GBAEmulator.CPU
         cIME IME = new cIME();
         cIE IE = new cIE();
         cIF IF = new cIF();
+
+        #endregion
+
+        #region HALTCNT
+
+        public class cPOSTFLG_HALTCNT : IORegister2
+        {
+            // 2 1 byte registers combined
+            public bool Halt, Stop;
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set(value, setlow, sethigh);
+                if (sethigh)
+                {
+                    if ((value & 0x8000) > 0) // enable Halt mode
+                        Halt = true;
+                    else                      // enable Stop mode
+                        Stop = true;
+                }
+            }
+        }
+
+        cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
 
         #endregion
     }

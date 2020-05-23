@@ -64,9 +64,17 @@ namespace GBAEmulator
         private void Visual_KeyDown(object sender, KeyEventArgs e)
         {
             // Debugging keys
-            if (e.KeyCode == Keys.Q)
+            if (e.KeyCode == Keys.I)
             {
                 this.gba.cpu.ShowInfo();
+            }
+            else if (e.KeyCode == Keys.P)
+            {
+                this.gba.cpu.DumpPAL();
+            }
+            else if (e.KeyCode == Keys.V)
+            {
+                this.gba.cpu.DumpVRAM(0, 4);
             }
         }
 

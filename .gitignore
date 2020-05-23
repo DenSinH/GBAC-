@@ -9,6 +9,7 @@
 docs/
 roms/
 Tests/
+gba_bios.bin
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -63,8 +63,8 @@ namespace GBAEmulator
             _Left = (ushort)(Keyboard.IsKeyDown(Left) ? 0b0010_0000 : 0);
             _Down = (ushort)(Keyboard.IsKeyDown(Down) ? 0b0100_0000 : 0);
             _Up = (ushort)(Keyboard.IsKeyDown(Up) ? 0b1000_0000 : 0);
-            _R = (ushort)(Keyboard.IsKeyDown(Up) ? 0b0001_0000_0000 : 0);
-            _L = (ushort)(Keyboard.IsKeyDown(Up) ? 0b0010_0000_0000 : 0);
+            _R = (ushort)(Keyboard.IsKeyDown(R) ? 0b0001_0000_0000 : 0);
+            _L = (ushort)(Keyboard.IsKeyDown(L) ? 0b0010_0000_0000 : 0);
 
             return (ushort)(_A | _B | _Start | _Select | _Up | _Down | _Left | _Right | _R | _L);
         }
