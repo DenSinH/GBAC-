@@ -24,7 +24,7 @@ namespace GBAEmulator.CPU
 
         public void ShowInfo()
         {
-            Console.WriteLine(string.Join(",", this.Registers.Select(x => "0x" + x.ToString("X8")).ToArray()));
+            Console.WriteLine(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + " " + this.VCOUNT.CurrentScanline.ToString("x2"));
         }
 
         public void DumpPAL()
@@ -43,44 +43,48 @@ namespace GBAEmulator.CPU
         public void DumpVRAM(byte CharBlock, byte bpp)
         {
             uint StartAddress = (uint)(CharBlock * 0x4000);
-            uint Address;
-            for (int i = 0; i < 0x30; i++)  // overall y
+            uint Address = 0;
+            for (int row = 0; row < 0x10; row++)
             {
-                for (int t = 0; t < 0x10; t++)
+                Console.WriteLine(Address.ToString("x4"));
+                for (int dy = 0; dy < 8; dy++)  // overall y
                 {
-                    Address = StartAddress + (uint)(8 * bpp * t) + (uint)(bpp * i);
-                    for (int j = 0; j < bpp; j++)
+                    for (int t = 0; t < 0x10; t++)
                     {
-                        for (int w = bpp - 1; w < 8; w += 4)  // double writing for 4bpp
+                        Address = StartAddress + (uint)(8 * bpp * 0x10 * row) + (uint)(8 * bpp * t) + (uint)(bpp * dy);  // 0x10 is row length
+                        for (int j = 0; j < bpp; j++)
                         {
-                            switch ((this.VRAM[Address] >> 4) / 2)
+                            for (int w = bpp - 1; w < 8; w += 4)  // double writing for 4bpp
                             {
-                                case 0:
-                                    Console.Write(" ");
-                                    break;
-                                case 1:
-                                    Console.Write("/");
-                                    break;
-                                case 2:
-                                    Console.Write("?");
-                                    break;
-                                case 3:
-                                    Console.Write("#");
-                                    break;
-                                default:
-                                    Console.Write(" ");
-                                    break;
+                                switch ((this.VRAM[Address] >> 4) / 2)
+                                {
+                                    case 0:
+                                        Console.Write(" ");
+                                        break;
+                                    case 1:
+                                        Console.Write("/");
+                                        break;
+                                    case 2:
+                                        Console.Write("?");
+                                        break;
+                                    case 3:
+                                        Console.Write("#");
+                                        break;
+                                    default:
+                                        Console.Write(" ");
+                                        break;
+                                }
                             }
+                            Address++;
                         }
-                        Address++;
+                        Console.Write("|");
                     }
-                    Console.Write("|");
-                }
-                if ((i + 1) % 8 == 0)
-                {
+                    if ((dy + 1) % 8 == 0)
+                    {
+                        Console.WriteLine();
+                    }
                     Console.WriteLine();
                 }
-                Console.WriteLine();
             }
         }
     }

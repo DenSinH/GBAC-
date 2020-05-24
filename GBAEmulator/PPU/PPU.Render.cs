@@ -203,6 +203,7 @@ namespace GBAEmulator
             {
                 Address |= (ushort)(TileID * 0x20);   // Beginning of tile
                 Address |= (ushort)(dy * 4);          // Beginning of tile line
+
                 uint PaletteBase = (uint)(PaletteBank * 0x20);
 
                 byte PaletteNibble;

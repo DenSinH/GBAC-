@@ -86,9 +86,9 @@ namespace GBAEmulator.CPU
             IORegister reg = this.IORAM[address];
             bool offset = (address & 1) > 0;
             if (!offset)
-                reg.Set(value, !offset, offset);
+                reg.Set(value, true, false);
             else
-                reg.Set((ushort)(value << 8), !offset, offset);
+                reg.Set((ushort)(value << 8), false, true);
         }
         
         private ushort IOGetHalfWordAt(uint address)
@@ -100,7 +100,7 @@ namespace GBAEmulator.CPU
             if (!offset)
                 return (ushort)reg.Get();
 
-            return (ushort)(((reg.Get() & 0xff00) >> 8) | (this.IORAM[address + 1].Get() & 0x00ff));
+            return (ushort)(((reg.Get() & 0xff00) >> 8) | ((this.IORAM[address + 1].Get() & 0x00ff) << 8));
         }
 
         private void IOSetHalfWordAt(uint address, ushort value)
@@ -127,7 +127,7 @@ namespace GBAEmulator.CPU
 
             if (!offset)
             {
-                return (uint)(reg.Get() | (reg.Get() << 16));
+                return (uint)(reg.Get() | (this.IORAM[address + 2].Get() << 16));
             }
             uint result = (uint)(reg.Get() >> 8);
             result |= ((uint)this.IORAM[address + 2].Get() << 8);

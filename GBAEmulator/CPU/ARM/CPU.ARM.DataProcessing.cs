@@ -87,37 +87,45 @@ namespace GBAEmulator.CPU
             switch ((Instruction & 0x01e0_0000) >> 21)
             {
                 case 0b0000:  // AND
+                    this.Log(string.Format("{0:x8} AND {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 & Op2;
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0001:  // EOR:
+                    this.Log(string.Format("{0:x8} EOR {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 ^ Op2;
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0010:  // SUB
+                    this.Log(string.Format("{0:x8} SUB {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 - Op2;
                     if (SetConditions)
                         this.SetCVSub(Op1, Op2, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0011:  // RSB
+                    this.Log(string.Format("{0:x8} RSB {1:x8} (so {1:x8} - {0:x8}) -> R{2}", Op1, Op2, Rd));
                     Result = Op2 - Op1;
                     if (SetConditions)
                         this.SetCVSub(Op2, Op1, Result);
+                    this.Registers[Rd] = Result;
                     break;
                 case 0b0100:  // ADD
+                    this.Log(string.Format("{0:x8} ADD {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 + Op2;
                     if (SetConditions)
                         this.SetCVAdd(Op1, Op2, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0101:  // ADC
+                    this.Log(string.Format("{0:x8} ADC {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 + Op2 + OldC;
                     if (SetConditions)
                         this.SetCVAdd(Op1, (ulong)Op2 + OldC, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0110:  // SBC
+                    this.Log(string.Format("{0:x8} SBC {1:x8} -> R{2}", Op1, Op2, Rd));
                     temp = Op2 - OldC + 1;
                     Result = (uint)(Op1 - temp);
                     if (SetConditions)
@@ -125,6 +133,7 @@ namespace GBAEmulator.CPU
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0111:  // RSC
+                    this.Log(string.Format("{0:x8} RSC {1:x8} -> R{2}", Op1, Op2, Rd));
                     temp = Op1 - OldC + 1;
                     Result = (uint)(Op2 - temp);
                     if (SetConditions)
@@ -132,34 +141,42 @@ namespace GBAEmulator.CPU
                     this.Registers[Rd] = Result;
                     break;
                 case 0b1000:  // TST
+                    this.Log(string.Format("{0:x8} TST {1:x8} (AND, no store)", Op1, Op2));
                     Result = Op1 & Op2;
                     break;
                 case 0b1001:  // TEQ
+                    this.Log(string.Format("{0:x8} TEQ {1:x8} (EOR, no store)", Op1, Op2, Rd));
                     Result = Op1 ^ Op2;
                     break;
                 case 0b1010:  // CMP
+                    this.Log(string.Format("{0:x8} CMP {1:x8} (SUB, no store)", Op1, Op2, Rd));
                     Result = Op1 - Op2;
                     if (SetConditions)
                         this.SetCVSub(Op1, Op2, Result);
                     break;
                 case 0b1011:  // CMN
+                    this.Log(string.Format("{0:x8} CMN {1:x8} (ADD, no store)", Op1, Op2, Rd));
                     Result = Op1 + Op2;
                     if (SetConditions)
                         this.SetCVAdd(Op1, Op2, Result);
                     break;
                 case 0b1100:  // ORR
+                    this.Log(string.Format("{0:x8} ORR {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 | Op2;
                     this.Registers[Rd] = Result;
                     break;
                 case 0b1101:  // MOV
+                    this.Log(string.Format("MOV {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op2;
                     this.Registers[Rd] = Result;
                     break;
                 case 0b1110:  // BIC
+                    this.Log(string.Format("{0:x8} BIC {1:x8} -> R{2} (Op1 & ~Op2)", Op1, Op2, Rd));
                     Result = Op1 & ~Op2;
                     this.Registers[Rd] = Result;
                     break;
                 case 0b1111:  // MVN
+                    this.Log(string.Format("MVN {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = ~Op2;
                     this.Registers[Rd] = Result;
                     break;

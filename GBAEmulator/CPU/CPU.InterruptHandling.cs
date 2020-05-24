@@ -25,13 +25,15 @@ namespace GBAEmulator.CPU
 
         private bool HandleIRQs()
         {
-            if (!this.IME.DisableAll && this.I == 0)
+            if ((this.IF.raw & this.IE.raw) != 0)
             {
-                if ((this.IF.raw & this.IE.raw) != 0)
+                if ((!this.IME.DisableAll) && (this.I == 0))
                 {
                     this.DoIRQ();
                     return true;
                 }
+
+                this.HALTCNT.Halt = false;
             }
             return false;
         }
@@ -41,8 +43,6 @@ namespace GBAEmulator.CPU
             this.Log("Doing IRQ");
             this.ChangeMode(Mode.IRQ);
             this.I = 1;
-            this.HALTCNT.Halt = false;
-            this.HALTCNT.Stop = false;
 
             // store address of instruction that did not get executed + 4
             // we check for IRQ before filling the pipeline, so we are 2 (in THUMB) or 4 (ARM) ahead

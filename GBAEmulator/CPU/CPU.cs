@@ -16,6 +16,8 @@ namespace GBAEmulator.CPU
         readonly Queue<uint> Pipeline = new Queue<uint>(3);
         GBA gba;
 
+        StreamReader fsTESTING;
+
         public ARM7TDMI(GBA gba)
         {
             this.gba = gba;
@@ -53,6 +55,8 @@ namespace GBAEmulator.CPU
                 this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
                 this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM
             };
+
+            fsTESTING = new StreamReader("../../Tests/irq.log");
         }
 
         public void LoadRom(string FileName)
@@ -79,17 +83,10 @@ namespace GBAEmulator.CPU
         {
             this.HandleIRQs();
 
-            //if (this.HALTCNT.Halt || this.HALTCNT.Stop)
-            //{
-            //    Console.ReadKey();
-            //    return;
-            //}
-            //else if ((this.IF.raw & this.IE.raw) != 0)
-            //{
-            //    this.HALTCNT.Halt = false;
-            //    this.HALTCNT.Stop = false;
-            //}
-            //else
+            if (this.HALTCNT.Halt)
+            {
+                return;
+            }
 
             if (this.state == State.ARM)
             {
@@ -120,7 +117,13 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            // Console.ReadKey();
+            //this.ShowInfo();
+            //if (this.pause || this.GetWordAt(0x0300_7eb4) == 0x0800_8ff4)
+            //{
+            //    Console.WriteLine(this.GetWordAt(0x0300_7eb4).ToString("x8"));
+            //    pause = Console.ReadKey().KeyChar == 'p';
+            //}
+            
 
             //if (this.Registers[15] != 0x0800_0190 && this.Registers[15] != 0x0800_0192 && this.Registers[15] != 0x0800_0194 && this.Registers[15] != 0x0800_0196)
             //{

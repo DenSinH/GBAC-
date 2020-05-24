@@ -77,7 +77,7 @@ namespace GBAEmulator.CPU
                 if (on)
                 {
                     this._raw |= 1;
-                    if ((this._raw & (ushort)DISPSTATFlags.VBlankIRQEnable) == (ushort)DISPSTATFlags.VBlankIRQEnable)
+                    if (this.IsSet(DISPSTATFlags.VBlankIRQEnable))
                         this.cpu.IF.Request(Interrupt.LCDVBlank);
                 }
                 else
@@ -89,18 +89,12 @@ namespace GBAEmulator.CPU
                 if (on)
                 {
                     this._raw |= 2;
-                    if ((this._raw & (ushort)DISPSTATFlags.HBlankIRQEnable) == (ushort)DISPSTATFlags.HBlankIRQEnable)
+                    if (this.IsSet(DISPSTATFlags.HBlankIRQEnable))
                         this.cpu.IF.Request(Interrupt.LCDHBlank);
                 }
                 else
                     this._raw &= 0xfffd;
             }
-
-            public override void Set(ushort value, bool setlow, bool sethigh)
-            {
-                base.Set(value, setlow, sethigh);
-            }
-
         }
 
         public cDISPSTAT DISPSTAT;
@@ -318,6 +312,12 @@ namespace GBAEmulator.CPU
             {
                 get => (this._raw & 0x01) > 0;
             }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                if (setlow)
+                    this._raw = (ushort)(value & 1);
+            }
         }
 
         public class cIE : IORegister2  // Interrupt Enable Register
@@ -361,17 +361,15 @@ namespace GBAEmulator.CPU
         public class cPOSTFLG_HALTCNT : IORegister2
         {
             // 2 1 byte registers combined
-            public bool Halt, Stop;
+            public bool Halt;
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
                 base.Set(value, setlow, sethigh);
                 if (sethigh)
                 {
-                    if ((value & 0x8000) > 0) // enable Halt mode
-                        Halt = true;
-                    else                      // enable Stop mode
-                        Stop = true;
+                    // "games never enable stop mode" - EmuDev Discord
+                    Halt = true;
                 }
             }
         }

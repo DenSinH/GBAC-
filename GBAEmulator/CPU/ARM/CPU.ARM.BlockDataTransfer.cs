@@ -136,9 +136,15 @@ namespace GBAEmulator.CPU
                         CurrentAddress += 4;  // always +4 because we start from the bottom in case of decr.
 
                     if (LoadFromMemory)
+                    {
                         this.Registers[Register] = this.GetWordAt(CurrentAddress);
+                        this.Log(string.Format("{0:x8} -> R{1} from {2:x8}", this.Registers[Register], Register, CurrentAddress));
+                    }
                     else
+                    {
                         this.SetWordAt(CurrentAddress, this.Registers[Register]);
+                        this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[Register], CurrentAddress, Register));
+                    }
 
                     if (!PreIndex)
                         CurrentAddress += 4;

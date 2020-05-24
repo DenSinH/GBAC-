@@ -596,14 +596,13 @@ namespace GBAEmulator.CPU
             FileStream fs;
             try
             {
-                
                 fs = File.OpenRead("../../CPU/bios/gba_bios.bin");
             }
             catch
             {
                 this.BIOS = this.NormattsBIOS;
                 // fs = File.OpenRead("../../CPU/bios/NormattBIOS.bin");
-                Console.WriteLine("BIOS dump load failed, using Normatt''s BIOS...");
+                Console.WriteLine("BIOS dump load failed, using Normatt's BIOS...");
                 return false;
             }
 

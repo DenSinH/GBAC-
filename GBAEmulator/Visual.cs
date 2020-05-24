@@ -76,6 +76,10 @@ namespace GBAEmulator
             {
                 this.gba.cpu.DumpVRAM(0, 4);
             }
+            else if (e.KeyCode == Keys.D)
+            {
+                Console.WriteLine(this.gba.cpu.DISPSTAT.Get().ToString("x4"));
+            }
         }
 
         private void Visual_Paint(object sender, PaintEventArgs e)
