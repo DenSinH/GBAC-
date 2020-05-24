@@ -16,8 +16,6 @@ namespace GBAEmulator.CPU
         readonly Queue<uint> Pipeline = new Queue<uint>(3);
         GBA gba;
 
-        StreamReader fsTESTING;
-
         public ARM7TDMI(GBA gba)
         {
             this.gba = gba;
@@ -55,8 +53,6 @@ namespace GBAEmulator.CPU
                 this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
                 this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM
             };
-
-            fsTESTING = new StreamReader("../../Tests/irq.log");
         }
 
         public void LoadRom(string FileName)

@@ -37,7 +37,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        public cDISPCNT DISPCNT = new cDISPCNT();  // 0x0400_0004
+        public readonly cDISPCNT DISPCNT = new cDISPCNT();  // 0x0400_0004
         #endregion
 
         #region DISPSTAT
@@ -173,25 +173,49 @@ namespace GBAEmulator.CPU
             }
         }
 
-        public cBGControl[] BGCNT = new cBGControl[4] { new cBGControl(), new cBGControl(), new cBGControl(), new cBGControl() };
+        public readonly cBGControl[] BGCNT = new cBGControl[4] { new cBGControl(), new cBGControl(), new cBGControl(), new cBGControl() };
         #endregion
 
         #region BGScrolling
         public class cBGScrolling : IORegister2
         {
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                if (setlow)
+                {
+                    base.Set((ushort)(value & 0x00ff), setlow, sethigh);
+                }
+            }
+
             public ushort Offset
             {
                 get => (ushort)(this._raw & 0x01ff);  // 9 bit value
             }
         }
 
-        public cBGScrolling[] BGHOFS = new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
-        public cBGScrolling[] BGVOFS = new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
+        public readonly cBGScrolling[] BGHOFS = 
+            new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
+        public readonly cBGScrolling[] BGVOFS = 
+            new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
         #endregion
 
         #region LCD I/O BG Rotation/Scaling
+        private class cReferencePointUpper : IORegister2
+        {
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                Console.WriteLine(value);
+                base.Set(value, setlow, sethigh);
+            }
+        }
+
         public class cReferencePoint : IORegister4
         {
+            public cReferencePoint() : base(new EmptyRegister(), new cReferencePointUpper())
+            {
+
+            }
+
             public byte FractionalPortion
             {
                 get => (byte)(this.lower.Get() & 0x00ff);
@@ -199,12 +223,22 @@ namespace GBAEmulator.CPU
 
             public uint IntegerPortion
             {
-                get => (uint)(((this.lower.Get() & 0xff00) >> 8) | ((this.upper.Get() & 0x07ff)));
+                get => (uint)(((this.lower.Get() & 0xff00) >> 8) | ((this.upper.Get() & 0x07ff) << 8));
             }
 
             public bool Sign
             {
                 get => (this.upper.Get() & 0x0800) > 0;
+            }
+
+            public int Full
+            {
+                get
+                {
+                    if (this.Sign)  // negative
+                        return -(this.lower.Get() | ((this.upper.Get() & 0x07ff) << 16));
+                    return (this.lower.Get() | ((this.upper.Get() & 0x07ff) << 16));
+                }
             }
         }
 
@@ -224,21 +258,27 @@ namespace GBAEmulator.CPU
             {
                 get => (this._raw & 0x8000) > 0;
             }
+
+            public short Full
+            {
+                get => (short)this._raw;  // automatically sign extends it
+            }
         }
 
-        cReferencePoint BG2X = new cReferencePoint();
-        cReferencePoint BG2Y = new cReferencePoint();
-        cReferencePoint BG3X = new cReferencePoint();
-        cReferencePoint BG3Y = new cReferencePoint();
+        public readonly cReferencePoint BG2X = new cReferencePoint();
+        public readonly cReferencePoint BG2Y = new cReferencePoint();
+        public readonly cReferencePoint BG3X = new cReferencePoint();
+        public readonly cReferencePoint BG3Y = new cReferencePoint();
 
-        cRotationScaling BG2PA = new cRotationScaling();
-        cRotationScaling BG2PB = new cRotationScaling();
-        cRotationScaling BG2PC = new cRotationScaling();
-        cRotationScaling BG2PD = new cRotationScaling();
-        cRotationScaling BG3PA = new cRotationScaling();
-        cRotationScaling BG3PB = new cRotationScaling();
-        cRotationScaling BG3PC = new cRotationScaling();
-        cRotationScaling BG3PD = new cRotationScaling();
+        public readonly cRotationScaling BG2PA = new cRotationScaling();
+        public readonly cRotationScaling BG2PB = new cRotationScaling();
+        public readonly cRotationScaling BG2PC = new cRotationScaling();
+        public readonly cRotationScaling BG2PD = new cRotationScaling();
+
+        public readonly cRotationScaling BG3PA = new cRotationScaling();
+        public readonly cRotationScaling BG3PB = new cRotationScaling();
+        public readonly cRotationScaling BG3PC = new cRotationScaling();
+        public readonly cRotationScaling BG3PD = new cRotationScaling();
         #endregion
 
         #region KEYINPUT
@@ -350,9 +390,9 @@ namespace GBAEmulator.CPU
             }
         }
 
-        cIME IME = new cIME();
-        cIE IE = new cIE();
-        cIF IF = new cIF();
+        readonly cIME IME = new cIME();
+        readonly cIE IE = new cIE();
+        readonly cIF IF = new cIF();
 
         #endregion
 
@@ -374,7 +414,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
+        readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
 
         #endregion
     }

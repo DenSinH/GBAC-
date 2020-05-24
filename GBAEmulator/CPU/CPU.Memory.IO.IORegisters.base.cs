@@ -42,6 +42,13 @@ namespace GBAEmulator.CPU
                 this.lower = new EmptyRegister();
                 this.upper = new EmptyRegister();
             }
+
+            protected IORegister4(IORegister2 lower, IORegister2 upper)
+            {
+                this.lower = lower;
+                this.upper = upper;
+            }
+
         }
     }
 }

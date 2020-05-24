@@ -106,8 +106,10 @@
     <Compile Include="CPU\THUMB\CPU.THUMB.PushPop.cs" />
     <Compile Include="GBA.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="PPU\PPU.Aux.cs" />
     <Compile Include="PPU\PPU.cs" />
     <Compile Include="PPU\PPU.Render.cs" />
+    <Compile Include="PPU\PPU.Render.Helpers.cs" />
     <Compile Include="Visual.cs">
       <SubType>Form</SubType>
     </Compile>
