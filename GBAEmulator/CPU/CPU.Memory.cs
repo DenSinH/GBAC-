@@ -11,7 +11,7 @@ namespace GBAEmulator.CPU
         // 1kB IO RAM
         public byte[] PaletteRAM = new byte[0x400];    // 1kB Palette RAM
         public byte[] VRAM = new byte[0x18000];        // 96kB VRAM
-        private byte[] OAM = new byte[0x400];           // 1kB OAM
+        public byte[] OAM = new byte[0x400];           // 1kB OAM
         private byte[] GamePak = new byte[0x200_0000];   // Game Pak (up to) 32MB (0x0800_0000 - 0x0a00_0000, then mirrored)
         private byte[] GamePakSRAM = new byte[0x10000]; // Game Pak Flash ROM (for saving game data)
 
@@ -25,7 +25,7 @@ namespace GBAEmulator.CPU
         private uint GetWordAt(uint address)
         {
             // trying to find the insane overflow bug in bigmap.gba
-            //if (address == 0x0300_0000 + 32412)
+            //if (address == 0x0300_0000 + 32412)  // y coord is stored at this address it seems
             //{
             //    Console.WriteLine(this.state);
             //    Console.WriteLine((this.PC - 4).ToString("x8"));

@@ -11,16 +11,109 @@ namespace GBAEmulator
          this actually contains most the logic for rendering, PPU.Render.cs is just everything put together
         */
 
-        ushort[][] BGScanlines = new ushort[4][] { new ushort[width], new ushort[width], new ushort[width], new ushort[width] };
+        private ushort[][] BGScanlines = new ushort[4][] { new ushort[width], new ushort[width], new ushort[width], new ushort[width] };
 
-        private void ResetGBScanlines(params byte[] BGs)
+        private void ResetBGScanlines(params byte[] BGs)
         {
+            byte Priority;
             foreach (byte BG in BGs)
             {
+                // reset only the relevant layers
+                Priority = this.gba.cpu.BGCNT[BG].BGPriority;
                 for (byte x = 0; x < width; x++)
                 {
-                    BGScanlines[BG][x] = 0;
+                    BGScanlines[Priority][x] = 0x8000;
                 }
+            }
+        }
+
+        private void MergeBGs(bool RenderOBJ)  // into current scanline
+        {
+            ushort Backdrop = this.Backdrop;
+
+            // only to be called after drawing into the DrawRegularBGScanline array
+            byte priority;
+            for (byte x = 0; x < width; x++)
+            {
+                for (priority = 0; priority < 3; priority++)
+                {
+                    if (RenderOBJ)
+                    {
+                        if (this.OBJLayers[priority][x] != 0x8000)
+                        {
+                            this.Display[width * scanline + x] = this.OBJLayers[priority][x];
+                            priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                            break;
+                        }
+                    }
+
+                    if (this.BGScanlines[priority][x] != 0x8000)
+                    {
+                        this.Display[width * scanline + x] = this.BGScanlines[priority][x];
+                        priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                        break;
+                    }
+                }
+
+                if (priority == 3)  // we found no non-transparent pixel
+                    this.Display[width * scanline + x] = Backdrop;
+            }
+        }
+
+        private void Render4bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress, uint PaletteBase)
+        {
+            // draw 4bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
+            // PaletteBase must be PaletteBank * 0x20
+            byte PaletteNibble;
+            byte ScreenX = (byte)StartX;  // todo: can casting cause visual glitches?
+
+            for (byte dx = 0; dx < 4; dx++)  // we need to look at nibbles here
+            {
+                
+                if (ScreenX < width)  // ScreenX is a byte, so always greater than 0
+                {
+                    if (Line[ScreenX] == 0x8000)
+                    {
+                        PaletteNibble = (byte)(this.gba.cpu.VRAM[TileLineBaseAddress + dx] & 0x0f);
+                        if (PaletteNibble == 0)  // transparent
+                            Line[ScreenX] = 0x8000;
+                        else
+                            Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
+                    }
+                }
+                
+                if (0 <= ScreenX + XSign && ScreenX < width - XSign)
+                {
+                    if (Line[ScreenX + XSign] == 0x8000)
+                    {
+                        PaletteNibble = (byte)((this.gba.cpu.VRAM[TileLineBaseAddress + dx] & 0xf0) >> 4);
+                        if (PaletteNibble == 0)  // transparent
+                            Line[ScreenX + XSign] = 0x8000;
+                        else
+                            Line[ScreenX + XSign] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
+                    }
+                }
+
+                ScreenX = (byte)(ScreenX + 2 * XSign);
+            }
+        }
+
+        private void Render8bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress)
+        {
+            // draw 8bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
+            byte ScreenX = (byte)StartX;
+            byte VRAMEntry;
+
+            for (byte dx = 0; dx < 8; dx++)
+            {
+                if (0 <= ScreenX && ScreenX < width)
+                {
+                    VRAMEntry = this.gba.cpu.VRAM[TileLineBaseAddress + dx];
+                    if (VRAMEntry != 0)
+                        Line[ScreenX] = this.GetPaletteEntry(2 * (uint)VRAMEntry);
+                }
+
+                ScreenX = (byte)(StartX + XSign);
             }
         }
 
@@ -58,69 +151,33 @@ namespace GBAEmulator
                 dy = (byte)(7 - dy);
 
             // read from right to left if HFlipping
-            sbyte s = 1;
+            sbyte XSign = 1;
             if (HFlip)
             {
                 StartX += 7;
-                s = -1;
+                XSign = -1;
             }
-
-            byte ScreenX;
 
             if (!ColorMode)  // 4bpp
             {
                 Address |= (ushort)(TileID * 0x20);   // Beginning of tile
-                Address |= (ushort)(dy * 4);          // Beginning of tile line
-
-                uint PaletteBase = (uint)(PaletteBank * 0x20);
-
-                byte PaletteNibble;
-                for (byte dx = 0; dx < 4; dx++)  // we need to look at nibbles here
-                {
-                    ScreenX = (byte)(StartX + 2 * s * dx);
-                    if (0 <= ScreenX && ScreenX < width)
-                    {
-                        PaletteNibble = (byte)(this.gba.cpu.VRAM[Address + dx] & 0x0f);
-                        if (PaletteNibble == 0)  // transparent
-                            Line[ScreenX] = 0x8000;
-                        else
-                            Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
-                        
-                    }
-
-                    if (0 <= ScreenX + s && ScreenX < width - s)
-                    {
-                        PaletteNibble = (byte)((this.gba.cpu.VRAM[Address + dx] & 0xf0) >> 4);
-                        if (PaletteNibble == 0)  // transparent
-                            Line[ScreenX + s] = 0x8000;
-                        else
-                            Line[ScreenX + s] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
-                        
-                    }
-                }
-
-                // vertical gridlines:
-                // if (0 <= StartX && StartX < width)
-                //     Line[StartX] = 0x7fff;
+                Address |= (ushort)(dy * 4);          // Beginning of tile sliver
+                
+                this.Render4bpp(ref Line, StartX, XSign, Address, (uint)(PaletteBank * 0x20));
             }
             else             // 8bpp
             {
-                Address |= (ushort)(TileID * 0x40);
+                Address |= (ushort)(TileID * 0x40);    // similar to 4bpp
                 Address |= (ushort)(dy * 8);
 
-                for (byte dx = 0; dx < 8; dx++)
-                {
-                    ScreenX = (byte)(StartX + s * dx);
-                    if (0 <= ScreenX && ScreenX < width)
-                        Line[ScreenX] = this.GetPaletteEntry((uint)2 * this.gba.cpu.VRAM[Address + dx]);
-                }
+                this.Render8bpp(ref Line, StartX, XSign, Address);
             }
         }
 
         private void DrawRegularBGScanline(params byte[] BGs)  // based on y = scanline
         {
             ushort HOFS, VOFS;
-            byte CharBaseBlock, ScreenBaseBlock, BGSize;
+            byte CharBaseBlock, ScreenBaseBlock, BGSize, Priority;
             bool ColorMode, Mosaic;
 
             uint ScreenEntryIndex;
@@ -140,6 +197,7 @@ namespace GBAEmulator
                 CharBaseBlock = BGCNT.CharBaseBlock;
                 ScreenBaseBlock = BGCNT.ScreenBaseBlock;
                 ColorMode = BGCNT.ColorMode;
+                Priority = BGCNT.BGPriority;
                 Mosaic = BGCNT.Mosaic;
 
                 BGSize = BGCNT.ScreenSize;
@@ -152,51 +210,9 @@ namespace GBAEmulator
 
                     ScreenEntry = (ushort)(this.gba.cpu.VRAM[ScreenEntryIndex + 1] << 8 | this.gba.cpu.VRAM[ScreenEntryIndex]);
 
-                    this.DrawRegularScreenEntry(ref this.BGScanlines[BG], (CourseX * 8) - (HOFS & 0x07), (byte)((scanline + VOFS) & 0x07),
+                    this.DrawRegularScreenEntry(ref this.BGScanlines[Priority], (CourseX * 8) - (HOFS & 0x07), (byte)((scanline + VOFS) & 0x07),
                         ScreenEntry, CharBaseBlock, ColorMode);
                 }
-            }
-        }
-
-        public void MergeBGs(params byte[] BGs)  // into current scanline
-        {
-            ushort Backdrop = this.Backdrop;
-
-            bool[] enabled = new bool[4];
-            byte[] priorities = new byte[4];
-
-            foreach (byte BG in BGs)
-            {
-                enabled[BG] = this.gba.cpu.DISPCNT.DisplayBG(BG);
-                priorities[BG] = this.gba.cpu.BGCNT[BG].BGPriority;
-            }
-
-            // only to be called after drawing into the DrawRegularBGScanline array
-            byte priority;
-            for (byte x = 0; x < width; x++)
-            {
-                for (priority = 0; priority < 3; priority++)
-                {
-                    foreach (byte BG in BGs)
-                    {
-                        if (!enabled[BG])
-                            continue;
-
-                        if (priorities[BG] != priority)
-                            continue;
-
-                        if ((this.BGScanlines[BG][x] & 0x8000) == 0)  // we set this to 1 if it is to be transparent
-                        {
-                            this.Display[240 * scanline + x] = this.BGScanlines[BG][x];
-                            priority = 0xfe;    // break out of priority loop as well
-                                                // this way priority is 0xff after the loop if a pixel was drawn
-                            break;
-                        }
-                    }
-                }
-
-                if (priority == 3)
-                    this.Display[240 * scanline + x] = Backdrop;
             }
         }
 
@@ -210,6 +226,7 @@ namespace GBAEmulator
         {
             // TileID is equivalent with ScreenEntry in affine backgrounds
             // we only use 8bpp mode for affine layers (Tonc)
+            
             ushort Address = (ushort)(CharBaseBlock * 0x4000 | (TileID * 0x40) | (dy * 8) | dx);
 
             return this.GetPaletteEntry((uint)2 * this.gba.cpu.VRAM[Address]);
@@ -230,15 +247,15 @@ namespace GBAEmulator
 
             byte CharBaseBlock = BGCNT.CharBaseBlock;
             uint ScreenEntryBaseAddress = (uint)BGCNT.ScreenBaseBlock * 0x800;
+            byte Priority = BGCNT.BGPriority;
 
-            bool Mosaic;
+            bool Mosaic = BGCNT.Mosaic;
 
             uint ScreenEntryIndex;
             byte AffineScreenEntry;
-            
-            Mosaic = BGCNT.Mosaic;
 
             int ScreenEntryX, ScreenEntryY;
+
             for (byte ScreenX = 0; ScreenX < width; ScreenX++)
             {
                 ScreenEntryX = (((int)BGxX.InternalRegister + PA.Full * ScreenX) >> 8);  // >> 8 because it is fractional
@@ -248,7 +265,7 @@ namespace GBAEmulator
                 {
                     if (!BGCNT.DisplayAreaOverflow)
                     {
-                        this.BGScanlines[BG][ScreenX] = 0x8000;  // transparent
+                        this.BGScanlines[Priority][ScreenX] = 0x8000;  // transparent
                         continue;
                     }
                     
@@ -263,7 +280,7 @@ namespace GBAEmulator
                 // Console.Write(ScreenEntryIndex.ToString("x3") + " ");
                 AffineScreenEntry = this.gba.cpu.VRAM[ScreenEntryIndex];
 
-                this.BGScanlines[BG][ScreenX] = this.GetAffinePixel(AffineScreenEntry, ScreenX, CharBaseBlock,
+                this.BGScanlines[Priority][ScreenX] = this.GetAffinePixel(AffineScreenEntry, ScreenX, CharBaseBlock,
                     (byte)(ScreenEntryX & 7), (byte)(ScreenEntryY & 7));
             }
         }

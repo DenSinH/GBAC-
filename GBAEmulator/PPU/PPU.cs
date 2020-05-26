@@ -24,6 +24,9 @@ namespace GBAEmulator
         {
             this.gba = gba;
             this.Display = display;
+
+            this.ResetBGScanlines(0, 1, 2, 3);
+            this.ResetOBJScanlines();
         }
     }
 }

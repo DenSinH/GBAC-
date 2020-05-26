@@ -1,6 +1,5 @@
-﻿using System;
-
-using GBAEmulator.CPU;
+﻿using GBAEmulator.CPU;
+using System;
 
 namespace GBAEmulator
 {
@@ -23,6 +22,7 @@ namespace GBAEmulator
              */
             if (!IsVBlank)
             {
+                // Console.WriteLine(this.gba.cpu.DISPCNT.BGMode);
                 switch (this.gba.cpu.DISPCNT.BGMode)
                 {
                     case 0:
@@ -58,28 +58,49 @@ namespace GBAEmulator
 
         private void Mode0Scanline()
         {
-            this.ResetGBScanlines(0, 1, 2, 3);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+
+            if (DoRenderOBJs)
+            {
+                this.RenderOBJs();
+            }
+
+            this.ResetBGScanlines(0, 1, 2, 3);
             this.DrawRegularBGScanline(0, 1, 2, 3);
-            this.MergeBGs(0, 1, 2, 3);
+            this.MergeBGs(DoRenderOBJs);
         }
 
         private void Mode1Scanline()
         {
-            this.ResetGBScanlines(0, 1, 2);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+
+            if (DoRenderOBJs)
+            {
+                this.RenderOBJs();
+            }
+
+            this.ResetBGScanlines(0, 1, 2);
             this.DrawRegularBGScanline(0, 1);
             this.DrawAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
-            this.MergeBGs(0, 1, 2);
+            this.MergeBGs(DoRenderOBJs);
         }
 
         private void Mode2Scanline()
         {
-            this.ResetGBScanlines(2, 3);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+
+            if (DoRenderOBJs)
+            {
+                this.RenderOBJs();
+            }
+
+            this.ResetBGScanlines(2, 3);
             this.DrawAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
             this.DrawAffineBGScanline(3, this.gba.cpu.BG3X, this.gba.cpu.BG3Y,
                 this.gba.cpu.BG3PA, this.gba.cpu.BG3PB, this.gba.cpu.BG3PC, this.gba.cpu.BG3PD);
-            this.MergeBGs(2, 3);
+            this.MergeBGs(DoRenderOBJs);
         }
 
         private void Mode3Scanline()
@@ -89,15 +110,15 @@ namespace GBAEmulator
             {
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[240 * scanline + x] = (ushort)((this.gba.cpu.VRAM[480 * scanline + 2 * x + 1] << 8) |
-                                                                 this.gba.cpu.VRAM[480 * scanline + 2 * x]);
+                    this.Display[width * scanline + x] = (ushort)((this.gba.cpu.VRAM[2 * width * scanline + 2 * x + 1] << 8) |
+                                                                 this.gba.cpu.VRAM[2 * width * scanline + 2 * x]);
                 }
             }
             else
             {
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[240 * scanline + x] = 0;
+                    this.Display[width * scanline + x] = 0;
                 }
             }
         }
@@ -111,14 +132,14 @@ namespace GBAEmulator
             {
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[240 * scanline + x] = this.GetPaletteEntry((uint)this.gba.cpu.VRAM[offset + 240 * scanline + x] << 1);
+                    this.Display[width * scanline + x] = this.GetPaletteEntry((uint)this.gba.cpu.VRAM[offset + width * scanline + x] << 1);
                 }
             }
             else
             {
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[240 * scanline + x] = 0;
+                    this.Display[width * scanline + x] = 0;
                 }
             }
         }
@@ -133,19 +154,19 @@ namespace GBAEmulator
                 // smaller format
                 for (int x = 0; x < 160; x++)
                 {
-                    this.Display[240 * scanline + x] = this.GetPaletteEntry((uint)this.gba.cpu.VRAM[offset + width * scanline + x] << 1);
+                    this.Display[width * scanline + x] = this.GetPaletteEntry((uint)this.gba.cpu.VRAM[offset + width * scanline + x] << 1);
                 }
 
                 for (int x = 160; x < width; x++)
                 {
-                    this.Display[240 * scanline + x] = 0;
+                    this.Display[width * scanline + x] = 0;
                 }
             }
             else
             {
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[240 * scanline + x] = 0;
+                    this.Display[width * scanline + x] = 0;
                 }
             }
         }

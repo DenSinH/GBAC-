@@ -42,6 +42,19 @@ namespace GBAEmulator.CPU
             }
         }
 
+        public void DumpOAM()
+        {
+            for (int i = 0; i < 0x20; i++)
+            {
+                Console.Write(string.Format("{0:x4} :: ", 0x20 * i));
+                for (int j = 0; j < 0xf; j++)
+                {
+                    Console.Write(string.Format("{0:x4} ", this.GetHalfWordAt((uint)(0x0700_0000 | (0x20 * i) | (2 * j)))));
+                }
+                Console.WriteLine();
+            }
+        }
+
         public void DumpVRAM(byte CharBlock, byte bpp)
         {
             uint StartAddress = (uint)(CharBlock * 0x4000);

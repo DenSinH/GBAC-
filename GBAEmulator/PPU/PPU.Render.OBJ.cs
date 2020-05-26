@@ -1,18 +1,20 @@
 ﻿using System;
 
+using GBAEmulator.CPU;
+
 namespace GBAEmulator
 {
     partial class PPU
     {
         ushort[][] OBJLayers = new ushort[4][] { new ushort[width], new ushort[width], new ushort[width], new ushort[width] };
 
-        private void ResetOBJScanlines(params byte[] Priorities)
+        private void ResetOBJScanlines()
         {
-            foreach (byte Priority in Priorities)
+            for (byte Priority = 0; Priority < 4; Priority++)
             {
                 for (byte x = 0; x < width; x++)
                 {
-                    OBJLayers[Priority][x] = 0;
+                    OBJLayers[Priority][x] = 0x8000;  // transparent
                 }
             }
         }
@@ -27,13 +29,236 @@ namespace GBAEmulator
             }
         }
 
-        // [Shape][Size]
+        // [Shape][Size], see table on Tonc
         private static readonly OBJSize[][] GetOBJSize = new OBJSize[3][]
         {
-            new OBJSize[4] {new OBJSize(8, 8), new OBJSize(16, 16), new OBJSize(32, 32), new OBJSize(32, 32) },
+            new OBJSize[4] {new OBJSize(8, 8), new OBJSize(16, 16), new OBJSize(32, 32), new OBJSize(64, 64) },
             new OBJSize[4] {new OBJSize(16, 8), new OBJSize(32, 8), new OBJSize(32, 16), new OBJSize(64, 32) },
             new OBJSize[4] {new OBJSize(8, 16), new OBJSize(8, 32), new OBJSize(16, 32), new OBJSize(32, 64) }
         };
+
+        bool OAM2DMap;  // false for 1D mapping, true for 2D
+
+        private void RenderOBJs()  // assumes y = scanline
+        {
+            this.ResetOBJScanlines();
+
+            ushort OBJ_ATTR0, OBJ_ATTR1, OBJ_ATTR2, OBJ_ATTR3;
+            short OBJy;
+            byte OBJMode, GFXMode;
+            bool ColorMode;
+
+            OBJSize OBJsz;
+
+            this.OAM2DMap = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.OBJVRamMapping);
+
+            for (ushort i = 0; i < 0x400; i += 8)  // 128 objects in OAM
+            {
+                /* Fetch all data for object */
+
+                OBJ_ATTR0 = (ushort)(this.gba.cpu.OAM[i] | (this.gba.cpu.OAM[i + 1] << 8));
+
+                OBJMode = (byte)((OBJ_ATTR0 & 0x0300) >> 8);
+
+                if (OBJMode == 0b10)
+                    continue;  // sprite hidden
+
+                OBJ_ATTR1 = (ushort)(this.gba.cpu.OAM[i + 2] | (this.gba.cpu.OAM[i + 3] << 8));
+                OBJ_ATTR2 = (ushort)(this.gba.cpu.OAM[i + 4] | (this.gba.cpu.OAM[i + 5] << 8));
+
+                // when OBJ is off screen, it can also be at the top
+                OBJy = (short)(OBJ_ATTR0 & 0x00ff);
+                if (OBJy > height)
+                    OBJy = (short)(OBJy - 0x100);
+
+                GFXMode = (byte)((OBJ_ATTR0 & 0x0c00) >> 10);
+                // todo: mosaic (also for BG)
+                ColorMode = (OBJ_ATTR0 & 0x2000) > 0;
+
+                OBJsz = PPU.GetOBJSize[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
+
+                /* Draw object */
+                if (OBJMode == 0b00)
+                {
+                    if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
+                        this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, OBJ_ATTR1, OBJ_ATTR2);
+                }
+                else if (OBJMode == 0b01)
+                {
+                    // todo: double size rendering
+                    if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
+                    {
+                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, OBJ_ATTR1, OBJ_ATTR2);
+                    }
+                }
+                else if (OBJMode == 0b11)
+                {
+                    Console.WriteLine("double rendering!");
+                }
+            }
+        }
+
+        private void RenderRegularOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, ushort OBJ_ATTR1, ushort OBJ_ATTR2)
+        {
+            ushort StartX = (ushort)(OBJ_ATTR1 & 0x01ff);
+            sbyte XSign = 1;
+            bool VFlip = (OBJ_ATTR1 & 0x2000) > 0;
+            bool HFlip = (OBJ_ATTR1 & 0x1000) > 0;
+
+            ushort TileID = (ushort)(OBJ_ATTR2 & 0x03ff);
+            byte Priority = (byte)((OBJ_ATTR2 & 0x0c00) >> 10);
+            byte PaletteBank = (byte)((OBJ_ATTR2 & 0xf000) >> 12);
+
+            byte dy = (byte)(scanline - OBJy);   // between 0 and OBJsz.Height (8, 16, 32, 64)
+            if (VFlip)
+                dy = (byte)(OBJsz.Height - dy);
+            
+            uint SliverBaseAddress;  // base address for horizontal sprite sliver
+            if (HFlip)
+            {
+                XSign = -1;
+                // tiles are also in a different order when we flip horizontally
+                StartX += OBJsz.Width;
+            }
+
+            if (!ColorMode)  // 4bpp
+            {
+                SliverBaseAddress = (uint)(TileID * 0x20);
+                // removed shifting for less arithmetic, logically OBJsz.Width should be OBJsz.Width >> 3 for the width in tiles, and
+                // 4 should be 0x20. This way we wrap around with the number of tiles, but since OBJsz.Width is a power of 2,
+                // this is ever so slightly faster
+                SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 4) : (32 * 0x20 * (dy >> 3)));
+                SliverBaseAddress += (uint)(4 * (dy & 0x07));   // offset within tile
+
+                // prevent overflow, not sure what is supposed to happen
+                if (SliverBaseAddress + (OBJsz.Width >> 3) * 0x20 > 0x8000)  
+                    SliverBaseAddress = 0;
+
+                // base address for sprites is 0x10000 in OAM
+                SliverBaseAddress = (SliverBaseAddress & 0x7fff) | 0x10000;  
+
+                for (byte dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
+                {
+                    // foreground palette starts at 0x0500_0200
+                    // we can use our same rendering method as for background, as we simply render a tile
+                    this.Render4bpp(ref this.OBJLayers[Priority], StartX, XSign,
+                        (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20));
+                    StartX = (byte)(StartX + 8 * XSign);
+                }
+            }
+            else
+            {
+                SliverBaseAddress = (uint)(TileID * 0x40);
+                // removed shifting for less arithmetic, like in 4bpp
+                SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 8) : (32 * 0x40 * (dy >> 3)));
+                SliverBaseAddress += (uint)(8 * (dy & 0x07));   // offset within tile
+
+                // prevent overflow, not sure what is supposed to happen
+                if (SliverBaseAddress + (OBJsz.Width >> 3) * 0x20 > 0x8000)  
+                    SliverBaseAddress = 0;
+
+                SliverBaseAddress = (SliverBaseAddress & 0x7fff) | 0x10000;
+
+                for (byte dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
+                {
+                    // we can use our same rendering method as for background, as we simply render a tile
+                    this.Render8bpp(ref this.OBJLayers[Priority], StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)));
+                    StartX = (byte)(StartX + 8 * XSign);
+                }
+            }
+        }
+
+        private ushort GetAffineOBJPixel(uint TileID, OBJSize OBJsz,
+            byte px, byte py, bool ColorMode, byte PaletteBank)
+        {
+            /*
+             Though this is really similar to regular objects, we cannot just do it in a straight line, so we have to calculate the address
+             over and over. For regular sprites / backgrounds it is faster to just do it all in a row
+             */
+            uint PixelAddress = 0x10000;   // OBJ vram starts at 0x10000 within VRAM
+            if (!ColorMode)     // 4bpp
+            {
+                PixelAddress += (uint)(TileID * 0x20);
+                // removed shifting for less arithmetic, like in regular objects
+                PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 4) : (32 * 0x20 * (py >> 3)));
+                PixelAddress += (uint)(4 * (py & 0x07));
+                PixelAddress += (uint)(0x20 * (px >> 3));
+
+                byte PaletteNibble = this.gba.cpu.VRAM[PixelAddress + ((px & 0x07) >> 1)];
+                if ((px & 1) == 1)
+                    PaletteNibble >>= 4;
+
+                PaletteNibble &= 0x0f;
+                if (PaletteNibble == 0)
+                    return 0x8000;
+
+                return this.GetPaletteEntry(0x200 + (uint)PaletteBank * 0x20 + (uint)(2 * PaletteNibble));
+            }
+            else                // 8bpp
+            {
+                PixelAddress += (uint)(TileID * 0x40);
+                // removed shifting for less arithmetic:
+                PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 8) : (32 * 0x40 * (py >> 3)));
+                PixelAddress += (uint)(8 * (py & 0x07));
+                PixelAddress += (uint)(0x40 * (px >> 3));
+
+                byte VRAMEntry = this.gba.cpu.VRAM[PixelAddress + (px & 0x07)];
+                if (VRAMEntry == 0)
+                    return 0x8000;
+
+                return this.GetPaletteEntry(2 * (uint)VRAMEntry);
+            }
+        }
+
+
+        private void RenderAffineOBJ(short OBJy, OBJSize OBJsz, bool ColorMode,
+            ushort OBJ_ATTR1, ushort OBJ_ATTR2)
+        {
+            ushort StartX = (ushort)(OBJ_ATTR1 & 0x01ff);
+            byte AffineIndex = (byte)((OBJ_ATTR1 & 0x3e00) >> 9);
+
+            ushort TileID = (ushort)(OBJ_ATTR2 & 0x03ff);
+            byte Priority = (byte)((OBJ_ATTR2 & 0x0c00) >> 10);
+            byte PaletteBank = (byte)((OBJ_ATTR2 & 0xf000) >> 12);
+
+            ushort RotScaleIndex = (ushort)(32 * AffineIndex + 6);
+
+            // PA, PB, PC, PD:
+            short[] RotateScaleParams = new short[4];
+            for (byte di = 0; di < 4; di++)
+            {
+                RotateScaleParams[di] = (short)(this.gba.cpu.OAM[RotScaleIndex] | (this.gba.cpu.OAM[RotScaleIndex + 1] << 8));
+                RotScaleIndex += 8;
+            }
+
+            // todo: SIMD?
+            byte px, py;
+            byte px0 = (byte)(OBJsz.Width >> 1);
+            byte py0 = (byte)(OBJsz.Height >> 1);
+
+            short dy = (short)(scanline - OBJy - (OBJsz.Height >> 1));
+            short dx;
+
+            for (byte ix = 0; ix < OBJsz.Width; ix++)
+            {
+                dx = (short)(ix - (OBJsz.Width >> 1));
+
+                if ((StartX + ix < 0) || (StartX + ix) >= width)
+                    continue;
+
+                if (this.OBJLayers[Priority][StartX + ix] != 0x8000)
+                    continue;
+
+                // transform
+                px = (byte)(((RotateScaleParams[0] * dx + RotateScaleParams[1] * dy) >> 8) + px0);
+                py = (byte)(((RotateScaleParams[2] * dx + RotateScaleParams[3] * dy) >> 8) + py0);
+
+                if (px < 0 || px >= OBJsz.Width || py < 0 || py >= OBJsz.Height)
+                    continue;
+
+                this.OBJLayers[Priority][StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, px, py, ColorMode, PaletteBank);
+            }
+        }
 
     }
 }

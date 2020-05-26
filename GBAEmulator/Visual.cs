@@ -68,13 +68,17 @@ namespace GBAEmulator
             {
                 this.gba.cpu.ShowInfo();
             }
+            else if (e.KeyCode == Keys.O)
+            {
+                this.gba.cpu.DumpOAM();
+            }
             else if (e.KeyCode == Keys.P)
             {
                 this.gba.cpu.DumpPAL();
             }
             else if (e.KeyCode == Keys.V)
             {
-                this.gba.cpu.DumpVRAM(0, 4);
+                this.gba.cpu.DumpVRAM(4, 4);
             }
             else if (e.KeyCode == Keys.D)
             {
