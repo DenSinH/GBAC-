@@ -6,8 +6,6 @@ namespace GBAEmulator.CPU
     {
         private void DataProcessing(uint Instruction)
         {
-            this.Log("Data Processing");
-
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             byte OpCode = (byte)((Instruction & 0x01e0_0000) >> 21);
             bool SetConditions = (Instruction & 0x0010_0000) > 0;
@@ -63,12 +61,17 @@ namespace GBAEmulator.CPU
                 byte ShiftAmount = (byte)(ImmediateShift ? ((Instruction & 0xf80) >> 7) : this.Registers[(Instruction & 0xf00) >> 8] & 0xff);
 
                 Op2 = ShiftOperand(Op2, ImmediateShift, (byte)((Instruction & 0x60) >> 5), ShiftAmount, SetConditions);
+
+                this.Log(string.Format("Data Processing, Op2 = R{0} shift {1}", Rm, ShiftAmount));
             }
             else
             {
                 // Immediate operand
                 Op2 = Instruction & 0x0ff;
                 byte ShiftAmount = (byte)((Instruction & 0xf00) >> 7);  // rotated right by twice the value of the operand
+
+                this.Log(string.Format("Data Processing, Op2 = immediate (hex){0:2x} ROR {1}", Op2, ShiftAmount));
+
                 // Rotate right
                 if (ShiftAmount > 0)
                 {

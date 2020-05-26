@@ -11,8 +11,6 @@ namespace GBAEmulator.CPU
 
         private void SWP(uint Instruction)
         {
-            this.Log("Single data swap");
-
             bool ByteQuantity;
             byte Rn, Rd, Rm;
 
@@ -41,6 +39,8 @@ namespace GBAEmulator.CPU
                 this.SetWordAt(Address & 0xffff_fffc, this.Registers[Rm]);  // force align
                 this.Registers[Rd] = MemoryContent;
             }
+
+            this.Log(string.Format("Single data swap: R{0} <- Mem[R{1}] <- R{2}", Rd, Rn, Rm));
         }
 
     }

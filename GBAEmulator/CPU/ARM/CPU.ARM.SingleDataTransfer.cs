@@ -6,8 +6,6 @@ namespace GBAEmulator.CPU
     {
         private void SingleDataTransfer(uint Instruction)
         {
-            this.Log("Single Data Transfer");
-
             bool RegisterOffset, PreIndex, Up, ByteQuantity, WriteBack, LoadFromMemory;
             byte Rn, Rd;
             uint Offset;
@@ -59,6 +57,8 @@ namespace GBAEmulator.CPU
 
             if (LoadFromMemory)
             {
+
+                this.Log(string.Format("Single Data Transfer: Mem{0:x8} -> R{1}", Address, Rd));
                 if (ByteQuantity)
                 {
                     this.Registers[Rd] = this.GetByteAt(Address);
@@ -81,6 +81,7 @@ namespace GBAEmulator.CPU
             }
             else
             {
+                this.Log(string.Format("Single Data Transfer: R{1} ->  Mem{0:x8}", Address, Rd));
                 /*
                  When R15 is the source register (Rd) of a register store (STR) instruction, the stored
                  value will be address of the instruction plus 12. 

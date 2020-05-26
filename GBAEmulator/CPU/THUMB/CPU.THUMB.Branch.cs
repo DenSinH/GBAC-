@@ -13,7 +13,6 @@ namespace GBAEmulator.CPU
                 return;
             }
 
-            this.Log("Conditional Branch");
             /*
              The instructions in this group all perform a conditional Branch depending on the state
              of the CPSR condition codes. The branch offset must take account of the prefetch
@@ -30,6 +29,8 @@ namespace GBAEmulator.CPU
             SOffset8 = (uint)(Instruction & 0x00ff) << 1;
 
             int SignedOffset = (int)(((SOffset8 & 0x100) > 0) ? ((int)SOffset8 - 0x200) : (int)SOffset8);
+
+            this.Log(string.Format("Conditional Branch, Offset {0}", SignedOffset));
 
             /*
              Cond = 1110 is undefined, and should not be used.
@@ -50,6 +51,7 @@ namespace GBAEmulator.CPU
             {
                 if (this.Condition(Condition))
                 {
+                    this.Log("Branch taken");
                     this.PC = (uint)(this.PC + SignedOffset);
                     this.PipelineFlush();
                 }
@@ -58,7 +60,6 @@ namespace GBAEmulator.CPU
 
         private void UnconditionalBranch(ushort Instruction)
         {
-            this.Log("Unconditional Branch");
             /*
              The address specified by label is a full 12-bit two’s complement address, but must
              always be halfword aligned (ie bit 0 set to 0), since the assembler places label >> 1 in
@@ -69,6 +70,8 @@ namespace GBAEmulator.CPU
             int TrueOffset = ((Offset11 & 0x0800) > 0) ? (Offset11 - 0x1000) : Offset11;
             this.PC = (uint)(this.PC + TrueOffset) & 0xffff_fffe;
             this.PipelineFlush();
+
+            this.Log(string.Format("Unconditional Branch, Offset {0}", TrueOffset));
         }
 
         private void LongBranchWithLink(ushort Instruction)

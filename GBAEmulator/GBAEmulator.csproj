@@ -60,6 +60,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -91,7 +92,6 @@
     <Compile Include="CPU\CPU.Memory.IO.cs" />
     <Compile Include="CPU\CPU.Memory.IO.IORegisters.base.cs" />
     <Compile Include="CPU\CPU.Memory.IO.IORegisters.cs" />
-    <Compile Include="CPU\CPU.Testing.cs" />
     <Compile Include="CPU\CPU.InterruptHandling.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.AddOffsetToSP.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.AddSubtract.cs" />
@@ -109,7 +109,8 @@
     <Compile Include="PPU\PPU.Aux.cs" />
     <Compile Include="PPU\PPU.cs" />
     <Compile Include="PPU\PPU.Render.cs" />
-    <Compile Include="PPU\PPU.Render.Helpers.cs" />
+    <Compile Include="PPU\PPU.Render.BG.cs" />
+    <Compile Include="PPU\PPU.Render.OBJ.cs" />
     <Compile Include="Visual.cs">
       <SubType>Form</SubType>
     </Compile>

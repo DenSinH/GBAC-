@@ -80,6 +80,15 @@ namespace GBAEmulator
             {
                 Console.WriteLine(this.gba.cpu.DISPSTAT.Get().ToString("x4"));
             }
+            else if (e.KeyCode == Keys.F1)
+            {
+                ushort ToFind = ushort.Parse(Console.ReadLine());
+                this.gba.cpu.FindValueInRAM(ToFind);
+            }
+            else if (e.KeyCode == Keys.F3)
+            {
+                this.gba.cpu.pause = true;
+            }
         }
 
         private void Visual_Paint(object sender, PaintEventArgs e)
@@ -135,8 +144,6 @@ namespace GBAEmulator
 
         private void Tick(object sender, EventArgs e)
         {
-            //Console.WriteLine(this.gba.cpu.Registers[1].ToString("x8") + " " + this.gba.cpu.Registers[1].ToString("x8"));
-            //Console.ReadKey();
             Draw();
 
             time += interval;

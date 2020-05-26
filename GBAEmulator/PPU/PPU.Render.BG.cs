@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 using GBAEmulator.CPU;
 
@@ -76,7 +77,7 @@ namespace GBAEmulator
                 byte PaletteNibble;
                 for (byte dx = 0; dx < 4; dx++)  // we need to look at nibbles here
                 {
-                    ScreenX = (byte)(StartX + 2 * dx);
+                    ScreenX = (byte)(StartX + 2 * s * dx);
                     if (0 <= ScreenX && ScreenX < width)
                     {
                         PaletteNibble = (byte)(this.gba.cpu.VRAM[Address + dx] & 0x0f);
@@ -87,13 +88,13 @@ namespace GBAEmulator
                         
                     }
 
-                    if (0 <= ScreenX && ScreenX < width - 1)
+                    if (0 <= ScreenX + s && ScreenX < width - s)
                     {
                         PaletteNibble = (byte)((this.gba.cpu.VRAM[Address + dx] & 0xf0) >> 4);
                         if (PaletteNibble == 0)  // transparent
-                            Line[ScreenX + 1] = 0x8000;
+                            Line[ScreenX + s] = 0x8000;
                         else
-                            Line[ScreenX + 1] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
+                            Line[ScreenX + s] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
                         
                     }
                 }
@@ -135,8 +136,6 @@ namespace GBAEmulator
                 HOFS = this.gba.cpu.BGHOFS[BG].Offset;
                 VOFS = this.gba.cpu.BGVOFS[BG].Offset;
                 BGCNT = this.gba.cpu.BGCNT[BG];
-
-                Console.WriteLine(HOFS);
 
                 CharBaseBlock = BGCNT.CharBaseBlock;
                 ScreenBaseBlock = BGCNT.ScreenBaseBlock;
@@ -207,17 +206,13 @@ namespace GBAEmulator
 
         private static readonly ushort[] AffineSizes = new ushort[4] { 128, 256, 512, 1024 };
 
-        private ushort GetAffinePixel(byte TileID, uint ScreenX, byte CharBaseBlock)
+        private ushort GetAffinePixel(byte TileID, uint ScreenX, byte CharBaseBlock, byte dx, byte dy)
         {
             // TileID is equivalent with ScreenEntry in affine backgrounds
-            ushort Address = (ushort)(CharBaseBlock * 0x4000);
-            
             // we only use 8bpp mode for affine layers (Tonc)
+            ushort Address = (ushort)(CharBaseBlock * 0x4000 | (TileID * 0x40) | (dy * 8) | dx);
 
-            Address |= (ushort)(TileID * 0x40);
-            Address |= (ushort)((scanline & 7) * 8);
-
-            return this.GetPaletteEntry((uint)2 * this.gba.cpu.VRAM[Address + (ScreenX & 7)]);
+            return this.GetPaletteEntry((uint)2 * this.gba.cpu.VRAM[Address]);
         }
 
         // based on y = scanline
@@ -243,12 +238,11 @@ namespace GBAEmulator
             
             Mosaic = BGCNT.Mosaic;
 
-            // todo: speed up with SIMD (system.Numerics)
-            uint ScreenEntryX, ScreenEntryY;
+            int ScreenEntryX, ScreenEntryY;
             for (byte ScreenX = 0; ScreenX < width; ScreenX++)
             {
-                ScreenEntryX = (uint)((BGxX.Full + (PA.Full * ScreenX + PB.Full * scanline)) >> 8);  // >> 8 because it is fractional
-                ScreenEntryY = (uint)((BGxY.Full + (PC.Full * ScreenX + PD.Full * scanline)) >> 8);  // >> 8 because it is fractional
+                ScreenEntryX = (((int)BGxX.InternalRegister + PA.Full * ScreenX) >> 8);  // >> 8 because it is fractional
+                ScreenEntryY = (((int)BGxY.InternalRegister + PC.Full * ScreenX) >> 8);  // >> 8 because it is fractional
 
                 if (ScreenEntryX < 0 || ScreenEntryX >= BGSize || ScreenEntryY < 0 || ScreenEntryY >= BGSize)
                 {
@@ -259,15 +253,18 @@ namespace GBAEmulator
                     }
                     
                     // wraparound: modulo BGSize (power of 2)
-                    ScreenEntryX &= (uint)(BGSize - 1);
-                    ScreenEntryY &= (uint)(BGSize - 1);
+                    ScreenEntryX &= (BGSize - 1);
+                    ScreenEntryY &= (BGSize - 1);
                 }
 
                 // similar to regular now
-                ScreenEntryIndex = (uint)(ScreenEntryBaseAddress | ((ScreenEntryY / 8) * (BGSize / 8)) | (ScreenEntryX / 8));
+                ScreenEntryIndex = (ScreenEntryBaseAddress | (uint)((ScreenEntryY >> 3) * (BGSize >> 3))| (uint)(ScreenEntryX >> 3));
+
+                // Console.Write(ScreenEntryIndex.ToString("x3") + " ");
                 AffineScreenEntry = this.gba.cpu.VRAM[ScreenEntryIndex];
 
-                this.BGScanlines[BG][ScreenX] = this.GetAffinePixel(AffineScreenEntry, ScreenX, CharBaseBlock);
+                this.BGScanlines[BG][ScreenX] = this.GetAffinePixel(AffineScreenEntry, ScreenX, CharBaseBlock,
+                    (byte)(ScreenEntryX & 7), (byte)(ScreenEntryY & 7));
             }
         }
 

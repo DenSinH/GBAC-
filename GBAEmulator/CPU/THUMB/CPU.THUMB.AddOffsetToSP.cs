@@ -6,7 +6,6 @@ namespace GBAEmulator.CPU
     {
         private void AddOffsetToSP(ushort Instruction)
         {
-            this.Log("Add offset to SP");
             bool Sign;
             uint SWord7;
 
@@ -17,6 +16,8 @@ namespace GBAEmulator.CPU
                 SP -= SWord7;
             else
                 SP += SWord7;
+
+            this.Log(string.Format("Add offset to SP: Negative: {0} Offset: {1:x4}", Sign, SWord7));
         }
     }
 }

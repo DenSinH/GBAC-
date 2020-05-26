@@ -6,7 +6,6 @@ namespace GBAEmulator.CPU
     {
         private void Halfword_SignedDataTransfer(uint Instruction)
         {
-            this.Log("Halfword Data Transfer");
             bool PreIndex, Up, WriteBack, LoadFromMemory;
             byte Rn, Rd, SH;
             uint Address, Offset;
@@ -58,6 +57,7 @@ namespace GBAEmulator.CPU
 
                     GBATek: LDRH Rd,[odd]   -->  LDRH Rd,[odd-1] ROR 8  ;read to bit0-7 and bit24-31
                     */
+                    this.Log(string.Format("Halfword Data Transfer: Unsigned Halfword Rd = R{0} @{1:x8}", Rd, Address));
                     if (LoadFromMemory)
                     {
                         if ((Address & 0x01) == 0)  // aligned
@@ -72,6 +72,7 @@ namespace GBAEmulator.CPU
                     }
                     break;
                 case 0b10:  // Signed byte
+                    this.Log(string.Format("Halfword Data Transfer: Signed byte Rd = R{0} @{1:x8}", Rd, Address, Rd));
                     if (LoadFromMemory)
                     {
                         this.Registers[Rd] = (uint)(sbyte)this.GetByteAt(Address);
@@ -89,6 +90,7 @@ namespace GBAEmulator.CPU
 
                     GBATek: LDRSH Rd,[odd]  -->  LDRSB Rd,[odd]         ;sign-expand BYTE value
                     */
+                    this.Log(string.Format("Halfword Data Transfer: Signed Halfword Rd = R{0} @{1:x8}", Rd, Address, Rd));
                     if (LoadFromMemory)
                     {
                         if ((Address & 0x01) == 1)

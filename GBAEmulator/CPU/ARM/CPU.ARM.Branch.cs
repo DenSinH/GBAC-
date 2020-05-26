@@ -17,14 +17,14 @@ namespace GBAEmulator.CPU
                 this.PC = Target & 0xffff_fffe;
             this.PipelineFlush();
 
+            this.Log(string.Format("BX: R{0} -> PC", Rn));
+
             // 2S + 1N cycles
         }
 
         private void Branch(uint Instruction)
         {
             // Branch / Branch with Link
-            this.Log("ARM Branch");
-
             if ((Instruction & 0x0100_0000) > 0)  // Link bit
             {
                 this.Registers[14] = (this.PC & 0xffff_fffc) - 4;  // PC is 8 ahead (Prefetch /Decode/ Execute), should be 4
@@ -37,6 +37,9 @@ namespace GBAEmulator.CPU
 
             this.PC = (uint)(this.PC + TrueOffset);
             this.PipelineFlush();
+
+
+            this.Log(string.Format("ARM branch (with link?) Offset {0:x8}", TrueOffset));
 
             // 2S + 1N cycles
         }

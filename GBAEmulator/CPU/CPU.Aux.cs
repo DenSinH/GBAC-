@@ -130,7 +130,7 @@ namespace GBAEmulator.CPU
                     case 0b10:  // Arithmetic Right
                         if (ShiftAmount < 32)
                         {
-                            newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
+                            newC = (byte)((int)(Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                             Op = (uint)((int)Op >> ShiftAmount);
                         }
                         else
@@ -163,6 +163,7 @@ namespace GBAEmulator.CPU
 
         private void SetCVSub(ulong Op1, ulong Op2, uint Result)
         {
+            // for Op1 - Op2
             this.C = (byte)(Op2 <= Op1 ? 1 : 0);
             this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
         }

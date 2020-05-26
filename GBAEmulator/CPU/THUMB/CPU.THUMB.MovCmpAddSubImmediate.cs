@@ -6,7 +6,6 @@ namespace GBAEmulator.CPU
     {
         private void MovCmpAddSubImmediate(ushort Instruction)
         {
-            this.Log("MOV/CMP/ADD/SUB Immediate");
             byte opcode, Rd, Offset8;
             uint Result;
 
@@ -17,19 +16,23 @@ namespace GBAEmulator.CPU
             switch (opcode)
             {
                 case 0b00:  // MOV
+                    this.Log(string.Format("MOV/CMP/ADD/SUB Immediate: MOV {0:x4} -> R{1}", Offset8, Rd));
                     Result = Offset8;
                     this.Registers[Rd] = Result;
                     break;
                 case 0b01:  // CMP
+                    this.Log(string.Format("MOV/CMP/ADD/SUB Immediate: CMP R{1} - {0:x4}", Offset8, Rd));
                     Result = this.Registers[Rd] - Offset8;
                     this.SetCVSub(this.Registers[Rd], Offset8, Result);
                     break;
                 case 0b10:  // ADD
+                    this.Log(string.Format("MOV/CMP/ADD/SUB Immediate: ADD {0:x4} + R{1} -> R{1}", Offset8, Rd));
                     Result = this.Registers[Rd] + Offset8;
                     this.SetCVAdd(this.Registers[Rd], Offset8, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b11:  // SUB
+                    this.Log(string.Format("MOV/CMP/ADD/SUB Immediate: SUB R{1} - {0:x4} -> R{1}", Offset8, Rd));
                     Result = this.Registers[Rd] - Offset8;
                     this.SetCVSub(this.Registers[Rd], Offset8, Result);
                     this.Registers[Rd] = Result;

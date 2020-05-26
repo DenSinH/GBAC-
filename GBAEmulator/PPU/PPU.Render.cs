@@ -43,17 +43,8 @@ namespace GBAEmulator
                     case 5:
                         this.Mode5Scanline();
                         break;
-#if DEBUG
                     default:
-                        Console.Error.WriteLine(string.Format("BG Mode {0} not implemented yet", this.gba.cpu.DISPCNT.BGMode));
-                        break;
-#else
-                    default:
-                        if (scanline == 0)
-                            Console.WriteLine(string.Format("BG Mode {0} not implemented yet", this.gba.cpu.DISPCNT.BGMode));
-                        this.Mode4Scanline();
-                        break;
-#endif
+                        throw new Exception("Invalid mode");
                 }
             }
             

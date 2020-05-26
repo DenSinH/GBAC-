@@ -12,8 +12,8 @@ namespace GBAEmulator.CPU
         /*
          Emulation of the ARM7TDMI CPU
         */
-        State state;
-        readonly Queue<uint> Pipeline = new Queue<uint>(3);
+        private State state;
+        private readonly Queue<uint> Pipeline = new Queue<uint>(3);
         GBA gba;
 
         public ARM7TDMI(GBA gba)
@@ -113,13 +113,12 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            //this.ShowInfo();
-            //if (this.pause || this.GetWordAt(0x0300_7eb4) == 0x0800_8ff4)
+            //if (this.pause || this.PC - 4 == 0x0800_47f0)
             //{
-            //    Console.WriteLine(this.GetWordAt(0x0300_7eb4).ToString("x8"));
+            //    this.ShowInfo();
             //    pause = Console.ReadKey().KeyChar == 'p';
             //}
-            
+
 
             //if (this.Registers[15] != 0x0800_0190 && this.Registers[15] != 0x0800_0192 && this.Registers[15] != 0x0800_0194 && this.Registers[15] != 0x0800_0196)
             //{

@@ -24,6 +24,7 @@ namespace GBAEmulator.CPU
                     if ((RList & (1 << i)) > 0)
                     {
                         // Pop from stack
+                        this.Log(string.Format("POP Mem[{0:x8}] -> R{1}", SP, i));
                         this.Registers[i] = this.GetWordAt(SP);
                         SP += 4;
                     }
@@ -56,6 +57,7 @@ namespace GBAEmulator.CPU
                 uint Address = SP;
                 while (RegisterQueue.Count > 0)
                 {
+                    this.Log(string.Format("PUSH R{1} -> Mem[{0:x8}]", Address, RegisterQueue.Peek()));
                     this.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }

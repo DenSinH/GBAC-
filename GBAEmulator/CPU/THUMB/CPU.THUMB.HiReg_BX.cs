@@ -43,6 +43,7 @@ namespace GBAEmulator.CPU
             switch (Opcode)
             {
                 case 0b00:
+                    this.Log(string.Format("R{0} + R{1} -> R{0}", Rd, Rs));
                     this.Registers[Rd] = Op1 + Op2;
                     if (Rd == 15)
                     {
@@ -51,11 +52,13 @@ namespace GBAEmulator.CPU
                     }
                     break;
                 case 0b01:
+                    this.Log(string.Format("R{0} - R{1} -> R{0}", Rd, Rs));
                     Result = Op1 - Op2;
                     this.SetCVSub(Op1, Op2, Result);
                     this.SetNZ(Result);
                     break;
                 case 0b10:
+                    this.Log(string.Format("R{1} -> R{0}", Rd, Rs));
                     this.Registers[Rd] = Op2;
                     if (Rd == 15)
                     {
@@ -64,6 +67,7 @@ namespace GBAEmulator.CPU
                     }
                     break;
                 case 0b11:
+                    this.Log("BX");
                     this.BX(Rs);  // rest of instruction does not matter for BX, we do not read that part
                     break;
             }

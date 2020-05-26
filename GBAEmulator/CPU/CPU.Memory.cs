@@ -24,6 +24,14 @@ namespace GBAEmulator.CPU
         
         private uint GetWordAt(uint address)
         {
+            // trying to find the insane overflow bug in bigmap.gba
+            //if (address == 0x0300_0000 + 32412)
+            //{
+            //    Console.WriteLine(this.state);
+            //    Console.WriteLine((this.PC - 4).ToString("x8"));
+            //    Console.WriteLine(__GetWordAt__(this.iWRAM, address & 0xffff));
+            //}
+
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             if (__MemoryRegions__[Section] != null)
                 return __GetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section]);
@@ -58,6 +66,9 @@ namespace GBAEmulator.CPU
             switch (Section)
             {
                 case 6:  // VRAM Mirrors
+                    //Console.WriteLine("PC: " + (this.PC - 8).ToString("x8"));
+                    //this.ShowInfo();
+
                     if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0

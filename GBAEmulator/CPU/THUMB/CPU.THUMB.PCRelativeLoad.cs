@@ -6,11 +6,11 @@ namespace GBAEmulator.CPU
     {
         private void PCRelativeLoad(ushort Instruction)
         {
-            this.Log("PC relative load");
             byte Rd;
             uint Address;
 
             Rd = (byte)((Instruction & 0x0700) >> 8);
+            this.Log(string.Format("PC relative load, Mem[PC + {0:x2}] -> R{1}", ((Instruction & 0x00ff) << 2), Rd));
 
             /*
             The value specified by #Imm is a full 10-bit address, but must always be word-aligned

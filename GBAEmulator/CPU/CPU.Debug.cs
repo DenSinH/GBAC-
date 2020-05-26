@@ -7,6 +7,8 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        public bool pause;
+
         [Conditional("DEBUG")]
         private void Error(string message)
         {
@@ -87,5 +89,38 @@ namespace GBAEmulator.CPU
                 }
             }
         }
+
+        public void FindValueInRAM(ushort value)
+        {
+            Console.Write("iWRAM: ");
+            for (uint i = 0; i < this.iWRAM.Length; i += 2)
+            {
+                if (__GetHalfWordAt__(this.iWRAM, i) == value)
+                    Console.Write(i + " ");
+            }
+            Console.WriteLine();
+
+            Console.Write("eWRAM: ");
+            for (uint i = 0; i < this.eWRAM.Length; i += 2)
+            {
+                if (__GetHalfWordAt__(this.eWRAM, i) == value)
+                    Console.Write(i + " ");
+            }
+            Console.WriteLine();
+
+            Console.Write("IORAM: ");
+            for (uint i = 0; i < this.IORAM.Length; i += 2)
+            {
+                if (this.IOGetHalfWordAt(i) == value)
+                    Console.Write(i + " ");
+            }
+            Console.WriteLine();
+        }
+
+        public void ShowIWRAMAt(uint address)
+        {
+            Console.WriteLine(string.Format("iWRAM[${0:x8}] : {1}", address, __GetWordAt__(this.iWRAM, address)));
+        }
+
     }
 }

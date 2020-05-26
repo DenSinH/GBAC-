@@ -200,20 +200,40 @@ namespace GBAEmulator.CPU
         #endregion
 
         #region LCD I/O BG Rotation/Scaling
-        private class cReferencePointUpper : IORegister2
+        public class cReferencePointHalf : IORegister2
         {
+            cReferencePoint parent;
+            
+            public cReferencePointHalf(cReferencePoint parent)
+            {
+                this.parent = parent;
+            }
+
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
-                Console.WriteLine(value);
                 base.Set(value, setlow, sethigh);
+                this.parent.ResetInternal();
             }
         }
 
-        public class cReferencePoint : IORegister4
+        public class cReferencePoint : IORegister4<cReferencePointHalf>
         {
-            public cReferencePoint() : base(new EmptyRegister(), new cReferencePointUpper())
+            public cReferencePoint()
             {
+                this.lower = new cReferencePointHalf(this);
+                this.upper = new cReferencePointHalf(this);
+            }
 
+            public uint InternalRegister { get; private set; }
+
+            public void ResetInternal()
+            {
+                this.InternalRegister = (uint)this.Full;
+            }
+
+            public void UpdateInternal(uint dm_)  // dmx/dmy
+            {
+                this.InternalRegister += dm_;
             }
 
             public byte FractionalPortion
@@ -236,7 +256,7 @@ namespace GBAEmulator.CPU
                 get
                 {
                     if (this.Sign)  // negative
-                        return -(this.lower.Get() | ((this.upper.Get() & 0x07ff) << 16));
+                        return (int)(this.lower.Get() | ((this.upper.Get() & 0x07ff) << 16) | 0xf800_0000);
                     return (this.lower.Get() | ((this.upper.Get() & 0x07ff) << 16));
                 }
             }
@@ -261,7 +281,10 @@ namespace GBAEmulator.CPU
 
             public short Full
             {
-                get => (short)this._raw;  // automatically sign extends it
+                get
+                {
+                    return (short)this._raw;
+                }
             }
         }
 

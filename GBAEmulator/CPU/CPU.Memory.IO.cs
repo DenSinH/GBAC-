@@ -33,7 +33,7 @@ namespace GBAEmulator.CPU
             this.IORAM[0x20] = this.IORAM[0x21] = this.BG2PA;
             this.IORAM[0x22] = this.IORAM[0x23] = this.BG2PB;
             this.IORAM[0x24] = this.IORAM[0x25] = this.BG2PC;
-            this.IORAM[0x26] = this.IORAM[0x27] = this.BG2PC;
+            this.IORAM[0x26] = this.IORAM[0x27] = this.BG2PD;
 
             this.IORAM[0x28] = this.IORAM[0x29] = this.BG2X.lower;
             this.IORAM[0x2a] = this.IORAM[0x2b] = this.BG2X.upper;
@@ -43,7 +43,7 @@ namespace GBAEmulator.CPU
             this.IORAM[0x30] = this.IORAM[0x31] = this.BG3PA;
             this.IORAM[0x32] = this.IORAM[0x33] = this.BG3PB;
             this.IORAM[0x34] = this.IORAM[0x35] = this.BG3PC;
-            this.IORAM[0x36] = this.IORAM[0x37] = this.BG3PC;
+            this.IORAM[0x36] = this.IORAM[0x37] = this.BG3PD;
 
             this.IORAM[0x38] = this.IORAM[0x39] = this.BG3X.lower;
             this.IORAM[0x3a] = this.IORAM[0x3b] = this.BG3X.upper;

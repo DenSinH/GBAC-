@@ -18,7 +18,7 @@ namespace GBAEmulator.CPU
             if ((Instruction & 0x0200) == 0)
             {
                 // Load/Store with register offset
-                this.Log("Load/Store with register offset");
+                this.Log(string.Format("Load/Store with register offset, Mem[R{0} + R{1}] <-> R{2}", Rb, Ro, Rd));
                 bool LoadFromMemory, ByteQuantity;
 
                 LoadFromMemory = (Instruction & 0x0800) > 0;
@@ -57,7 +57,7 @@ namespace GBAEmulator.CPU
             else
             {
                 // Load/Store sign-extended byte/halfword
-                this.Log("THUMB Load/Store sign-extended byte/halfword");
+                this.Log(string.Format("Load/Store sign-extended, Mem[R{0} + R{1}] <-> R{2}", Rb, Ro, Rd));
                 bool HFlag, SignExtended;
 
                 HFlag = (Instruction & 0x0800) > 0;
@@ -102,7 +102,6 @@ namespace GBAEmulator.CPU
 
         private void LoadStoreImmediate(ushort Instruction)
         {
-            this.Log("Load/Store with immediate offset");
             bool ByteQuantity, LoadFromMemory;
             byte Offset5, Rb, Rd;
 
@@ -111,6 +110,8 @@ namespace GBAEmulator.CPU
             Offset5 = (byte)((Instruction & 0x07c0) >> 6);  // Offset value
             Rb = (byte)((Instruction & 0x0038) >> 3);       // Base Register
             Rd = (byte)(Instruction & 0x0007);              // Source/Destination Register
+
+            this.Log(string.Format("Load/Store with immediate offset, Mem[R{0} + {1:x4} << 2] <-> R{2}", Rb, Offset5, Rd));
 
             /*
              For word accesses (B = 0), the value specified by #Imm is a full 7-bit address, but must
@@ -153,7 +154,6 @@ namespace GBAEmulator.CPU
 
         private void LoadStoreHalfword(ushort Instruction)
         {
-            this.Log("Load/Store Halfword");
             bool LoadFromMemory;
             byte Offset5, Rb, Rd;
             
@@ -161,6 +161,8 @@ namespace GBAEmulator.CPU
             Offset5 = (byte)((Instruction & 0x07c0) >> 6);  // Offset value
             Rb = (byte)((Instruction & 0x0038) >> 3);       // Base Register
             Rd = (byte)(Instruction & 0x0007);              // Source/Destination Register
+
+            this.Log(string.Format("Load/Store halfword, Mem[R{0} + {1:x4} << 1] <-> R{2}", Rb, Offset5, Rd));
 
             /*
              #Imm is a full 6-bit address but must be halfword-aligned (ie with bit 0 set to 0) since
@@ -185,7 +187,6 @@ namespace GBAEmulator.CPU
 
         private void LoadStoreSPRelative(ushort Instruction)
         {
-            this.Log("Load/Store SP-relative");
             bool LoadFromMemory;
             byte Rd;
             uint Word8;
@@ -198,6 +199,8 @@ namespace GBAEmulator.CPU
             */
             Word8 = (uint)(Instruction & 0x00ff) << 2;
             uint Address = SP + Word8;
+
+            this.Log(string.Format("Load/Store halfword, Mem[SP + {0:x4} << 1] <-> R{1}", Word8, Rd));
 
             if (LoadFromMemory)
             {
@@ -220,8 +223,6 @@ namespace GBAEmulator.CPU
 
         private void LoadAddress(ushort Instruction)
         {
-            this.Log("Load Address");
-             
             bool Source;
             byte Rd;
             uint Word8;
@@ -234,6 +235,8 @@ namespace GBAEmulator.CPU
              with bits 1:0 set to 0) since the assembler places #Imm >> 2 in field Word8.
             */
             Word8 = (uint)(Instruction & 0x00ff) << 2;
+
+            this.Log(string.Format("Load Address, SP/PC + {0:x4} -> R{1}", Word8, Rd));
             if (Source)
             {
                 // Use SP as source
@@ -292,6 +295,7 @@ namespace GBAEmulator.CPU
                     if ((RList & (1 << i)) > 0)
                     {
                         this.Registers[i] = this.GetWordAt(Address);
+                        this.Log(string.Format("{0:x8} -> R{1} from {2:x8}", this.Registers[i], i, Address));
                         Address += 4;
                     }
                 }
@@ -311,6 +315,7 @@ namespace GBAEmulator.CPU
                 // we know that the queue is not empty, because RList != 0
                 if (RegisterQueue.Peek() == Rb)
                 {
+                    this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[Rb], Address, Rb));
                     this.SetWordAt(Address, this.Registers[Rb]);
                     Address += 4;
                     RegisterQueue.Dequeue();
@@ -321,6 +326,7 @@ namespace GBAEmulator.CPU
 
                 while (RegisterQueue.Count > 0)
                 {
+                    this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[RegisterQueue.Peek()], Address, RegisterQueue.Peek()));
                     this.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }

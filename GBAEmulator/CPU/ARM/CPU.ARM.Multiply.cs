@@ -6,8 +6,6 @@ namespace GBAEmulator.CPU
     {
         private void Multiply(uint Instruction)
         {
-            this.Log("Multiply");
-
             bool Accumulate, SetCondition;
             byte Rd, Rn, Rs, Rm;
 
@@ -31,6 +29,8 @@ namespace GBAEmulator.CPU
             if (SetCondition)
                 this.SetNZ(this.Registers[Rd]);
 
+            this.Log(string.Format("Multiply (Accumulate: {0}) (R{1} * R{2} ( + R{3}) -> R{4})", Accumulate, Rm, Rs, Rn, Rd));
+
             /*
              Execution Time: 1S+mI for MUL, and 1S+(m+1)I for MLA.
              Whereas 'm' depends on whether/how many most significant bits of Rs are all zero or all one.
@@ -40,8 +40,6 @@ namespace GBAEmulator.CPU
 
         private void MultiplyLong(uint Instruction)
         {
-            this.Log("Multiply long");
-
             /*
              • R15 must not be used as an operand or as a destination register.
              • RdHi, RdLo, and Rm must all specify different registers.
@@ -57,7 +55,7 @@ namespace GBAEmulator.CPU
             RdLo = (byte)((Instruction & 0x0000_f000) >> 12);
             Rs = (byte)((Instruction & 0x0000_0f00) >> 8);
             Rm = (byte)(Instruction & 0x0000_000f);
-
+            
             if (!Accumulate)
             {
                 if (Signed)
@@ -97,6 +95,10 @@ namespace GBAEmulator.CPU
                 this.Z = (byte)(((this.Registers[RdHi] == 0) && (this.Registers[RdLo] == 0)) ? 1 : 0);
             }
 
+            this.Log(
+                string.Format("Multiply Long (Accumulate: {0}, Signed: {1}) (R{2} * R{3} -> R{4}R{5})", Accumulate, Signed, Rm, Rs, RdHi, RdLo)
+                );
+            
             /*
              Execution Time: 1S+(m+1)I for MULL, and 1S+(m+2)I for MLAL.
              Whereas 'm' depends on whether/how many most significant bits of Rs are "all zero" (UMULL/UMLAL) or "all zero or all one" (SMULL,SMLAL).

@@ -32,18 +32,14 @@ namespace GBAEmulator.CPU
             }
         }
 
-        public abstract class IORegister4
+        public abstract class IORegister4<T> where T : IORegister2
         {
-            public readonly IORegister2 lower;
-            public readonly IORegister2 upper;
+            public T lower;
+            public T upper;
 
-            public IORegister4()
-            {
-                this.lower = new EmptyRegister();
-                this.upper = new EmptyRegister();
-            }
+            protected IORegister4() { }
 
-            protected IORegister4(IORegister2 lower, IORegister2 upper)
+            protected IORegister4(T lower, T upper)
             {
                 this.lower = lower;
                 this.upper = upper;
