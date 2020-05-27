@@ -148,6 +148,7 @@ namespace GBAEmulator
         private void Mode5Scanline()
         {
             // I don't think this is working properly
+            // I can't find much on mode 5 rendering though, so I'll just leave it
             if (scanline < 128 && this.gba.cpu.DISPCNT.DisplayBG(2))
             {
                 ushort offset = (ushort)(this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);

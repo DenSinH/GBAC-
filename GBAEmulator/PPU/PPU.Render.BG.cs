@@ -76,12 +76,13 @@ namespace GBAEmulator
             }
         }
 
-        private void Render4bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress, uint PaletteBase, bool Mosaic, byte MosaicHSize)
+        private void Render4bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress,
+            uint PaletteBase, bool Mosaic, byte MosaicHSize)
         {
             // draw 4bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             // PaletteBase must be PaletteBank * 0x20
             byte PaletteNibble;
-            byte ScreenX = (byte)StartX;  // todo: can casting cause visual glitches?
+            byte ScreenX = (byte)StartX;  // todo: can casting cause visual glitches on screen borders?
             uint MosaicCorrectedAddress;
             byte VRAMEntry;
             bool UpperNibble;
@@ -145,14 +146,14 @@ namespace GBAEmulator
                 if (Mosaic)
                     MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize);
 
-                if (0 <= ScreenX && ScreenX < width)
+                if (ScreenX < width)  // ScreenX is a byte, so always >= 0
                 {
                     VRAMEntry = this.gba.cpu.VRAM[MosaicCorrectedAddress];
                     if (VRAMEntry != 0)
                         Line[ScreenX] = this.GetPaletteEntry(2 * (uint)VRAMEntry);
                 }
 
-                ScreenX = (byte)(StartX + XSign);
+                ScreenX = (byte)(ScreenX + XSign);
             }
         }
 
@@ -162,6 +163,7 @@ namespace GBAEmulator
 
         private static uint VRAMIndexRegular(int TileX, int TileY, byte ScreenblockSize)
         {
+            // TileX and TileY are indices of the tile, not of the pixels of the tile
             switch (ScreenblockSize)
             {
                 case 0b00:  // 32x32
@@ -249,6 +251,7 @@ namespace GBAEmulator
                 for (sbyte CourseX = -1; CourseX < 31; CourseX++)
                 {
                     EffectiveX = (short)((CourseX << 3) + HOFS);
+
                     if (Mosaic)
                         EffectiveX -= (short)(EffectiveX % this.gba.cpu.MOSAIC.BGMosaicHSize);
 

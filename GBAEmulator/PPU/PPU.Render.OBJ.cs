@@ -131,7 +131,7 @@ namespace GBAEmulator
                 SliverBaseAddress = (uint)(TileID * 0x20);
                 // removed shifting for less arithmetic, logically OBJsz.Width should be OBJsz.Width >> 3 for the width in tiles, and
                 // 4 should be 0x20. This way we wrap around with the number of tiles, but since OBJsz.Width is a power of 2,
-                // this is ever so slightly faster
+                // this is ever so slightly faster, at least I think.
                 SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 4) : (32 * 0x20 * (dy >> 3)));
                 SliverBaseAddress += (uint)(4 * (dy & 0x07));   // offset within tile
 

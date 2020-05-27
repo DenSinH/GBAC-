@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 
 namespace GBAEmulator.CPU
@@ -85,7 +83,7 @@ namespace GBAEmulator.CPU
 
             if (this.HALTCNT.Halt)
             {
-                return 1;  // how many cycles?
+                return 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
             }
 
             if (this.state == State.ARM)

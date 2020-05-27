@@ -79,7 +79,7 @@ namespace GBAEmulator
         {
             // cpu.LoadRom("../../roms/KirbyNightmare.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSCHECKSUM.gba");
-            cpu.LoadRom("../../Tests/Tonc/obj_aff.gba");
+            cpu.LoadRom("../../Tests/Tonc/prio_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
             // cpu.LoadRom("../../Tests/AgingCard.gba");
             cpu.SkipBios();

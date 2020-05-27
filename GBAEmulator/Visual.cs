@@ -78,7 +78,7 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.V)
             {
-                this.gba.cpu.DumpVRAM(4, 4);
+                this.gba.cpu.DumpVRAM(1, 4);
             }
             else if (e.KeyCode == Keys.D)
             {
