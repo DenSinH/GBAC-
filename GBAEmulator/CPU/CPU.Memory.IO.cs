@@ -50,11 +50,23 @@ namespace GBAEmulator.CPU
             this.IORAM[0x3c] = this.IORAM[0x3d] = this.BG3Y.lower;
             this.IORAM[0x3e] = this.IORAM[0x3f] = this.BG3Y.upper;
 
+            this.IORAM[0x40] = this.IORAM[0x41] = this.WINH[0];
+            this.IORAM[0x42] = this.IORAM[0x43] = this.WINH[1];
 
-            for (int i = 0x20; i < IORAM.Length >> 1; i++)
+            this.IORAM[0x44] = this.IORAM[0x45] = this.WINV[0];
+            this.IORAM[0x46] = this.IORAM[0x47] = this.WINV[1];
+
+            this.IORAM[0x48] = this.IORAM[0x49] = this.WININ;
+            this.IORAM[0x4a] = this.IORAM[0x4b] = this.WINOUT;
+
+            this.IORAM[0x4c] = this.IORAM[0x4d] = this.MOSAIC;
+            this.IORAM[0x4e] = this.IORAM[0x4f] = new EmptyRegister();  // unused MOSAIC bits
+
+
+            for (int i = 0x50; i < IORAM.Length; i+= 2)
             {
                 // double length no registers
-                this.IORAM[2 * i] = this.IORAM[2 * i + 1] = new EmptyRegister();
+                this.IORAM[i] = this.IORAM[i + 1] = new EmptyRegister();
             }
 
             cKeyInterruptControl KEYCNT = new cKeyInterruptControl();

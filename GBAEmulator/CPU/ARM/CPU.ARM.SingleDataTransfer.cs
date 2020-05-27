@@ -4,12 +4,13 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void SingleDataTransfer(uint Instruction)
+        private byte SingleDataTransfer(uint Instruction)
         {
             bool RegisterOffset, PreIndex, Up, ByteQuantity, WriteBack, LoadFromMemory;
             byte Rn, Rd;
             uint Offset;
             uint Address;
+            byte Cycles;
 
             RegisterOffset = (Instruction & 0x0200_0000) > 0;
             PreIndex = (Instruction & 0x0100_0000) > 0;
@@ -77,7 +78,16 @@ namespace GBAEmulator.CPU
                 }
 
                 if (Rd == 15)
+                {
+                    // LDR PC take 2S + 2N +1I incremental cycles
+                    Cycles = (SCycle << 1) + (NCycle << 1) + ICycle;
                     this.PipelineFlush();
+                }
+                else
+                {
+                    // Normal LDR instructions take 1S + 1N + 1I (incremental)
+                    Cycles = SCycle + NCycle + ICycle;
+                }
             }
             else
             {
@@ -105,6 +115,9 @@ namespace GBAEmulator.CPU
                     Address &= 0xffff_fffc;  // forced align for STR
                     this.SetWordAt(Address, Value);
                 }
+
+                // STR instructions take 2N incremental cycles to execute.
+                Cycles = NCycle << 1;
             }
 
             if ((WriteBack || !PreIndex) && !(Rn == Rd && LoadFromMemory))
@@ -124,6 +137,7 @@ namespace GBAEmulator.CPU
                 // Write-back must not be specified if R15 is specified as the base register (Rn). (Manual)
                 this.Registers[Rn] = Address;
             }
+            return Cycles;
         }
     }
 }

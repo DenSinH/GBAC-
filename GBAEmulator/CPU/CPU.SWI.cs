@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void SWIInstruction(uint Instruction)
+        private byte SWIInstruction(uint Instruction)
         {
             this.Log(string.Format("SWI: {0:x8}", Instruction));
 
@@ -15,6 +15,9 @@ namespace GBAEmulator.CPU
 
             this.PC = SWIVector;
             this.PipelineFlush();
+
+            // Software interrupt instructions take 2S + 1N incremental cycles to execute
+            return (SCycle << 1) + NCycle;
         }
 
         private void SWIInstruction(ushort Instruction)

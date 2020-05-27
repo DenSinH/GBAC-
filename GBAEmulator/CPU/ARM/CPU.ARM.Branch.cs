@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
 
-        private void BX(uint Instruction)
+        private byte BX(uint Instruction)
         {
             // Branch & Exchange instruction
             byte Rn = (byte)(Instruction & 0x0f);
@@ -20,9 +20,10 @@ namespace GBAEmulator.CPU
             this.Log(string.Format("BX: R{0} -> PC", Rn));
 
             // 2S + 1N cycles
+            return (SCycle << 1) + NCycle;
         }
 
-        private void Branch(uint Instruction)
+        private byte Branch(uint Instruction)
         {
             // Branch / Branch with Link
             if ((Instruction & 0x0100_0000) > 0)  // Link bit
@@ -42,6 +43,7 @@ namespace GBAEmulator.CPU
             this.Log(string.Format("ARM branch (with link?) Offset {0:x8}", TrueOffset));
 
             // 2S + 1N cycles
+            return (SCycle << 1) + NCycle;
         }
     }
 }

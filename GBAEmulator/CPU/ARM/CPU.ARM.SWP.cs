@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
 
-        private void SWP(uint Instruction)
+        private byte SWP(uint Instruction)
         {
             bool ByteQuantity;
             byte Rn, Rd, Rm;
@@ -41,6 +37,9 @@ namespace GBAEmulator.CPU
             }
 
             this.Log(string.Format("Single data swap: R{0} <- Mem[R{1}] <- R{2}", Rd, Rn, Rm));
+
+            // Swap instructions take 1S + 2N +1I incremental cycles to execute
+            return SCycle + (NCycle << 1) + ICycle;
         }
 
     }

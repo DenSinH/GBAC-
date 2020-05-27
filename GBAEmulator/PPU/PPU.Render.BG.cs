@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Numerics;
+using System.Threading.Tasks;
 
 using GBAEmulator.CPU;
 
@@ -15,21 +15,27 @@ namespace GBAEmulator
 
         private void ResetBGScanlines(params byte[] BGs)
         {
-            byte Priority;
             foreach (byte BG in BGs)
             {
                 // reset only the relevant layers
-                Priority = this.gba.cpu.BGCNT[BG].BGPriority;
                 for (byte x = 0; x < width; x++)
                 {
-                    BGScanlines[Priority][x] = 0x8000;
+                    BGScanlines[BG][x] = 0x8000;
                 }
             }
         }
 
-        private void MergeBGs(bool RenderOBJ)  // into current scanline
+        private void MergeBGs(bool RenderOBJ, params byte[] BGs)  // into current scanline
         {
             ushort Backdrop = this.Backdrop;
+            byte[] Priorities = new byte[4];
+            bool[] Enabled = new bool[4];
+
+            foreach (byte BG in BGs)
+            {
+                Priorities[BG] = this.gba.cpu.BGCNT[BG].BGPriority;
+                Enabled[BG] = this.gba.cpu.DISPCNT.DisplayBG(BG);
+            }
 
             // only to be called after drawing into the DrawRegularBGScanline array
             byte priority;
@@ -42,73 +48,107 @@ namespace GBAEmulator
                         if (this.OBJLayers[priority][x] != 0x8000)
                         {
                             this.Display[width * scanline + x] = this.OBJLayers[priority][x];
-                            priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                            priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
                             break;
                         }
                     }
 
-                    if (this.BGScanlines[priority][x] != 0x8000)
+                    foreach (byte BG in BGs)
                     {
-                        this.Display[width * scanline + x] = this.BGScanlines[priority][x];
-                        priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
-                        break;
+                        if (!Enabled[BG])
+                            continue;
+
+                        if (Priorities[BG] != priority)
+                            continue;
+
+                        if (this.BGScanlines[BG][x] != 0x8000)
+                        {
+                            this.Display[width * scanline + x] = this.BGScanlines[BG][x];
+                            priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                            break;
+                        }
                     }
                 }
 
                 if (priority == 3)  // we found no non-transparent pixel
+                {
                     this.Display[width * scanline + x] = Backdrop;
+                }
             }
         }
 
-        private void Render4bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress, uint PaletteBase)
+        private void Render4bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress, uint PaletteBase, bool Mosaic, byte MosaicHSize)
         {
             // draw 4bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             // PaletteBase must be PaletteBank * 0x20
             byte PaletteNibble;
             byte ScreenX = (byte)StartX;  // todo: can casting cause visual glitches?
+            uint MosaicCorrectedAddress;
+            byte VRAMEntry;
+            bool UpperNibble;
 
             for (byte dx = 0; dx < 4; dx++)  // we need to look at nibbles here
             {
-                
+                MosaicCorrectedAddress = TileLineBaseAddress + dx;
+                if (Mosaic && MosaicHSize != 1)
+                {
+                    // todo: fix horizontal mosaic
+                    UpperNibble = (((dx << 1) % MosaicHSize) & 1) == 1;
+                    MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize) >> 1;
+                }
+                else
+                {
+                    UpperNibble = false;
+                }
+
+                VRAMEntry = this.gba.cpu.VRAM[MosaicCorrectedAddress];
+
                 if (ScreenX < width)  // ScreenX is a byte, so always greater than 0
                 {
                     if (Line[ScreenX] == 0x8000)
                     {
-                        PaletteNibble = (byte)(this.gba.cpu.VRAM[TileLineBaseAddress + dx] & 0x0f);
+                        PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
                         if (PaletteNibble == 0)  // transparent
                             Line[ScreenX] = 0x8000;
                         else
                             Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
                     }
                 }
-                
-                if (0 <= ScreenX + XSign && ScreenX < width - XSign)
+                ScreenX = (byte)(ScreenX + XSign);
+
+                UpperNibble = !Mosaic || MosaicHSize == 1 ||((((dx << 1) + 1) % MosaicHSize) & 1) == 1;
+
+                if (ScreenX < width)
                 {
-                    if (Line[ScreenX + XSign] == 0x8000)
+                    if (Line[ScreenX] == 0x8000)
                     {
-                        PaletteNibble = (byte)((this.gba.cpu.VRAM[TileLineBaseAddress + dx] & 0xf0) >> 4);
+                        PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
                         if (PaletteNibble == 0)  // transparent
-                            Line[ScreenX + XSign] = 0x8000;
+                            Line[ScreenX] = 0x8000;
                         else
-                            Line[ScreenX + XSign] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
+                            Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
                     }
                 }
-
-                ScreenX = (byte)(ScreenX + 2 * XSign);
+                ScreenX = (byte)(ScreenX + XSign);
             }
         }
 
-        private void Render8bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress)
+        private void Render8bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress, bool Mosaic, byte MosaicHSize)
         {
             // draw 8bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             byte ScreenX = (byte)StartX;
             byte VRAMEntry;
+            uint MosaicCorrectedAddress;
 
             for (byte dx = 0; dx < 8; dx++)
             {
+                MosaicCorrectedAddress = TileLineBaseAddress + dx;
+                if (Mosaic)
+                    MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize);
+
                 if (0 <= ScreenX && ScreenX < width)
                 {
-                    VRAMEntry = this.gba.cpu.VRAM[TileLineBaseAddress + dx];
+                    VRAMEntry = this.gba.cpu.VRAM[MosaicCorrectedAddress];
                     if (VRAMEntry != 0)
                         Line[ScreenX] = this.GetPaletteEntry(2 * (uint)VRAMEntry);
                 }
@@ -139,7 +179,7 @@ namespace GBAEmulator
         }
 
         private void DrawRegularScreenEntry(ref ushort[] Line, int StartX, byte dy, ushort ScreenEntry,
-                                            byte CharBaseBlock, bool ColorMode)  // based on y = scanline
+                                            byte CharBaseBlock, bool ColorMode, bool Mosaic, byte MosaicHSize)  // based on y = scanline
         {
             byte PaletteBank = (byte)((ScreenEntry & 0xf000) >> 12);
             bool VFlip = (ScreenEntry & 0x0800) > 0, HFlip = (ScreenEntry & 0x0400) > 0;
@@ -163,27 +203,29 @@ namespace GBAEmulator
                 Address |= (ushort)(TileID * 0x20);   // Beginning of tile
                 Address |= (ushort)(dy * 4);          // Beginning of tile sliver
                 
-                this.Render4bpp(ref Line, StartX, XSign, Address, (uint)(PaletteBank * 0x20));
+                this.Render4bpp(ref Line, StartX, XSign, Address, (uint)(PaletteBank * 0x20), Mosaic, MosaicHSize);
             }
             else             // 8bpp
             {
                 Address |= (ushort)(TileID * 0x40);    // similar to 4bpp
                 Address |= (ushort)(dy * 8);
 
-                this.Render8bpp(ref Line, StartX, XSign, Address);
+                this.Render8bpp(ref Line, StartX, XSign, Address, Mosaic, MosaicHSize);
             }
         }
 
         private void DrawRegularBGScanline(params byte[] BGs)  // based on y = scanline
         {
             ushort HOFS, VOFS;
-            byte CharBaseBlock, ScreenBaseBlock, BGSize, Priority;
+            byte CharBaseBlock, ScreenBaseBlock, BGSize;
+            ushort EffectiveX, EffectiveY;
             bool ColorMode, Mosaic;
 
             uint ScreenEntryIndex;
             ushort ScreenEntry;
 
             ARM7TDMI.cBGControl BGCNT;
+
             foreach (byte BG in BGs)
             {
                 if (!this.gba.cpu.DISPCNT.DisplayBG(BG))
@@ -197,21 +239,28 @@ namespace GBAEmulator
                 CharBaseBlock = BGCNT.CharBaseBlock;
                 ScreenBaseBlock = BGCNT.ScreenBaseBlock;
                 ColorMode = BGCNT.ColorMode;
-                Priority = BGCNT.BGPriority;
                 Mosaic = BGCNT.Mosaic;
 
                 BGSize = BGCNT.ScreenSize;
 
+                EffectiveY = (ushort)(scanline + VOFS);
+                if (Mosaic)
+                    EffectiveY -= (ushort)(EffectiveY % this.gba.cpu.MOSAIC.BGMosaicVSize);
+
                 for (sbyte CourseX = -1; CourseX < 31; CourseX++)
                 {
+                    EffectiveX = (ushort)((CourseX << 3) + HOFS);
+                    if (Mosaic)
+                        EffectiveX -= (ushort)(EffectiveX % this.gba.cpu.MOSAIC.BGMosaicHSize);
+
                     // ScreenEntryIndex is the index of the screenentry for the tile we are currently rendering
-                    ScreenEntryIndex = PPU.VRAMIndexRegular((int)(CourseX + (HOFS >> 3)), (int)((scanline + VOFS) >> 3), BGSize);
+                    ScreenEntryIndex = PPU.VRAMIndexRegular((int)(EffectiveX >> 3), (int)((EffectiveY) >> 3), BGSize);
                     ScreenEntryIndex += (uint)(ScreenBaseBlock * 0x800);
 
                     ScreenEntry = (ushort)(this.gba.cpu.VRAM[ScreenEntryIndex + 1] << 8 | this.gba.cpu.VRAM[ScreenEntryIndex]);
 
-                    this.DrawRegularScreenEntry(ref this.BGScanlines[Priority], (CourseX * 8) - (HOFS & 0x07), (byte)((scanline + VOFS) & 0x07),
-                        ScreenEntry, CharBaseBlock, ColorMode);
+                    this.DrawRegularScreenEntry(ref this.BGScanlines[BG], (CourseX * 8) - (HOFS & 0x07), (byte)(EffectiveY & 0x07),
+                        ScreenEntry, CharBaseBlock, ColorMode, Mosaic, this.gba.cpu.MOSAIC.BGMosaicHSize);
                 }
             }
         }
@@ -265,7 +314,7 @@ namespace GBAEmulator
                 {
                     if (!BGCNT.DisplayAreaOverflow)
                     {
-                        this.BGScanlines[Priority][ScreenX] = 0x8000;  // transparent
+                        this.BGScanlines[BG][ScreenX] = 0x8000;  // transparent
                         continue;
                     }
                     
@@ -280,7 +329,7 @@ namespace GBAEmulator
                 // Console.Write(ScreenEntryIndex.ToString("x3") + " ");
                 AffineScreenEntry = this.gba.cpu.VRAM[ScreenEntryIndex];
 
-                this.BGScanlines[Priority][ScreenX] = this.GetAffinePixel(AffineScreenEntry, ScreenX, CharBaseBlock,
+                this.BGScanlines[BG][ScreenX] = this.GetAffinePixel(AffineScreenEntry, ScreenX, CharBaseBlock,
                     (byte)(ScreenEntryX & 7), (byte)(ScreenEntryY & 7));
             }
         }

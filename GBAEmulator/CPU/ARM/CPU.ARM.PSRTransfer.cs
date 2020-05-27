@@ -4,25 +4,22 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void PossiblePSRTransfer(uint Instruction)
+        private byte PossiblePSRTransfer(uint Instruction)
         {
             if ((Instruction & 0x0fbf_0fff) == 0x010f_0000)
             {
                 // MRS (transfer PSR contents to a register)
-                this.MRS(Instruction);
-                return;
+                return this.MRS(Instruction);
             }
             else if ((Instruction & 0x0fb0_fff0) == 0x0120_f000 || (Instruction & 0x0fb0_f000) == 0x0320_f000)
             {
                 // MSR (transfer register contents to PSR)
-                this.MSR(Instruction);
-                return;
+                return this.MSR(Instruction);
             }
             else
             {
                 this.Log("Ambiguous Dataprocessing reached");
-                this.DataProcessing(Instruction);
-                return;
+                return this.DataProcessing(Instruction);
             }
         }
 
@@ -63,7 +60,7 @@ namespace GBAEmulator.CPU
           You COULD also set an immediate operand for general MSR, but this was not in the documentation of
           the ARM7TDMI, so I ingored this too...
            */
-        private void MRS(uint Instruction)
+        private byte MRS(uint Instruction)
         {
             this.Log("MRS");
             byte Rd = (byte)((Instruction & 0xf000) >> 12);
@@ -75,9 +72,12 @@ namespace GBAEmulator.CPU
             {
                 this.Registers[Rd] = CPSR;
             }
+
+            // PSR Transfers take 1S incremental cycles
+            return SCycle;
         }
 
-        private void MSR(uint Instruction)
+        private byte MSR(uint Instruction)
         {
             this.Log("MSR");
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
@@ -121,6 +121,9 @@ namespace GBAEmulator.CPU
             {
                 CPSR = (CPSR & (~BitMask)) | (Operand & BitMask);
             }
+
+            // PSR Transfers take 1S incremental cycles
+            return SCycle;
         }
     }
 }

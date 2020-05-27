@@ -4,10 +4,11 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void Multiply(uint Instruction)
+        private byte Multiply(uint Instruction)
         {
             bool Accumulate, SetCondition;
             byte Rd, Rn, Rs, Rm;
+            byte mCycles = 4;
 
             Accumulate = (Instruction & 0x0020_0000) > 0;
             SetCondition = (Instruction & 0x0010_0000) > 0;
@@ -36,9 +37,24 @@ namespace GBAEmulator.CPU
              Whereas 'm' depends on whether/how many most significant bits of Rs are all zero or all one.
              That is m=1 for Bit 31-8, m=2 for Bit 31-16, m=3 for Bit 31-24, and m=4 otherwise.
             */
+            uint OperandBitComparison = this.Registers[Rs] ^ (this.Registers[Rs] << 1);
+            if ((OperandBitComparison & 0xfe00_0000) == 0)
+            {
+                mCycles--;
+                if ((OperandBitComparison & 0xfffe_0000) == 0)
+                {
+                    mCycles--;
+                    if ((OperandBitComparison & 0xffff_fe00) == 0)
+                    {
+                        mCycles--;
+                    }
+                }
+            }
+
+            return (byte)(SCycle + mCycles * ICycle);
         }
 
-        private void MultiplyLong(uint Instruction)
+        private byte MultiplyLong(uint Instruction)
         {
             /*
              • R15 must not be used as an operand or as a destination register.
@@ -47,6 +63,7 @@ namespace GBAEmulator.CPU
             */
             bool Signed, Accumulate, SetCondition;
             byte RdHi, RdLo, Rs, Rm;
+            byte mCycles = 4;
 
             Signed = (Instruction & 0x0040_0000) > 0;
             Accumulate = (Instruction & 0x0020_0000) > 0;
@@ -98,12 +115,29 @@ namespace GBAEmulator.CPU
             this.Log(
                 string.Format("Multiply Long (Accumulate: {0}, Signed: {1}) (R{2} * R{3} -> R{4}R{5})", Accumulate, Signed, Rm, Rs, RdHi, RdLo)
                 );
-            
+
             /*
              Execution Time: 1S+(m+1)I for MULL, and 1S+(m+2)I for MLAL.
              Whereas 'm' depends on whether/how many most significant bits of Rs are "all zero" (UMULL/UMLAL) or "all zero or all one" (SMULL,SMLAL).
              That is m=1 for Bit31-8, m=2 for Bit31-16, m=3 for Bit31-24, and m=4 otherwise.
             */
+
+            uint OperandBitComparison = Accumulate ? this.Registers[Rs] : this.Registers[Rs] ^ (this.Registers[Rs] << 1);
+            if ((OperandBitComparison & 0xfe00_0000) == 0)
+            {
+                // we falsely get here if the first 7 bits are 0 in Accumulate mode
+                mCycles--;
+                if ((OperandBitComparison & 0xfffe_0000) == 0)
+                {
+                    mCycles--;
+                    if ((OperandBitComparison & 0xffff_fe00) == 0)
+                    {
+                        mCycles--;
+                    }
+                }
+            }
+
+            return (byte)(SCycle + mCycles * ICycle);
         }
     }
 }

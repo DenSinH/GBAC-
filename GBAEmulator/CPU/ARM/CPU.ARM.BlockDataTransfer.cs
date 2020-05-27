@@ -5,13 +5,14 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void BlockDataTransfer(uint Instruction)
+        private byte BlockDataTransfer(uint Instruction)
         {
             this.Log("Block Data Transfer");
 
             bool PreIndex, Up, PSR_ForceUser, WriteBack, LoadFromMemory;
             byte Rn;  // Base register
             ushort RegisterList;
+            byte Cycles;
 
             PreIndex = (Instruction & 0x0100_0000) > 0;
             Up = (Instruction & 0x0080_0000) > 0;
@@ -83,6 +84,8 @@ namespace GBAEmulator.CPU
 
                 if (WriteBack)
                     this.Registers[Rn] = Up ? OriginalAddress + 0x40 : OriginalAddress - 0x40;
+
+                Cycles = SCycle;  // todo: find out
             }
             else
             {
@@ -106,6 +109,9 @@ namespace GBAEmulator.CPU
 
                 if (!LoadFromMemory)
                 {
+                    // Normal LDM instructions take nS + 1N + 1I
+                    Cycles = (byte)(RegisterQueue.Count * SCycle + NCycle + ICycle);
+
                     // Writeback with Rb included in Rlist: Store OLD base if Rb is FIRST entry in Rlist, otherwise store NEW base (STM/ARMv4)
                     // (GBATek)
 
@@ -120,6 +126,11 @@ namespace GBAEmulator.CPU
                         OriginalAddress = (uint)(OriginalAddress + (Up? 4 : -4));  // for writeback
                         RegisterQueue.Dequeue();
                     }
+                }
+                else
+                {
+                    // STM instructions take (n-1)S + 2N incremental cycles to execute
+                    Cycles = (byte)((RegisterQueue.Count - 1) * SCycle + (NCycle << 1));
                 }
 
                 // so we must set Rn on the case of writeback in case we store it later
@@ -153,7 +164,12 @@ namespace GBAEmulator.CPU
                 if (Register == 15)
                 {
                     if (LoadFromMemory)
+                    {
+                        //  LDM PC takes (n+1)S + 2N + 1I incremental cycles
+                        Cycles += SCycle + NCycle;
+
                         this.PipelineFlush();  // Flush pipeline when changing PC
+                    }
                     else
                         // PC is 8 ahead, while it should be 12
                         this.SetWordAt(CurrentAddress - (uint)((!PreIndex) ? 4 : 0), this.Registers[15] + 4);
@@ -165,7 +181,8 @@ namespace GBAEmulator.CPU
             {
                 this.ChangeMode(OldMode);
             }
-            
+
+            return Cycles;
         }
     }
 }

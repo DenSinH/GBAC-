@@ -236,16 +236,6 @@ namespace GBAEmulator.CPU
                 this.InternalRegister += dm_;
             }
 
-            public byte FractionalPortion
-            {
-                get => (byte)(this.lower.Get() & 0x00ff);
-            }
-
-            public uint IntegerPortion
-            {
-                get => (uint)(((this.lower.Get() & 0xff00) >> 8) | ((this.upper.Get() & 0x07ff) << 8));
-            }
-
             public bool Sign
             {
                 get => (this.upper.Get() & 0x0800) > 0;
@@ -264,21 +254,6 @@ namespace GBAEmulator.CPU
 
         public class cRotationScaling : IORegister2
         {
-            public byte FractionalPortion
-            {
-                get => (byte)(this._raw & 0x00ff);
-            }
-
-            public byte IntegerPortion
-            {
-                get => (byte)((this._raw & 0x7f00) >> 8);
-            }
-
-            public bool Sign
-            {
-                get => (this._raw & 0x8000) > 0;
-            }
-
             public short Full
             {
                 get
@@ -302,6 +277,81 @@ namespace GBAEmulator.CPU
         public readonly cRotationScaling BG3PB = new cRotationScaling();
         public readonly cRotationScaling BG3PC = new cRotationScaling();
         public readonly cRotationScaling BG3PD = new cRotationScaling();
+        #endregion
+
+        #region Window Feature
+        public class cWindowDimensions : IORegister2
+        {
+            public byte HighCoord
+            {
+                get => (byte)(this._raw & 0x00ff);
+            }
+
+            public byte LowCoord
+            {
+                get => (byte)(this._raw >> 8);
+            }
+        }
+
+        public cWindowDimensions[] WINH = new cWindowDimensions[2] { new cWindowDimensions(), new cWindowDimensions() };
+        public cWindowDimensions[] WINV = new cWindowDimensions[2] { new cWindowDimensions(), new cWindowDimensions() };
+
+        public class cWindowControl : IORegister2
+        {
+            public bool WindowBGEnable(byte Window, byte BG)
+            {
+                if (Window == 0)
+                    return (this._raw & (1 << BG)) > 0;
+                else
+                    return (this._raw & (1 << BG)) > 0;
+            }
+
+            public bool WindowOBJEnable(byte Window)
+            {
+                if (Window == 0)
+                    return (this._raw & 0x0010) > 0;
+                else
+                    return (this._raw & 0x1000) > 0;
+            }
+
+            public bool WindowSpecialEffects(byte Window)
+            {
+                if (Window == 0)
+                    return (this._raw & 0x0020) > 0;
+                else
+                    return (this._raw & 0x2000) > 0;
+            }
+        }
+
+        public cWindowControl WININ = new cWindowControl();
+        public cWindowControl WINOUT = new cWindowControl();
+        #endregion
+
+        #region Mosaic Function
+        public class cMosaic : IORegister2
+        {
+            public byte BGMosaicHSize
+            {
+                get => (byte)((this._raw & 0x000f) + 1);
+            }
+
+            public byte BGMosaicVSize
+            {
+                get => (byte)(((this._raw & 0x00f0) >> 4) + 1);
+            }
+
+            public byte OBJMosaicHSize
+            {
+                get => (byte)(((this._raw & 0x0f00) >> 8) + 1);
+            }
+
+            public byte OBJMosaicVSize
+            {
+                get => (byte)(((this._raw & 0xf000) >> 12) + 1);
+            }
+        }
+
+        public cMosaic MOSAIC = new cMosaic();
         #endregion
 
         #region KEYINPUT

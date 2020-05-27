@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void Halfword_SignedDataTransfer(uint Instruction)
+        private byte Halfword_SignedDataTransfer(uint Instruction)
         {
             bool PreIndex, Up, WriteBack, LoadFromMemory;
             byte Rn, Rd, SH;
@@ -126,6 +126,20 @@ namespace GBAEmulator.CPU
                 // Write-back must not be specified if R15 is specified as the base register (Rn). (Manual)
                 this.Registers[Rn] = Address;
             }
+
+            if (LoadFromMemory)
+            {
+                if (Rd == 15)
+                    // LDR(H,SH,SB) PC take 2S + 2N + 1I incremental cycles.
+                    return (SCycle << 1) + (NCycle << 1) + ICycle;
+                else
+                    // Normal LDR(H,SH,SB) instructions take 1S + 1N + 1I
+                    return SCycle + NCycle + ICycle;
+            }
+            else
+                // STRH instructions take 2N incremental cycles to execute.
+                return NCycle << 1;
+
         }
     }
 }

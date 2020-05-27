@@ -20,6 +20,11 @@ namespace GBAEmulator
             this.display = display;
         }
 
+        const int NonHBlankCycles = 960;
+        const int HBlankCycles = 272;
+
+        long cycle;
+
         private void RunLine()
         {
             // Console.Write("y_lo: "); this.cpu.ShowIWRAMAt(32412);
@@ -40,8 +45,6 @@ namespace GBAEmulator
 
             from: https://www.coranac.com/tonc/text/video.htm
              */
-            int cycle;
-            
             this.cpu.DISPSTAT.SetVBlank(this.ppu.IsVBlank);  // set VBlank to correct value
             if (this.ppu.IsVBlank)
             {
@@ -54,14 +57,16 @@ namespace GBAEmulator
             this.cpu.DISPSTAT.SetHBlank(false);
             this.cpu.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
 
-            for (cycle = 0; cycle < 960; cycle++)
-                this.cpu.Step();
+            this.cycle += NonHBlankCycles;
+            while (this.cycle > 0)
+                this.cycle -= this.cpu.Step();
 
             this.cpu.DISPSTAT.SetHBlank(true);
             this.ppu.DrawScanline();
 
-            for (cycle = 0; cycle < 272; cycle++)
-                this.cpu.Step();
+            this.cycle += HBlankCycles;
+            while (this.cycle > 0)
+                this.cycle -= this.cpu.Step();
 
             this.cpu.BG2X.UpdateInternal((uint)this.cpu.BG2PB.Full);
             this.cpu.BG2Y.UpdateInternal((uint)this.cpu.BG2PD.Full);
@@ -72,8 +77,8 @@ namespace GBAEmulator
         public void Run()
         {
             // cpu.LoadRom("../../roms/KirbyNightmare.gba");
-            // cpu.LoadRom("../../Tests/Krom/BIOSBIT1BPP.gba");
-            cpu.LoadRom("../../Tests/Tonc/bigmap.gba");
+            // cpu.LoadRom("../../Tests/Krom/BIOSCHECKSUM.gba");
+            cpu.LoadRom("../../Tests/Tonc/tte_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
             // cpu.LoadRom("../../Tests/AgingCard.gba");
             cpu.SkipBios();

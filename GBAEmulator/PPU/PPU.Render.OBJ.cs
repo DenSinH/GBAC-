@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime;
 
 using GBAEmulator.CPU;
 
@@ -43,10 +44,10 @@ namespace GBAEmulator
         {
             this.ResetOBJScanlines();
 
-            ushort OBJ_ATTR0, OBJ_ATTR1, OBJ_ATTR2, OBJ_ATTR3;
+            ushort OBJ_ATTR0, OBJ_ATTR1, OBJ_ATTR2;
             short OBJy;
             byte OBJMode, GFXMode;
-            bool ColorMode;
+            bool ColorMode, Mosaic;
 
             OBJSize OBJsz;
 
@@ -72,7 +73,7 @@ namespace GBAEmulator
                     OBJy = (short)(OBJy - 0x100);
 
                 GFXMode = (byte)((OBJ_ATTR0 & 0x0c00) >> 10);
-                // todo: mosaic (also for BG)
+                Mosaic = (OBJ_ATTR0 & 0x1000) > 0;
                 ColorMode = (OBJ_ATTR0 & 0x2000) > 0;
 
                 OBJsz = PPU.GetOBJSize[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
@@ -81,14 +82,14 @@ namespace GBAEmulator
                 if (OBJMode == 0b00)
                 {
                     if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
-                        this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, OBJ_ATTR1, OBJ_ATTR2);
+                        this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2);
                 }
                 else if (OBJMode == 0b01)
                 {
                     // todo: double size rendering
                     if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
                     {
-                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, OBJ_ATTR1, OBJ_ATTR2);
+                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2);
                     }
                 }
                 else if (OBJMode == 0b11)
@@ -98,7 +99,7 @@ namespace GBAEmulator
             }
         }
 
-        private void RenderRegularOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, ushort OBJ_ATTR1, ushort OBJ_ATTR2)
+        private void RenderRegularOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic, ushort OBJ_ATTR1, ushort OBJ_ATTR2)
         {
             ushort StartX = (ushort)(OBJ_ATTR1 & 0x01ff);
             sbyte XSign = 1;
@@ -110,6 +111,9 @@ namespace GBAEmulator
             byte PaletteBank = (byte)((OBJ_ATTR2 & 0xf000) >> 12);
 
             byte dy = (byte)(scanline - OBJy);   // between 0 and OBJsz.Height (8, 16, 32, 64)
+            if (Mosaic)
+                dy -= (byte)(dy % this.gba.cpu.MOSAIC.OBJMosaicVSize);
+
             if (VFlip)
                 dy = (byte)(OBJsz.Height - dy);
             
@@ -142,13 +146,15 @@ namespace GBAEmulator
                     // foreground palette starts at 0x0500_0200
                     // we can use our same rendering method as for background, as we simply render a tile
                     this.Render4bpp(ref this.OBJLayers[Priority], StartX, XSign,
-                        (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20));
+                        (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
+                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
                     StartX = (byte)(StartX + 8 * XSign);
                 }
             }
             else
             {
-                SliverBaseAddress = (uint)(TileID * 0x40);
+                // Tonc about Sprite tile memory offsets: Always per 4bpp tile size: start = base + id * 32
+                SliverBaseAddress = (uint)(TileID * 0x20);
                 // removed shifting for less arithmetic, like in 4bpp
                 SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 8) : (32 * 0x40 * (dy >> 3)));
                 SliverBaseAddress += (uint)(8 * (dy & 0x07));   // offset within tile
@@ -162,7 +168,8 @@ namespace GBAEmulator
                 for (byte dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
                 {
                     // we can use our same rendering method as for background, as we simply render a tile
-                    this.Render8bpp(ref this.OBJLayers[Priority], StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)));
+                    this.Render8bpp(ref this.OBJLayers[Priority], StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
+                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
                     StartX = (byte)(StartX + 8 * XSign);
                 }
             }
@@ -196,7 +203,8 @@ namespace GBAEmulator
             }
             else                // 8bpp
             {
-                PixelAddress += (uint)(TileID * 0x40);
+                // Tonc about Sprite tile memory offsets: Always per 4bpp tile size: start = base + id * 32
+                PixelAddress += (uint)(TileID * 0x20);
                 // removed shifting for less arithmetic:
                 PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 8) : (32 * 0x40 * (py >> 3)));
                 PixelAddress += (uint)(8 * (py & 0x07));
@@ -210,8 +218,7 @@ namespace GBAEmulator
             }
         }
 
-
-        private void RenderAffineOBJ(short OBJy, OBJSize OBJsz, bool ColorMode,
+        private void RenderAffineOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic,
             ushort OBJ_ATTR1, ushort OBJ_ATTR2)
         {
             ushort StartX = (ushort)(OBJ_ATTR1 & 0x01ff);
@@ -259,6 +266,5 @@ namespace GBAEmulator
                 this.OBJLayers[Priority][StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, px, py, ColorMode, PaletteBank);
             }
         }
-
     }
 }

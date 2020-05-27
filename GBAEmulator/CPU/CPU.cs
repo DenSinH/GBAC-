@@ -55,6 +55,10 @@ namespace GBAEmulator.CPU
             };
         }
 
+        const byte SCycle = 1;
+        const byte NCycle = 1;
+        const byte ICycle = 1;
+
         public void LoadRom(string FileName)
         {
             FileStream fs = File.OpenRead(FileName);
@@ -75,13 +79,13 @@ namespace GBAEmulator.CPU
             this.Pipeline.Clear();
         }
         
-        public void Step()
+        public byte Step()
         {
             this.HandleIRQs();
 
             if (this.HALTCNT.Halt)
             {
-                return;
+                return 1;  // how many cycles?
             }
 
             if (this.state == State.ARM)
@@ -91,11 +95,12 @@ namespace GBAEmulator.CPU
 
                 if (this.Pipeline.Count == 2)
                 {
-                    this.ExecuteARM(this.Pipeline.Dequeue());
+                    return this.ExecuteARM(this.Pipeline.Dequeue());
                 }
                 else
                 {
                     this.Log("Filling Pipeline");
+                    return 1;  // how many cycles?
                 }
             }
             else
@@ -106,10 +111,12 @@ namespace GBAEmulator.CPU
                 if (this.Pipeline.Count == 2)
                 {
                     this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
+                    return 1;  // todo: add cycles to THUMB instructions
                 }
                 else
                 {
                     this.Log("Filling Pipeline");
+                    return 1;  // how many cycles?
                 }
             }
 

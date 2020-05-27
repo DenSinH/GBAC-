@@ -67,7 +67,7 @@ namespace GBAEmulator
 
             this.ResetBGScanlines(0, 1, 2, 3);
             this.DrawRegularBGScanline(0, 1, 2, 3);
-            this.MergeBGs(DoRenderOBJs);
+            this.MergeBGs(DoRenderOBJs, 0, 1, 2, 3);
         }
 
         private void Mode1Scanline()
@@ -83,7 +83,7 @@ namespace GBAEmulator
             this.DrawRegularBGScanline(0, 1);
             this.DrawAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
-            this.MergeBGs(DoRenderOBJs);
+            this.MergeBGs(DoRenderOBJs, 0, 1, 2);
         }
 
         private void Mode2Scanline()
@@ -100,7 +100,7 @@ namespace GBAEmulator
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
             this.DrawAffineBGScanline(3, this.gba.cpu.BG3X, this.gba.cpu.BG3Y,
                 this.gba.cpu.BG3PA, this.gba.cpu.BG3PB, this.gba.cpu.BG3PC, this.gba.cpu.BG3PD);
-            this.MergeBGs(DoRenderOBJs);
+            this.MergeBGs(DoRenderOBJs, 2, 3);
         }
 
         private void Mode3Scanline()

@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         // todo: SWI, Coprocessor instructions, Undefined
 
-        private delegate void ARMInstruction(uint Instruction);
+        private delegate byte ARMInstruction(uint Instruction);
         private ARMInstruction[] ARMInstructions = new ARMInstruction[0x1000];  // 12 bits determine the instruction
 
         private void InitARM()
@@ -127,25 +127,23 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private void ExecuteARM(uint Instruction)
+        private byte ExecuteARM(uint Instruction)
         {
             this.Log(string.Format("ARM: {0:x8} :: PC: {1:x8} :: CPSR: {2:x8}", Instruction, this.PC - 8, this.CPSR));
 
             if (!Condition((byte)((Instruction & 0xf000_0000) >> 28)))
             {
                 this.Log("Condition false");
-                return;
+                return 1;  // how many cycles?
             }
 
             if ((Instruction & 0x0fff_fff0) == 0x012f_ff10)
             {
-                this.BX(Instruction);
-                return;
+                return this.BX(Instruction);
             }
 
             ushort InstructionShorthand = (ushort)(((Instruction & 0x0ff0_0000) >> 16) | ((Instruction & 0x00f0) >> 4));
-            this.ARMInstructions[InstructionShorthand](Instruction);
-            return;
+            return this.ARMInstructions[InstructionShorthand](Instruction);
         }
     }
 }
