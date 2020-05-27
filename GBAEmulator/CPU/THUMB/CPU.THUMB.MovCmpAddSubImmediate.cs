@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void MovCmpAddSubImmediate(ushort Instruction)
+        private byte MovCmpAddSubImmediate(ushort Instruction)
         {
             byte opcode, Rd, Offset8;
             uint Result;
@@ -42,6 +42,9 @@ namespace GBAEmulator.CPU
             }
 
             this.SetNZ(Result);
+
+            // equivalent instruction is MOV/CMP/SUB/ADD #imm. Rd cannot be PC as we are in THUMB mode
+            return this.DataProcessingTimings(true, false);
         }
     }
 }

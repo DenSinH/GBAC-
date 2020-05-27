@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void HiReg_BX(ushort Instruction)
+        private byte HiReg_BX(ushort Instruction)
         {
             this.Log("Hi Register Operations / BX");
             byte Opcode, Rs, Rd;
@@ -68,9 +68,12 @@ namespace GBAEmulator.CPU
                     break;
                 case 0b11:
                     this.Log("BX");
-                    this.BX(Rs);  // rest of instruction does not matter for BX, we do not read that part
-                    break;
+                    return this.BX(Rs);  // rest of instruction does not matter for BX, we do not read that part
             }
+
+            // equivalent instruction is a Dataprocessing instruction if it was not BX
+            // we CAN use Rd = PC here because we are doing Hi Register operations
+            return this.DataProcessingTimings(false, Rd == 15 && this.Registers[Rd] == 15);
         }
     }
 }

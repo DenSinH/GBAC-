@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 using GBAEmulator.CPU;
 
@@ -214,11 +213,11 @@ namespace GBAEmulator
             }
         }
 
-        private void DrawRegularBGScanline(params byte[] BGs)  // based on y = scanline
+        private void RenderRegularBGScanlines(params byte[] BGs)  // based on y = scanline
         {
             ushort HOFS, VOFS;
             byte CharBaseBlock, ScreenBaseBlock, BGSize;
-            ushort EffectiveX, EffectiveY;
+            short EffectiveX, EffectiveY;
             bool ColorMode, Mosaic;
 
             uint ScreenEntryIndex;
@@ -243,15 +242,15 @@ namespace GBAEmulator
 
                 BGSize = BGCNT.ScreenSize;
 
-                EffectiveY = (ushort)(scanline + VOFS);
+                EffectiveY = (short)(scanline + VOFS);
                 if (Mosaic)
-                    EffectiveY -= (ushort)(EffectiveY % this.gba.cpu.MOSAIC.BGMosaicVSize);
+                    EffectiveY -= (short)(EffectiveY % this.gba.cpu.MOSAIC.BGMosaicVSize);
 
                 for (sbyte CourseX = -1; CourseX < 31; CourseX++)
                 {
-                    EffectiveX = (ushort)((CourseX << 3) + HOFS);
+                    EffectiveX = (short)((CourseX << 3) + HOFS);
                     if (Mosaic)
-                        EffectiveX -= (ushort)(EffectiveX % this.gba.cpu.MOSAIC.BGMosaicHSize);
+                        EffectiveX -= (short)(EffectiveX % this.gba.cpu.MOSAIC.BGMosaicHSize);
 
                     // ScreenEntryIndex is the index of the screenentry for the tile we are currently rendering
                     ScreenEntryIndex = PPU.VRAMIndexRegular((int)(EffectiveX >> 3), (int)((EffectiveY) >> 3), BGSize);
@@ -282,7 +281,7 @@ namespace GBAEmulator
         }
 
         // based on y = scanline
-        private void DrawAffineBGScanline(byte BG, ARM7TDMI.cReferencePoint BGxX, ARM7TDMI.cReferencePoint BGxY,
+        private void RenderAffineBGScanline(byte BG, ARM7TDMI.cReferencePoint BGxX, ARM7TDMI.cReferencePoint BGxY,
             ARM7TDMI.cRotationScaling PA, ARM7TDMI.cRotationScaling PB, ARM7TDMI.cRotationScaling PC, ARM7TDMI.cRotationScaling PD)
         {
             // ! only to be used with BG = 2 or BG = 3

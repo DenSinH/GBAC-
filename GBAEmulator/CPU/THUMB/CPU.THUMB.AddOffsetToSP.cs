@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void AddOffsetToSP(ushort Instruction)
+        private byte AddOffsetToSP(ushort Instruction)
         {
             bool Sign;
             uint SWord7;
@@ -18,6 +18,9 @@ namespace GBAEmulator.CPU
                 SP += SWord7;
 
             this.Log(string.Format("Add offset to SP: Negative: {0} Offset: {1:x4}", Sign, SWord7));
+
+            // equivalent instructions are ADD/SUB #imm
+            return this.DataProcessingTimings(true, false);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private delegate void THUMBInstruction(ushort Instruction);
+        private delegate byte THUMBInstruction(ushort Instruction);
         private THUMBInstruction[] THUMBInstructions = new THUMBInstruction[0x40];  // top 6 bits are enough to determine what instruction
 
         private void InitTHUMB()
@@ -54,10 +54,10 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private void ExecuteTHUMB(ushort Instruction)
+        private byte ExecuteTHUMB(ushort Instruction)
         {
             this.Log(string.Format("THUMB: {0:x8} :: PC: {1:x8} :: CPSR: {2:x8}", Instruction, this.PC - 4, this.CPSR));
-            this.THUMBInstructions[(Instruction & 0xfc00) >> 10](Instruction);
+            return this.THUMBInstructions[(Instruction & 0xfc00) >> 10](Instruction);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void ALUOperations(ushort Instruction)
+        private byte ALUOperations(ushort Instruction)
         {
             this.Log("ALU Operations");
             byte Opcode, Rs, Rd;
@@ -114,6 +114,9 @@ namespace GBAEmulator.CPU
                     throw new Exception("Yo I programmed this wrong");
             }
             this.SetNZ(Result);
+
+            // We always use a register as operand, Rd cannot be PC as we are in THUMB mode
+            return this.DataProcessingTimings(false, false);
         }
     }
 }

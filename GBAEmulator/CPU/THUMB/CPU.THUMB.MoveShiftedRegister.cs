@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void MoveShiftedRegister(ushort Instruction)
+        private byte MoveShiftedRegister(ushort Instruction)
         {
             byte Opcode, Offset5, Rs, Rd;
             Opcode = (byte)((Instruction & 0x1800) >> 11);
@@ -18,6 +18,9 @@ namespace GBAEmulator.CPU
             this.SetNZ(Result);
 
             this.Registers[Rd] = Result;
+            
+            // equivalent instruction is MOVS #imm, Rd cannot be PC
+            return this.DataProcessingTimings(true, false);
         }
     }
 }

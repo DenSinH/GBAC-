@@ -4,6 +4,26 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        private byte DataProcessingTimings(bool ImmediateOperand, bool PCUsed)
+        {
+            if (ImmediateOperand)
+            {
+                if (PCUsed)
+                    // it could happen that we read from PC and the operation result had the same value,
+                    // but our emulator is not that accurate that it matters
+                    return (SCycle << 1) + NCycle;
+                else
+                    return SCycle;
+            }
+            else
+            {
+                if (PCUsed)
+                    return (SCycle << 1) + NCycle + ICycle;
+                else
+                    return SCycle + ICycle;
+            }
+        }
+
         private byte DataProcessing(uint Instruction)
         {
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
@@ -208,22 +228,7 @@ namespace GBAEmulator.CPU
              Data Processing with PC written                                2S + 1N
              Data Processing with register specified shift and PC written   2S + 1N + 1I
              */
-            if (ImmediateOperand)
-            {
-                if (Rd == 15 && this.Registers[Rd] == Result)
-                    // it could happen that we read from PC and the operation result had the same value,
-                    // but our emulator is not that accurate that it matters
-                    return (SCycle << 1) + NCycle;
-                else
-                    return SCycle;
-            }
-            else
-            {
-                if (Rd == 15 && this.Registers[Rd] == Result)
-                    return (SCycle << 1) + NCycle + ICycle;
-                else
-                    return SCycle + ICycle;
-            }
+            return this.DataProcessingTimings(ImmediateOperand, Rd == 15 && this.Registers[Rd] == Result);
         }
 
     }

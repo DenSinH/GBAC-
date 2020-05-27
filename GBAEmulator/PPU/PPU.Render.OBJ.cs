@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime;
 
 using GBAEmulator.CPU;
 
@@ -86,15 +85,17 @@ namespace GBAEmulator
                 }
                 else if (OBJMode == 0b01)
                 {
-                    // todo: double size rendering
                     if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
                     {
-                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2);
+                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, false);
                     }
                 }
                 else if (OBJMode == 0b11)
                 {
-                    Console.WriteLine("double rendering!");
+                    if ((OBJy <= scanline) && (OBJy + 2 * OBJsz.Height > scanline))
+                    {
+                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, true);
+                    }
                 }
             }
         }
@@ -219,7 +220,7 @@ namespace GBAEmulator
         }
 
         private void RenderAffineOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic,
-            ushort OBJ_ATTR1, ushort OBJ_ATTR2)
+            ushort OBJ_ATTR1, ushort OBJ_ATTR2, bool DoubleRendering)
         {
             ushort StartX = (ushort)(OBJ_ATTR1 & 0x01ff);
             byte AffineIndex = (byte)((OBJ_ATTR1 & 0x3e00) >> 9);
@@ -239,16 +240,25 @@ namespace GBAEmulator
             }
 
             // todo: SIMD?
-            byte px, py;
-            byte px0 = (byte)(OBJsz.Width >> 1);
-            byte py0 = (byte)(OBJsz.Height >> 1);
+            uint px, py;
+            uint px0 = (uint)(OBJsz.Width >> 1);
+            uint py0 = (uint)(OBJsz.Height >> 1);
 
-            short dy = (short)(scanline - OBJy - (OBJsz.Height >> 1));
-            short dx;
+            short dy;
+            if (!DoubleRendering)
+                dy = (short)(scanline - OBJy - (OBJsz.Height >> 1));
+            else
+                dy = (short)(scanline - OBJy - OBJsz.Height);
 
-            for (byte ix = 0; ix < OBJsz.Width; ix++)
+            short dx = (short)((DoubleRendering ? -OBJsz.Width : -(OBJsz.Width >> 1)) - 1);
+
+            // What the object width is to be interpreted as for looping over x coordinates
+            byte FictionalOBJWidth = (byte)(DoubleRendering ? 2 * OBJsz.Width : OBJsz.Width);
+
+            for (byte ix = 0; ix < FictionalOBJWidth; ix++)
             {
-                dx = (short)(ix - (OBJsz.Width >> 1));
+                // we started at one less than we should have, so that we could simply increment instead of do the calculation again
+                dx++;
 
                 if ((StartX + ix < 0) || (StartX + ix) >= width)
                     continue;
@@ -257,13 +267,13 @@ namespace GBAEmulator
                     continue;
 
                 // transform
-                px = (byte)(((RotateScaleParams[0] * dx + RotateScaleParams[1] * dy) >> 8) + px0);
-                py = (byte)(((RotateScaleParams[2] * dx + RotateScaleParams[3] * dy) >> 8) + py0);
+                px = (uint)(((RotateScaleParams[0] * dx + RotateScaleParams[1] * dy) >> 8) + px0);
+                py = (uint)(((RotateScaleParams[2] * dx + RotateScaleParams[3] * dy) >> 8) + py0);
 
-                if (px < 0 || px >= OBJsz.Width || py < 0 || py >= OBJsz.Height)
+                if (px >= OBJsz.Width || py >= OBJsz.Height)
                     continue;
 
-                this.OBJLayers[Priority][StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, px, py, ColorMode, PaletteBank);
+                this.OBJLayers[Priority][StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, (byte)px, (byte)py, ColorMode, PaletteBank);
             }
         }
     }

@@ -4,13 +4,12 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void ConditionalBranch(ushort Instruction)
+        private byte ConditionalBranch(ushort Instruction)
         {
             if ((Instruction & 0xff00) == 0xdf00)
             {
                 // "ambiguity"
-                this.SWIInstruction(Instruction);
-                return;
+                return this.SWIInstruction(Instruction);
             }
 
             /*
@@ -56,9 +55,12 @@ namespace GBAEmulator.CPU
                     this.PipelineFlush();
                 }
             }
+
+            // 2S + 1N cycles
+            return (SCycle << 1) + NCycle;
         }
 
-        private void UnconditionalBranch(ushort Instruction)
+        private byte UnconditionalBranch(ushort Instruction)
         {
             /*
              The address specified by label is a full 12-bit two’s complement address, but must
@@ -72,9 +74,12 @@ namespace GBAEmulator.CPU
             this.PipelineFlush();
 
             this.Log(string.Format("Unconditional Branch, Offset {0}", TrueOffset));
+
+            // 2S + 1N cycles
+            return (SCycle << 1) + NCycle;
         }
 
-        private void LongBranchWithLink(ushort Instruction)
+        private byte LongBranchWithLink(ushort Instruction)
         {
             this.Log("Long Branch With Link");
             bool H;
@@ -99,6 +104,9 @@ namespace GBAEmulator.CPU
                 PC &= 0xffff_fffe;
                 this.PipelineFlush();
             }
+
+            // see 10.3 in Instruction cycle operations in the manual
+            return 3 * SCycle + NCycle;
         }
     }
 }

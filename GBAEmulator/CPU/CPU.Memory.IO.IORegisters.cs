@@ -183,7 +183,7 @@ namespace GBAEmulator.CPU
             {
                 if (setlow)
                 {
-                    base.Set((ushort)(value & 0x00ff), setlow, sethigh);
+                    base.Set((ushort)(value & 0x01ff), setlow, sethigh);
                 }
             }
 

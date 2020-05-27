@@ -45,6 +45,7 @@ namespace GBAEmulator
 
             from: https://www.coranac.com/tonc/text/video.htm
              */
+
             this.cpu.DISPSTAT.SetVBlank(this.ppu.IsVBlank);  // set VBlank to correct value
             if (this.ppu.IsVBlank)
             {
@@ -78,7 +79,7 @@ namespace GBAEmulator
         {
             // cpu.LoadRom("../../roms/KirbyNightmare.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSCHECKSUM.gba");
-            cpu.LoadRom("../../Tests/Tonc/tte_demo.gba");
+            cpu.LoadRom("../../Tests/Tonc/obj_aff.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
             // cpu.LoadRom("../../Tests/AgingCard.gba");
             cpu.SkipBios();

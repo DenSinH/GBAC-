@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void AddSubtract(ushort Instruction)
+        private byte AddSubtract(ushort Instruction)
         {
             bool ImmediateOperand, Sub;
             byte Rs, Rd;
@@ -40,6 +40,9 @@ namespace GBAEmulator.CPU
             this.Registers[Rd] = Result;
 
             this.SetNZ(Result);
+
+            // equivalent instruction is ADD/SUB #/Rs. Rd cannot be PC as we are in THUMB mode
+            return this.DataProcessingTimings(ImmediateOperand, false);
         }
     }
 }

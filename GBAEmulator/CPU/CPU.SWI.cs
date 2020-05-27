@@ -20,9 +20,9 @@ namespace GBAEmulator.CPU
             return (SCycle << 1) + NCycle;
         }
 
-        private void SWIInstruction(ushort Instruction)
+        private byte SWIInstruction(ushort Instruction)
         {
-            this.SWIInstruction((uint)Instruction);
+            return this.SWIInstruction((uint)Instruction);
         }
     }
 }

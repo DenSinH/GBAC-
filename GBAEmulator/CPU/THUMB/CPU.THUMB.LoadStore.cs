@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void LoadStoreRegOffset_SignExtended(ushort Instruction)
+        private byte LoadStoreRegOffset_SignExtended(ushort Instruction)
         {
             // Contains both the instructions for Load/Store with Register offset, and for Load/Store sign-extended
 
@@ -35,6 +35,9 @@ namespace GBAEmulator.CPU
                         Address &= 0xffff_fffc;  // Forced align for STR
                         this.SetWordAt(Address, this.Registers[Rd]);
                     }
+
+                    // STR instructions take 2N incremental cycles to execute.
+                    return NCycle << 1;
                 }
                 else
                 {
@@ -51,7 +54,8 @@ namespace GBAEmulator.CPU
 
                         this.Registers[Rd] = Result;
                     }
-                        
+                    // Normal LDR instructions take 1S + 1N + 1I (incremental)
+                    return SCycle + NCycle + ICycle;
                 }
             }
             else
@@ -71,6 +75,9 @@ namespace GBAEmulator.CPU
                     {
                         Address &= 0xffff_fffe;  // force align STRH
                         this.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
+
+                        // STR instructions take 2N incremental cycles to execute.
+                        return NCycle << 1;
                     }
                     else
                     {
@@ -78,6 +85,9 @@ namespace GBAEmulator.CPU
                             this.Registers[Rd] = this.GetHalfWordAt(Address);
                         else
                             this.Registers[Rd] = (uint)(this.GetByteAt(Address - 1) << 24) | this.GetByteAt(Address);
+
+                        // Normal LDR instructions take 1S + 1N + 1I (incremental)
+                        return SCycle + NCycle + ICycle;
                     }
                 }
                 else
@@ -95,12 +105,15 @@ namespace GBAEmulator.CPU
                             this.Registers[Rd] = (uint)(short)this.GetHalfWordAt(Address);
                         }
                     }
+
+                    // Normal LDR instructions take 1S + 1N + 1I (incremental)
+                    return SCycle + NCycle + ICycle;
                 }
 
             }
         }
 
-        private void LoadStoreImmediate(ushort Instruction)
+        private byte LoadStoreImmediate(ushort Instruction)
         {
             bool ByteQuantity, LoadFromMemory;
             byte Offset5, Rb, Rd;
@@ -139,6 +152,9 @@ namespace GBAEmulator.CPU
 
                     this.Registers[Rd] = Result;
                 }
+
+                // Normal LDR instructions take 1S + 1N + 1I (incremental)
+                return SCycle + NCycle + ICycle;
             }
             else
             {
@@ -149,10 +165,13 @@ namespace GBAEmulator.CPU
                     Address &= 0xffff_fffe;  // force align
                     this.SetWordAt(Address, this.Registers[Rd]);
                 }
+
+                // STR instructions take 2N incremental cycles to execute.
+                return NCycle << 1;
             }
         }
 
-        private void LoadStoreHalfword(ushort Instruction)
+        private byte LoadStoreHalfword(ushort Instruction)
         {
             bool LoadFromMemory;
             byte Offset5, Rb, Rd;
@@ -177,15 +196,21 @@ namespace GBAEmulator.CPU
                     this.Registers[Rd] = this.GetHalfWordAt(Address);
                 else
                     this.Registers[Rd] = (uint)(this.GetByteAt(Address - 1) << 24) | this.GetByteAt(Address);
+
+                // Normal LDR instructions take 1S + 1N + 1I (incremental)
+                return SCycle + NCycle + ICycle;
             }
             else
             {
                 Address &= 0xffff_fffe;  // force align
                 this.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
+
+                // STR instructions take 2N incremental cycles to execute.
+                return NCycle << 1;
             }
         }
 
-        private void LoadStoreSPRelative(ushort Instruction)
+        private byte LoadStoreSPRelative(ushort Instruction)
         {
             bool LoadFromMemory;
             byte Rd;
@@ -213,15 +238,21 @@ namespace GBAEmulator.CPU
                     Result = this.ROR(Result, RotateAmount);
 
                 this.Registers[Rd] = Result;
+
+                // Normal LDR instructions take 1S + 1N + 1I (incremental)
+                return SCycle + NCycle + ICycle;
             }
             else
             {
                 Address &= 0xffff_fffc;  // force align
                 this.SetWordAt(SP + Word8, this.Registers[Rd]);
+
+                // STR instructions take 2N incremental cycles to execute.
+                return NCycle << 1;
             }
         }
 
-        private void LoadAddress(ushort Instruction)
+        private byte LoadAddress(ushort Instruction)
         {
             bool Source;
             byte Rd;
@@ -253,9 +284,12 @@ namespace GBAEmulator.CPU
                 */
                 this.Registers[Rd] = (PC & 0xffff_fffd) + Word8;
             }
+
+            // Normal LDR instructions take 1S + 1N + 1I (incremental)
+            return SCycle + NCycle + ICycle;
         }
 
-        private void MultipleLoadStore(ushort Instruction)
+        private byte MultipleLoadStore(ushort Instruction)
         {
             this.Log("Multiple Load/Store");
              
@@ -287,9 +321,13 @@ namespace GBAEmulator.CPU
 
                 // Writeback
                 this.Registers[Rb] += 0x40;
+
+                return SCycle;  // todo: figure out actual timings
             }
             else if (LoadFromMemory)
             {
+                byte RegisterCount = 0;
+
                 for (byte i = 0; i < 8; i++)
                 {
                     if ((RList & (1 << i)) > 0)
@@ -297,9 +335,14 @@ namespace GBAEmulator.CPU
                         this.Registers[i] = this.GetWordAt(Address);
                         this.Log(string.Format("{0:x8} -> R{1} from {2:x8}", this.Registers[i], i, Address));
                         Address += 4;
+
+                        RegisterCount++;
                     }
                 }
                 this.Registers[Rb] = Address | Misalignment;  // return misalignment
+
+                // Normal LDM instructions take nS + 1N + 1I
+                return (byte)(RegisterCount * SCycle + NCycle + ICycle);
             }
             else
             {
@@ -311,6 +354,9 @@ namespace GBAEmulator.CPU
                     if ((RList & (1 << i)) > 0)
                         RegisterQueue.Enqueue(i);
                 }
+
+                // STM instructions take (n-1)S + 2N incremental cycles to execute
+                byte Cycles = (byte)((RegisterQueue.Count - 1) * SCycle + (NCycle << 1));
 
                 // we know that the queue is not empty, because RList != 0
                 if (RegisterQueue.Peek() == Rb)
@@ -330,6 +376,8 @@ namespace GBAEmulator.CPU
                     this.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
+
+                return Cycles;
             }
         }
     }

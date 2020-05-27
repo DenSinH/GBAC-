@@ -1,5 +1,6 @@
-﻿using GBAEmulator.CPU;
-using System;
+﻿using System;
+
+using GBAEmulator.CPU;
 
 namespace GBAEmulator
 {
@@ -66,7 +67,7 @@ namespace GBAEmulator
             }
 
             this.ResetBGScanlines(0, 1, 2, 3);
-            this.DrawRegularBGScanline(0, 1, 2, 3);
+            this.RenderRegularBGScanlines(0, 1, 2, 3);
             this.MergeBGs(DoRenderOBJs, 0, 1, 2, 3);
         }
 
@@ -80,8 +81,8 @@ namespace GBAEmulator
             }
 
             this.ResetBGScanlines(0, 1, 2);
-            this.DrawRegularBGScanline(0, 1);
-            this.DrawAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
+            this.RenderRegularBGScanlines(0, 1);
+            this.RenderAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
             this.MergeBGs(DoRenderOBJs, 0, 1, 2);
         }
@@ -96,9 +97,9 @@ namespace GBAEmulator
             }
 
             this.ResetBGScanlines(2, 3);
-            this.DrawAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
+            this.RenderAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
-            this.DrawAffineBGScanline(3, this.gba.cpu.BG3X, this.gba.cpu.BG3Y,
+            this.RenderAffineBGScanline(3, this.gba.cpu.BG3X, this.gba.cpu.BG3Y,
                 this.gba.cpu.BG3PA, this.gba.cpu.BG3PB, this.gba.cpu.BG3PC, this.gba.cpu.BG3PD);
             this.MergeBGs(DoRenderOBJs, 2, 3);
         }

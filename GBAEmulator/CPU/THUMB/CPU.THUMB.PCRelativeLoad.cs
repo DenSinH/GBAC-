@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void PCRelativeLoad(ushort Instruction)
+        private byte PCRelativeLoad(ushort Instruction)
         {
             byte Rd;
             uint Address;
@@ -32,6 +32,9 @@ namespace GBAEmulator.CPU
                 Result = this.ROR(Result, RotateAmount);
 
             this.Registers[Rd] = Result;
+
+            // Normal LDR instructions take 1S + 1N + 1I (incremental)
+            return SCycle + NCycle + ICycle;
         }
     }
 }

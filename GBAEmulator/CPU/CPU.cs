@@ -110,8 +110,7 @@ namespace GBAEmulator.CPU
 
                 if (this.Pipeline.Count == 2)
                 {
-                    this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
-                    return 1;  // todo: add cycles to THUMB instructions
+                    return this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
                 }
                 else
                 {

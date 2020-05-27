@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void PushPopRegisters(ushort Instructions)
+        private byte PushPopRegisters(ushort Instructions)
         {
             this.Log("Push/Pop registers");
             bool LoadFromMemory, PCLR;
@@ -18,6 +18,8 @@ namespace GBAEmulator.CPU
 
             if (LoadFromMemory)
             {
+                byte RegisterCount = 0;
+
                 // Pop from stack
                 for (byte i = 0; i < 8; i++)
                 {
@@ -27,6 +29,7 @@ namespace GBAEmulator.CPU
                         this.Log(string.Format("POP Mem[{0:x8}] -> R{1}", SP, i));
                         this.Registers[i] = this.GetWordAt(SP);
                         SP += 4;
+                        RegisterCount++;
                     }
                 }
 
@@ -35,10 +38,20 @@ namespace GBAEmulator.CPU
                     PC = this.GetWordAt(SP) & 0xffff_fffe;
                     SP += 4;
                     this.PipelineFlush();
+
+                    //  LDM PC takes (n+1)S + 2N + 1I incremental cycles
+                    return (byte)((RegisterCount + 1) * SCycle + (NCycle << 1) + ICycle);
+                }
+                else
+                {
+                    // Normal LDM instructions take nS + 1N + 1I
+                    return (byte)(RegisterCount * SCycle + NCycle + ICycle);
                 }
             }
             else
             {
+                byte Cycles;
+
                 // Reverse pushing, like in ARM block data transfer instruction.
                 Queue<byte> RegisterQueue = new Queue<byte>(9);
                 for (byte i = 0; i < 8; i++)
@@ -53,6 +66,9 @@ namespace GBAEmulator.CPU
                 if (PCLR)
                     RegisterQueue.Enqueue(14);  // Also push link register
 
+                // STM instructions take (n-1)S + 2N incremental cycles to execute
+                Cycles = (byte)((RegisterQueue.Count - 1) * SCycle + (NCycle << 1));
+
                 SP -= 4 * (uint)RegisterQueue.Count;
                 uint Address = SP;
                 while (RegisterQueue.Count > 0)
@@ -61,6 +77,8 @@ namespace GBAEmulator.CPU
                     this.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
+
+                return Cycles;
             }
         }
     }
