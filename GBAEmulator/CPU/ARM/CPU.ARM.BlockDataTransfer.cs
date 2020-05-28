@@ -5,14 +5,14 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte BlockDataTransfer(uint Instruction)
+        private int BlockDataTransfer(uint Instruction)
         {
             this.Log("Block Data Transfer");
 
             bool PreIndex, Up, PSR_ForceUser, WriteBack, LoadFromMemory;
             byte Rn;  // Base register
             ushort RegisterList;
-            byte Cycles;
+            int Cycles;
 
             PreIndex = (Instruction & 0x0100_0000) > 0;
             Up = (Instruction & 0x0080_0000) > 0;

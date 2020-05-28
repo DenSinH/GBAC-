@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace GBAEmulator
 {
@@ -9,6 +10,7 @@ namespace GBAEmulator
             get { return (scanline >= 160) && (scanline < 227); }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ushort GetPaletteEntry(uint Address)
         {
             // Address within palette memory

@@ -17,7 +17,7 @@ namespace GBAEmulator
             foreach (byte BG in BGs)
             {
                 // reset only the relevant layers
-                for (byte x = 0; x < width; x++)
+                for (int x = 0; x < width; x++)
                 {
                     BGScanlines[BG][x] = 0x8000;
                 }
@@ -38,7 +38,7 @@ namespace GBAEmulator
 
             // only to be called after drawing into the DrawRegularBGScanline array
             byte priority;
-            for (byte x = 0; x < width; x++)
+            for (int x = 0; x < width; x++)
             {
                 for (priority = 0; priority < 3; priority++)
                 {
@@ -87,9 +87,9 @@ namespace GBAEmulator
             byte VRAMEntry;
             bool UpperNibble;
 
-            for (byte dx = 0; dx < 4; dx++)  // we need to look at nibbles here
+            for (int dx = 0; dx < 4; dx++)  // we need to look at nibbles here
             {
-                MosaicCorrectedAddress = TileLineBaseAddress + dx;
+                MosaicCorrectedAddress = (uint)(TileLineBaseAddress + dx);
                 if (Mosaic && MosaicHSize != 1)
                 {
                     // todo: fix horizontal mosaic
@@ -140,9 +140,9 @@ namespace GBAEmulator
             byte VRAMEntry;
             uint MosaicCorrectedAddress;
 
-            for (byte dx = 0; dx < 8; dx++)
+            for (int dx = 0; dx < 8; dx++)
             {
-                MosaicCorrectedAddress = TileLineBaseAddress + dx;
+                MosaicCorrectedAddress = (uint)(TileLineBaseAddress + dx);
                 if (Mosaic)
                     MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize);
 
@@ -307,7 +307,7 @@ namespace GBAEmulator
 
             int ScreenEntryX, ScreenEntryY;
 
-            for (byte ScreenX = 0; ScreenX < width; ScreenX++)
+            for (int ScreenX = 0; ScreenX < width; ScreenX++)
             {
                 ScreenEntryX = (((int)BGxX.InternalRegister + PA.Full * ScreenX) >> 8);  // >> 8 because it is fractional
                 ScreenEntryY = (((int)BGxY.InternalRegister + PC.Full * ScreenX) >> 8);  // >> 8 because it is fractional
@@ -331,7 +331,7 @@ namespace GBAEmulator
                 // Console.Write(ScreenEntryIndex.ToString("x3") + " ");
                 AffineScreenEntry = this.gba.cpu.VRAM[ScreenEntryIndex];
 
-                this.BGScanlines[BG][ScreenX] = this.GetAffinePixel(AffineScreenEntry, ScreenX, CharBaseBlock,
+                this.BGScanlines[BG][ScreenX] = this.GetAffinePixel(AffineScreenEntry, (byte)ScreenX, CharBaseBlock,
                     (byte)(ScreenEntryX & 7), (byte)(ScreenEntryY & 7));
             }
         }

@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte AddOffsetToSP(ushort Instruction)
+        private int AddOffsetToSP(ushort Instruction)
         {
             bool Sign;
             uint SWord7;

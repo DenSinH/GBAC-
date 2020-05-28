@@ -601,7 +601,6 @@ namespace GBAEmulator.CPU
             catch
             {
                 this.BIOS = this.NormattsBIOS;
-                // fs = File.OpenRead("../../CPU/bios/NormattBIOS.bin");
                 Console.WriteLine("BIOS dump load failed, using Normatt's BIOS...");
                 return false;
             }

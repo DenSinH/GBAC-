@@ -10,9 +10,9 @@ namespace GBAEmulator
 
         private void ResetOBJScanlines()
         {
-            for (byte Priority = 0; Priority < 4; Priority++)
+            for (int Priority = 0; Priority < 4; Priority++)
             {
-                for (byte x = 0; x < width; x++)
+                for (int x = 0; x < width; x++)
                 {
                     OBJLayers[Priority][x] = 0x8000;  // transparent
                 }
@@ -142,7 +142,7 @@ namespace GBAEmulator
                 // base address for sprites is 0x10000 in OAM
                 SliverBaseAddress = (SliverBaseAddress & 0x7fff) | 0x10000;  
 
-                for (byte dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
+                for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
                 {
                     // foreground palette starts at 0x0500_0200
                     // we can use our same rendering method as for background, as we simply render a tile
@@ -166,7 +166,7 @@ namespace GBAEmulator
 
                 SliverBaseAddress = (SliverBaseAddress & 0x7fff) | 0x10000;
 
-                for (byte dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
+                for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
                 {
                     // we can use our same rendering method as for background, as we simply render a tile
                     this.Render8bpp(ref this.OBJLayers[Priority], StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
@@ -233,7 +233,7 @@ namespace GBAEmulator
 
             // PA, PB, PC, PD:
             short[] RotateScaleParams = new short[4];
-            for (byte di = 0; di < 4; di++)
+            for (int di = 0; di < 4; di++)
             {
                 RotateScaleParams[di] = (short)(this.gba.cpu.OAM[RotScaleIndex] | (this.gba.cpu.OAM[RotScaleIndex + 1] << 8));
                 RotScaleIndex += 8;
@@ -255,7 +255,7 @@ namespace GBAEmulator
             // What the object width is to be interpreted as for looping over x coordinates
             byte FictionalOBJWidth = (byte)(DoubleRendering ? 2 * OBJsz.Width : OBJsz.Width);
 
-            for (byte ix = 0; ix < FictionalOBJWidth; ix++)
+            for (int ix = 0; ix < FictionalOBJWidth; ix++)
             {
                 // we started at one less than we should have, so that we could simply increment instead of do the calculation again
                 dx++;

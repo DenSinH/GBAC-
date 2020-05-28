@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte PCRelativeLoad(ushort Instruction)
+        private int PCRelativeLoad(ushort Instruction)
         {
             byte Rd;
             uint Address;

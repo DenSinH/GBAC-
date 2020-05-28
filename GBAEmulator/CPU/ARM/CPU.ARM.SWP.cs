@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
 
-        private byte SWP(uint Instruction)
+        private int SWP(uint Instruction)
         {
             bool ByteQuantity;
             byte Rn, Rd, Rm;

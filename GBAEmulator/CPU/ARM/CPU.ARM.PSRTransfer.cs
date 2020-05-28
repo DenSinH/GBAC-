@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte PossiblePSRTransfer(uint Instruction)
+        private int PossiblePSRTransfer(uint Instruction)
         {
             if ((Instruction & 0x0fbf_0fff) == 0x010f_0000)
             {
@@ -60,7 +60,7 @@ namespace GBAEmulator.CPU
           You COULD also set an immediate operand for general MSR, but this was not in the documentation of
           the ARM7TDMI, so I ingored this too...
            */
-        private byte MRS(uint Instruction)
+        private int MRS(uint Instruction)
         {
             this.Log("MRS");
             byte Rd = (byte)((Instruction & 0xf000) >> 12);
@@ -77,7 +77,7 @@ namespace GBAEmulator.CPU
             return SCycle;
         }
 
-        private byte MSR(uint Instruction)
+        private int MSR(uint Instruction)
         {
             this.Log("MSR");
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;

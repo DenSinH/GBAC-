@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte PushPopRegisters(ushort Instructions)
+        private int PushPopRegisters(ushort Instructions)
         {
             this.Log("Push/Pop registers");
             bool LoadFromMemory, PCLR;
@@ -21,7 +21,7 @@ namespace GBAEmulator.CPU
                 byte RegisterCount = 0;
 
                 // Pop from stack
-                for (byte i = 0; i < 8; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     if ((RList & (1 << i)) > 0)
                     {
@@ -40,17 +40,17 @@ namespace GBAEmulator.CPU
                     this.PipelineFlush();
 
                     //  LDM PC takes (n+1)S + 2N + 1I incremental cycles
-                    return (byte)((RegisterCount + 1) * SCycle + (NCycle << 1) + ICycle);
+                    return (RegisterCount + 1) * SCycle + (NCycle << 1) + ICycle;
                 }
                 else
                 {
                     // Normal LDM instructions take nS + 1N + 1I
-                    return (byte)(RegisterCount * SCycle + NCycle + ICycle);
+                    return RegisterCount * SCycle + NCycle + ICycle;
                 }
             }
             else
             {
-                byte Cycles;
+                int Cycles;
 
                 // Reverse pushing, like in ARM block data transfer instruction.
                 Queue<byte> RegisterQueue = new Queue<byte>(9);
@@ -67,7 +67,7 @@ namespace GBAEmulator.CPU
                     RegisterQueue.Enqueue(14);  // Also push link register
 
                 // STM instructions take (n-1)S + 2N incremental cycles to execute
-                Cycles = (byte)((RegisterQueue.Count - 1) * SCycle + (NCycle << 1));
+                Cycles = (RegisterQueue.Count - 1) * SCycle + (NCycle << 1);
 
                 SP -= 4 * (uint)RegisterQueue.Count;
                 uint Address = SP;

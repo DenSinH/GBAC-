@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte HiReg_BX(ushort Instruction)
+        private int HiReg_BX(ushort Instruction)
         {
             this.Log("Hi Register Operations / BX");
             byte Opcode, Rs, Rd;

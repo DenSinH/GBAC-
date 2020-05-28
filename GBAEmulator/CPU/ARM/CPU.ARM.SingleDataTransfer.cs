@@ -4,13 +4,13 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte SingleDataTransfer(uint Instruction)
+        private int SingleDataTransfer(uint Instruction)
         {
             bool RegisterOffset, PreIndex, Up, ByteQuantity, WriteBack, LoadFromMemory;
             byte Rn, Rd;
             uint Offset;
             uint Address;
-            byte Cycles;
+            int Cycles;
 
             RegisterOffset = (Instruction & 0x0200_0000) > 0;
             PreIndex = (Instruction & 0x0100_0000) > 0;

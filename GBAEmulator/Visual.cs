@@ -115,9 +115,9 @@ namespace GBAEmulator
         private void LoadDisplay()
         {
             // converting BRG555 to RGB555
-            for (byte x = 0; x < width; x++)
+            for (int x = 0; x < width; x++)
             {
-                for (byte y = 0; y < height; y++)
+                for (int y = 0; y < height; y++)
                 {
                     ushort BRGEntry = this.gba.display[width * y + x];
                     this._display[width * y + x] = (ushort)(((BRGEntry & 0x001f) << 10) | (BRGEntry & 0x03e0) | ((BRGEntry & 0x7c00) >> 10));

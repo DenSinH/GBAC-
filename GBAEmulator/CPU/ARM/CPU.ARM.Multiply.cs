@@ -4,11 +4,11 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte Multiply(uint Instruction)
+        private int Multiply(uint Instruction)
         {
             bool Accumulate, SetCondition;
             byte Rd, Rn, Rs, Rm;
-            byte mCycles = 4;
+            int mCycles = 4;
 
             Accumulate = (Instruction & 0x0020_0000) > 0;
             SetCondition = (Instruction & 0x0010_0000) > 0;
@@ -51,10 +51,10 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            return (byte)(SCycle + mCycles * ICycle);
+            return SCycle + mCycles * ICycle;
         }
 
-        private byte MultiplyLong(uint Instruction)
+        private int MultiplyLong(uint Instruction)
         {
             /*
              • R15 must not be used as an operand or as a destination register.
@@ -63,7 +63,7 @@ namespace GBAEmulator.CPU
             */
             bool Signed, Accumulate, SetCondition;
             byte RdHi, RdLo, Rs, Rm;
-            byte mCycles = 4;
+            int mCycles = 4;
 
             Signed = (Instruction & 0x0040_0000) > 0;
             Accumulate = (Instruction & 0x0020_0000) > 0;
@@ -137,7 +137,7 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            return (byte)(SCycle + mCycles * ICycle);
+            return SCycle + mCycles * ICycle;
         }
     }
 }

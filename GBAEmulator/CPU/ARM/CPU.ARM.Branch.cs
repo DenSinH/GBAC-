@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
 
-        private byte BX(uint Instruction)
+        private int BX(uint Instruction)
         {
             // Branch & Exchange instruction
             byte Rn = (byte)(Instruction & 0x0f);
@@ -23,7 +23,7 @@ namespace GBAEmulator.CPU
             return (SCycle << 1) + NCycle;
         }
 
-        private byte Branch(uint Instruction)
+        private int Branch(uint Instruction)
         {
             // Branch / Branch with Link
             if ((Instruction & 0x0100_0000) > 0)  // Link bit

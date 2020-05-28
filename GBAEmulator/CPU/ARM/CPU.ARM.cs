@@ -6,7 +6,7 @@ namespace GBAEmulator.CPU
     {
         // todo: SWI, Coprocessor instructions, Undefined
 
-        private delegate byte ARMInstruction(uint Instruction);
+        private delegate int ARMInstruction(uint Instruction);
         private ARMInstruction[] ARMInstructions = new ARMInstruction[0x1000];  // 12 bits determine the instruction
 
         private void InitARM()
@@ -127,7 +127,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private byte ExecuteARM(uint Instruction)
+        private int ExecuteARM(uint Instruction)
         {
             this.Log(string.Format("ARM: {0:x8} :: PC: {1:x8} :: CPSR: {2:x8}", Instruction, this.PC - 8, this.CPSR));
 

@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte ALUOperations(ushort Instruction)
+        private int ALUOperations(ushort Instruction)
         {
             this.Log("ALU Operations");
             byte Opcode, Rs, Rd;

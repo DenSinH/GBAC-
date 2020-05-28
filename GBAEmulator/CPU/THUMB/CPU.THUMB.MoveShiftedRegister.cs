@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte MoveShiftedRegister(ushort Instruction)
+        private int MoveShiftedRegister(ushort Instruction)
         {
             byte Opcode, Offset5, Rs, Rd;
             Opcode = (byte)((Instruction & 0x1800) >> 11);

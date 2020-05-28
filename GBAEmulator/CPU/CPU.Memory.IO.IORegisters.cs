@@ -6,6 +6,17 @@ namespace GBAEmulator.CPU
     {
         private class EmptyRegister : IORegister2 { }  // basically default register (name might be a bit misleading)
 
+        private class UnusedRegister : IORegister
+        {
+            // Register full of unused bits (always returns 0)
+            public ushort Get()
+            {
+                return 0;
+            }
+
+            public void Set(ushort value, bool setlow, bool sethigh) { }
+        }
+
         #region DISPCNT
         [Flags]
         public enum DISPCNTFlags : ushort
@@ -181,10 +192,13 @@ namespace GBAEmulator.CPU
         {
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
-                if (setlow)
-                {
-                    base.Set((ushort)(value & 0x01ff), setlow, sethigh);
-                }
+                base.Set((ushort)(value & 0x01ff), setlow, sethigh);
+            }
+
+            public override ushort Get()
+            {
+                // Write only
+                return 0;
             }
 
             public ushort Offset
@@ -202,17 +216,30 @@ namespace GBAEmulator.CPU
         #region LCD I/O BG Rotation/Scaling
         public class cReferencePointHalf : IORegister2
         {
-            cReferencePoint parent;
+            private cReferencePoint parent;
+            private ushort BitMask;
             
-            public cReferencePointHalf(cReferencePoint parent)
+            public cReferencePointHalf(cReferencePoint parent, ushort BitMask)
             {
                 this.parent = parent;
+                this.BitMask = BitMask;
+            }
+
+            public ushort raw
+            {
+                get => this._raw;
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
-                base.Set(value, setlow, sethigh);
+                base.Set((ushort)(value & this.BitMask), setlow, sethigh);
                 this.parent.ResetInternal();
+            }
+
+            public override ushort Get()
+            {
+                // Write only
+                return 0;
             }
         }
 
@@ -220,8 +247,9 @@ namespace GBAEmulator.CPU
         {
             public cReferencePoint()
             {
-                this.lower = new cReferencePointHalf(this);
-                this.upper = new cReferencePointHalf(this);
+                this.lower = new cReferencePointHalf(this, 0xffff);
+                // top 4 bits unused
+                this.upper = new cReferencePointHalf(this, 0x0fff);
             }
 
             public uint InternalRegister { get; private set; }
@@ -238,7 +266,7 @@ namespace GBAEmulator.CPU
 
             public bool Sign
             {
-                get => (this.upper.Get() & 0x0800) > 0;
+                get => (this.upper.raw & 0x0800) > 0;
             }
 
             public int Full
@@ -246,8 +274,8 @@ namespace GBAEmulator.CPU
                 get
                 {
                     if (this.Sign)  // negative
-                        return (int)(this.lower.Get() | ((this.upper.Get() & 0x07ff) << 16) | 0xf800_0000);
-                    return (this.lower.Get() | ((this.upper.Get() & 0x07ff) << 16));
+                        return (int)(this.lower.raw | ((this.upper.raw & 0x07ff) << 16) | 0xf800_0000);
+                    return (this.lower.raw | ((this.upper.raw & 0x07ff) << 16));
                 }
             }
         }
@@ -291,6 +319,12 @@ namespace GBAEmulator.CPU
             {
                 get => (byte)(this._raw >> 8);
             }
+
+            public override ushort Get()
+            {
+                // Write only
+                return 0;
+            }
         }
 
         public cWindowDimensions[] WINH = new cWindowDimensions[2] { new cWindowDimensions(), new cWindowDimensions() };
@@ -320,6 +354,12 @@ namespace GBAEmulator.CPU
                     return (this._raw & 0x0020) > 0;
                 else
                     return (this._raw & 0x2000) > 0;
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                // top 2 bits unused
+                base.Set((ushort)(value & 0x3fff), setlow, sethigh);
             }
         }
 
@@ -463,15 +503,14 @@ namespace GBAEmulator.CPU
             }
         }
 
-        readonly cIME IME = new cIME();
-        readonly cIE IE = new cIE();
-        readonly cIF IF = new cIF();
+        private readonly cIME IME = new cIME();
+        private readonly cIE IE = new cIE();
+        private readonly cIF IF = new cIF();
 
         #endregion
 
         #region HALTCNT
-
-        public class cPOSTFLG_HALTCNT : IORegister2
+        private class cPOSTFLG_HALTCNT : IORegister2
         {
             // 2 1 byte registers combined
             public bool Halt;
@@ -487,7 +526,175 @@ namespace GBAEmulator.CPU
             }
         }
 
-        readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
+        private readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
+
+        #endregion
+
+        #region DMA Transfers
+        private class cDMAAddressHalf : IORegister2
+        {
+            private ushort BitMask;
+            public ushort InternalRegister;
+
+            public cDMAAddressHalf(ushort BitMask) : base()
+            {
+                this.BitMask = BitMask;
+            }
+
+            public override ushort Get()
+            {
+                // Write only
+                return 0;
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set((ushort)(value & this.BitMask), setlow, sethigh);
+                this.InternalRegister = this._raw;
+            }
+        }
+
+        private class cDMAAddress : IORegister4<cDMAAddressHalf>
+        {
+            bool InternalMemory;
+
+            public cDMAAddress(bool InternalMemory) : base(new cDMAAddressHalf(0xffff), new cDMAAddressHalf((ushort)(InternalMemory ? 0x07ff : 0xffff)))
+            {
+                this.InternalMemory = InternalMemory;
+            }
+
+            public uint Address
+            {
+                // todo: separate based on memory section
+                get => (uint)(this.upper.InternalRegister << 16 | this.lower.InternalRegister);
+                set
+                {
+                    // todo: can upper overflow (upper 4/5 bits unused)
+                    this.upper.InternalRegister = (ushort)(value >> 16);
+                    this.lower.InternalRegister = (ushort)(value & 0xffff);
+                }
+            }
+        }
+
+        private readonly cDMAAddress[] DMASAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(false),
+            new cDMAAddress(false), new cDMAAddress(false) };
+        private readonly cDMAAddress[] DMADAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(true),
+            new cDMAAddress(true), new cDMAAddress(false) };
+
+        private class cDMACNT_L : IORegister2
+        {
+            private ushort BitMask;
+            public ushort InternalRegister;
+
+            public cDMACNT_L(ushort BitMask) : base()
+            {
+                this.BitMask = BitMask;
+            }
+
+            public ushort WordCount
+            {
+                // a value of zero is treated as max length (ie. 4000h, or 10000h for DMA3).
+                // the bitmask is simply   max length - 1
+                get => (ushort)((this.InternalRegister == 0) ? (this.BitMask + 1) : this.InternalRegister);
+                set => this.InternalRegister = value;
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set((ushort)(value & this.BitMask), setlow, sethigh);
+                this.InternalRegister = this._raw;
+            }
+
+            public override ushort Get()
+            {
+                // Write only
+                return 0;
+            }
+        }
+
+        private readonly cDMACNT_L[] DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(0x3fff), new cDMACNT_L(0x3fff),
+            new cDMACNT_L(0x3fff), new cDMACNT_L(0xffff) };
+
+        private enum AddrControl : byte
+        {
+            Increment = 0,
+            Decrement = 1,
+            Fixed = 2,
+            IncrementReload = 3
+        }
+
+        private enum DMAStartTiming : byte
+        {
+            Immediately = 0,
+            VBlank = 1,
+            HBlank = 2,
+            Special = 3
+        }
+
+        private class cDMACNT_H : IORegister2
+        {
+            private bool AllowGamePakDRQ;
+            public bool Active;
+
+            public cDMACNT_H() : base() { }
+
+            public cDMACNT_H(bool AllowGamePakDRQ) : base()
+            {
+                this.AllowGamePakDRQ = AllowGamePakDRQ;
+            }
+
+            public AddrControl DestAddrControl
+            {
+                get => (AddrControl)((this._raw & 0x0060) >> 5);
+            }
+
+            public AddrControl SourceAddrControl
+            {
+                get => (AddrControl)((this._raw & 0x0180) >> 7);
+            }
+
+            public bool DMARepeat
+            {
+                get => (this._raw & 0x0200) > 0;
+            }
+
+            public bool DMATransferType
+            {
+                // (0=16bit, 1=32bit)
+                get => (this._raw & 0x0400) > 0;
+            }
+
+            public bool GamePakDRQ
+            {
+                // (0=Normal, 1=DRQ <from> Game Pak, DMA3 only)
+                get => this.AllowGamePakDRQ && (this._raw & 0x0800) > 0;
+            }
+
+            public DMAStartTiming StartTiming
+            {
+                get => (DMAStartTiming)((this._raw & 0x3000) >> 12);
+            }
+
+            public bool IRQOnEnd
+            {
+                get => (this._raw & 0x4000) > 0;
+            }
+
+            public bool DMAEnable
+            {
+                get => (this._raw & 0x8000) > 0;
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set(value, setlow, sethigh);
+                if ((this._raw & 0xb000) == 0xb000)  // DMA Enable set AND DMA start timing immediate
+                    this.Active = true;
+            }
+        }
+
+        private cDMACNT_H[] DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(), new cDMACNT_H(),
+            new cDMACNT_H(), new cDMACNT_H(true) };
 
         #endregion
     }

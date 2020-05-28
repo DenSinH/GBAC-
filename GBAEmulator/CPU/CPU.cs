@@ -77,7 +77,7 @@ namespace GBAEmulator.CPU
             this.Pipeline.Clear();
         }
         
-        public byte Step()
+        public int Step()
         {
             this.HandleIRQs();
 

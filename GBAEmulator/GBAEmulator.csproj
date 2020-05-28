@@ -81,6 +81,7 @@
     <Compile Include="CPU\ARM\CPU.ARM.SingleDataTransfer.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.SWP.cs" />
     <Compile Include="CPU\CPU.Debug.cs" />
+    <Compile Include="CPU\CPU.DMA.cs" />
     <Compile Include="CPU\CPU.SWI.cs" />
     <Compile Include="CPU\CPU.Aux.cs" />
     <Compile Include="CPU\CPU.BIOS.cs" />

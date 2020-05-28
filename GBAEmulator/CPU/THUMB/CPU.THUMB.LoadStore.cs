@@ -5,7 +5,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte LoadStoreRegOffset_SignExtended(ushort Instruction)
+        private int LoadStoreRegOffset_SignExtended(ushort Instruction)
         {
             // Contains both the instructions for Load/Store with Register offset, and for Load/Store sign-extended
 
@@ -113,7 +113,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private byte LoadStoreImmediate(ushort Instruction)
+        private int LoadStoreImmediate(ushort Instruction)
         {
             bool ByteQuantity, LoadFromMemory;
             byte Offset5, Rb, Rd;
@@ -171,7 +171,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private byte LoadStoreHalfword(ushort Instruction)
+        private int LoadStoreHalfword(ushort Instruction)
         {
             bool LoadFromMemory;
             byte Offset5, Rb, Rd;
@@ -210,7 +210,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private byte LoadStoreSPRelative(ushort Instruction)
+        private int LoadStoreSPRelative(ushort Instruction)
         {
             bool LoadFromMemory;
             byte Rd;
@@ -252,7 +252,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private byte LoadAddress(ushort Instruction)
+        private int LoadAddress(ushort Instruction)
         {
             bool Source;
             byte Rd;
@@ -289,7 +289,7 @@ namespace GBAEmulator.CPU
             return SCycle + NCycle + ICycle;
         }
 
-        private byte MultipleLoadStore(ushort Instruction)
+        private int MultipleLoadStore(ushort Instruction)
         {
             this.Log("Multiple Load/Store");
              
@@ -328,7 +328,7 @@ namespace GBAEmulator.CPU
             {
                 byte RegisterCount = 0;
 
-                for (byte i = 0; i < 8; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     if ((RList & (1 << i)) > 0)
                     {
@@ -342,7 +342,7 @@ namespace GBAEmulator.CPU
                 this.Registers[Rb] = Address | Misalignment;  // return misalignment
 
                 // Normal LDM instructions take nS + 1N + 1I
-                return (byte)(RegisterCount * SCycle + NCycle + ICycle);
+                return RegisterCount * SCycle + NCycle + ICycle;
             }
             else
             {
@@ -356,7 +356,7 @@ namespace GBAEmulator.CPU
                 }
 
                 // STM instructions take (n-1)S + 2N incremental cycles to execute
-                byte Cycles = (byte)((RegisterQueue.Count - 1) * SCycle + (NCycle << 1));
+                int Cycles =(RegisterQueue.Count - 1) * SCycle + (NCycle << 1);
 
                 // we know that the queue is not empty, because RList != 0
                 if (RegisterQueue.Peek() == Rb)

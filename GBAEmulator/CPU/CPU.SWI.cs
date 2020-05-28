@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte SWIInstruction(uint Instruction)
+        private int SWIInstruction(uint Instruction)
         {
             this.Log(string.Format("SWI: {0:x8}", Instruction));
 
@@ -20,7 +20,7 @@ namespace GBAEmulator.CPU
             return (SCycle << 1) + NCycle;
         }
 
-        private byte SWIInstruction(ushort Instruction)
+        private int SWIInstruction(ushort Instruction)
         {
             return this.SWIInstruction((uint)Instruction);
         }

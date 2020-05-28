@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte ConditionalBranch(ushort Instruction)
+        private int ConditionalBranch(ushort Instruction)
         {
             if ((Instruction & 0xff00) == 0xdf00)
             {
@@ -60,7 +60,7 @@ namespace GBAEmulator.CPU
             return (SCycle << 1) + NCycle;
         }
 
-        private byte UnconditionalBranch(ushort Instruction)
+        private int UnconditionalBranch(ushort Instruction)
         {
             /*
              The address specified by label is a full 12-bit two’s complement address, but must
@@ -79,7 +79,7 @@ namespace GBAEmulator.CPU
             return (SCycle << 1) + NCycle;
         }
 
-        private byte LongBranchWithLink(ushort Instruction)
+        private int LongBranchWithLink(ushort Instruction)
         {
             this.Log("Long Branch With Link");
             bool H;

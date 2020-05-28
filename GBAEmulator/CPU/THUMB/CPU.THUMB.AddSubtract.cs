@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte AddSubtract(ushort Instruction)
+        private int AddSubtract(ushort Instruction)
         {
             bool ImmediateOperand, Sub;
             byte Rs, Rd;

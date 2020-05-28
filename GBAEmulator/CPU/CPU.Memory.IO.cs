@@ -60,14 +60,44 @@ namespace GBAEmulator.CPU
             this.IORAM[0x4a] = this.IORAM[0x4b] = this.WINOUT;
 
             this.IORAM[0x4c] = this.IORAM[0x4d] = this.MOSAIC;
-            this.IORAM[0x4e] = this.IORAM[0x4f] = new EmptyRegister();  // unused MOSAIC bits
-
-
+            this.IORAM[0x4e] = this.IORAM[0x4f] = new UnusedRegister();  // unused MOSAIC bits
+            
             for (int i = 0x50; i < IORAM.Length; i+= 2)
             {
                 // double length no registers
                 this.IORAM[i] = this.IORAM[i + 1] = new EmptyRegister();
             }
+
+            this.IORAM[0xb0] = this.IORAM[0xb1] = this.DMASAD[0].lower;
+            this.IORAM[0xb2] = this.IORAM[0xb3] = this.DMASAD[0].upper;
+            this.IORAM[0xb4] = this.IORAM[0xb5] = this.DMADAD[0].lower;
+            this.IORAM[0xb6] = this.IORAM[0xb7] = this.DMADAD[0].upper;
+            this.IORAM[0xb8] = this.IORAM[0xb9] = this.DMACNT_L[0];
+            this.IORAM[0xba] = this.IORAM[0xbb] = this.DMACNT_H[0];
+
+            this.IORAM[0xbc] = this.IORAM[0xbd] = this.DMASAD[1].lower;
+            this.IORAM[0xbe] = this.IORAM[0xbf] = this.DMASAD[1].upper;
+            this.IORAM[0xc0] = this.IORAM[0xc1] = this.DMADAD[1].lower;
+            this.IORAM[0xc2] = this.IORAM[0xc3] = this.DMADAD[1].upper;
+            this.IORAM[0xc4] = this.IORAM[0xc5] = this.DMACNT_L[1];
+            this.IORAM[0xc6] = this.IORAM[0xc7] = this.DMACNT_H[1];
+
+            this.IORAM[0xc8] = this.IORAM[0xc9] = this.DMASAD[2].lower;
+            this.IORAM[0xca] = this.IORAM[0xcb] = this.DMASAD[2].upper;
+            this.IORAM[0xcc] = this.IORAM[0xcd] = this.DMADAD[2].lower;
+            this.IORAM[0xce] = this.IORAM[0xcf] = this.DMADAD[2].upper;
+            this.IORAM[0xd0] = this.IORAM[0xd1] = this.DMACNT_L[2];
+            this.IORAM[0xd2] = this.IORAM[0xd3] = this.DMACNT_H[2];
+
+            this.IORAM[0xd4] = this.IORAM[0xd5] = this.DMASAD[3].lower;
+            this.IORAM[0xd6] = this.IORAM[0xd7] = this.DMASAD[3].upper;
+            this.IORAM[0xd8] = this.IORAM[0xd9] = this.DMADAD[3].lower;
+            this.IORAM[0xda] = this.IORAM[0xdb] = this.DMADAD[3].upper;
+            this.IORAM[0xdc] = this.IORAM[0xdd] = this.DMACNT_L[3];
+            this.IORAM[0xde] = this.IORAM[0xdf] = this.DMACNT_H[3];
+
+            this.IORAM[0xe0] = this.IORAM[0xe1] = new UnusedRegister();
+            // todo: 0xe2 - 0xff
 
             cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
             this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(KEYCNT, this);

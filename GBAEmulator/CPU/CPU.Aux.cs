@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace GBAEmulator.CPU
 {
@@ -21,6 +22,7 @@ namespace GBAEmulator.CPU
             System = 0b11111
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool Condition(byte field)
         {
             switch (field)
@@ -155,12 +157,14 @@ namespace GBAEmulator.CPU
             return Op;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetCVAdd(ulong Op1, ulong Op2, uint Result)
         {
             this.C = (byte)((ulong)Op1 + Op2 > 0xffff_ffff ? 1 : 0);
             this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetCVSub(ulong Op1, ulong Op2, uint Result)
         {
             // for Op1 - Op2
@@ -168,6 +172,7 @@ namespace GBAEmulator.CPU
             this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private uint ROR(uint Operand, byte RotateAmount)
         {
             RotateAmount &= 0x1f;

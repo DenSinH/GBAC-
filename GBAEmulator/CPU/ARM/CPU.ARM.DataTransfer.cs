@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte Halfword_SignedDataTransfer(uint Instruction)
+        private int Halfword_SignedDataTransfer(uint Instruction)
         {
             bool PreIndex, Up, WriteBack, LoadFromMemory;
             byte Rn, Rd, SH;

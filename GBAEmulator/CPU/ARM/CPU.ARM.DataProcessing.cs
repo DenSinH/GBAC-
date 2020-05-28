@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte DataProcessingTimings(bool ImmediateOperand, bool PCUsed)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int DataProcessingTimings(bool ImmediateOperand, bool PCUsed)
         {
             if (ImmediateOperand)
             {
@@ -24,7 +26,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private byte DataProcessing(uint Instruction)
+        private int DataProcessing(uint Instruction)
         {
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
             byte OpCode = (byte)((Instruction & 0x01e0_0000) >> 21);

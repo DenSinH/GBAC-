@@ -4,7 +4,7 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private byte MovCmpAddSubImmediate(ushort Instruction)
+        private int MovCmpAddSubImmediate(ushort Instruction)
         {
             byte opcode, Rd, Offset8;
             uint Result;
