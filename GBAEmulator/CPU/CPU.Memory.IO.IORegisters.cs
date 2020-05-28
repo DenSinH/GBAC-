@@ -527,7 +527,6 @@ namespace GBAEmulator.CPU
         }
 
         private readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
-
         #endregion
 
         #region DMA Transfers
@@ -550,13 +549,17 @@ namespace GBAEmulator.CPU
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
                 base.Set((ushort)(value & this.BitMask), setlow, sethigh);
+            }
+
+            public void Reload()
+            {
                 this.InternalRegister = this._raw;
             }
         }
 
         private class cDMAAddress : IORegister4<cDMAAddressHalf>
         {
-            bool InternalMemory;
+            private bool InternalMemory;
 
             public cDMAAddress(bool InternalMemory) : base(new cDMAAddressHalf(0xffff), new cDMAAddressHalf((ushort)(InternalMemory ? 0x07ff : 0xffff)))
             {
@@ -574,6 +577,12 @@ namespace GBAEmulator.CPU
                     this.lower.InternalRegister = (ushort)(value & 0xffff);
                 }
             }
+
+            public void Reload()
+            {
+                this.lower.Reload();
+                this.upper.Reload();
+            }
         }
 
         private readonly cDMAAddress[] DMASAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(false),
@@ -584,14 +593,14 @@ namespace GBAEmulator.CPU
         private class cDMACNT_L : IORegister2
         {
             private ushort BitMask;
-            public ushort InternalRegister;
+            private ushort InternalRegister;
 
             public cDMACNT_L(ushort BitMask) : base()
             {
                 this.BitMask = BitMask;
             }
 
-            public ushort WordCount
+            public ushort UnitCount
             {
                 // a value of zero is treated as max length (ie. 4000h, or 10000h for DMA3).
                 // the bitmask is simply   max length - 1
@@ -599,10 +608,14 @@ namespace GBAEmulator.CPU
                 set => this.InternalRegister = value;
             }
 
+            public void Reload()
+            {
+                this.InternalRegister = this._raw;
+            }
+
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
                 base.Set((ushort)(value & this.BitMask), setlow, sethigh);
-                this.InternalRegister = this._raw;
             }
 
             public override ushort Get()
@@ -623,7 +636,7 @@ namespace GBAEmulator.CPU
             IncrementReload = 3
         }
 
-        private enum DMAStartTiming : byte
+        public enum DMAStartTiming : byte
         {
             Immediately = 0,
             VBlank = 1,
@@ -636,9 +649,16 @@ namespace GBAEmulator.CPU
             private bool AllowGamePakDRQ;
             public bool Active;
 
-            public cDMACNT_H() : base() { }
+            private ARM7TDMI cpu;
+            public readonly int index;
 
-            public cDMACNT_H(bool AllowGamePakDRQ) : base()
+            public cDMACNT_H(ARM7TDMI cpu, int index) : base()
+            {
+                this.index = index;
+                this.cpu = cpu;
+            }
+
+            public cDMACNT_H(ARM7TDMI cpu, int index, bool AllowGamePakDRQ) : this(cpu, index)
             {
                 this.AllowGamePakDRQ = AllowGamePakDRQ;
             }
@@ -685,16 +705,38 @@ namespace GBAEmulator.CPU
                 get => (this._raw & 0x8000) > 0;
             }
 
+            public void Disable()
+            {
+                this._raw &= 0x7fff;
+            }
+
+            public void Trigger(DMAStartTiming timing)
+            {
+                if ((this._raw & 0x8000) > 0)  // enabled
+                {
+                    if (timing == this.StartTiming)
+                        this.Active = true;
+                }
+            }
+
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
+                bool DoReload = !this.DMAEnable;
+
                 base.Set(value, setlow, sethigh);
-                if ((this._raw & 0xb000) == 0xb000)  // DMA Enable set AND DMA start timing immediate
+                if (DoReload && this.DMAEnable)
+                {
+                    this.cpu.DMADAD[this.index].Reload();
+                    this.cpu.DMASAD[this.index].Reload();
+                    this.cpu.DMACNT_L[this.index].Reload();
+                }
+
+                if ((this._raw & 0xb000) == 0x8000)  // DMA Enable set AND DMA start timing immediate
                     this.Active = true;
             }
         }
 
-        private cDMACNT_H[] DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(), new cDMACNT_H(),
-            new cDMACNT_H(), new cDMACNT_H(true) };
+        private cDMACNT_H[] DMACNT_H;
 
         #endregion
     }

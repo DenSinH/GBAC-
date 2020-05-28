@@ -47,7 +47,11 @@ namespace GBAEmulator
              */
 
             // set VBlank
-            if (this.ppu.scanline == 160) this.cpu.DISPSTAT.SetVBlank(true); 
+            if (this.ppu.scanline == 160)
+            {
+                this.cpu.DISPSTAT.SetVBlank(true);
+                this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.VBlank);
+            }
             else if (this.ppu.scanline == 0) this.cpu.DISPSTAT.SetVBlank(false);
 
             if (this.ppu.IsVBlank)
@@ -58,14 +62,22 @@ namespace GBAEmulator
                 this.cpu.BG3Y.ResetInternal();
             }
 
+            /* NON-HBLANK */
             this.cpu.DISPSTAT.SetHBlank(false);
             this.cpu.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
+            if (this.ppu.scanline >= 2 && this.ppu.scanline < 162)
+            {
+                // DMA 3 video capture mode (special DMA trigger)
+                this.cpu.TriggerDMASpecial(3);
+            }
 
             this.cycle += NonHBlankCycles;
             while (this.cycle > 0)
                 this.cycle -= this.cpu.Step();
 
+            /* HBLANK */
             this.cpu.DISPSTAT.SetHBlank(true);
+            this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.HBlank);
             this.ppu.DrawScanline();
 
             this.cycle += HBlankCycles;
@@ -81,11 +93,12 @@ namespace GBAEmulator
         public void Run()
         {
             // cpu.LoadRom("../../roms/KirbyNightmare.gba");
-            // cpu.LoadRom("../../Tests/Krom/BIOSCHECKSUM.gba");
-            cpu.LoadRom("../../Tests/Tonc/obj_aff.gba");
+            // cpu.LoadRom("../../Tests/Krom/3DEngine.gba");
+            // cpu.LoadRom("../../Tests/GBASuiteNew/stripes.gba");
+            // cpu.LoadRom("../../Tests/Tonc/dma_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
-            // cpu.LoadRom("../../Tests/AgingCard.gba");
-            cpu.SkipBios();
+            cpu.LoadRom("../../Tests/AgingCard.gba");
+            // cpu.SkipBios();
 
             while (!this.ShutDown)
             {

@@ -11,6 +11,8 @@ namespace GBAEmulator.CPU
             this.DISPSTAT = new cDISPSTAT(this);
             this.VCOUNT = new cVCOUNT(this);
 
+            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(this, 0), new cDMACNT_H(this, 1), new cDMACNT_H(this, 2), new cDMACNT_H(this, 3, true) };
+
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;
             this.IORAM[0x02] = this.IORAM[0x03] = new EmptyRegister();
             this.IORAM[0x04] = this.IORAM[0x05] = this.DISPSTAT;

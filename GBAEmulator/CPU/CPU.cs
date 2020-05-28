@@ -57,6 +57,7 @@ namespace GBAEmulator.CPU
         const byte NCycle = 1;
         const byte ICycle = 1;
 
+        public string RomName { get; private set; }
         public void LoadRom(string FileName)
         {
             FileStream fs = File.OpenRead(FileName);
@@ -70,6 +71,7 @@ namespace GBAEmulator.CPU
                 i++;
             }
             this.Log(string.Format("{0:x8} Bytes loaded (hex)", i));
+            this.RomName = Path.GetFileName(FileName);
         }
 
         private void PipelineFlush()
@@ -84,6 +86,12 @@ namespace GBAEmulator.CPU
             if (this.HALTCNT.Halt)
             {
                 return 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
+            }
+
+            int DMACycles = this.HandleDMAs();
+            if (DMACycles > 0)
+            {
+                return DMACycles;
             }
 
             if (this.state == State.ARM)
