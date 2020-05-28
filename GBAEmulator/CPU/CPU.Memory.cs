@@ -21,6 +21,19 @@ namespace GBAEmulator.CPU
             0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
             0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0xffff
         };
+
+        enum MemorySection : byte
+        {
+            BIOS = 0,
+            // BIOS Mirror
+            eWRAM = 2,
+            iWRAM = 3,
+            IORAM = 4,
+            PaletteRAM = 5,
+            VRAM = 6,
+            OAM = 7
+            // otherwise GamePak
+        }
         
         private uint GetWordAt(uint address)
         {
@@ -160,6 +173,16 @@ namespace GBAEmulator.CPU
         private void SetByteAt(uint address, byte value)
         {
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+
+            switch ((MemorySection)Section)
+            {
+                case MemorySection.OAM:   // ignore OAM byte stores
+                case MemorySection.VRAM:  // ignore VRAM byte stores
+                case MemorySection.PaletteRAM:  // ignore PaletteRAM byte stores
+                    this.Error("Attempted OAM/VRAM/PaletteRAM byte write");
+                    return;
+            }
+            
             if (__MemoryRegions__[Section] != null)
             {
                 this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]] = value;

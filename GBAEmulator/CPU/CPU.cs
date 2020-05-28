@@ -85,7 +85,7 @@ namespace GBAEmulator.CPU
 
             if (this.HALTCNT.Halt)
             {
-                return 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
+                // return 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
             }
 
             int DMACycles = this.HandleDMAs();

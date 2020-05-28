@@ -157,7 +157,7 @@ namespace GBAEmulator
                 // Tonc about Sprite tile memory offsets: Always per 4bpp tile size: start = base + id * 32
                 SliverBaseAddress = (uint)(TileID * 0x20);
                 // removed shifting for less arithmetic, like in 4bpp
-                SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 8) : (32 * 0x40 * (dy >> 3)));
+                SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 4) : (32 * 0x20 * (dy >> 3)));
                 SliverBaseAddress += (uint)(8 * (dy & 0x07));   // offset within tile
 
                 // prevent overflow, not sure what is supposed to happen
@@ -207,7 +207,7 @@ namespace GBAEmulator
                 // Tonc about Sprite tile memory offsets: Always per 4bpp tile size: start = base + id * 32
                 PixelAddress += (uint)(TileID * 0x20);
                 // removed shifting for less arithmetic:
-                PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 8) : (32 * 0x40 * (py >> 3)));
+                PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 4) : (32 * 0x20 * (py >> 3)));
                 PixelAddress += (uint)(8 * (py & 0x07));
                 PixelAddress += (uint)(0x40 * (px >> 3));
 

@@ -64,17 +64,14 @@ namespace GBAEmulator.CPU
 
         private void EndDMA(cDMACNT_H dmacnt_h, cDMACNT_L dmacnt_l, cDMAAddress dmasad, cDMAAddress dmadad)
         {
-            if (dmacnt_h.DMARepeat)
+            // Immediate DMA transfers should ignore the Repeat bit  - Fleroviux
+            if (dmacnt_h.DMARepeat && dmacnt_h.StartTiming != DMAStartTiming.Immediately)
             {
-
                 dmacnt_l.Reload();
                 if (dmacnt_h.DestAddrControl == AddrControl.IncrementReload)
                 {
                     dmadad.Reload();
                 }
-
-                // set to inactive if not immedieately starting
-                dmacnt_h.Active = dmacnt_h.StartTiming == DMAStartTiming.Immediately;
             }
             else
             {
@@ -84,8 +81,8 @@ namespace GBAEmulator.CPU
                     this.IF.Request((Interrupt)((ushort)Interrupt.DMA << dmacnt_h.index));
                 }
                 dmacnt_h.Disable();
-                dmacnt_h.Active = false;
             }
+            dmacnt_h.Active = false;
         }
 
         private int HandleDMAs()

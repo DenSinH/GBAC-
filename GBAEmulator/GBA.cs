@@ -94,11 +94,11 @@ namespace GBAEmulator
         {
             // cpu.LoadRom("../../roms/KirbyNightmare.gba");
             // cpu.LoadRom("../../Tests/Krom/3DEngine.gba");
-            // cpu.LoadRom("../../Tests/GBASuiteNew/stripes.gba");
-            // cpu.LoadRom("../../Tests/Tonc/dma_demo.gba");
+            // cpu.LoadRom("../../Tests/GBASuiteNew/bios.gba");
+            // cpu.LoadRom("../../Tests/Tonc/obj_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
-            cpu.LoadRom("../../Tests/AgingCard.gba");
-            // cpu.SkipBios();
+            cpu.LoadRom("../../Tests/EndriftSuite.gba");
+            cpu.SkipBios();
 
             while (!this.ShutDown)
             {

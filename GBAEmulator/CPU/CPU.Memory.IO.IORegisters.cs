@@ -739,5 +739,22 @@ namespace GBAEmulator.CPU
         private cDMACNT_H[] DMACNT_H;
 
         #endregion
+
+        #region Timer Registers
+        public class TimerRegister : IORegister2
+        {
+            public override ushort Get()
+            {
+                Console.WriteLine("Timer read");
+                return base.Get();
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set(value, setlow, sethigh);
+                Console.WriteLine($"Timer set to {value}");
+            }
+        }
+        #endregion
     }
 }

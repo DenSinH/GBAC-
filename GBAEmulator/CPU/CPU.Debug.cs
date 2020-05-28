@@ -9,13 +9,13 @@ namespace GBAEmulator.CPU
     {
         public bool pause;
 
-        [Conditional("DEBUG")]
+        [Conditional("DEBaUG")]
         private void Error(string message)
         {
             Console.Error.WriteLine("Error: " + message);
         }
 
-        [Conditional("DEBUG")]
+        [Conditional("DEBaUG")]
         private void Log(string message)
         {
             if (this.PC != 0x0800_0194 && this.PC != 0x0800_0196 && this.PC != 0x0800_0198)
@@ -27,6 +27,12 @@ namespace GBAEmulator.CPU
         public void ShowInfo()
         {
             Console.WriteLine(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + " " + this.VCOUNT.CurrentScanline.ToString("x2"));
+        }
+
+        public void InterruptInfo()
+        {
+            Console.WriteLine($"HALTCNT: {this.HALTCNT.Halt}, CPSR-I: {this.I}");
+            Console.WriteLine($"IME disable all: {this.IME.DisableAll}, IE: {this.IE.raw.ToString("x8")}, IF: {this.IF.raw.ToString("x8")}");
         }
 
         public void DumpPAL()
@@ -47,7 +53,7 @@ namespace GBAEmulator.CPU
             for (int i = 0; i < 0x20; i++)
             {
                 Console.Write(string.Format("{0:x4} :: ", 0x20 * i));
-                for (int j = 0; j < 0xf; j++)
+                for (int j = 0; j < 0x10; j++)
                 {
                     Console.Write(string.Format("{0:x4} ", this.GetHalfWordAt((uint)(0x0700_0000 | (0x20 * i) | (2 * j)))));
                 }

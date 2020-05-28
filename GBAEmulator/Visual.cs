@@ -67,6 +67,11 @@ namespace GBAEmulator
             if (e.KeyCode == Keys.I)
             {
                 this.gba.cpu.ShowInfo();
+                this.gba.cpu.InterruptInfo();
+            }
+            else if (e.KeyCode == Keys.F4)
+            {
+                // this.gba.cpu.DoIRQ();
             }
             else if (e.KeyCode == Keys.O)
             {

@@ -101,6 +101,15 @@ namespace GBAEmulator.CPU
             this.IORAM[0xe0] = this.IORAM[0xe1] = new UnusedRegister();
             // todo: 0xe2 - 0xff
 
+            this.IORAM[0x100] = this.IORAM[0x101] = new TimerRegister();
+            this.IORAM[0x102] = this.IORAM[0x103] = new TimerRegister();
+            this.IORAM[0x104] = this.IORAM[0x105] = new TimerRegister();
+            this.IORAM[0x106] = this.IORAM[0x107] = new TimerRegister();
+            this.IORAM[0x108] = this.IORAM[0x109] = new TimerRegister();
+            this.IORAM[0x10a] = this.IORAM[0x10b] = new TimerRegister();
+            this.IORAM[0x10c] = this.IORAM[0x10d] = new TimerRegister();
+            this.IORAM[0x10e] = this.IORAM[0x10f] = new TimerRegister();
+
             cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
             this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(KEYCNT, this);
             this.IORAM[0x0132] = this.IORAM[0x0133] = KEYCNT;
@@ -183,7 +192,6 @@ namespace GBAEmulator.CPU
         private void IOSetWordAt(uint address, uint value)
         {
             this.Log("Set register word at address " + address.ToString("x3") + " " + value.ToString("x"));
-            this.Log(this.PC.ToString("x"));
             IORegister reg = this.IORAM[address];
             bool offset = (address & 1) > 0;
 

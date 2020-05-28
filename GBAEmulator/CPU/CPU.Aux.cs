@@ -111,8 +111,6 @@ namespace GBAEmulator.CPU
                         }
                         break;
                     case 0b01:  // Logical Right
-                        newC = this.C;
-
                         if (ShiftAmount < 32)
                         {
                             newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm
@@ -160,7 +158,7 @@ namespace GBAEmulator.CPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetCVAdd(ulong Op1, ulong Op2, uint Result)
         {
-            this.C = (byte)((ulong)Op1 + Op2 > 0xffff_ffff ? 1 : 0);
+            this.C = (byte)(Op1 + Op2 > 0xffff_ffff ? 1 : 0);
             this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
         }
 
