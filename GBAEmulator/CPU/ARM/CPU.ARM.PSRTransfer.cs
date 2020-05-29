@@ -106,7 +106,7 @@ namespace GBAEmulator.CPU
                 Operand = Instruction & 0x00ff;
                 // Rotate in steps of 2
                 byte ShiftAmount = (byte)((Instruction & 0x0f00) >> 7);  // * 2 so >> 7 instead of >> 8
-                Operand = (uint)((Operand >> ShiftAmount) | ((Operand & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
+                Operand = this.ROR(Operand, ShiftAmount);
             }
             else
             {

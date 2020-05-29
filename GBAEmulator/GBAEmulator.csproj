@@ -105,6 +105,12 @@
     <Compile Include="CPU\THUMB\CPU.THUMB.MoveShiftedRegister.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.PCRelativeLoad.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.PushPop.cs" />
+    <Compile Include="Debug.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debug.Designer.cs">
+      <DependentUpon>Debug.cs</DependentUpon>
+    </Compile>
     <Compile Include="GBA.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="PPU\PPU.Aux.cs" />
@@ -120,6 +126,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Debug.resx">
+      <DependentUpon>Debug.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

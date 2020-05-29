@@ -9,19 +9,16 @@ namespace GBAEmulator.CPU
     {
         public bool pause;
 
-        [Conditional("DEBaUG")]
+        [Conditional("DEBUG")]
         private void Error(string message)
         {
             Console.Error.WriteLine("Error: " + message);
         }
 
-        [Conditional("DEBaUG")]
+        [Conditional("DEBUG")]
         private void Log(string message)
         {
-            if (this.PC != 0x0800_0194 && this.PC != 0x0800_0196 && this.PC != 0x0800_0198)
-            {
-                Console.WriteLine(message);
-            }
+            Console.WriteLine(message);
         }
 
         public void ShowInfo()

@@ -45,7 +45,7 @@ namespace GBAEmulator
                         this.Mode5Scanline();
                         break;
                     default:
-                        throw new Exception("Invalid mode");
+                        throw new Exception("Invalid Rendering Mode");
                 }
             }
             

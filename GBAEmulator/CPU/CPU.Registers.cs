@@ -20,6 +20,9 @@ namespace GBAEmulator.CPU
             if (NewMode == this.mode)
                 return;
 
+            //if (!Enum.IsDefined(typeof(Mode), NewMode))
+            //    throw new Exception($"Invalid mode {NewMode}");
+
             bool FIQInvolved = (this.mode == Mode.FIQ) || (NewMode == Mode.FIQ);
 
             this.Log("new mode: " + NewMode);

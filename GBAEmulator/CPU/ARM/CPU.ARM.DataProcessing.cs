@@ -146,7 +146,7 @@ namespace GBAEmulator.CPU
                     this.Log(string.Format("{0:x8} ADC {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 + Op2 + OldC;
                     if (SetConditions)
-                        this.SetCVAdd((ulong)Op2 + OldC, Op1, Result);
+                        this.SetCVAdd(Op1, (ulong)Op2 + OldC, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0110:  // SBC

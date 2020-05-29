@@ -102,8 +102,10 @@ namespace GBAEmulator
 
         private void RenderRegularOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic, ushort OBJ_ATTR1, ushort OBJ_ATTR2)
         {
-            ushort StartX = (ushort)(OBJ_ATTR1 & 0x01ff);
-            sbyte XSign = 1;
+            int StartX = OBJ_ATTR1 & 0x01ff;
+            if ((OBJ_ATTR1 & 0x0100) > 0) StartX = (int)(StartX | 0xffff_ff00);  // sign extend
+
+            int XSign = 1;
             bool VFlip = (OBJ_ATTR1 & 0x2000) > 0;
             bool HFlip = (OBJ_ATTR1 & 0x1000) > 0;
 
@@ -149,7 +151,7 @@ namespace GBAEmulator
                     this.Render4bpp(ref this.OBJLayers[Priority], StartX, XSign,
                         (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
-                    StartX = (byte)(StartX + 8 * XSign);
+                    StartX += 8 * XSign;
                 }
             }
             else
@@ -171,7 +173,7 @@ namespace GBAEmulator
                     // we can use our same rendering method as for background, as we simply render a tile
                     this.Render8bpp(ref this.OBJLayers[Priority], StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
-                    StartX = (byte)(StartX + 8 * XSign);
+                    StartX += 8 * XSign;
                 }
             }
         }
@@ -222,7 +224,9 @@ namespace GBAEmulator
         private void RenderAffineOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic,
             ushort OBJ_ATTR1, ushort OBJ_ATTR2, bool DoubleRendering)
         {
-            ushort StartX = (ushort)(OBJ_ATTR1 & 0x01ff);
+            int StartX = OBJ_ATTR1 & 0x01ff;
+            if ((OBJ_ATTR1 & 0x0100) > 0) StartX = (int)(StartX | 0xffff_ff00);  // sign extend
+
             byte AffineIndex = (byte)((OBJ_ATTR1 & 0x3e00) >> 9);
 
             ushort TileID = (ushort)(OBJ_ATTR2 & 0x03ff);
@@ -250,6 +254,7 @@ namespace GBAEmulator
             else
                 dy = (short)(scanline - OBJy - OBJsz.Height);
 
+            // subtract one because we increment at the start of the loop
             short dx = (short)((DoubleRendering ? -OBJsz.Width : -(OBJsz.Width >> 1)) - 1);
 
             // What the object width is to be interpreted as for looping over x coordinates
@@ -258,6 +263,7 @@ namespace GBAEmulator
             for (int ix = 0; ix < FictionalOBJWidth; ix++)
             {
                 // we started at one less than we should have, so that we could simply increment instead of do the calculation again
+                // we do this here so the continue statements dont mess stuff up
                 dx++;
 
                 if ((StartX + ix < 0) || (StartX + ix) >= width)
@@ -270,6 +276,7 @@ namespace GBAEmulator
                 px = (uint)(((RotateScaleParams[0] * dx + RotateScaleParams[1] * dy) >> 8) + px0);
                 py = (uint)(((RotateScaleParams[2] * dx + RotateScaleParams[3] * dy) >> 8) + py0);
 
+                // use actual width of sprite, even for double rendering
                 if (px >= OBJsz.Width || py >= OBJsz.Height)
                     continue;
 

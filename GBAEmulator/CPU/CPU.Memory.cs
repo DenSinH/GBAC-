@@ -16,10 +16,24 @@ namespace GBAEmulator.CPU
         private byte[] GamePakSRAM = new byte[0x10000]; // Game Pak Flash ROM (for saving game data)
 
         private readonly byte[][] __MemoryRegions__;  // Lookup table for memory regions for instant access (instead of switch statement)
-        private readonly uint[] __MemoryMasks__ =
+        private readonly uint[] __MemoryMasks__ = new uint[15]
         {
             0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
             0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0xffff
+        };
+
+        // todo: waitstates / N & S cycles
+        // Byte access cycles are equal to halfword access cycles
+        private readonly int[] __ByteAccessCycles__ = new int[15]
+        {
+            1, 1, 3, 1, 1, 1, 1, 1,
+            5, 5, 5, 5, 5, 5, 5
+        };
+
+        private readonly int[] __WordAccessCycles__ = new int[15]
+        {
+            1, 1, 6, 1, 1, 2, 2, 1,
+            8, 8, 8, 8, 8, 8, 8
         };
 
         enum MemorySection : byte
@@ -46,6 +60,9 @@ namespace GBAEmulator.CPU
             //}
 
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+            this.NCycle = __WordAccessCycles__[Section];
+            this.SCycle = __WordAccessCycles__[Section];
+
             if (__MemoryRegions__[Section] != null)
                 return __GetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section]);
 
@@ -70,6 +87,9 @@ namespace GBAEmulator.CPU
         private void SetWordAt(uint address, uint value)
         {
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+            this.NCycle = __WordAccessCycles__[Section];
+            this.SCycle = __WordAccessCycles__[Section];
+
             if (__MemoryRegions__[Section] != null)
             {
                 __SetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
@@ -101,6 +121,9 @@ namespace GBAEmulator.CPU
         private ushort GetHalfWordAt(uint address)
         {
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+            this.NCycle = __ByteAccessCycles__[Section];
+            this.SCycle = __ByteAccessCycles__[Section];
+
             if (__MemoryRegions__[Section] != null)
                 return __GetHalfWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section]);
 
@@ -123,6 +146,9 @@ namespace GBAEmulator.CPU
         private void SetHalfWordAt(uint address, ushort value)
         {
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+            this.NCycle = __ByteAccessCycles__[Section];
+            this.SCycle = __ByteAccessCycles__[Section];
+
             if (__MemoryRegions__[Section] != null)
             {
                 __SetHalfWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
@@ -151,6 +177,9 @@ namespace GBAEmulator.CPU
         private byte GetByteAt(uint address)
         {
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+            this.NCycle = __ByteAccessCycles__[Section];
+            this.SCycle = __ByteAccessCycles__[Section];
+
             if (__MemoryRegions__[Section] != null)
                 return this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]];
 
@@ -173,15 +202,17 @@ namespace GBAEmulator.CPU
         private void SetByteAt(uint address, byte value)
         {
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+            this.NCycle = __ByteAccessCycles__[Section];
+            this.SCycle = __ByteAccessCycles__[Section];
 
-            switch ((MemorySection)Section)
-            {
-                case MemorySection.OAM:   // ignore OAM byte stores
-                case MemorySection.VRAM:  // ignore VRAM byte stores
-                case MemorySection.PaletteRAM:  // ignore PaletteRAM byte stores
-                    this.Error("Attempted OAM/VRAM/PaletteRAM byte write");
-                    return;
-            }
+            //switch ((MemorySection)Section)
+            //{
+            //    case MemorySection.OAM:   // ignore OAM byte stores
+            //    case MemorySection.VRAM:  // ignore VRAM byte stores
+            //    case MemorySection.PaletteRAM:  // ignore PaletteRAM byte stores
+            //        this.Error("Attempted OAM/VRAM/PaletteRAM byte write");
+            //        break;
+            //}
             
             if (__MemoryRegions__[Section] != null)
             {

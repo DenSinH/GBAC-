@@ -76,13 +76,13 @@ namespace GBAEmulator
             }
         }
 
-        private void Render4bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress,
+        private void Render4bpp(ref ushort[] Line, int StartX, int XSign, uint TileLineBaseAddress,
             uint PaletteBase, bool Mosaic, byte MosaicHSize)
         {
             // draw 4bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             // PaletteBase must be PaletteBank * 0x20
             byte PaletteNibble;
-            byte ScreenX = (byte)StartX;  // todo: can casting cause visual glitches on screen borders?
+            int ScreenX = StartX;
             uint MosaicCorrectedAddress;
             byte VRAMEntry;
             bool UpperNibble;
@@ -103,7 +103,7 @@ namespace GBAEmulator
 
                 VRAMEntry = this.gba.cpu.VRAM[MosaicCorrectedAddress];
 
-                if (ScreenX < width)  // ScreenX is a byte, so always greater than 0
+                if (0 <= ScreenX && ScreenX < width)  // ScreenX is a byte, so always greater than 0
                 {
                     if (Line[ScreenX] == 0x8000)
                     {
@@ -114,11 +114,11 @@ namespace GBAEmulator
                             Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
                     }
                 }
-                ScreenX = (byte)(ScreenX + XSign);
+                ScreenX += XSign;
 
                 UpperNibble = !Mosaic || MosaicHSize == 1 ||((((dx << 1) + 1) % MosaicHSize) & 1) == 1;
 
-                if (ScreenX < width)
+                if (0 <= ScreenX && ScreenX < width)
                 {
                     if (Line[ScreenX] == 0x8000)
                     {
@@ -129,14 +129,14 @@ namespace GBAEmulator
                             Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
                     }
                 }
-                ScreenX = (byte)(ScreenX + XSign);
+                ScreenX += XSign;
             }
         }
 
-        private void Render8bpp(ref ushort[] Line, int StartX, sbyte XSign, uint TileLineBaseAddress, bool Mosaic, byte MosaicHSize)
+        private void Render8bpp(ref ushort[] Line, int StartX, int XSign, uint TileLineBaseAddress, bool Mosaic, byte MosaicHSize)
         {
             // draw 8bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
-            byte ScreenX = (byte)StartX;
+            int ScreenX = StartX;
             byte VRAMEntry;
             uint MosaicCorrectedAddress;
 
@@ -146,14 +146,14 @@ namespace GBAEmulator
                 if (Mosaic)
                     MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize);
 
-                if (ScreenX < width)  // ScreenX is a byte, so always >= 0
+                if (0 <= ScreenX && ScreenX < width)  // ScreenX is a byte, so always >= 0
                 {
                     VRAMEntry = this.gba.cpu.VRAM[MosaicCorrectedAddress];
                     if (VRAMEntry != 0)
                         Line[ScreenX] = this.GetPaletteEntry(2 * (uint)VRAMEntry);
                 }
 
-                ScreenX = (byte)(ScreenX + XSign);
+                ScreenX +=XSign;
             }
         }
 
@@ -192,7 +192,7 @@ namespace GBAEmulator
                 dy = (byte)(7 - dy);
 
             // read from right to left if HFlipping
-            sbyte XSign = 1;
+            int XSign = 1;
             if (HFlip)
             {
                 StartX += 7;

@@ -53,8 +53,8 @@ namespace GBAEmulator.CPU
             };
         }
 
-        const byte SCycle = 1;
-        const byte NCycle = 1;
+        int SCycle = 1;
+        int NCycle = 1;
         const byte ICycle = 1;
 
         public string RomName { get; private set; }
@@ -85,12 +85,14 @@ namespace GBAEmulator.CPU
 
             if (this.HALTCNT.Halt)
             {
+                this.Log("Halted");
                 return 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
             }
 
             int DMACycles = this.HandleDMAs();
             if (DMACycles > 0)
             {
+                this.Log("DMAing");
                 return DMACycles;
             }
 
@@ -105,7 +107,6 @@ namespace GBAEmulator.CPU
                 }
                 else
                 {
-                    this.Log("Filling Pipeline");
                     return 1;  // how many cycles?
                 }
             }
@@ -120,26 +121,9 @@ namespace GBAEmulator.CPU
                 }
                 else
                 {
-                    this.Log("Filling Pipeline");
                     return 1;  // how many cycles?
                 }
             }
-
-            //if (this.pause || this.PC - 4 == 0x0800_47f0)
-            //{
-            //    this.ShowInfo();
-            //    pause = Console.ReadKey().KeyChar == 'p';
-            //}
-
-
-            //if (this.Registers[15] != 0x0800_0190 && this.Registers[15] != 0x0800_0192 && this.Registers[15] != 0x0800_0194 && this.Registers[15] != 0x0800_0196)
-            //{
-            //    if (this.Registers[15] != 0x0800_01a4 && this.Registers[15] != 0x0800_01a6 && this.Registers[15] != 0x0800_01a8 && this.Registers[15] != 0x0800_01aa && this.Registers[15] != 0x0800_01ac)
-            //    {
-            //        this.ShowInfo();
-            //        Console.ReadKey();
-            //    }
-            //}
         }
     }
 }
