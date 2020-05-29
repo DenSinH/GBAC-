@@ -12,7 +12,7 @@ namespace GBAEmulator.CPU
         private uint SPSR_fiq, SPSR_svc, SPSR_abt, SPSR_irq, SPSR_und;  // Saved Processor Status Registers
 
         private byte N, Z, C, V, I, F;
-        Mode mode = Mode.User;
+        public Mode mode { get; private set; } = Mode.User;
         private uint SR_RESERVED;
 
         private void ChangeMode(Mode NewMode)
@@ -20,8 +20,8 @@ namespace GBAEmulator.CPU
             if (NewMode == this.mode)
                 return;
 
-            //if (!Enum.IsDefined(typeof(Mode), NewMode))
-            //    throw new Exception($"Invalid mode {NewMode}");
+            if (!Enum.IsDefined(typeof(Mode), NewMode))
+                throw new Exception($"Invalid mode {NewMode}");
 
             bool FIQInvolved = (this.mode == Mode.FIQ) || (NewMode == Mode.FIQ);
 

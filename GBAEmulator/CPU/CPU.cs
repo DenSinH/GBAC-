@@ -10,7 +10,7 @@ namespace GBAEmulator.CPU
         /*
          Emulation of the ARM7TDMI CPU
         */
-        private State state;
+        public State state { get; private set; }
         private readonly Queue<uint> Pipeline = new Queue<uint>(3);
         GBA gba;
 
@@ -46,10 +46,10 @@ namespace GBAEmulator.CPU
             // need banked registers for CPSR initialization
             this.CPSR = 0x0000005F;
 
-            this.__MemoryRegions__ = new byte[15][]
+            this.__MemoryRegions__ = new byte[16][]
             {
                 this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
-                this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM
+                this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM, this.GamePakSRAM
             };
         }
 

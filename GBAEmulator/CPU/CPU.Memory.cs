@@ -16,24 +16,24 @@ namespace GBAEmulator.CPU
         private byte[] GamePakSRAM = new byte[0x10000]; // Game Pak Flash ROM (for saving game data)
 
         private readonly byte[][] __MemoryRegions__;  // Lookup table for memory regions for instant access (instead of switch statement)
-        private readonly uint[] __MemoryMasks__ = new uint[15]
+        private readonly uint[] __MemoryMasks__ = new uint[16]  // mirrored twice
         {
             0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
-            0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0xffff
+            0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0x1ff_ffff, 0xffff, 0xffff
         };
 
         // todo: waitstates / N & S cycles
         // Byte access cycles are equal to halfword access cycles
-        private readonly int[] __ByteAccessCycles__ = new int[15]
+        private readonly int[] __ByteAccessCycles__ = new int[16]
         {
             1, 1, 3, 1, 1, 1, 1, 1,
-            5, 5, 5, 5, 5, 5, 5
+            5, 5, 5, 5, 5, 5, 5, 5
         };
 
-        private readonly int[] __WordAccessCycles__ = new int[15]
+        private readonly int[] __WordAccessCycles__ = new int[16]
         {
             1, 1, 6, 1, 1, 2, 2, 1,
-            8, 8, 8, 8, 8, 8, 8
+            8, 8, 8, 8, 8, 8, 8, 8
         };
 
         enum MemorySection : byte
@@ -177,6 +177,7 @@ namespace GBAEmulator.CPU
         private byte GetByteAt(uint address)
         {
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
+
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
 
@@ -205,15 +206,56 @@ namespace GBAEmulator.CPU
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
 
-            //switch ((MemorySection)Section)
-            //{
-            //    case MemorySection.OAM:   // ignore OAM byte stores
-            //    case MemorySection.VRAM:  // ignore VRAM byte stores
-            //    case MemorySection.PaletteRAM:  // ignore PaletteRAM byte stores
-            //        this.Error("Attempted OAM/VRAM/PaletteRAM byte write");
-            //        break;
-            //}
-            
+            if (Section >= 5)
+            {
+                /*
+                 Writing 8bit Data to Video Memory
+                Video Memory (BG, OBJ, OAM, Palette) can be written to in 16bit and 32bit units only.
+                Attempts to write 8bit data (by STRB opcode) won't work:
+
+                Writes to OBJ (6010000h-6017FFFh) (or 6014000h-6017FFFh in Bitmap mode)
+                and to OAM (7000000h-70003FFh) are ignored, the memory content remains unchanged.
+
+                Writes to BG (6000000h-600FFFFh) (or 6000000h-6013FFFh in Bitmap mode)
+                and to Palette (5000000h-50003FFh) are writing the new 8bit value to BOTH upper and
+                lower 8bits of the addressed halfword, ie. "[addr AND NOT 1]=data*101h".
+                 */
+                switch ((MemorySection)Section)
+                {
+                    case MemorySection.VRAM:   // ignore OAM byte stores
+                        if (this.DISPCNT.BGMode >= 3)
+                        {
+                            if (address >= 0x0601_4000)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                this.VRAM[address & 0x17ffe] = value;
+                                this.VRAM[(address & 0x17ffe) | 1] = value;
+                                return;
+                            }
+                        }
+                        else if (address >= 0x0601_0000)
+                        {
+                            // non-bitmap modes
+                            return;
+                        }
+                        else
+                        {
+                            this.VRAM[address & 0xfffe] = value;
+                            this.VRAM[(address & 0xfffe) | 1] = value;
+                            return;
+                        }
+                    case MemorySection.OAM:
+                        return;
+                    case MemorySection.PaletteRAM:  // ignore PaletteRAM byte stores
+                        this.PaletteRAM[address & 0x3fe] = value;
+                        this.PaletteRAM[(address & 0x3fe) | 1] = value;
+                        return;
+                }
+            }
+
             if (__MemoryRegions__[Section] != null)
             {
                 this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]] = value;

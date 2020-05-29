@@ -109,14 +109,16 @@ namespace GBAEmulator.CPU
             this.IORAM[0x10a] = this.IORAM[0x10b] = new TimerRegister();
             this.IORAM[0x10c] = this.IORAM[0x10d] = new TimerRegister();
             this.IORAM[0x10e] = this.IORAM[0x10f] = new TimerRegister();
+            
+            this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(this.KEYCNT, this);
+            this.IORAM[0x0132] = this.IORAM[0x0133] = this.KEYCNT;
 
-            cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
-            this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(KEYCNT, this);
-            this.IORAM[0x0132] = this.IORAM[0x0133] = KEYCNT;
-
-            this.IORAM[0x0208] = this.IORAM[0x0209] = this.IME;
             this.IORAM[0x0200] = this.IORAM[0x0201] = this.IE;
             this.IORAM[0x0202] = this.IORAM[0x0203] = this.IF;
+
+            this.IORAM[0x0206] = this.IORAM[0x0207] = new UnusedRegister();  // unused
+            this.IORAM[0x0208] = this.IORAM[0x0209] = this.IME;
+            this.IORAM[0x020a] = this.IORAM[0x020b] = new UnusedRegister();  // unused IME bits
 
             this.IORAM[0x0300] = this.IORAM[0x0301] = this.HALTCNT;
         }

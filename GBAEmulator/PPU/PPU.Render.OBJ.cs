@@ -50,7 +50,7 @@ namespace GBAEmulator
 
             OBJSize OBJsz;
 
-            this.OAM2DMap = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.OBJVRamMapping);
+            this.OAM2DMap = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.OBJVRAMMapping);
 
             for (ushort i = 0; i < 0x400; i += 8)  // 128 objects in OAM
             {

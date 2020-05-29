@@ -163,10 +163,26 @@ namespace GBAEmulator.CPU
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetCVAddC(ulong Op1, ulong Op2, uint C, uint Result)
+        {
+            // for ADC
+            this.C = (byte)(Op1 + Op2 + C> 0xffff_ffff ? 1 : 0);
+            this.V = (byte)(((Op1 ^ Result) & (~Op1 ^ Op2)) >> 31);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetCVSub(ulong Op1, ulong Op2, uint Result)
         {
             // for Op1 - Op2
             this.C = (byte)(Op2 <= Op1 ? 1 : 0);
+            this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetCVSubC(ulong Op1, ulong Op2, uint C, uint Result)
+        {
+            // for Op1 - Op2
+            this.C = (byte)(Op2 + 1 - C <= Op1 ? 1 : 0);
             this.V = (byte)(((Op1 ^ Op2) & (~Op2 ^ Result)) >> 31);
         }
 

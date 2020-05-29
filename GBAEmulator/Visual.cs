@@ -16,6 +16,7 @@ namespace GBAEmulator
 
         private const int width = 240;
         private const int height = 160;
+        private const int MenuStripHeight = 20;
         private const double scale = 2;
 
         private const byte interval = 17; // ms
@@ -23,12 +24,16 @@ namespace GBAEmulator
 
         private GBA gba;
 
+        private Debug DebugScreen;
+        private bool DebugActive;
+
         public Visual(GBA gba)
         {
             InitializeComponent();
-            this.ClientSize = new Size((int)(scale * width), (int)(scale * height));
+            this.ClientSize = new Size((int)(scale * width), (int)(scale * height) + MenuStripHeight);
 
             this.gba = gba;
+            this.DebugScreen = new Debug(gba);
             this._display = new ushort[width * height];
 
             // disable resizing
@@ -49,6 +54,33 @@ namespace GBAEmulator
             timer.Tick += new EventHandler(Tick);
             timer.Start();
 
+            MenuStrip ms = new MenuStrip();
+            ToolStripMenuItem GameMenu = new ToolStripMenuItem("Game");
+            ToolStripMenuItem GameOpenItem = new ToolStripMenuItem("Open", null, new EventHandler(LoadGame));
+            ToolStripMenuItem GameDebugItem = new ToolStripMenuItem("Debug", null, new EventHandler(OpenDebug));
+
+            GameMenu.DropDownItems.Add(GameOpenItem);
+            GameMenu.DropDownItems.Add(GameDebugItem);
+            ((ToolStripDropDownMenu)(GameMenu.DropDown)).ShowImageMargin = false;
+            ((ToolStripDropDownMenu)(GameMenu.DropDown)).ShowCheckMargin = false;
+
+            // Assign the ToolStripMenuItem that displays 
+            // the list of child forms.
+            ms.MdiWindowListItem = GameMenu;
+
+            // Add the window ToolStripMenuItem to the MenuStrip.
+            ms.Items.Add(GameMenu);
+
+            // Dock the MenuStrip to the top of the form.
+            ms.Dock = DockStyle.Top;
+
+            // The Form.MainMenuStrip property determines the merge target.
+            this.MainMenuStrip = ms;
+
+            // Add the MenuStrip last.
+            // This is important for correct placement in the z-order.
+            this.Controls.Add(ms);
+
             this.Load += new EventHandler(Visual_CreateBackBuffer);
             this.Paint += new PaintEventHandler(Visual_Paint);
 
@@ -58,6 +90,7 @@ namespace GBAEmulator
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             this.gba.ShutDown = true;
+            this.DebugScreen?.Close();
             base.OnFormClosing(e);
         }
 
@@ -106,7 +139,7 @@ namespace GBAEmulator
             {
                 // no image scaling for crisp pixels!
                 e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                e.Graphics.DrawImage(this.Backbuffer, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
+                e.Graphics.DrawImage(this.Backbuffer, 0, MenuStripHeight, this.ClientSize.Width, this.ClientSize.Height - MenuStripHeight);
             }
         }
 
@@ -151,12 +184,29 @@ namespace GBAEmulator
             }
         }
 
+        private void LoadGame(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OpenDebug(object sender, EventArgs e)
+        {
+            this.DebugScreen.Show();
+            this.DebugActive = true;
+        }
+
         private void Tick(object sender, EventArgs e)
         {
             Draw();
 
             time += interval;
             this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.RomName, (1000 * this.gba.ppu.frame / this.time));
+
+            if (this.DebugActive)
+            {
+                this.DebugScreen.UpdateAll();
+            }
+
             if (time > 2000)
             {
                 this.gba.ppu.frame = 0;

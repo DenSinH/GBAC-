@@ -5,6 +5,21 @@ using System.Diagnostics;
 
 namespace GBAEmulator.CPU
 {
+    public struct InterruptControlInfo
+    {
+        public string KEYCNT, IME, HALTCNT;
+        public ushort IE, IF;
+
+        public InterruptControlInfo(string KEYCNT, string IME, ushort IE, ushort IF, string HALTCNT)
+        {
+            this.KEYCNT = KEYCNT;
+            this.IME = IME;
+            this.IE = IE;
+            this.IF = IF;
+            this.HALTCNT = HALTCNT;
+        }
+    }
+
     partial class ARM7TDMI
     {
         public bool pause;
@@ -21,6 +36,14 @@ namespace GBAEmulator.CPU
             Console.WriteLine(message);
         }
 
+        public InterruptControlInfo GetInterruptControl()
+        {
+            return new InterruptControlInfo(
+                this.KEYCNT.Mask.ToString("x4"), this.IME.Enabled ? "1" : "0", this.IE.raw,
+                this.IF.raw, this.HALTCNT.Halt ? "1" : "0"
+            );
+        }
+
         public void ShowInfo()
         {
             Console.WriteLine(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + " " + this.VCOUNT.CurrentScanline.ToString("x2"));
@@ -29,7 +52,7 @@ namespace GBAEmulator.CPU
         public void InterruptInfo()
         {
             Console.WriteLine($"HALTCNT: {this.HALTCNT.Halt}, CPSR-I: {this.I}");
-            Console.WriteLine($"IME disable all: {this.IME.DisableAll}, IE: {this.IE.raw.ToString("x8")}, IF: {this.IF.raw.ToString("x8")}");
+            Console.WriteLine($"IME enabled: {this.IME.Enabled}, IE: {this.IE.raw.ToString("x8")}, IF: {this.IF.raw.ToString("x8")}");
         }
 
         public void DumpPAL()

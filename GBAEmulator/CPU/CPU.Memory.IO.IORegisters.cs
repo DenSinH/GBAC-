@@ -23,8 +23,8 @@ namespace GBAEmulator.CPU
         {
             CGBMode = 0x0008,
             DPFrameSelect = 0x0010,
-            HBLankIntervalFree = 0x0020,
-            OBJVRamMapping = 0x0040,
+            HBlankIntervalFree = 0x0020,
+            OBJVRAMMapping = 0x0040,
             ForcedBlank = 0x0080,
 
             DisplayOBJ = 0x1000,
@@ -456,14 +456,16 @@ namespace GBAEmulator.CPU
                 get => (this._raw & 0x8000) > 0;
             }
         }
+
+        cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
         #endregion
 
         #region Interrupt Control
         public class cIME : IORegister2  // Interrupt Master Enable
         {
-            public bool DisableAll
+            public bool Enabled
             {
-                get => (this._raw & 0x01) == 0;
+                get => (this._raw & 0x01) > 0;
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
