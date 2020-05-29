@@ -71,7 +71,7 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.F4)
             {
-                // this.gba.cpu.DoIRQ();
+                this.gba.cpu.ShowEWRAMAt(0x40000 - 4);
             }
             else if (e.KeyCode == Keys.O)
             {

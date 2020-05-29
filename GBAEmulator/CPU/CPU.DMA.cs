@@ -41,7 +41,7 @@ namespace GBAEmulator.CPU
             this.UpdateDMAAddress(dmadad, dmacnt_h.DestAddrControl, UnitLength);
             dmacnt_l.UnitCount--;
 
-            if (dmacnt_l.UnitCount == 0)
+            if (dmacnt_l.Empty)
                 this.EndDMA(dmacnt_h, dmacnt_l, dmasad, dmadad);
         }
 

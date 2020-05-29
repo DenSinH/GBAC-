@@ -463,7 +463,7 @@ namespace GBAEmulator.CPU
         {
             public bool DisableAll
             {
-                get => (this._raw & 0x01) > 0;
+                get => (this._raw & 0x01) == 0;
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
@@ -608,6 +608,11 @@ namespace GBAEmulator.CPU
                 set => this.InternalRegister = value;
             }
 
+            public bool Empty
+            {
+                get => this.InternalRegister == 0;
+            }
+
             public void Reload()
             {
                 this.InternalRegister = this._raw;
@@ -745,14 +750,14 @@ namespace GBAEmulator.CPU
         {
             public override ushort Get()
             {
-                Console.WriteLine("Timer read");
+                // Console.WriteLine("Timer read");
                 return base.Get();
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
                 base.Set(value, setlow, sethigh);
-                Console.WriteLine($"Timer set to {value}");
+                // Console.WriteLine($"Timer set to {value}");
             }
         }
         #endregion

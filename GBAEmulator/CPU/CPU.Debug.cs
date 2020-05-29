@@ -138,7 +138,12 @@ namespace GBAEmulator.CPU
 
         public void ShowIWRAMAt(uint address)
         {
-            Console.WriteLine(string.Format("iWRAM[${0:x8}] : {1}", address, __GetWordAt__(this.iWRAM, address)));
+            Console.WriteLine(string.Format("iWRAM[${0:x8}] : {1:x8}", address, __GetWordAt__(this.iWRAM, address)));
+        }
+
+        public void ShowEWRAMAt(uint address)
+        {
+            Console.WriteLine(string.Format("eWRAM[${0:x8}] : {1:x8}", address, __GetWordAt__(this.eWRAM, address)));
         }
 
     }

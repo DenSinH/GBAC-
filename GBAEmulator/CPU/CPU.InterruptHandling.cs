@@ -29,13 +29,13 @@ namespace GBAEmulator.CPU
         {
             if ((this.IF.raw & this.IE.raw) != 0)
             {
+                this.HALTCNT.Halt = false;
+
                 if ((!this.IME.DisableAll) && (this.I == 0))
                 {
                     this.DoIRQ();
                     return true;
                 }
-
-                this.HALTCNT.Halt = false;
             }
             return false;
         }
