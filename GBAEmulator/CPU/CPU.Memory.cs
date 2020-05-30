@@ -89,15 +89,7 @@ namespace GBAEmulator.CPU
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __WordAccessCycles__[Section];
             this.SCycle = __WordAccessCycles__[Section];
-
-            //if (address >= 0x0600_8000 && address < 0x0600_c000)
-            //{
-            //    //Console.WriteLine("word: " + address.ToString("x8"));
-            //    //Console.WriteLine(this.PC.ToString("x8"));
-            //    if (this.PC < 0x0800_0000)
-            //        return;
-            //}
-
+            
             if (__MemoryRegions__[Section] != null)
             {
                 __SetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);

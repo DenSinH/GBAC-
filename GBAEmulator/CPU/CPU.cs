@@ -85,38 +85,30 @@ namespace GBAEmulator.CPU
         bool manual;
         public int Step()
         {
-            if (this.Pipeline.Count == 1)
-            {
-                //this.ShowInfo();
-                //if (this.GetWordAt(0x0300_78a8) == 0x0300_7a93)
-                //{
-                //    Console.WriteLine(this.PC.ToString("x8"));
-                //    Console.WriteLine("WRONG STORE");
-                //    Console.ReadKey();
-                //}
+            //if (this.Pipeline.Count == 1)
+            //{
+            //    if (pause || this.PC == 0x0800_0b56)
+            //    {
+            //        pause = true;
+            //        if (this.PC == 0x0800_0b56)
+            //            Console.WriteLine("BREAKPOINT HIT!!!!!!!!!!!!!!");
 
-                //if (pause || this.PC == 0x0800_0b56)
-                //{
-                //    pause = true;
-                //    if (this.PC == 0x0800_0b56)
-                //        Console.WriteLine("BREAKPOINT HIT!!!!!!!!!!!!!!");
+            //        string Line = SBB_AFF_TEST.ReadLine();
 
-                //    string Line = SBB_AFF_TEST.ReadLine();
-
-                //    Console.WriteLine("LOG: " + Line);
-                //    Console.Write("ACT: ");
-                //    this.ShowInfo();
-                //    if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
-                //    {
-                //        if (this.Registers[7] != 0x03007a93)
-                //            manual = true;
-                //    }
-                //    if (manual)
-                //    {
-                //        manual = Console.ReadKey().KeyChar == ' ';
-                //    }
-                //}
-            }
+            //        Console.WriteLine("LOG: " + Line);
+            //        Console.Write("ACT: ");
+            //        this.ShowInfo();
+            //        if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //        {
+            //            if (this.Registers[7] != 0x03007a93)
+            //                manual = true;
+            //        }
+            //        if (manual)
+            //        {
+            //            manual = Console.ReadKey().KeyChar == ' ';
+            //        }
+            //    }
+            //}
 
             this.HandleIRQs();
 

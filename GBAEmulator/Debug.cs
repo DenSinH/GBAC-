@@ -17,11 +17,16 @@ namespace GBAEmulator
         private GCHandle _rawBitmap;
         private ushort[] RawCharBlock;
 
-        const int CharBlockSize = 32 * 8;
+        const int CharBlockSize = 16 * 8;
 
         public Debug(GBA gba)
         {
             InitializeComponent();
+
+            // disable resizing
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MinimizeBox = false;
+            this.MaximizeBox = false;
 
             this.gba = gba;
             this.CharBlocks = new PictureBox[4] { this.CharBlock0, this.CharBlock1, this.CharBlock2, this.CharBlock3 };
@@ -64,23 +69,23 @@ namespace GBAEmulator
         private void UpdateDISPCNT()
         {
             this.BGMode.Text = this.gba.cpu.DISPCNT.BGMode.ToString();
-            this.DPFrameSelect.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.DPFrameSelect) ? "0" : "1";
-            this.HBlankIntervalFree.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.HBlankIntervalFree) ? "0" : "1";
-            this.OBJVRAMMapping.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.OBJVRAMMapping) ? "0" : "1";
-            this.ForcedBlank.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.ForcedBlank) ? "0" : "1";
-            this.Window0Display.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.WindowDisplay0) ? "0" : "1";
-            this.Window1Display.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.WindowDisplay1) ? "0" : "1";
-            this.OBJWindowDisplay.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.OBJWindowDisplay) ? "0" : "1";
+            this.DPFrameSelect.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.DPFrameSelect) ? "1" : "0";
+            this.HBlankIntervalFree.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.HBlankIntervalFree) ? "1" : "0";
+            this.OBJVRAMMapping.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.OBJVRAMMapping) ? "1" : "0";
+            this.ForcedBlank.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.ForcedBlank) ? "1" : "0";
+            this.Window0Display.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.WindowDisplay0) ? "1" : "0";
+            this.Window1Display.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.WindowDisplay1) ? "1" : "0";
+            this.OBJWindowDisplay.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.OBJWindowDisplay) ? "1" : "0";
         }
 
         private void UpdateDISPSTAT()
         {
-            this.VBlankFlag.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VBlankFlag) ? "0" : "1";
-            this.HBlankFlag.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.HBlankFlag) ? "0" : "1";
-            this.VCounterFlag.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VCounterFlag) ? "0" : "1";
-            this.VBlankIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VBlankIRQEnable) ? "0" : "1";
-            this.HBlankIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.HBlankIRQEnable) ? "0" : "1";
-            this.VCountIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VCounterIRQEnable) ? "0" : "1";
+            this.VBlankFlag.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VBlankFlag) ? "1" : "0";
+            this.HBlankFlag.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.HBlankFlag) ? "1" : "0";
+            this.VCounterFlag.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VCounterFlag) ? "1" : "0";
+            this.VBlankIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VBlankIRQEnable) ? "1" : "0";
+            this.HBlankIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.HBlankIRQEnable) ? "1" : "0";
+            this.VCountIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(CPU.ARM7TDMI.DISPSTATFlags.VCounterIRQEnable) ? "1" : "0";
             this.VCountSetting.Text = this.gba.cpu.DISPSTAT.VCountSetting.ToString("d3");
         }
 
@@ -132,20 +137,13 @@ namespace GBAEmulator
 
             for (uint dTileY = 0; dTileY < 8; dTileY++)  // 16 to not go out of range
             {
-                for (uint dTileX = 0; dTileX < 32; dTileX++)
+                for (uint dTileX = 0; dTileX < 16; dTileX++)
                 {
                     for (uint y = 0; y < 8; y++)
                     {
                         for (uint x = 0; x < 8; x++)
                         {
                             PixelAddress = Address + 8 * y + x;
-
-                            if (this.gba.cpu.VRAM[PixelAddress] == 0)
-                            {
-                                this.RawCharBlock[CharBlockSize * (8 * dTileY + y) + 8 * dTileX + x] = 0;
-                                continue;
-                            }
-
                             this.RawCharBlock[CharBlockSize * (8 * dTileY + y) + 8 * dTileX + x] = 
                                 this.GetPaletteEntry(2 * (uint)this.gba.cpu.VRAM[PixelAddress]);
                         }
@@ -164,7 +162,7 @@ namespace GBAEmulator
 
             for (uint dTileY = 0; dTileY < 16; dTileY++)
             {
-                for (uint dTileX = 0; dTileX < 32; dTileX++)
+                for (uint dTileX = 0; dTileX < 16; dTileX++)
                 {
                     for (uint y = 0; y < 8; y++)
                     {
@@ -176,11 +174,6 @@ namespace GBAEmulator
                             if ((x & 1) == 1) PaletteNibble >>= 4;
 
                             PaletteNibble &= 0x0f;
-                            if (PaletteNibble == 0)
-                            {
-                                this.RawCharBlock[CharBlockSize * (8 * dTileY + y) + 8 * dTileX + x] = 0;
-                                continue;
-                            }
 
                             this.RawCharBlock[CharBlockSize * (8 * dTileY + y) + 8 * dTileX + x] =
                                 this.GetPaletteEntry(2 * PaletteNibble);

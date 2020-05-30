@@ -16,7 +16,7 @@ namespace GBAEmulator
 
         private const int width = 240;
         private const int height = 160;
-        private const int MenuStripHeight = 20;
+        private readonly int MenuStripHeight;
         private const double scale = 2;
 
         private const byte interval = 17; // ms
@@ -30,6 +30,9 @@ namespace GBAEmulator
         public Visual(GBA gba)
         {
             InitializeComponent();
+            MenuStrip ms = new MenuStrip();
+            MenuStripHeight = ms.Bounds.Height;
+
             this.ClientSize = new Size((int)(scale * width), (int)(scale * height) + MenuStripHeight);
 
             this.gba = gba;
@@ -54,7 +57,6 @@ namespace GBAEmulator
             timer.Tick += new EventHandler(Tick);
             timer.Start();
 
-            MenuStrip ms = new MenuStrip();
             ToolStripMenuItem GameMenu = new ToolStripMenuItem("Game");
             ToolStripMenuItem GameOpenItem = new ToolStripMenuItem("Open", null, new EventHandler(LoadGame));
             ToolStripMenuItem GameDebugItem = new ToolStripMenuItem("Debug", null, new EventHandler(OpenDebug));

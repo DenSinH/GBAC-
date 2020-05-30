@@ -89,7 +89,9 @@ namespace GBAEmulator.CPU
                 {
                     this._raw |= 1;
                     if (this.IsSet(DISPSTATFlags.VBlankIRQEnable))
+                    {
                         this.cpu.IF.Request(Interrupt.LCDVBlank);
+                    }
                 }
                 else
                     this._raw &= 0xfffe;
@@ -130,7 +132,9 @@ namespace GBAEmulator.CPU
                 {
                     this._raw = (ushort)((this._raw & 0xff00) | value);
                     if (this.cpu.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable) && (value == this.cpu.DISPSTAT.VCountSetting))
+                    {
                         this.cpu.IF.Request(Interrupt.LCDVCountMatch);
+                    }
                 }
             }
 
