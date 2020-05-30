@@ -225,7 +225,7 @@ namespace GBAEmulator.CPU
             Word8 = (uint)(Instruction & 0x00ff) << 2;
             uint Address = SP + Word8;
 
-            this.Log(string.Format("Load/Store halfword, Mem[SP + {0:x4} << 1] <-> R{1}", Word8, Rd));
+            this.Log(string.Format("Load/Store SP-relative, Mem[SP + {0:x4} << 1] <-> R{1}", Word8, Rd));
 
             if (LoadFromMemory)
             {

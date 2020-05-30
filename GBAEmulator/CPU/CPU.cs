@@ -2,6 +2,8 @@
 using System.IO;
 using System.Collections.Generic;
 
+using System.Linq;
+
 
 namespace GBAEmulator.CPU
 {
@@ -14,6 +16,7 @@ namespace GBAEmulator.CPU
         private readonly Queue<uint> Pipeline = new Queue<uint>(3);
         GBA gba;
 
+        StreamReader SBB_AFF_TEST = new StreamReader("../../Tests/sbb_aff_long.log");
         public ARM7TDMI(GBA gba)
         {
             this.gba = gba;
@@ -78,9 +81,43 @@ namespace GBAEmulator.CPU
         {
             this.Pipeline.Clear();
         }
-        
+
+        bool manual;
         public int Step()
         {
+            if (this.Pipeline.Count == 1)
+            {
+                //this.ShowInfo();
+                //if (this.GetWordAt(0x0300_78a8) == 0x0300_7a93)
+                //{
+                //    Console.WriteLine(this.PC.ToString("x8"));
+                //    Console.WriteLine("WRONG STORE");
+                //    Console.ReadKey();
+                //}
+
+                //if (pause || this.PC == 0x0800_0b56)
+                //{
+                //    pause = true;
+                //    if (this.PC == 0x0800_0b56)
+                //        Console.WriteLine("BREAKPOINT HIT!!!!!!!!!!!!!!");
+
+                //    string Line = SBB_AFF_TEST.ReadLine();
+
+                //    Console.WriteLine("LOG: " + Line);
+                //    Console.Write("ACT: ");
+                //    this.ShowInfo();
+                //    if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+                //    {
+                //        if (this.Registers[7] != 0x03007a93)
+                //            manual = true;
+                //    }
+                //    if (manual)
+                //    {
+                //        manual = Console.ReadKey().KeyChar == ' ';
+                //    }
+                //}
+            }
+
             this.HandleIRQs();
 
             if (this.HALTCNT.Halt)

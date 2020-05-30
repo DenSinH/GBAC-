@@ -33,7 +33,8 @@ namespace GBAEmulator.CPU
         [Conditional("DEBUG")]
         private void Log(string message)
         {
-            Console.WriteLine(message);
+            if (pause)
+                Console.WriteLine(message);
         }
 
         public InterruptControlInfo GetInterruptControl()
@@ -46,7 +47,7 @@ namespace GBAEmulator.CPU
 
         public void ShowInfo()
         {
-            Console.WriteLine(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + " " + this.VCOUNT.CurrentScanline.ToString("x2"));
+            Console.WriteLine(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}");
         }
 
         public void InterruptInfo()

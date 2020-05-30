@@ -77,6 +77,7 @@ namespace GBAEmulator.CPU
                 case 0b1001:  // NEG
                     this.Log(string.Format("-R{0} -> R{1}", Rs, Rd));
                     Result = (uint)-Op2;
+                    this.SetCVSub(0, Op2, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b1010:  // CMP

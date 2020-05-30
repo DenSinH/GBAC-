@@ -260,7 +260,7 @@ namespace GBAEmulator
                     ScreenEntryIndex += (uint)(ScreenBaseBlock * 0x800);
 
                     ScreenEntry = (ushort)(this.gba.cpu.VRAM[ScreenEntryIndex + 1] << 8 | this.gba.cpu.VRAM[ScreenEntryIndex]);
-
+                    
                     this.DrawRegularScreenEntry(ref this.BGScanlines[BG], (CourseX * 8) - (HOFS & 0x07), (byte)(EffectiveY & 0x07),
                         ScreenEntry, CharBaseBlock, ColorMode, Mosaic, this.gba.cpu.MOSAIC.BGMosaicHSize);
                 }

@@ -29,30 +29,45 @@
         private void InitializeComponent()
         {
             this.Tabs = new System.Windows.Forms.TabControl();
-            this.PalettePage = new System.Windows.Forms.TabPage();
-            this.OBJPaletteLabel = new System.Windows.Forms.Label();
-            this.BGPaletteLabel = new System.Windows.Forms.Label();
-            this.OBJPalette = new System.Windows.Forms.PictureBox();
-            this.BGPalette = new System.Windows.Forms.PictureBox();
             this.Registers = new System.Windows.Forms.TabPage();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.DISPCNTLabel = new System.Windows.Forms.Label();
-            this.BGModeLabel = new System.Windows.Forms.Label();
-            this.DPFrameSelectLabel = new System.Windows.Forms.Label();
-            this.HBlankIntervalFreeLabel = new System.Windows.Forms.Label();
-            this.OBJVRAMMappingLabel = new System.Windows.Forms.Label();
-            this.ForcedBlankLabel = new System.Windows.Forms.Label();
-            this.Window0DisplayLabel = new System.Windows.Forms.Label();
-            this.Window1DisplayLabel = new System.Windows.Forms.Label();
-            this.OBJWindowDisplayLabel = new System.Windows.Forms.Label();
-            this.BGMode = new System.Windows.Forms.Label();
-            this.DPFrameSelect = new System.Windows.Forms.Label();
-            this.HBlankIntervalFree = new System.Windows.Forms.Label();
-            this.OBJVRAMMapping = new System.Windows.Forms.Label();
-            this.ForcedBlank = new System.Windows.Forms.Label();
-            this.Window0Display = new System.Windows.Forms.Label();
-            this.Window1Display = new System.Windows.Forms.Label();
-            this.OBJWindowDisplay = new System.Windows.Forms.Label();
+            this.IFGamePak = new System.Windows.Forms.Label();
+            this.IFKeypad = new System.Windows.Forms.Label();
+            this.IFDMA = new System.Windows.Forms.Label();
+            this.IFSIO = new System.Windows.Forms.Label();
+            this.IFTimers = new System.Windows.Forms.Label();
+            this.IFVCOUNT = new System.Windows.Forms.Label();
+            this.IFHBlank = new System.Windows.Forms.Label();
+            this.IFVBlank = new System.Windows.Forms.Label();
+            this.IEGamePak = new System.Windows.Forms.Label();
+            this.IEGamePakLabel = new System.Windows.Forms.Label();
+            this.IEKeypad = new System.Windows.Forms.Label();
+            this.IEKeypadLabel = new System.Windows.Forms.Label();
+            this.IEDMA = new System.Windows.Forms.Label();
+            this.IEDMALabel = new System.Windows.Forms.Label();
+            this.IESIO = new System.Windows.Forms.Label();
+            this.IESIOLabel = new System.Windows.Forms.Label();
+            this.IETimers = new System.Windows.Forms.Label();
+            this.IETimersLabel = new System.Windows.Forms.Label();
+            this.IEVCOUNT = new System.Windows.Forms.Label();
+            this.IEVCountLabel = new System.Windows.Forms.Label();
+            this.IEHBlank = new System.Windows.Forms.Label();
+            this.IEHBlankLabel = new System.Windows.Forms.Label();
+            this.IEVBlank = new System.Windows.Forms.Label();
+            this.IEVBlankLabel = new System.Windows.Forms.Label();
+            this.SWILabel = new System.Windows.Forms.Label();
+            this.IRQLabel = new System.Windows.Forms.Label();
+            this.HALTCNT = new System.Windows.Forms.Label();
+            this.HALTCNTLabel = new System.Windows.Forms.Label();
+            this.IFLabel = new System.Windows.Forms.Label();
+            this.IELabel = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.IME = new System.Windows.Forms.Label();
+            this.IMELabel = new System.Windows.Forms.Label();
+            this.KEYCNT = new System.Windows.Forms.Label();
+            this.KEYCNTLabel = new System.Windows.Forms.Label();
+            this.VCOUNT = new System.Windows.Forms.Label();
+            this.VCountLabel = new System.Windows.Forms.Label();
             this.VCountSetting = new System.Windows.Forms.Label();
             this.VCountIRQEnable = new System.Windows.Forms.Label();
             this.HBlankIRQEnable = new System.Windows.Forms.Label();
@@ -68,111 +83,81 @@
             this.HBlankFlagLabel = new System.Windows.Forms.Label();
             this.VBlankFlagLabel = new System.Windows.Forms.Label();
             this.DISPSTAT = new System.Windows.Forms.Label();
-            this.VCountLabel = new System.Windows.Forms.Label();
-            this.VCOUNT = new System.Windows.Forms.Label();
-            this.KEYCNT = new System.Windows.Forms.Label();
-            this.KEYCNTLabel = new System.Windows.Forms.Label();
-            this.IME = new System.Windows.Forms.Label();
-            this.IMELabel = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.IELabel = new System.Windows.Forms.Label();
-            this.IFLabel = new System.Windows.Forms.Label();
-            this.HALTCNT = new System.Windows.Forms.Label();
-            this.HALTCNTLabel = new System.Windows.Forms.Label();
-            this.IRQLabel = new System.Windows.Forms.Label();
-            this.SWILabel = new System.Windows.Forms.Label();
-            this.IEVBlankLabel = new System.Windows.Forms.Label();
-            this.IEVBlank = new System.Windows.Forms.Label();
-            this.IEHBlank = new System.Windows.Forms.Label();
-            this.IEHBlankLabel = new System.Windows.Forms.Label();
-            this.IEVCOUNT = new System.Windows.Forms.Label();
-            this.IEVCountLabel = new System.Windows.Forms.Label();
-            this.IETimers = new System.Windows.Forms.Label();
-            this.IETimersLabel = new System.Windows.Forms.Label();
-            this.IESIO = new System.Windows.Forms.Label();
-            this.IESIOLabel = new System.Windows.Forms.Label();
-            this.IEDMA = new System.Windows.Forms.Label();
-            this.IEDMALabel = new System.Windows.Forms.Label();
-            this.IEKeypad = new System.Windows.Forms.Label();
-            this.IEKeypadLabel = new System.Windows.Forms.Label();
-            this.IEGamePak = new System.Windows.Forms.Label();
-            this.IEGamePakLabel = new System.Windows.Forms.Label();
-            this.IFGamePak = new System.Windows.Forms.Label();
-            this.IFKeypad = new System.Windows.Forms.Label();
-            this.IFDMA = new System.Windows.Forms.Label();
-            this.IFSIO = new System.Windows.Forms.Label();
-            this.IFTimers = new System.Windows.Forms.Label();
-            this.IFVCOUNT = new System.Windows.Forms.Label();
-            this.IFHBlank = new System.Windows.Forms.Label();
-            this.IFVBlank = new System.Windows.Forms.Label();
+            this.OBJWindowDisplay = new System.Windows.Forms.Label();
+            this.Window1Display = new System.Windows.Forms.Label();
+            this.Window0Display = new System.Windows.Forms.Label();
+            this.ForcedBlank = new System.Windows.Forms.Label();
+            this.OBJVRAMMapping = new System.Windows.Forms.Label();
+            this.HBlankIntervalFree = new System.Windows.Forms.Label();
+            this.DPFrameSelect = new System.Windows.Forms.Label();
+            this.BGMode = new System.Windows.Forms.Label();
+            this.OBJWindowDisplayLabel = new System.Windows.Forms.Label();
+            this.Window1DisplayLabel = new System.Windows.Forms.Label();
+            this.Window0DisplayLabel = new System.Windows.Forms.Label();
+            this.ForcedBlankLabel = new System.Windows.Forms.Label();
+            this.OBJVRAMMappingLabel = new System.Windows.Forms.Label();
+            this.HBlankIntervalFreeLabel = new System.Windows.Forms.Label();
+            this.DPFrameSelectLabel = new System.Windows.Forms.Label();
+            this.BGModeLabel = new System.Windows.Forms.Label();
+            this.DISPCNTLabel = new System.Windows.Forms.Label();
+            this.PalettePage = new System.Windows.Forms.TabPage();
+            this.OBJPaletteLabel = new System.Windows.Forms.Label();
+            this.BGPaletteLabel = new System.Windows.Forms.Label();
+            this.OBJPalette = new System.Windows.Forms.PictureBox();
+            this.BGPalette = new System.Windows.Forms.PictureBox();
+            this.CharBlocksTab = new System.Windows.Forms.TabPage();
+            this.CharBlockTabs = new System.Windows.Forms.TabControl();
+            this.CharBlock0Tab = new System.Windows.Forms.TabPage();
+            this.CharBlock0 = new System.Windows.Forms.PictureBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.CharBlock1 = new System.Windows.Forms.PictureBox();
+            this.CharBlock2Tab = new System.Windows.Forms.TabPage();
+            this.CharBlock2 = new System.Windows.Forms.PictureBox();
+            this.CharBlock3Tab = new System.Windows.Forms.TabPage();
+            this.CharBlock3 = new System.Windows.Forms.PictureBox();
+            this.CharBlock1ColorMode = new System.Windows.Forms.GroupBox();
+            this.CharBlock14bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock18bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock0ColorMode = new System.Windows.Forms.GroupBox();
+            this.CharBlock08bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock04bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock2ColorMode = new System.Windows.Forms.GroupBox();
+            this.CharBlock28bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock24bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock3ColorMode = new System.Windows.Forms.GroupBox();
+            this.CharBlock38bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock34bpp = new System.Windows.Forms.RadioButton();
             this.Tabs.SuspendLayout();
+            this.Registers.SuspendLayout();
             this.PalettePage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.OBJPalette)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.BGPalette)).BeginInit();
-            this.Registers.SuspendLayout();
+            this.CharBlocksTab.SuspendLayout();
+            this.CharBlockTabs.SuspendLayout();
+            this.CharBlock0Tab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock0)).BeginInit();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock1)).BeginInit();
+            this.CharBlock2Tab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock2)).BeginInit();
+            this.CharBlock3Tab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock3)).BeginInit();
+            this.CharBlock1ColorMode.SuspendLayout();
+            this.CharBlock0ColorMode.SuspendLayout();
+            this.CharBlock2ColorMode.SuspendLayout();
+            this.CharBlock3ColorMode.SuspendLayout();
             this.SuspendLayout();
             // 
             // Tabs
             // 
             this.Tabs.Controls.Add(this.Registers);
             this.Tabs.Controls.Add(this.PalettePage);
-            this.Tabs.Controls.Add(this.tabPage1);
+            this.Tabs.Controls.Add(this.CharBlocksTab);
             this.Tabs.Location = new System.Drawing.Point(12, 12);
             this.Tabs.Name = "Tabs";
             this.Tabs.SelectedIndex = 0;
             this.Tabs.Size = new System.Drawing.Size(796, 576);
             this.Tabs.TabIndex = 0;
-            // 
-            // PalettePage
-            // 
-            this.PalettePage.Controls.Add(this.OBJPaletteLabel);
-            this.PalettePage.Controls.Add(this.BGPaletteLabel);
-            this.PalettePage.Controls.Add(this.OBJPalette);
-            this.PalettePage.Controls.Add(this.BGPalette);
-            this.PalettePage.Location = new System.Drawing.Point(4, 22);
-            this.PalettePage.Name = "PalettePage";
-            this.PalettePage.Padding = new System.Windows.Forms.Padding(3);
-            this.PalettePage.Size = new System.Drawing.Size(1154, 582);
-            this.PalettePage.TabIndex = 0;
-            this.PalettePage.Text = "Palette";
-            this.PalettePage.UseVisualStyleBackColor = true;
-            // 
-            // OBJPaletteLabel
-            // 
-            this.OBJPaletteLabel.AutoSize = true;
-            this.OBJPaletteLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OBJPaletteLabel.Location = new System.Drawing.Point(277, 3);
-            this.OBJPaletteLabel.Name = "OBJPaletteLabel";
-            this.OBJPaletteLabel.Size = new System.Drawing.Size(94, 20);
-            this.OBJPaletteLabel.TabIndex = 3;
-            this.OBJPaletteLabel.Text = "OBJ Palette";
-            // 
-            // BGPaletteLabel
-            // 
-            this.BGPaletteLabel.AutoSize = true;
-            this.BGPaletteLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BGPaletteLabel.Location = new System.Drawing.Point(3, 3);
-            this.BGPaletteLabel.Name = "BGPaletteLabel";
-            this.BGPaletteLabel.Size = new System.Drawing.Size(149, 20);
-            this.BGPaletteLabel.TabIndex = 2;
-            this.BGPaletteLabel.Text = "Background Palette";
-            // 
-            // OBJPalette
-            // 
-            this.OBJPalette.Location = new System.Drawing.Point(281, 26);
-            this.OBJPalette.Name = "OBJPalette";
-            this.OBJPalette.Size = new System.Drawing.Size(272, 272);
-            this.OBJPalette.TabIndex = 1;
-            this.OBJPalette.TabStop = false;
-            // 
-            // BGPalette
-            // 
-            this.BGPalette.Location = new System.Drawing.Point(3, 26);
-            this.BGPalette.Name = "BGPalette";
-            this.BGPalette.Size = new System.Drawing.Size(272, 272);
-            this.BGPalette.TabIndex = 0;
-            this.BGPalette.TabStop = false;
             // 
             // Registers
             // 
@@ -254,185 +239,387 @@
             this.Registers.Text = "Registers";
             this.Registers.UseVisualStyleBackColor = true;
             // 
-            // tabPage1
+            // IFGamePak
             // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1154, 582);
-            this.tabPage1.TabIndex = 2;
-            this.tabPage1.Text = "tabPage1";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.IFGamePak.AutoSize = true;
+            this.IFGamePak.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFGamePak.Location = new System.Drawing.Point(426, 278);
+            this.IFGamePak.Name = "IFGamePak";
+            this.IFGamePak.Size = new System.Drawing.Size(18, 20);
+            this.IFGamePak.TabIndex = 89;
+            this.IFGamePak.Text = "0";
             // 
-            // DISPCNTLabel
+            // IFKeypad
             // 
-            this.DISPCNTLabel.AutoSize = true;
-            this.DISPCNTLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DISPCNTLabel.Location = new System.Drawing.Point(6, 51);
-            this.DISPCNTLabel.Name = "DISPCNTLabel";
-            this.DISPCNTLabel.Size = new System.Drawing.Size(85, 20);
-            this.DISPCNTLabel.TabIndex = 0;
-            this.DISPCNTLabel.Text = "DISPCNT";
+            this.IFKeypad.AutoSize = true;
+            this.IFKeypad.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFKeypad.Location = new System.Drawing.Point(426, 258);
+            this.IFKeypad.Name = "IFKeypad";
+            this.IFKeypad.Size = new System.Drawing.Size(18, 20);
+            this.IFKeypad.TabIndex = 87;
+            this.IFKeypad.Text = "0";
             // 
-            // BGModeLabel
+            // IFDMA
             // 
-            this.BGModeLabel.AutoSize = true;
-            this.BGModeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BGModeLabel.Location = new System.Drawing.Point(6, 78);
-            this.BGModeLabel.Name = "BGModeLabel";
-            this.BGModeLabel.Size = new System.Drawing.Size(73, 20);
-            this.BGModeLabel.TabIndex = 1;
-            this.BGModeLabel.Text = "BGMode";
+            this.IFDMA.AutoSize = true;
+            this.IFDMA.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFDMA.Location = new System.Drawing.Point(426, 238);
+            this.IFDMA.Name = "IFDMA";
+            this.IFDMA.Size = new System.Drawing.Size(18, 20);
+            this.IFDMA.TabIndex = 85;
+            this.IFDMA.Text = "0";
             // 
-            // DPFrameSelectLabel
+            // IFSIO
             // 
-            this.DPFrameSelectLabel.AutoSize = true;
-            this.DPFrameSelectLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DPFrameSelectLabel.Location = new System.Drawing.Point(6, 98);
-            this.DPFrameSelectLabel.Name = "DPFrameSelectLabel";
-            this.DPFrameSelectLabel.Size = new System.Drawing.Size(159, 20);
-            this.DPFrameSelectLabel.TabIndex = 2;
-            this.DPFrameSelectLabel.Text = "Display Frame Select";
+            this.IFSIO.AutoSize = true;
+            this.IFSIO.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFSIO.Location = new System.Drawing.Point(426, 218);
+            this.IFSIO.Name = "IFSIO";
+            this.IFSIO.Size = new System.Drawing.Size(18, 20);
+            this.IFSIO.TabIndex = 83;
+            this.IFSIO.Text = "0";
             // 
-            // HBlankIntervalFreeLabel
+            // IFTimers
             // 
-            this.HBlankIntervalFreeLabel.AutoSize = true;
-            this.HBlankIntervalFreeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.HBlankIntervalFreeLabel.Location = new System.Drawing.Point(6, 118);
-            this.HBlankIntervalFreeLabel.Name = "HBlankIntervalFreeLabel";
-            this.HBlankIntervalFreeLabel.Size = new System.Drawing.Size(154, 20);
-            this.HBlankIntervalFreeLabel.TabIndex = 3;
-            this.HBlankIntervalFreeLabel.Text = "HBlank Interval Free";
+            this.IFTimers.AutoSize = true;
+            this.IFTimers.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFTimers.Location = new System.Drawing.Point(426, 198);
+            this.IFTimers.Name = "IFTimers";
+            this.IFTimers.Size = new System.Drawing.Size(18, 20);
+            this.IFTimers.TabIndex = 81;
+            this.IFTimers.Text = "0";
             // 
-            // OBJVRAMMappingLabel
+            // IFVCOUNT
             // 
-            this.OBJVRAMMappingLabel.AutoSize = true;
-            this.OBJVRAMMappingLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OBJVRAMMappingLabel.Location = new System.Drawing.Point(6, 138);
-            this.OBJVRAMMappingLabel.Name = "OBJVRAMMappingLabel";
-            this.OBJVRAMMappingLabel.Size = new System.Drawing.Size(156, 20);
-            this.OBJVRAMMappingLabel.TabIndex = 4;
-            this.OBJVRAMMappingLabel.Text = "OBJ VRAM Mapping";
+            this.IFVCOUNT.AutoSize = true;
+            this.IFVCOUNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFVCOUNT.Location = new System.Drawing.Point(426, 178);
+            this.IFVCOUNT.Name = "IFVCOUNT";
+            this.IFVCOUNT.Size = new System.Drawing.Size(18, 20);
+            this.IFVCOUNT.TabIndex = 79;
+            this.IFVCOUNT.Text = "0";
             // 
-            // ForcedBlankLabel
+            // IFHBlank
             // 
-            this.ForcedBlankLabel.AutoSize = true;
-            this.ForcedBlankLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ForcedBlankLabel.Location = new System.Drawing.Point(6, 158);
-            this.ForcedBlankLabel.Name = "ForcedBlankLabel";
-            this.ForcedBlankLabel.Size = new System.Drawing.Size(99, 20);
-            this.ForcedBlankLabel.TabIndex = 5;
-            this.ForcedBlankLabel.Text = "ForcedBlank";
+            this.IFHBlank.AutoSize = true;
+            this.IFHBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFHBlank.Location = new System.Drawing.Point(426, 158);
+            this.IFHBlank.Name = "IFHBlank";
+            this.IFHBlank.Size = new System.Drawing.Size(18, 20);
+            this.IFHBlank.TabIndex = 77;
+            this.IFHBlank.Text = "0";
             // 
-            // Window0DisplayLabel
+            // IFVBlank
             // 
-            this.Window0DisplayLabel.AutoSize = true;
-            this.Window0DisplayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Window0DisplayLabel.Location = new System.Drawing.Point(6, 178);
-            this.Window0DisplayLabel.Name = "Window0DisplayLabel";
-            this.Window0DisplayLabel.Size = new System.Drawing.Size(133, 20);
-            this.Window0DisplayLabel.TabIndex = 6;
-            this.Window0DisplayLabel.Text = "Window 0 Display";
+            this.IFVBlank.AutoSize = true;
+            this.IFVBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFVBlank.Location = new System.Drawing.Point(426, 138);
+            this.IFVBlank.Name = "IFVBlank";
+            this.IFVBlank.Size = new System.Drawing.Size(18, 20);
+            this.IFVBlank.TabIndex = 75;
+            this.IFVBlank.Text = "0";
             // 
-            // Window1DisplayLabel
+            // IEGamePak
             // 
-            this.Window1DisplayLabel.AutoSize = true;
-            this.Window1DisplayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Window1DisplayLabel.Location = new System.Drawing.Point(6, 198);
-            this.Window1DisplayLabel.Name = "Window1DisplayLabel";
-            this.Window1DisplayLabel.Size = new System.Drawing.Size(133, 20);
-            this.Window1DisplayLabel.TabIndex = 7;
-            this.Window1DisplayLabel.Text = "Window 1 Display";
+            this.IEGamePak.AutoSize = true;
+            this.IEGamePak.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEGamePak.Location = new System.Drawing.Point(394, 278);
+            this.IEGamePak.Name = "IEGamePak";
+            this.IEGamePak.Size = new System.Drawing.Size(18, 20);
+            this.IEGamePak.TabIndex = 73;
+            this.IEGamePak.Text = "0";
             // 
-            // OBJWindowDisplayLabel
+            // IEGamePakLabel
             // 
-            this.OBJWindowDisplayLabel.AutoSize = true;
-            this.OBJWindowDisplayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OBJWindowDisplayLabel.Location = new System.Drawing.Point(6, 218);
-            this.OBJWindowDisplayLabel.Name = "OBJWindowDisplayLabel";
-            this.OBJWindowDisplayLabel.Size = new System.Drawing.Size(155, 20);
-            this.OBJWindowDisplayLabel.TabIndex = 8;
-            this.OBJWindowDisplayLabel.Text = "OBJ Window Display";
+            this.IEGamePakLabel.AutoSize = true;
+            this.IEGamePakLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEGamePakLabel.Location = new System.Drawing.Point(243, 278);
+            this.IEGamePakLabel.Name = "IEGamePakLabel";
+            this.IEGamePakLabel.Size = new System.Drawing.Size(80, 20);
+            this.IEGamePakLabel.TabIndex = 72;
+            this.IEGamePakLabel.Text = "GamePak";
             // 
-            // BGMode
+            // IEKeypad
             // 
-            this.BGMode.AutoSize = true;
-            this.BGMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BGMode.Location = new System.Drawing.Point(175, 78);
-            this.BGMode.Name = "BGMode";
-            this.BGMode.Size = new System.Drawing.Size(18, 20);
-            this.BGMode.TabIndex = 9;
-            this.BGMode.Text = "0";
+            this.IEKeypad.AutoSize = true;
+            this.IEKeypad.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEKeypad.Location = new System.Drawing.Point(394, 258);
+            this.IEKeypad.Name = "IEKeypad";
+            this.IEKeypad.Size = new System.Drawing.Size(18, 20);
+            this.IEKeypad.TabIndex = 71;
+            this.IEKeypad.Text = "0";
             // 
-            // DPFrameSelect
+            // IEKeypadLabel
             // 
-            this.DPFrameSelect.AutoSize = true;
-            this.DPFrameSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DPFrameSelect.Location = new System.Drawing.Point(175, 98);
-            this.DPFrameSelect.Name = "DPFrameSelect";
-            this.DPFrameSelect.Size = new System.Drawing.Size(18, 20);
-            this.DPFrameSelect.TabIndex = 10;
-            this.DPFrameSelect.Text = "0";
+            this.IEKeypadLabel.AutoSize = true;
+            this.IEKeypadLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEKeypadLabel.Location = new System.Drawing.Point(243, 258);
+            this.IEKeypadLabel.Name = "IEKeypadLabel";
+            this.IEKeypadLabel.Size = new System.Drawing.Size(62, 20);
+            this.IEKeypadLabel.TabIndex = 70;
+            this.IEKeypadLabel.Text = "Keypad";
             // 
-            // HBlankIntervalFree
+            // IEDMA
             // 
-            this.HBlankIntervalFree.AutoSize = true;
-            this.HBlankIntervalFree.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.HBlankIntervalFree.Location = new System.Drawing.Point(175, 118);
-            this.HBlankIntervalFree.Name = "HBlankIntervalFree";
-            this.HBlankIntervalFree.Size = new System.Drawing.Size(18, 20);
-            this.HBlankIntervalFree.TabIndex = 11;
-            this.HBlankIntervalFree.Text = "0";
+            this.IEDMA.AutoSize = true;
+            this.IEDMA.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEDMA.Location = new System.Drawing.Point(394, 238);
+            this.IEDMA.Name = "IEDMA";
+            this.IEDMA.Size = new System.Drawing.Size(18, 20);
+            this.IEDMA.TabIndex = 69;
+            this.IEDMA.Text = "0";
             // 
-            // OBJVRAMMapping
+            // IEDMALabel
             // 
-            this.OBJVRAMMapping.AutoSize = true;
-            this.OBJVRAMMapping.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OBJVRAMMapping.Location = new System.Drawing.Point(175, 138);
-            this.OBJVRAMMapping.Name = "OBJVRAMMapping";
-            this.OBJVRAMMapping.Size = new System.Drawing.Size(18, 20);
-            this.OBJVRAMMapping.TabIndex = 12;
-            this.OBJVRAMMapping.Text = "0";
+            this.IEDMALabel.AutoSize = true;
+            this.IEDMALabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEDMALabel.Location = new System.Drawing.Point(243, 238);
+            this.IEDMALabel.Name = "IEDMALabel";
+            this.IEDMALabel.Size = new System.Drawing.Size(45, 20);
+            this.IEDMALabel.TabIndex = 68;
+            this.IEDMALabel.Text = "DMA";
             // 
-            // ForcedBlank
+            // IESIO
             // 
-            this.ForcedBlank.AutoSize = true;
-            this.ForcedBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ForcedBlank.Location = new System.Drawing.Point(175, 158);
-            this.ForcedBlank.Name = "ForcedBlank";
-            this.ForcedBlank.Size = new System.Drawing.Size(18, 20);
-            this.ForcedBlank.TabIndex = 13;
-            this.ForcedBlank.Text = "0";
+            this.IESIO.AutoSize = true;
+            this.IESIO.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IESIO.Location = new System.Drawing.Point(394, 218);
+            this.IESIO.Name = "IESIO";
+            this.IESIO.Size = new System.Drawing.Size(18, 20);
+            this.IESIO.TabIndex = 67;
+            this.IESIO.Text = "0";
             // 
-            // Window0Display
+            // IESIOLabel
             // 
-            this.Window0Display.AutoSize = true;
-            this.Window0Display.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Window0Display.Location = new System.Drawing.Point(175, 178);
-            this.Window0Display.Name = "Window0Display";
-            this.Window0Display.Size = new System.Drawing.Size(18, 20);
-            this.Window0Display.TabIndex = 14;
-            this.Window0Display.Text = "0";
+            this.IESIOLabel.AutoSize = true;
+            this.IESIOLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IESIOLabel.Location = new System.Drawing.Point(243, 218);
+            this.IESIOLabel.Name = "IESIOLabel";
+            this.IESIOLabel.Size = new System.Drawing.Size(37, 20);
+            this.IESIOLabel.TabIndex = 66;
+            this.IESIOLabel.Text = "SIO";
             // 
-            // Window1Display
+            // IETimers
             // 
-            this.Window1Display.AutoSize = true;
-            this.Window1Display.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Window1Display.Location = new System.Drawing.Point(175, 198);
-            this.Window1Display.Name = "Window1Display";
-            this.Window1Display.Size = new System.Drawing.Size(18, 20);
-            this.Window1Display.TabIndex = 15;
-            this.Window1Display.Text = "0";
+            this.IETimers.AutoSize = true;
+            this.IETimers.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IETimers.Location = new System.Drawing.Point(394, 198);
+            this.IETimers.Name = "IETimers";
+            this.IETimers.Size = new System.Drawing.Size(18, 20);
+            this.IETimers.TabIndex = 65;
+            this.IETimers.Text = "0";
             // 
-            // OBJWindowDisplay
+            // IETimersLabel
             // 
-            this.OBJWindowDisplay.AutoSize = true;
-            this.OBJWindowDisplay.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OBJWindowDisplay.Location = new System.Drawing.Point(175, 218);
-            this.OBJWindowDisplay.Name = "OBJWindowDisplay";
-            this.OBJWindowDisplay.Size = new System.Drawing.Size(18, 20);
-            this.OBJWindowDisplay.TabIndex = 16;
-            this.OBJWindowDisplay.Text = "0";
+            this.IETimersLabel.AutoSize = true;
+            this.IETimersLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IETimersLabel.Location = new System.Drawing.Point(243, 198);
+            this.IETimersLabel.Name = "IETimersLabel";
+            this.IETimersLabel.Size = new System.Drawing.Size(56, 20);
+            this.IETimersLabel.TabIndex = 64;
+            this.IETimersLabel.Text = "Timers";
+            // 
+            // IEVCOUNT
+            // 
+            this.IEVCOUNT.AutoSize = true;
+            this.IEVCOUNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEVCOUNT.Location = new System.Drawing.Point(394, 178);
+            this.IEVCOUNT.Name = "IEVCOUNT";
+            this.IEVCOUNT.Size = new System.Drawing.Size(18, 20);
+            this.IEVCOUNT.TabIndex = 63;
+            this.IEVCOUNT.Text = "0";
+            // 
+            // IEVCountLabel
+            // 
+            this.IEVCountLabel.AutoSize = true;
+            this.IEVCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEVCountLabel.Location = new System.Drawing.Point(243, 178);
+            this.IEVCountLabel.Name = "IEVCountLabel";
+            this.IEVCountLabel.Size = new System.Drawing.Size(123, 20);
+            this.IEVCountLabel.TabIndex = 62;
+            this.IEVCountLabel.Text = "VCOUNT Match";
+            // 
+            // IEHBlank
+            // 
+            this.IEHBlank.AutoSize = true;
+            this.IEHBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEHBlank.Location = new System.Drawing.Point(394, 158);
+            this.IEHBlank.Name = "IEHBlank";
+            this.IEHBlank.Size = new System.Drawing.Size(18, 20);
+            this.IEHBlank.TabIndex = 61;
+            this.IEHBlank.Text = "0";
+            // 
+            // IEHBlankLabel
+            // 
+            this.IEHBlankLabel.AutoSize = true;
+            this.IEHBlankLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEHBlankLabel.Location = new System.Drawing.Point(243, 158);
+            this.IEHBlankLabel.Name = "IEHBlankLabel";
+            this.IEHBlankLabel.Size = new System.Drawing.Size(61, 20);
+            this.IEHBlankLabel.TabIndex = 60;
+            this.IEHBlankLabel.Text = "HBlank";
+            // 
+            // IEVBlank
+            // 
+            this.IEVBlank.AutoSize = true;
+            this.IEVBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEVBlank.Location = new System.Drawing.Point(394, 138);
+            this.IEVBlank.Name = "IEVBlank";
+            this.IEVBlank.Size = new System.Drawing.Size(18, 20);
+            this.IEVBlank.TabIndex = 59;
+            this.IEVBlank.Text = "0";
+            // 
+            // IEVBlankLabel
+            // 
+            this.IEVBlankLabel.AutoSize = true;
+            this.IEVBlankLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IEVBlankLabel.Location = new System.Drawing.Point(243, 138);
+            this.IEVBlankLabel.Name = "IEVBlankLabel";
+            this.IEVBlankLabel.Size = new System.Drawing.Size(60, 20);
+            this.IEVBlankLabel.TabIndex = 58;
+            this.IEVBlankLabel.Text = "VBlank";
+            // 
+            // SWILabel
+            // 
+            this.SWILabel.AutoSize = true;
+            this.SWILabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SWILabel.ForeColor = System.Drawing.Color.Red;
+            this.SWILabel.Location = new System.Drawing.Point(401, 51);
+            this.SWILabel.Name = "SWILabel";
+            this.SWILabel.Size = new System.Drawing.Size(43, 20);
+            this.SWILabel.TabIndex = 57;
+            this.SWILabel.Text = "SWI";
+            // 
+            // IRQLabel
+            // 
+            this.IRQLabel.AutoSize = true;
+            this.IRQLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IRQLabel.ForeColor = System.Drawing.Color.Red;
+            this.IRQLabel.Location = new System.Drawing.Point(243, 51);
+            this.IRQLabel.Name = "IRQLabel";
+            this.IRQLabel.Size = new System.Drawing.Size(41, 20);
+            this.IRQLabel.TabIndex = 56;
+            this.IRQLabel.Text = "IRQ";
+            // 
+            // HALTCNT
+            // 
+            this.HALTCNT.AutoSize = true;
+            this.HALTCNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HALTCNT.Location = new System.Drawing.Point(394, 320);
+            this.HALTCNT.Name = "HALTCNT";
+            this.HALTCNT.Size = new System.Drawing.Size(18, 20);
+            this.HALTCNT.TabIndex = 55;
+            this.HALTCNT.Text = "0";
+            // 
+            // HALTCNTLabel
+            // 
+            this.HALTCNTLabel.AutoSize = true;
+            this.HALTCNTLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HALTCNTLabel.Location = new System.Drawing.Point(243, 320);
+            this.HALTCNTLabel.Name = "HALTCNTLabel";
+            this.HALTCNTLabel.Size = new System.Drawing.Size(88, 20);
+            this.HALTCNTLabel.TabIndex = 54;
+            this.HALTCNTLabel.Text = "HALTCNT";
+            // 
+            // IFLabel
+            // 
+            this.IFLabel.AutoSize = true;
+            this.IFLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IFLabel.Location = new System.Drawing.Point(418, 118);
+            this.IFLabel.Name = "IFLabel";
+            this.IFLabel.Size = new System.Drawing.Size(26, 20);
+            this.IFLabel.TabIndex = 52;
+            this.IFLabel.Text = "IF";
+            // 
+            // IELabel
+            // 
+            this.IELabel.AutoSize = true;
+            this.IELabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IELabel.Location = new System.Drawing.Point(385, 118);
+            this.IELabel.Name = "IELabel";
+            this.IELabel.Size = new System.Drawing.Size(27, 20);
+            this.IELabel.TabIndex = 50;
+            this.IELabel.Text = "IE";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(243, 3);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(142, 20);
+            this.label3.TabIndex = 49;
+            this.label3.Text = "Interrupt Control";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(3, 3);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(107, 20);
+            this.label2.TabIndex = 48;
+            this.label2.Text = "LCD Control";
+            // 
+            // IME
+            // 
+            this.IME.AutoSize = true;
+            this.IME.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IME.Location = new System.Drawing.Point(399, 98);
+            this.IME.Name = "IME";
+            this.IME.Size = new System.Drawing.Size(45, 20);
+            this.IME.TabIndex = 47;
+            this.IME.Text = "0000";
+            // 
+            // IMELabel
+            // 
+            this.IMELabel.AutoSize = true;
+            this.IMELabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IMELabel.Location = new System.Drawing.Point(243, 98);
+            this.IMELabel.Name = "IMELabel";
+            this.IMELabel.Size = new System.Drawing.Size(41, 20);
+            this.IMELabel.TabIndex = 46;
+            this.IMELabel.Text = "IME";
+            // 
+            // KEYCNT
+            // 
+            this.KEYCNT.AutoSize = true;
+            this.KEYCNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.KEYCNT.Location = new System.Drawing.Point(399, 78);
+            this.KEYCNT.Name = "KEYCNT";
+            this.KEYCNT.Size = new System.Drawing.Size(45, 20);
+            this.KEYCNT.TabIndex = 45;
+            this.KEYCNT.Text = "0000";
+            // 
+            // KEYCNTLabel
+            // 
+            this.KEYCNTLabel.AutoSize = true;
+            this.KEYCNTLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.KEYCNTLabel.Location = new System.Drawing.Point(243, 78);
+            this.KEYCNTLabel.Name = "KEYCNTLabel";
+            this.KEYCNTLabel.Size = new System.Drawing.Size(78, 20);
+            this.KEYCNTLabel.TabIndex = 36;
+            this.KEYCNTLabel.Text = "KEYCNT";
+            // 
+            // VCOUNT
+            // 
+            this.VCOUNT.AutoSize = true;
+            this.VCOUNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.VCOUNT.Location = new System.Drawing.Point(175, 437);
+            this.VCOUNT.Name = "VCOUNT";
+            this.VCOUNT.Size = new System.Drawing.Size(36, 20);
+            this.VCOUNT.TabIndex = 35;
+            this.VCOUNT.Text = "000";
+            // 
+            // VCountLabel
+            // 
+            this.VCountLabel.AutoSize = true;
+            this.VCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.VCountLabel.Location = new System.Drawing.Point(6, 437);
+            this.VCountLabel.Name = "VCountLabel";
+            this.VCountLabel.Size = new System.Drawing.Size(81, 20);
+            this.VCountLabel.TabIndex = 34;
+            this.VCountLabel.Text = "VCOUNT";
             // 
             // VCountSetting
             // 
@@ -584,387 +771,460 @@
             this.DISPSTAT.TabIndex = 17;
             this.DISPSTAT.Text = "DISPSTAT";
             // 
-            // VCountLabel
-            // 
-            this.VCountLabel.AutoSize = true;
-            this.VCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.VCountLabel.Location = new System.Drawing.Point(6, 437);
-            this.VCountLabel.Name = "VCountLabel";
-            this.VCountLabel.Size = new System.Drawing.Size(81, 20);
-            this.VCountLabel.TabIndex = 34;
-            this.VCountLabel.Text = "VCOUNT";
-            // 
-            // VCOUNT
-            // 
-            this.VCOUNT.AutoSize = true;
-            this.VCOUNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.VCOUNT.Location = new System.Drawing.Point(175, 437);
-            this.VCOUNT.Name = "VCOUNT";
-            this.VCOUNT.Size = new System.Drawing.Size(36, 20);
-            this.VCOUNT.TabIndex = 35;
-            this.VCOUNT.Text = "000";
-            // 
-            // KEYCNT
-            // 
-            this.KEYCNT.AutoSize = true;
-            this.KEYCNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.KEYCNT.Location = new System.Drawing.Point(399, 78);
-            this.KEYCNT.Name = "KEYCNT";
-            this.KEYCNT.Size = new System.Drawing.Size(45, 20);
-            this.KEYCNT.TabIndex = 45;
-            this.KEYCNT.Text = "0000";
-            // 
-            // KEYCNTLabel
-            // 
-            this.KEYCNTLabel.AutoSize = true;
-            this.KEYCNTLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.KEYCNTLabel.Location = new System.Drawing.Point(243, 78);
-            this.KEYCNTLabel.Name = "KEYCNTLabel";
-            this.KEYCNTLabel.Size = new System.Drawing.Size(78, 20);
-            this.KEYCNTLabel.TabIndex = 36;
-            this.KEYCNTLabel.Text = "KEYCNT";
-            // 
-            // IME
-            // 
-            this.IME.AutoSize = true;
-            this.IME.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IME.Location = new System.Drawing.Point(399, 98);
-            this.IME.Name = "IME";
-            this.IME.Size = new System.Drawing.Size(45, 20);
-            this.IME.TabIndex = 47;
-            this.IME.Text = "0000";
-            // 
-            // IMELabel
-            // 
-            this.IMELabel.AutoSize = true;
-            this.IMELabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IMELabel.Location = new System.Drawing.Point(243, 98);
-            this.IMELabel.Name = "IMELabel";
-            this.IMELabel.Size = new System.Drawing.Size(41, 20);
-            this.IMELabel.TabIndex = 46;
-            this.IMELabel.Text = "IME";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(3, 3);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(107, 20);
-            this.label2.TabIndex = 48;
-            this.label2.Text = "LCD Control";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(243, 3);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(142, 20);
-            this.label3.TabIndex = 49;
-            this.label3.Text = "Interrupt Control";
-            // 
-            // IELabel
-            // 
-            this.IELabel.AutoSize = true;
-            this.IELabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IELabel.Location = new System.Drawing.Point(385, 118);
-            this.IELabel.Name = "IELabel";
-            this.IELabel.Size = new System.Drawing.Size(27, 20);
-            this.IELabel.TabIndex = 50;
-            this.IELabel.Text = "IE";
-            // 
-            // IFLabel
-            // 
-            this.IFLabel.AutoSize = true;
-            this.IFLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFLabel.Location = new System.Drawing.Point(418, 118);
-            this.IFLabel.Name = "IFLabel";
-            this.IFLabel.Size = new System.Drawing.Size(26, 20);
-            this.IFLabel.TabIndex = 52;
-            this.IFLabel.Text = "IF";
-            // 
-            // HALTCNT
-            // 
-            this.HALTCNT.AutoSize = true;
-            this.HALTCNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.HALTCNT.Location = new System.Drawing.Point(394, 320);
-            this.HALTCNT.Name = "HALTCNT";
-            this.HALTCNT.Size = new System.Drawing.Size(18, 20);
-            this.HALTCNT.TabIndex = 55;
-            this.HALTCNT.Text = "0";
-            // 
-            // HALTCNTLabel
-            // 
-            this.HALTCNTLabel.AutoSize = true;
-            this.HALTCNTLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.HALTCNTLabel.Location = new System.Drawing.Point(243, 320);
-            this.HALTCNTLabel.Name = "HALTCNTLabel";
-            this.HALTCNTLabel.Size = new System.Drawing.Size(88, 20);
-            this.HALTCNTLabel.TabIndex = 54;
-            this.HALTCNTLabel.Text = "HALTCNT";
-            // 
-            // IRQLabel
-            // 
-            this.IRQLabel.AutoSize = true;
-            this.IRQLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IRQLabel.ForeColor = System.Drawing.Color.Red;
-            this.IRQLabel.Location = new System.Drawing.Point(243, 51);
-            this.IRQLabel.Name = "IRQLabel";
-            this.IRQLabel.Size = new System.Drawing.Size(41, 20);
-            this.IRQLabel.TabIndex = 56;
-            this.IRQLabel.Text = "IRQ";
-            // 
-            // SWILabel
-            // 
-            this.SWILabel.AutoSize = true;
-            this.SWILabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SWILabel.ForeColor = System.Drawing.Color.Red;
-            this.SWILabel.Location = new System.Drawing.Point(401, 51);
-            this.SWILabel.Name = "SWILabel";
-            this.SWILabel.Size = new System.Drawing.Size(43, 20);
-            this.SWILabel.TabIndex = 57;
-            this.SWILabel.Text = "SWI";
-            // 
-            // IEVBlankLabel
-            // 
-            this.IEVBlankLabel.AutoSize = true;
-            this.IEVBlankLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEVBlankLabel.Location = new System.Drawing.Point(243, 138);
-            this.IEVBlankLabel.Name = "IEVBlankLabel";
-            this.IEVBlankLabel.Size = new System.Drawing.Size(60, 20);
-            this.IEVBlankLabel.TabIndex = 58;
-            this.IEVBlankLabel.Text = "VBlank";
-            // 
-            // IEVBlank
-            // 
-            this.IEVBlank.AutoSize = true;
-            this.IEVBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEVBlank.Location = new System.Drawing.Point(394, 138);
-            this.IEVBlank.Name = "IEVBlank";
-            this.IEVBlank.Size = new System.Drawing.Size(18, 20);
-            this.IEVBlank.TabIndex = 59;
-            this.IEVBlank.Text = "0";
-            // 
-            // IEHBlank
-            // 
-            this.IEHBlank.AutoSize = true;
-            this.IEHBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEHBlank.Location = new System.Drawing.Point(394, 158);
-            this.IEHBlank.Name = "IEHBlank";
-            this.IEHBlank.Size = new System.Drawing.Size(18, 20);
-            this.IEHBlank.TabIndex = 61;
-            this.IEHBlank.Text = "0";
-            // 
-            // IEHBlankLabel
-            // 
-            this.IEHBlankLabel.AutoSize = true;
-            this.IEHBlankLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEHBlankLabel.Location = new System.Drawing.Point(243, 158);
-            this.IEHBlankLabel.Name = "IEHBlankLabel";
-            this.IEHBlankLabel.Size = new System.Drawing.Size(61, 20);
-            this.IEHBlankLabel.TabIndex = 60;
-            this.IEHBlankLabel.Text = "HBlank";
-            // 
-            // IEVCOUNT
-            // 
-            this.IEVCOUNT.AutoSize = true;
-            this.IEVCOUNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEVCOUNT.Location = new System.Drawing.Point(394, 178);
-            this.IEVCOUNT.Name = "IEVCOUNT";
-            this.IEVCOUNT.Size = new System.Drawing.Size(18, 20);
-            this.IEVCOUNT.TabIndex = 63;
-            this.IEVCOUNT.Text = "0";
-            // 
-            // IEVCountLabel
-            // 
-            this.IEVCountLabel.AutoSize = true;
-            this.IEVCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEVCountLabel.Location = new System.Drawing.Point(243, 178);
-            this.IEVCountLabel.Name = "IEVCountLabel";
-            this.IEVCountLabel.Size = new System.Drawing.Size(123, 20);
-            this.IEVCountLabel.TabIndex = 62;
-            this.IEVCountLabel.Text = "VCOUNT Match";
-            // 
-            // IETimers
-            // 
-            this.IETimers.AutoSize = true;
-            this.IETimers.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IETimers.Location = new System.Drawing.Point(394, 198);
-            this.IETimers.Name = "IETimers";
-            this.IETimers.Size = new System.Drawing.Size(18, 20);
-            this.IETimers.TabIndex = 65;
-            this.IETimers.Text = "0";
-            // 
-            // IETimersLabel
-            // 
-            this.IETimersLabel.AutoSize = true;
-            this.IETimersLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IETimersLabel.Location = new System.Drawing.Point(243, 198);
-            this.IETimersLabel.Name = "IETimersLabel";
-            this.IETimersLabel.Size = new System.Drawing.Size(56, 20);
-            this.IETimersLabel.TabIndex = 64;
-            this.IETimersLabel.Text = "Timers";
-            // 
-            // IESIO
-            // 
-            this.IESIO.AutoSize = true;
-            this.IESIO.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IESIO.Location = new System.Drawing.Point(394, 218);
-            this.IESIO.Name = "IESIO";
-            this.IESIO.Size = new System.Drawing.Size(18, 20);
-            this.IESIO.TabIndex = 67;
-            this.IESIO.Text = "0";
-            // 
-            // IESIOLabel
-            // 
-            this.IESIOLabel.AutoSize = true;
-            this.IESIOLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IESIOLabel.Location = new System.Drawing.Point(243, 218);
-            this.IESIOLabel.Name = "IESIOLabel";
-            this.IESIOLabel.Size = new System.Drawing.Size(37, 20);
-            this.IESIOLabel.TabIndex = 66;
-            this.IESIOLabel.Text = "SIO";
-            // 
-            // IEDMA
-            // 
-            this.IEDMA.AutoSize = true;
-            this.IEDMA.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEDMA.Location = new System.Drawing.Point(394, 238);
-            this.IEDMA.Name = "IEDMA";
-            this.IEDMA.Size = new System.Drawing.Size(18, 20);
-            this.IEDMA.TabIndex = 69;
-            this.IEDMA.Text = "0";
-            // 
-            // IEDMALabel
-            // 
-            this.IEDMALabel.AutoSize = true;
-            this.IEDMALabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEDMALabel.Location = new System.Drawing.Point(243, 238);
-            this.IEDMALabel.Name = "IEDMALabel";
-            this.IEDMALabel.Size = new System.Drawing.Size(45, 20);
-            this.IEDMALabel.TabIndex = 68;
-            this.IEDMALabel.Text = "DMA";
-            // 
-            // IEKeypad
-            // 
-            this.IEKeypad.AutoSize = true;
-            this.IEKeypad.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEKeypad.Location = new System.Drawing.Point(394, 258);
-            this.IEKeypad.Name = "IEKeypad";
-            this.IEKeypad.Size = new System.Drawing.Size(18, 20);
-            this.IEKeypad.TabIndex = 71;
-            this.IEKeypad.Text = "0";
-            // 
-            // IEKeypadLabel
-            // 
-            this.IEKeypadLabel.AutoSize = true;
-            this.IEKeypadLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEKeypadLabel.Location = new System.Drawing.Point(243, 258);
-            this.IEKeypadLabel.Name = "IEKeypadLabel";
-            this.IEKeypadLabel.Size = new System.Drawing.Size(62, 20);
-            this.IEKeypadLabel.TabIndex = 70;
-            this.IEKeypadLabel.Text = "Keypad";
-            // 
-            // IEGamePak
-            // 
-            this.IEGamePak.AutoSize = true;
-            this.IEGamePak.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEGamePak.Location = new System.Drawing.Point(394, 278);
-            this.IEGamePak.Name = "IEGamePak";
-            this.IEGamePak.Size = new System.Drawing.Size(18, 20);
-            this.IEGamePak.TabIndex = 73;
-            this.IEGamePak.Text = "0";
-            // 
-            // IEGamePakLabel
-            // 
-            this.IEGamePakLabel.AutoSize = true;
-            this.IEGamePakLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IEGamePakLabel.Location = new System.Drawing.Point(243, 278);
-            this.IEGamePakLabel.Name = "IEGamePakLabel";
-            this.IEGamePakLabel.Size = new System.Drawing.Size(80, 20);
-            this.IEGamePakLabel.TabIndex = 72;
-            this.IEGamePakLabel.Text = "GamePak";
-            // 
-            // IFGamePak
-            // 
-            this.IFGamePak.AutoSize = true;
-            this.IFGamePak.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFGamePak.Location = new System.Drawing.Point(426, 278);
-            this.IFGamePak.Name = "IFGamePak";
-            this.IFGamePak.Size = new System.Drawing.Size(18, 20);
-            this.IFGamePak.TabIndex = 89;
-            this.IFGamePak.Text = "0";
-            // 
-            // IFKeypad
-            // 
-            this.IFKeypad.AutoSize = true;
-            this.IFKeypad.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFKeypad.Location = new System.Drawing.Point(426, 258);
-            this.IFKeypad.Name = "IFKeypad";
-            this.IFKeypad.Size = new System.Drawing.Size(18, 20);
-            this.IFKeypad.TabIndex = 87;
-            this.IFKeypad.Text = "0";
-            // 
-            // IFDMA
-            // 
-            this.IFDMA.AutoSize = true;
-            this.IFDMA.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFDMA.Location = new System.Drawing.Point(426, 238);
-            this.IFDMA.Name = "IFDMA";
-            this.IFDMA.Size = new System.Drawing.Size(18, 20);
-            this.IFDMA.TabIndex = 85;
-            this.IFDMA.Text = "0";
-            // 
-            // IFSIO
-            // 
-            this.IFSIO.AutoSize = true;
-            this.IFSIO.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFSIO.Location = new System.Drawing.Point(426, 218);
-            this.IFSIO.Name = "IFSIO";
-            this.IFSIO.Size = new System.Drawing.Size(18, 20);
-            this.IFSIO.TabIndex = 83;
-            this.IFSIO.Text = "0";
-            // 
-            // IFTimers
-            // 
-            this.IFTimers.AutoSize = true;
-            this.IFTimers.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFTimers.Location = new System.Drawing.Point(426, 198);
-            this.IFTimers.Name = "IFTimers";
-            this.IFTimers.Size = new System.Drawing.Size(18, 20);
-            this.IFTimers.TabIndex = 81;
-            this.IFTimers.Text = "0";
-            // 
-            // IFVCOUNT
-            // 
-            this.IFVCOUNT.AutoSize = true;
-            this.IFVCOUNT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFVCOUNT.Location = new System.Drawing.Point(426, 178);
-            this.IFVCOUNT.Name = "IFVCOUNT";
-            this.IFVCOUNT.Size = new System.Drawing.Size(18, 20);
-            this.IFVCOUNT.TabIndex = 79;
-            this.IFVCOUNT.Text = "0";
-            // 
-            // IFHBlank
-            // 
-            this.IFHBlank.AutoSize = true;
-            this.IFHBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFHBlank.Location = new System.Drawing.Point(426, 158);
-            this.IFHBlank.Name = "IFHBlank";
-            this.IFHBlank.Size = new System.Drawing.Size(18, 20);
-            this.IFHBlank.TabIndex = 77;
-            this.IFHBlank.Text = "0";
-            // 
-            // IFVBlank
-            // 
-            this.IFVBlank.AutoSize = true;
-            this.IFVBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IFVBlank.Location = new System.Drawing.Point(426, 138);
-            this.IFVBlank.Name = "IFVBlank";
-            this.IFVBlank.Size = new System.Drawing.Size(18, 20);
-            this.IFVBlank.TabIndex = 75;
-            this.IFVBlank.Text = "0";
+            // OBJWindowDisplay
+            // 
+            this.OBJWindowDisplay.AutoSize = true;
+            this.OBJWindowDisplay.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OBJWindowDisplay.Location = new System.Drawing.Point(175, 218);
+            this.OBJWindowDisplay.Name = "OBJWindowDisplay";
+            this.OBJWindowDisplay.Size = new System.Drawing.Size(18, 20);
+            this.OBJWindowDisplay.TabIndex = 16;
+            this.OBJWindowDisplay.Text = "0";
+            // 
+            // Window1Display
+            // 
+            this.Window1Display.AutoSize = true;
+            this.Window1Display.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Window1Display.Location = new System.Drawing.Point(175, 198);
+            this.Window1Display.Name = "Window1Display";
+            this.Window1Display.Size = new System.Drawing.Size(18, 20);
+            this.Window1Display.TabIndex = 15;
+            this.Window1Display.Text = "0";
+            // 
+            // Window0Display
+            // 
+            this.Window0Display.AutoSize = true;
+            this.Window0Display.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Window0Display.Location = new System.Drawing.Point(175, 178);
+            this.Window0Display.Name = "Window0Display";
+            this.Window0Display.Size = new System.Drawing.Size(18, 20);
+            this.Window0Display.TabIndex = 14;
+            this.Window0Display.Text = "0";
+            // 
+            // ForcedBlank
+            // 
+            this.ForcedBlank.AutoSize = true;
+            this.ForcedBlank.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ForcedBlank.Location = new System.Drawing.Point(175, 158);
+            this.ForcedBlank.Name = "ForcedBlank";
+            this.ForcedBlank.Size = new System.Drawing.Size(18, 20);
+            this.ForcedBlank.TabIndex = 13;
+            this.ForcedBlank.Text = "0";
+            // 
+            // OBJVRAMMapping
+            // 
+            this.OBJVRAMMapping.AutoSize = true;
+            this.OBJVRAMMapping.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OBJVRAMMapping.Location = new System.Drawing.Point(175, 138);
+            this.OBJVRAMMapping.Name = "OBJVRAMMapping";
+            this.OBJVRAMMapping.Size = new System.Drawing.Size(18, 20);
+            this.OBJVRAMMapping.TabIndex = 12;
+            this.OBJVRAMMapping.Text = "0";
+            // 
+            // HBlankIntervalFree
+            // 
+            this.HBlankIntervalFree.AutoSize = true;
+            this.HBlankIntervalFree.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HBlankIntervalFree.Location = new System.Drawing.Point(175, 118);
+            this.HBlankIntervalFree.Name = "HBlankIntervalFree";
+            this.HBlankIntervalFree.Size = new System.Drawing.Size(18, 20);
+            this.HBlankIntervalFree.TabIndex = 11;
+            this.HBlankIntervalFree.Text = "0";
+            // 
+            // DPFrameSelect
+            // 
+            this.DPFrameSelect.AutoSize = true;
+            this.DPFrameSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DPFrameSelect.Location = new System.Drawing.Point(175, 98);
+            this.DPFrameSelect.Name = "DPFrameSelect";
+            this.DPFrameSelect.Size = new System.Drawing.Size(18, 20);
+            this.DPFrameSelect.TabIndex = 10;
+            this.DPFrameSelect.Text = "0";
+            // 
+            // BGMode
+            // 
+            this.BGMode.AutoSize = true;
+            this.BGMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BGMode.Location = new System.Drawing.Point(175, 78);
+            this.BGMode.Name = "BGMode";
+            this.BGMode.Size = new System.Drawing.Size(18, 20);
+            this.BGMode.TabIndex = 9;
+            this.BGMode.Text = "0";
+            // 
+            // OBJWindowDisplayLabel
+            // 
+            this.OBJWindowDisplayLabel.AutoSize = true;
+            this.OBJWindowDisplayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OBJWindowDisplayLabel.Location = new System.Drawing.Point(6, 218);
+            this.OBJWindowDisplayLabel.Name = "OBJWindowDisplayLabel";
+            this.OBJWindowDisplayLabel.Size = new System.Drawing.Size(155, 20);
+            this.OBJWindowDisplayLabel.TabIndex = 8;
+            this.OBJWindowDisplayLabel.Text = "OBJ Window Display";
+            // 
+            // Window1DisplayLabel
+            // 
+            this.Window1DisplayLabel.AutoSize = true;
+            this.Window1DisplayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Window1DisplayLabel.Location = new System.Drawing.Point(6, 198);
+            this.Window1DisplayLabel.Name = "Window1DisplayLabel";
+            this.Window1DisplayLabel.Size = new System.Drawing.Size(133, 20);
+            this.Window1DisplayLabel.TabIndex = 7;
+            this.Window1DisplayLabel.Text = "Window 1 Display";
+            // 
+            // Window0DisplayLabel
+            // 
+            this.Window0DisplayLabel.AutoSize = true;
+            this.Window0DisplayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Window0DisplayLabel.Location = new System.Drawing.Point(6, 178);
+            this.Window0DisplayLabel.Name = "Window0DisplayLabel";
+            this.Window0DisplayLabel.Size = new System.Drawing.Size(133, 20);
+            this.Window0DisplayLabel.TabIndex = 6;
+            this.Window0DisplayLabel.Text = "Window 0 Display";
+            // 
+            // ForcedBlankLabel
+            // 
+            this.ForcedBlankLabel.AutoSize = true;
+            this.ForcedBlankLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ForcedBlankLabel.Location = new System.Drawing.Point(6, 158);
+            this.ForcedBlankLabel.Name = "ForcedBlankLabel";
+            this.ForcedBlankLabel.Size = new System.Drawing.Size(99, 20);
+            this.ForcedBlankLabel.TabIndex = 5;
+            this.ForcedBlankLabel.Text = "ForcedBlank";
+            // 
+            // OBJVRAMMappingLabel
+            // 
+            this.OBJVRAMMappingLabel.AutoSize = true;
+            this.OBJVRAMMappingLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OBJVRAMMappingLabel.Location = new System.Drawing.Point(6, 138);
+            this.OBJVRAMMappingLabel.Name = "OBJVRAMMappingLabel";
+            this.OBJVRAMMappingLabel.Size = new System.Drawing.Size(156, 20);
+            this.OBJVRAMMappingLabel.TabIndex = 4;
+            this.OBJVRAMMappingLabel.Text = "OBJ VRAM Mapping";
+            // 
+            // HBlankIntervalFreeLabel
+            // 
+            this.HBlankIntervalFreeLabel.AutoSize = true;
+            this.HBlankIntervalFreeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HBlankIntervalFreeLabel.Location = new System.Drawing.Point(6, 118);
+            this.HBlankIntervalFreeLabel.Name = "HBlankIntervalFreeLabel";
+            this.HBlankIntervalFreeLabel.Size = new System.Drawing.Size(154, 20);
+            this.HBlankIntervalFreeLabel.TabIndex = 3;
+            this.HBlankIntervalFreeLabel.Text = "HBlank Interval Free";
+            // 
+            // DPFrameSelectLabel
+            // 
+            this.DPFrameSelectLabel.AutoSize = true;
+            this.DPFrameSelectLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DPFrameSelectLabel.Location = new System.Drawing.Point(6, 98);
+            this.DPFrameSelectLabel.Name = "DPFrameSelectLabel";
+            this.DPFrameSelectLabel.Size = new System.Drawing.Size(159, 20);
+            this.DPFrameSelectLabel.TabIndex = 2;
+            this.DPFrameSelectLabel.Text = "Display Frame Select";
+            // 
+            // BGModeLabel
+            // 
+            this.BGModeLabel.AutoSize = true;
+            this.BGModeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BGModeLabel.Location = new System.Drawing.Point(6, 78);
+            this.BGModeLabel.Name = "BGModeLabel";
+            this.BGModeLabel.Size = new System.Drawing.Size(73, 20);
+            this.BGModeLabel.TabIndex = 1;
+            this.BGModeLabel.Text = "BGMode";
+            // 
+            // DISPCNTLabel
+            // 
+            this.DISPCNTLabel.AutoSize = true;
+            this.DISPCNTLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DISPCNTLabel.Location = new System.Drawing.Point(6, 51);
+            this.DISPCNTLabel.Name = "DISPCNTLabel";
+            this.DISPCNTLabel.Size = new System.Drawing.Size(85, 20);
+            this.DISPCNTLabel.TabIndex = 0;
+            this.DISPCNTLabel.Text = "DISPCNT";
+            // 
+            // PalettePage
+            // 
+            this.PalettePage.Controls.Add(this.OBJPaletteLabel);
+            this.PalettePage.Controls.Add(this.BGPaletteLabel);
+            this.PalettePage.Controls.Add(this.OBJPalette);
+            this.PalettePage.Controls.Add(this.BGPalette);
+            this.PalettePage.Location = new System.Drawing.Point(4, 22);
+            this.PalettePage.Name = "PalettePage";
+            this.PalettePage.Padding = new System.Windows.Forms.Padding(3);
+            this.PalettePage.Size = new System.Drawing.Size(788, 550);
+            this.PalettePage.TabIndex = 0;
+            this.PalettePage.Text = "Palette";
+            this.PalettePage.UseVisualStyleBackColor = true;
+            // 
+            // OBJPaletteLabel
+            // 
+            this.OBJPaletteLabel.AutoSize = true;
+            this.OBJPaletteLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OBJPaletteLabel.Location = new System.Drawing.Point(277, 3);
+            this.OBJPaletteLabel.Name = "OBJPaletteLabel";
+            this.OBJPaletteLabel.Size = new System.Drawing.Size(94, 20);
+            this.OBJPaletteLabel.TabIndex = 3;
+            this.OBJPaletteLabel.Text = "OBJ Palette";
+            // 
+            // BGPaletteLabel
+            // 
+            this.BGPaletteLabel.AutoSize = true;
+            this.BGPaletteLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BGPaletteLabel.Location = new System.Drawing.Point(3, 3);
+            this.BGPaletteLabel.Name = "BGPaletteLabel";
+            this.BGPaletteLabel.Size = new System.Drawing.Size(149, 20);
+            this.BGPaletteLabel.TabIndex = 2;
+            this.BGPaletteLabel.Text = "Background Palette";
+            // 
+            // OBJPalette
+            // 
+            this.OBJPalette.Location = new System.Drawing.Point(281, 26);
+            this.OBJPalette.Name = "OBJPalette";
+            this.OBJPalette.Size = new System.Drawing.Size(272, 272);
+            this.OBJPalette.TabIndex = 1;
+            this.OBJPalette.TabStop = false;
+            // 
+            // BGPalette
+            // 
+            this.BGPalette.Location = new System.Drawing.Point(3, 26);
+            this.BGPalette.Name = "BGPalette";
+            this.BGPalette.Size = new System.Drawing.Size(272, 272);
+            this.BGPalette.TabIndex = 0;
+            this.BGPalette.TabStop = false;
+            // 
+            // CharBlocksTab
+            // 
+            this.CharBlocksTab.Controls.Add(this.CharBlockTabs);
+            this.CharBlocksTab.Location = new System.Drawing.Point(4, 22);
+            this.CharBlocksTab.Name = "CharBlocksTab";
+            this.CharBlocksTab.Padding = new System.Windows.Forms.Padding(3);
+            this.CharBlocksTab.Size = new System.Drawing.Size(788, 550);
+            this.CharBlocksTab.TabIndex = 2;
+            this.CharBlocksTab.Text = "CharBlocks";
+            this.CharBlocksTab.UseVisualStyleBackColor = true;
+            // 
+            // CharBlockTabs
+            // 
+            this.CharBlockTabs.Controls.Add(this.CharBlock0Tab);
+            this.CharBlockTabs.Controls.Add(this.tabPage2);
+            this.CharBlockTabs.Controls.Add(this.CharBlock2Tab);
+            this.CharBlockTabs.Controls.Add(this.CharBlock3Tab);
+            this.CharBlockTabs.Location = new System.Drawing.Point(6, 6);
+            this.CharBlockTabs.Name = "CharBlockTabs";
+            this.CharBlockTabs.SelectedIndex = 0;
+            this.CharBlockTabs.Size = new System.Drawing.Size(776, 541);
+            this.CharBlockTabs.TabIndex = 0;
+            // 
+            // CharBlock0Tab
+            // 
+            this.CharBlock0Tab.Controls.Add(this.CharBlock0ColorMode);
+            this.CharBlock0Tab.Controls.Add(this.CharBlock0);
+            this.CharBlock0Tab.Location = new System.Drawing.Point(4, 22);
+            this.CharBlock0Tab.Name = "CharBlock0Tab";
+            this.CharBlock0Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.CharBlock0Tab.Size = new System.Drawing.Size(768, 515);
+            this.CharBlock0Tab.TabIndex = 0;
+            this.CharBlock0Tab.Text = "CharBlock 0";
+            this.CharBlock0Tab.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock0
+            // 
+            this.CharBlock0.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock0.Name = "CharBlock0";
+            this.CharBlock0.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock0.TabIndex = 0;
+            this.CharBlock0.TabStop = false;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.CharBlock1ColorMode);
+            this.tabPage2.Controls.Add(this.CharBlock1);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(768, 515);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "CharBlock 1";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock1
+            // 
+            this.CharBlock1.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock1.Name = "CharBlock1";
+            this.CharBlock1.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock1.TabIndex = 1;
+            this.CharBlock1.TabStop = false;
+            // 
+            // CharBlock2Tab
+            // 
+            this.CharBlock2Tab.Controls.Add(this.CharBlock2ColorMode);
+            this.CharBlock2Tab.Controls.Add(this.CharBlock2);
+            this.CharBlock2Tab.Location = new System.Drawing.Point(4, 22);
+            this.CharBlock2Tab.Name = "CharBlock2Tab";
+            this.CharBlock2Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.CharBlock2Tab.Size = new System.Drawing.Size(768, 515);
+            this.CharBlock2Tab.TabIndex = 2;
+            this.CharBlock2Tab.Text = "CharBlock 2";
+            this.CharBlock2Tab.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock2
+            // 
+            this.CharBlock2.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock2.Name = "CharBlock2";
+            this.CharBlock2.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock2.TabIndex = 1;
+            this.CharBlock2.TabStop = false;
+            // 
+            // CharBlock3Tab
+            // 
+            this.CharBlock3Tab.Controls.Add(this.CharBlock3ColorMode);
+            this.CharBlock3Tab.Controls.Add(this.CharBlock3);
+            this.CharBlock3Tab.Location = new System.Drawing.Point(4, 22);
+            this.CharBlock3Tab.Name = "CharBlock3Tab";
+            this.CharBlock3Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.CharBlock3Tab.Size = new System.Drawing.Size(768, 515);
+            this.CharBlock3Tab.TabIndex = 3;
+            this.CharBlock3Tab.Text = "CharBlock 3";
+            this.CharBlock3Tab.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock3
+            // 
+            this.CharBlock3.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock3.Name = "CharBlock3";
+            this.CharBlock3.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock3.TabIndex = 1;
+            this.CharBlock3.TabStop = false;
+            // 
+            // CharBlock1ColorMode
+            // 
+            this.CharBlock1ColorMode.Controls.Add(this.CharBlock18bpp);
+            this.CharBlock1ColorMode.Controls.Add(this.CharBlock14bpp);
+            this.CharBlock1ColorMode.Location = new System.Drawing.Point(521, 6);
+            this.CharBlock1ColorMode.Name = "CharBlock1ColorMode";
+            this.CharBlock1ColorMode.Size = new System.Drawing.Size(241, 65);
+            this.CharBlock1ColorMode.TabIndex = 2;
+            this.CharBlock1ColorMode.TabStop = false;
+            this.CharBlock1ColorMode.Text = "Color Mode";
+            // 
+            // CharBlock14bpp
+            // 
+            this.CharBlock14bpp.AutoSize = true;
+            this.CharBlock14bpp.Checked = true;
+            this.CharBlock14bpp.Location = new System.Drawing.Point(11, 17);
+            this.CharBlock14bpp.Name = "CharBlock14bpp";
+            this.CharBlock14bpp.Size = new System.Drawing.Size(128, 17);
+            this.CharBlock14bpp.TabIndex = 0;
+            this.CharBlock14bpp.TabStop = true;
+            this.CharBlock14bpp.Text = "4 bpp (16 color mode)";
+            this.CharBlock14bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock18bpp
+            // 
+            this.CharBlock18bpp.AutoSize = true;
+            this.CharBlock18bpp.Location = new System.Drawing.Point(11, 40);
+            this.CharBlock18bpp.Name = "CharBlock18bpp";
+            this.CharBlock18bpp.Size = new System.Drawing.Size(134, 17);
+            this.CharBlock18bpp.TabIndex = 1;
+            this.CharBlock18bpp.Text = "8 bpp (256 color mode)";
+            this.CharBlock18bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock0ColorMode
+            // 
+            this.CharBlock0ColorMode.Controls.Add(this.CharBlock08bpp);
+            this.CharBlock0ColorMode.Controls.Add(this.CharBlock04bpp);
+            this.CharBlock0ColorMode.Location = new System.Drawing.Point(521, 6);
+            this.CharBlock0ColorMode.Name = "CharBlock0ColorMode";
+            this.CharBlock0ColorMode.Size = new System.Drawing.Size(241, 65);
+            this.CharBlock0ColorMode.TabIndex = 3;
+            this.CharBlock0ColorMode.TabStop = false;
+            this.CharBlock0ColorMode.Text = "Color Mode";
+            // 
+            // CharBlock08bpp
+            // 
+            this.CharBlock08bpp.AutoSize = true;
+            this.CharBlock08bpp.Location = new System.Drawing.Point(11, 40);
+            this.CharBlock08bpp.Name = "CharBlock08bpp";
+            this.CharBlock08bpp.Size = new System.Drawing.Size(134, 17);
+            this.CharBlock08bpp.TabIndex = 1;
+            this.CharBlock08bpp.Text = "8 bpp (256 color mode)";
+            this.CharBlock08bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock04bpp
+            // 
+            this.CharBlock04bpp.AutoSize = true;
+            this.CharBlock04bpp.Checked = true;
+            this.CharBlock04bpp.Location = new System.Drawing.Point(11, 17);
+            this.CharBlock04bpp.Name = "CharBlock04bpp";
+            this.CharBlock04bpp.Size = new System.Drawing.Size(128, 17);
+            this.CharBlock04bpp.TabIndex = 0;
+            this.CharBlock04bpp.TabStop = true;
+            this.CharBlock04bpp.Text = "4 bpp (16 color mode)";
+            this.CharBlock04bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock2ColorMode
+            // 
+            this.CharBlock2ColorMode.Controls.Add(this.CharBlock28bpp);
+            this.CharBlock2ColorMode.Controls.Add(this.CharBlock24bpp);
+            this.CharBlock2ColorMode.Location = new System.Drawing.Point(521, 6);
+            this.CharBlock2ColorMode.Name = "CharBlock2ColorMode";
+            this.CharBlock2ColorMode.Size = new System.Drawing.Size(241, 65);
+            this.CharBlock2ColorMode.TabIndex = 3;
+            this.CharBlock2ColorMode.TabStop = false;
+            this.CharBlock2ColorMode.Text = "Color Mode";
+            // 
+            // CharBlock28bpp
+            // 
+            this.CharBlock28bpp.AutoSize = true;
+            this.CharBlock28bpp.Location = new System.Drawing.Point(11, 40);
+            this.CharBlock28bpp.Name = "CharBlock28bpp";
+            this.CharBlock28bpp.Size = new System.Drawing.Size(134, 17);
+            this.CharBlock28bpp.TabIndex = 1;
+            this.CharBlock28bpp.Text = "8 bpp (256 color mode)";
+            this.CharBlock28bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock24bpp
+            // 
+            this.CharBlock24bpp.AutoSize = true;
+            this.CharBlock24bpp.Checked = true;
+            this.CharBlock24bpp.Location = new System.Drawing.Point(11, 17);
+            this.CharBlock24bpp.Name = "CharBlock24bpp";
+            this.CharBlock24bpp.Size = new System.Drawing.Size(128, 17);
+            this.CharBlock24bpp.TabIndex = 0;
+            this.CharBlock24bpp.TabStop = true;
+            this.CharBlock24bpp.Text = "4 bpp (16 color mode)";
+            this.CharBlock24bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock3ColorMode
+            // 
+            this.CharBlock3ColorMode.Controls.Add(this.CharBlock38bpp);
+            this.CharBlock3ColorMode.Controls.Add(this.CharBlock34bpp);
+            this.CharBlock3ColorMode.Location = new System.Drawing.Point(521, 6);
+            this.CharBlock3ColorMode.Name = "CharBlock3ColorMode";
+            this.CharBlock3ColorMode.Size = new System.Drawing.Size(241, 65);
+            this.CharBlock3ColorMode.TabIndex = 3;
+            this.CharBlock3ColorMode.TabStop = false;
+            this.CharBlock3ColorMode.Text = "Color Mode";
+            // 
+            // CharBlock38bpp
+            // 
+            this.CharBlock38bpp.AutoSize = true;
+            this.CharBlock38bpp.Location = new System.Drawing.Point(11, 40);
+            this.CharBlock38bpp.Name = "CharBlock38bpp";
+            this.CharBlock38bpp.Size = new System.Drawing.Size(134, 17);
+            this.CharBlock38bpp.TabIndex = 1;
+            this.CharBlock38bpp.Text = "8 bpp (256 color mode)";
+            this.CharBlock38bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock34bpp
+            // 
+            this.CharBlock34bpp.AutoSize = true;
+            this.CharBlock34bpp.Checked = true;
+            this.CharBlock34bpp.Location = new System.Drawing.Point(11, 17);
+            this.CharBlock34bpp.Name = "CharBlock34bpp";
+            this.CharBlock34bpp.Size = new System.Drawing.Size(128, 17);
+            this.CharBlock34bpp.TabIndex = 0;
+            this.CharBlock34bpp.TabStop = true;
+            this.CharBlock34bpp.Text = "4 bpp (16 color mode)";
+            this.CharBlock34bpp.UseVisualStyleBackColor = true;
             // 
             // Debug
             // 
@@ -975,12 +1235,30 @@
             this.Name = "Debug";
             this.Text = "Debug";
             this.Tabs.ResumeLayout(false);
+            this.Registers.ResumeLayout(false);
+            this.Registers.PerformLayout();
             this.PalettePage.ResumeLayout(false);
             this.PalettePage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.OBJPalette)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.BGPalette)).EndInit();
-            this.Registers.ResumeLayout(false);
-            this.Registers.PerformLayout();
+            this.CharBlocksTab.ResumeLayout(false);
+            this.CharBlockTabs.ResumeLayout(false);
+            this.CharBlock0Tab.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock0)).EndInit();
+            this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock1)).EndInit();
+            this.CharBlock2Tab.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock2)).EndInit();
+            this.CharBlock3Tab.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock3)).EndInit();
+            this.CharBlock1ColorMode.ResumeLayout(false);
+            this.CharBlock1ColorMode.PerformLayout();
+            this.CharBlock0ColorMode.ResumeLayout(false);
+            this.CharBlock0ColorMode.PerformLayout();
+            this.CharBlock2ColorMode.ResumeLayout(false);
+            this.CharBlock2ColorMode.PerformLayout();
+            this.CharBlock3ColorMode.ResumeLayout(false);
+            this.CharBlock3ColorMode.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -994,7 +1272,7 @@
         private System.Windows.Forms.PictureBox OBJPalette;
         private System.Windows.Forms.PictureBox BGPalette;
         private System.Windows.Forms.TabPage Registers;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage CharBlocksTab;
         private System.Windows.Forms.Label Window1DisplayLabel;
         private System.Windows.Forms.Label Window0DisplayLabel;
         private System.Windows.Forms.Label ForcedBlankLabel;
@@ -1065,5 +1343,26 @@
         private System.Windows.Forms.Label IEHBlankLabel;
         private System.Windows.Forms.Label IEVBlank;
         private System.Windows.Forms.Label IEVBlankLabel;
+        private System.Windows.Forms.TabControl CharBlockTabs;
+        private System.Windows.Forms.TabPage CharBlock0Tab;
+        private System.Windows.Forms.PictureBox CharBlock0;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.PictureBox CharBlock1;
+        private System.Windows.Forms.TabPage CharBlock2Tab;
+        private System.Windows.Forms.PictureBox CharBlock2;
+        private System.Windows.Forms.TabPage CharBlock3Tab;
+        private System.Windows.Forms.PictureBox CharBlock3;
+        private System.Windows.Forms.GroupBox CharBlock1ColorMode;
+        private System.Windows.Forms.RadioButton CharBlock18bpp;
+        private System.Windows.Forms.RadioButton CharBlock14bpp;
+        private System.Windows.Forms.GroupBox CharBlock0ColorMode;
+        private System.Windows.Forms.RadioButton CharBlock08bpp;
+        private System.Windows.Forms.RadioButton CharBlock04bpp;
+        private System.Windows.Forms.GroupBox CharBlock2ColorMode;
+        private System.Windows.Forms.RadioButton CharBlock28bpp;
+        private System.Windows.Forms.RadioButton CharBlock24bpp;
+        private System.Windows.Forms.GroupBox CharBlock3ColorMode;
+        private System.Windows.Forms.RadioButton CharBlock38bpp;
+        private System.Windows.Forms.RadioButton CharBlock34bpp;
     }
 }
