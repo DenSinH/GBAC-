@@ -96,11 +96,7 @@ namespace GBAEmulator.CPU
                  When R15 is the source register (Rd) of a register store (STR) instruction, the stored
                  value will be address of the instruction plus 12. 
                  (Manual)
-
-                 We reset this to 8 at the beginning, so we will have to undo that now here
                  */
-                if (Rn == 15)
-                    Address += 4;
 
                 uint Value = this.Registers[Rd];
                 if (Rd == 15)

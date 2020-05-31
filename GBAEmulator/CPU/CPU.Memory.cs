@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        [Conditional("DEBUG")]
+        private void MemoryAccess(uint Address)
+        {
+            Console.WriteLine("Memory Access: " + Address.ToString("x8"));
+            //Console.WriteLine(__GetWordAt__(this.iWRAM, 0x0550).ToString("x8"));
+            //Console.WriteLine(__GetWordAt__(this.iWRAM, 0x0554).ToString("x8"));
+            //Console.WriteLine(__GetWordAt__(this.iWRAM, 0x0558).ToString("x8"));
+            //if (Address >= 0x0300_0550 && Address < 0x0300_055c) Console.ReadKey();
+        }
+
         /* BIOS is defined in CPU.BIOS.cs */
         private byte[] eWRAM = new byte[0x40000];       // 256kB External Work RAM
         private byte[] iWRAM = new byte[0x8000];        // 32kB Internal Work RAM
@@ -51,6 +62,8 @@ namespace GBAEmulator.CPU
         
         private uint GetWordAt(uint address)
         {
+            this.MemoryAccess(address);
+
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __WordAccessCycles__[Section];
             this.SCycle = __WordAccessCycles__[Section];
@@ -81,6 +94,8 @@ namespace GBAEmulator.CPU
 
         private void SetWordAt(uint address, uint value)
         {
+            this.MemoryAccess(address);
+
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __WordAccessCycles__[Section];
             this.SCycle = __WordAccessCycles__[Section];
@@ -130,6 +145,8 @@ namespace GBAEmulator.CPU
 
         private ushort GetHalfWordAt(uint address)
         {
+            this.MemoryAccess(address);
+
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
@@ -158,6 +175,8 @@ namespace GBAEmulator.CPU
 
         private void SetHalfWordAt(uint address, ushort value)
         {
+            this.MemoryAccess(address);
+
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
@@ -204,6 +223,8 @@ namespace GBAEmulator.CPU
 
         private byte GetByteAt(uint address)
         {
+            this.MemoryAccess(address);
+
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
 
             this.NCycle = __ByteAccessCycles__[Section];
@@ -233,6 +254,8 @@ namespace GBAEmulator.CPU
 
         private void SetByteAt(uint address, byte value)
         {
+            this.MemoryAccess(address);
+
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];

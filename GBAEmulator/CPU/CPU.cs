@@ -81,9 +81,10 @@ namespace GBAEmulator.CPU
             this.Pipeline.Clear();
         }
         
-        // StreamReader IRQ_DEMO = new StreamReader("../../Tests/irq_demo_long.log");
+        StreamReader LOGFILE = new StreamReader("../../Tests/LTTP.log");
         public int Step()
         {
+            int DMACycles = 0;
             int StepCycles;
 
             if (pause)
@@ -98,7 +99,7 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                int DMACycles = this.HandleDMAs();
+                DMACycles = this.HandleDMAs();
                 if (DMACycles > 0)
                 {
                     this.Log("DMAing");
@@ -136,22 +137,23 @@ namespace GBAEmulator.CPU
 
             for (int i = 0; i < 4; i++) this.Timers[i].Tick(StepCycles);
 
-            return StepCycles;
-
-            //if (this.Pipeline.Count == 1)
+            //if (!this.HALTCNT.Halt && (DMACycles == 0))
             //{
-            //    string Line = IRQ_DEMO.ReadLine();
-            //    Console.WriteLine("LOG " + Line);
-            //    Console.Write("ACT ");
-            //    this.ShowInfo();
-
-            //    if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //    if (this.Pipeline.Count == 1)
             //    {
-            //        Console.ReadKey();
+            //        string Line = LOGFILE.ReadLine();
+            //        Console.WriteLine("LOG " + Line);
+            //        Console.Write("ACT ");
+            //        this.ShowInfo();
+
+            //        if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //        {
+            //            Console.ReadKey();
+            //        }
             //    }
             //}
 
-            
+            return StepCycles;
         }
     }
 }
