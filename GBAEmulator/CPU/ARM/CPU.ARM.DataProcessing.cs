@@ -25,7 +25,7 @@ namespace GBAEmulator.CPU
                     return SCycle + ICycle;
             }
         }
-
+        
         private int DataProcessing(uint Instruction)
         {
             bool ImmediateOperand = (Instruction & 0x0200_0000) > 0;
@@ -65,7 +65,7 @@ namespace GBAEmulator.CPU
             {
                 byte Rm = (byte)(Instruction & 0x0f);
                 Op2 = this.Registers[Rm];
-
+                
                 bool ImmediateShift = (Instruction & 0x10) == 0;
                 /*
                 The PC value will be the address of the instruction, plus 8 or 12 bytes due to instruction
@@ -146,7 +146,7 @@ namespace GBAEmulator.CPU
                     this.Log(string.Format("{0:x8} ADC {1:x8} -> R{2}", Op1, Op2, Rd));
                     Result = Op1 + Op2 + OldC;
                     if (SetConditions) this.SetCVAddC(Op1, Op2, OldC, Result);
-
+                    
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0110:  // SBC

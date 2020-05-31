@@ -23,7 +23,7 @@ namespace GBAEmulator.CPU
             My PC is always 4 bytes ahead, so I don't have to account for this difference.
             */
             Address = (this.PC & 0xffff_fffc) + (uint)((Instruction & 0x00ff) << 2);
-            uint Result = this.GetWordAt(Address & 0xffff_fffc);
+            uint Result = this.GetWordAt(Address);
 
             byte RotateAmount = (byte)((Address & 0x03) << 3);
 

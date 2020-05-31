@@ -17,6 +17,8 @@ namespace GBAEmulator
         private GCHandle _rawBitmap;
         private ushort[] RawCharBlock;
 
+        Label[] TimerCounters, TimerReloads, TimerPrescalers, TimerIRQEnables, TimerEnables, TimerCountUps;
+
         const int CharBlockSize = 16 * 8;
 
         public Debug(GBA gba)
@@ -27,6 +29,13 @@ namespace GBAEmulator
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MinimizeBox = false;
             this.MaximizeBox = false;
+
+            this.TimerCounters = new Label[4] { Timer0Counter, Timer1Counter, Timer2Counter, Timer3Counter };
+            this.TimerReloads = new Label[4] { Timer0Reload, Timer1Reload, Timer2Reload, Timer3Reload };
+            this.TimerPrescalers = new Label[4] { Timer0Prescaler, Timer1Prescaler, Timer2Prescaler, Timer3Prescaler };
+            this.TimerIRQEnables = new Label[4] { Timer0IRQEnable, Timer1IRQEnable, Timer2IRQEnable, Timer3IRQEnable };
+            this.TimerEnables = new Label[4] { Timer0Enabled, Timer1Enabled, Timer2Enabled, Timer3Enabled };
+            this.TimerCountUps = new Label[4] { null, Timer1CountUp, Timer2CountUp, Timer3CountUp };
 
             this.gba = gba;
             this.CharBlocks = new PictureBox[4] { this.CharBlock0, this.CharBlock1, this.CharBlock2, this.CharBlock3 };
@@ -101,16 +110,16 @@ namespace GBAEmulator
             this.IME.Text = InterruptControlData.IME;
 
             // Nice and hardcoded, I know
-            this.IEHBlank.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDVBlank) > 0) ? "1" : "0";
-            this.IEVBlank.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
+            this.IEVBlank.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDVBlank) > 0) ? "1" : "0";
+            this.IEHBlank.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
             this.IEVCOUNT.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
             this.IETimers.Text = ((InterruptControlData.IE & 0x0078) >> 3).ToString("x1");
             this.IESIO.Text = ((InterruptControlData.IE & 0x0f00) >> 8).ToString("x1"); ;
             this.IEKeypad.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.Keypad) > 0) ? "1" : "0";
             this.IEGamePak.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.GamePak) > 0) ? "1" : "0";
 
-            this.IFHBlank.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDVBlank) > 0) ? "1" : "0";
-            this.IFVBlank.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
+            this.IFVBlank.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDVBlank) > 0) ? "1" : "0";
+            this.IFHBlank.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
             this.IFVCOUNT.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
             this.IFTimers.Text = ((InterruptControlData.IF & 0x0078) >> 3).ToString("x1");
             this.IFSIO.Text = ((InterruptControlData.IF & 0x0f00) >> 8).ToString("x1"); ;
@@ -122,12 +131,26 @@ namespace GBAEmulator
             this.SWILabel.ForeColor = this.gba.cpu.mode == ARM7TDMI.Mode.Supervisor ? Color.Green : Color.Red;
         }
 
+        private void UpdateTimers()
+        {
+            int index = this.TimerTabs.SelectedIndex;
+            TimerInfo info = this.gba.cpu.GetTimerInfo(index);
+
+            this.TimerCounters[index].Text = info.Counter;
+            this.TimerReloads[index].Text = info.Reload;
+            this.TimerPrescalers[index].Text = info.Prescaler;
+            this.TimerIRQEnables[index].Text = info.IRQEnabled;
+            this.TimerEnables[index].Text = info.Enabled;
+            if (index != 0) this.TimerCountUps[index].Text = info.CountUp;
+        }
+
         private void UpdateRegisterTab()
         {
             this.UpdateDISPCNT();
             this.UpdateDISPSTAT();
             this.UpdateVCOUNT();
             this.UpdateInterruptControl();
+            this.UpdateTimers();
         }
 
         private void GenCharBlock8bpp(uint index)

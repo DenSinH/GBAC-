@@ -15,8 +15,7 @@ namespace GBAEmulator.CPU
         public State state { get; private set; }
         private readonly Queue<uint> Pipeline = new Queue<uint>(3);
         GBA gba;
-
-        StreamReader SBB_AFF_TEST = new StreamReader("../../Tests/sbb_aff_long.log");
+        
         public ARM7TDMI(GBA gba)
         {
             this.gba = gba;
@@ -52,7 +51,7 @@ namespace GBAEmulator.CPU
             this.__MemoryRegions__ = new byte[16][]
             {
                 this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
-                this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePakSRAM, this.GamePakSRAM
+                this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, null, null
             };
         }
 
@@ -81,78 +80,78 @@ namespace GBAEmulator.CPU
         {
             this.Pipeline.Clear();
         }
-
-        bool manual;
+        
+        // StreamReader IRQ_DEMO = new StreamReader("../../Tests/irq_demo_long.log");
         public int Step()
         {
-            //if (this.Pipeline.Count == 1)
-            //{
-            //    if (pause || this.PC == 0x0800_0b56)
-            //    {
-            //        pause = true;
-            //        if (this.PC == 0x0800_0b56)
-            //            Console.WriteLine("BREAKPOINT HIT!!!!!!!!!!!!!!");
+            int StepCycles;
 
-            //        string Line = SBB_AFF_TEST.ReadLine();
-
-            //        Console.WriteLine("LOG: " + Line);
-            //        Console.Write("ACT: ");
-            //        this.ShowInfo();
-            //        if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
-            //        {
-            //            if (this.Registers[7] != 0x03007a93)
-            //                manual = true;
-            //        }
-            //        if (manual)
-            //        {
-            //            manual = Console.ReadKey().KeyChar == ' ';
-            //        }
-            //    }
-            //}
+            if (pause)
+                return 1;
 
             this.HandleIRQs();
 
             if (this.HALTCNT.Halt)
             {
                 this.Log("Halted");
-                return 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
-            }
-
-            int DMACycles = this.HandleDMAs();
-            if (DMACycles > 0)
-            {
-                this.Log("DMAing");
-                return DMACycles;
-            }
-
-            if (this.state == State.ARM)
-            {
-                this.Pipeline.Enqueue(this.GetWordAt(this.PC));
-                this.PC += 4;
-
-                if (this.Pipeline.Count == 2)
-                {
-                    return this.ExecuteARM(this.Pipeline.Dequeue());
-                }
-                else
-                {
-                    return 1;  // how many cycles?
-                }
+                StepCycles = 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
             }
             else
             {
-                this.Pipeline.Enqueue(this.GetHalfWordAt(this.PC));
-                this.PC += 2;
-
-                if (this.Pipeline.Count == 2)
+                int DMACycles = this.HandleDMAs();
+                if (DMACycles > 0)
                 {
-                    return this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
+                    this.Log("DMAing");
+                    StepCycles = DMACycles;
+                }
+                else if (this.state == State.ARM)
+                {
+                    this.Pipeline.Enqueue(this.GetWordAt(this.PC));
+                    this.PC += 4;
+
+                    if (this.Pipeline.Count == 2)
+                    {
+                        StepCycles = this.ExecuteARM(this.Pipeline.Dequeue());
+                    }
+                    else
+                    {
+                        StepCycles = 1;  // how many cycles?
+                    }
                 }
                 else
                 {
-                    return 1;  // how many cycles?
+                    this.Pipeline.Enqueue(this.GetHalfWordAt(this.PC));
+                    this.PC += 2;
+
+                    if (this.Pipeline.Count == 2)
+                    {
+                        StepCycles = this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
+                    }
+                    else
+                    {
+                        StepCycles = 1;  // how many cycles?
+                    }
                 }
             }
+
+            for (int i = 0; i < 4; i++) this.Timers[i].Tick(StepCycles);
+
+            return StepCycles;
+
+            //if (this.Pipeline.Count == 1)
+            //{
+            //    string Line = IRQ_DEMO.ReadLine();
+            //    Console.WriteLine("LOG " + Line);
+            //    Console.Write("ACT ");
+            //    this.ShowInfo();
+
+            //    if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //    {
+            //        Console.ReadKey();
+            //    }
+            //}
+
+            
         }
     }
 }

@@ -752,20 +752,146 @@ namespace GBAEmulator.CPU
         #endregion
 
         #region Timer Registers
-        public class TimerRegister : IORegister2
+        public class cTMCNT_L : IORegister2
         {
+            public ushort Counter { get; private set; }
+            public ushort Reload { get; private set; }
+
+            private ushort PrescalerCounter;
+            public ushort PrescalerLimit = cTMCNT_H.PrescalerSelection[0];
+
+            public void TimerReload()
+            {
+                this.Counter = Reload;
+            }
+
+            public bool TickDirect(ushort cycles)
+            {
+                bool Overflow = false;
+                if (this.Counter + cycles > 0xffff)  // overflow
+                {
+                    this.Counter += cycles;
+                    this.Counter += this.Reload;
+                    Overflow = true;
+                }
+                this.Counter += cycles;
+
+                return Overflow;
+            }
+
+            public bool Tick(ushort cycles)
+            {
+                bool Overflow = false;
+
+                this.PrescalerCounter += cycles;
+                while (this.PrescalerCounter > this.PrescalerLimit)
+                {
+                    Overflow |= this.TickDirect(1);
+
+                    this.PrescalerCounter -= this.PrescalerLimit;
+                }
+
+                return Overflow;
+            }
+
             public override ushort Get()
             {
-                // Console.WriteLine("Timer read");
-                return base.Get();
+                return this.Counter;
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
                 base.Set(value, setlow, sethigh);
-                // Console.WriteLine($"Timer set to {value}");
+                this.Reload = value;
             }
         }
+
+        public class cTMCNT_H : IORegister2
+        {
+            public static ushort[] PrescalerSelection = new ushort[4] { 1, 64, 256, 1024 };
+
+            cTMCNT_L Data;
+
+            public cTMCNT_H(cTMCNT_L Data) : base()
+            {
+                this.Data = Data;
+            }
+
+            public byte Prescaler
+            {
+                get => (byte)(this._raw & 0x0003);
+            }
+
+            public bool CountUpTiming
+            {
+                get => (this._raw & 0x0004) > 0;
+            }
+
+            public bool TimerIRQEnable
+            {
+                get => (this._raw & 0x0040) > 0;
+            }
+
+            public bool Enabled
+            {
+                get => (this._raw & 0x0080) > 0;
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                bool WasEnabled = this.Enabled;
+
+                base.Set(value, setlow, sethigh);
+
+                this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
+                if (!WasEnabled && this.Enabled) this.Data.TimerReload();
+            }
+        }
+
+        public class cTimer
+        {
+            private cTimer Next;
+
+            private ARM7TDMI cpu;
+            private int index;
+
+            public cTMCNT_L Data;
+            public cTMCNT_H Control;
+
+            public cTimer(ARM7TDMI cpu, int index)
+            {
+                this.cpu = cpu;
+                this.index = index;
+                this.Data = new cTMCNT_L();
+                this.Control = new cTMCNT_H(this.Data);
+            }
+
+            public cTimer(ARM7TDMI cpu, int index, cTimer Next) : this(cpu, index)
+            {
+                this.Next = Next;
+            }
+
+            public void TickDirect(int cycles)
+            {
+                // countup tick calls
+                this.Data.TickDirect((ushort)cycles);
+            }
+
+            public void Tick(int cycles)
+            {
+                if (this.Control.Enabled && !this.Control.CountUpTiming)
+                {
+                    if (this.Data.Tick((ushort)cycles))  // overflow
+                    {
+                        if (this.Next?.Control.CountUpTiming ?? false) this.Next?.TickDirect(1);
+
+                        if (this.Control.TimerIRQEnable) this.cpu.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
+                    }
+                }
+            }
+        }
+
+        cTimer[] Timers = new cTimer[4];
         #endregion
     }
 }

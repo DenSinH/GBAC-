@@ -20,6 +20,21 @@ namespace GBAEmulator.CPU
         }
     }
 
+    public struct TimerInfo
+    {
+        public string Counter, Reload, Prescaler, IRQEnabled, Enabled, CountUp;
+
+        public TimerInfo(ARM7TDMI.cTimer timer)
+        {
+            this.Counter = timer.Data.Counter.ToString("x4");
+            this.Reload = timer.Data.Reload.ToString("x4");
+            this.Prescaler = timer.Data.PrescalerLimit.ToString("d4");
+            this.IRQEnabled = timer.Control.TimerIRQEnable ? "1" : "0";
+            this.Enabled = timer.Control.Enabled ? "1" : "0";
+            this.CountUp = timer.Control.CountUpTiming ? "1" : "0";
+        }
+    }
+
     partial class ARM7TDMI
     {
         public bool pause;
@@ -29,12 +44,11 @@ namespace GBAEmulator.CPU
         {
             Console.Error.WriteLine("Error: " + message);
         }
-
+        
         [Conditional("DEBUG")]
         private void Log(string message)
         {
-            if (pause)
-                Console.WriteLine(message);
+            Console.WriteLine(message);
         }
 
         public InterruptControlInfo GetInterruptControl()
@@ -44,6 +58,11 @@ namespace GBAEmulator.CPU
                 this.IF.raw, this.HALTCNT.Halt ? "1" : "0"
             );
         }
+
+        public TimerInfo GetTimerInfo(int index)
+        {
+            return new TimerInfo(this.Timers[index]);
+        } 
 
         public void ShowInfo()
         {

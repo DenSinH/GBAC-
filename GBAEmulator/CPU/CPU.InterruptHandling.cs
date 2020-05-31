@@ -31,7 +31,7 @@ namespace GBAEmulator.CPU
             {
                 this.HALTCNT.Halt = false;
 
-                // flipping IME makes irq_demo and Endrif's suite work, so this can be used for testing
+                // flipping IME makes irq_demo and Endrift's suite work, so this can be used for testing
                 if (this.IME.Enabled && (this.I == 0))
                 {
                     this.DoIRQ();
@@ -43,7 +43,7 @@ namespace GBAEmulator.CPU
 
         public void DoIRQ()
         {
-            this.Log("Doing IRQ");
+            this.Log("Doing IRQ: " + (this.IF.raw & this.IE.raw).ToString("x8"));
             this.ChangeMode(Mode.IRQ);
             this.I = 1;
 

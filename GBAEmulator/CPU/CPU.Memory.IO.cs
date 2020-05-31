@@ -13,6 +13,11 @@ namespace GBAEmulator.CPU
 
             this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(this, 0), new cDMACNT_H(this, 1), new cDMACNT_H(this, 2), new cDMACNT_H(this, 3, true) };
 
+            this.Timers[3] = new cTimer(this, 3);
+            this.Timers[2] = new cTimer(this, 2, this.Timers[3]);
+            this.Timers[1] = new cTimer(this, 1, this.Timers[2]);
+            this.Timers[0] = new cTimer(this, 0, this.Timers[1]);
+
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;
             this.IORAM[0x02] = this.IORAM[0x03] = new EmptyRegister();
             this.IORAM[0x04] = this.IORAM[0x05] = this.DISPSTAT;
@@ -101,15 +106,18 @@ namespace GBAEmulator.CPU
             this.IORAM[0xe0] = this.IORAM[0xe1] = new UnusedRegister();
             // todo: 0xe2 - 0xff
 
-            this.IORAM[0x100] = this.IORAM[0x101] = new TimerRegister();
-            this.IORAM[0x102] = this.IORAM[0x103] = new TimerRegister();
-            this.IORAM[0x104] = this.IORAM[0x105] = new TimerRegister();
-            this.IORAM[0x106] = this.IORAM[0x107] = new TimerRegister();
-            this.IORAM[0x108] = this.IORAM[0x109] = new TimerRegister();
-            this.IORAM[0x10a] = this.IORAM[0x10b] = new TimerRegister();
-            this.IORAM[0x10c] = this.IORAM[0x10d] = new TimerRegister();
-            this.IORAM[0x10e] = this.IORAM[0x10f] = new TimerRegister();
-            
+            this.IORAM[0x100] = this.IORAM[0x101] = this.Timers[0].Data;
+            this.IORAM[0x102] = this.IORAM[0x103] = this.Timers[0].Control;
+
+            this.IORAM[0x104] = this.IORAM[0x105] = this.Timers[1].Data;
+            this.IORAM[0x106] = this.IORAM[0x107] = this.Timers[1].Control;
+
+            this.IORAM[0x108] = this.IORAM[0x109] = this.Timers[2].Data;
+            this.IORAM[0x10a] = this.IORAM[0x10b] = this.Timers[2].Control;
+
+            this.IORAM[0x10c] = this.IORAM[0x10d] = this.Timers[3].Data;
+            this.IORAM[0x10e] = this.IORAM[0x10f] = this.Timers[3].Control;
+
             this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(this.KEYCNT, this);
             this.IORAM[0x0132] = this.IORAM[0x0133] = this.KEYCNT;
 
@@ -185,8 +193,8 @@ namespace GBAEmulator.CPU
                 return (uint)(reg.Get() | (this.IORAM[address + 2].Get() << 16));
             }
             uint result = (uint)(reg.Get() >> 8);
-            result |= ((uint)this.IORAM[address + 2].Get() << 8);
-            result |= ((uint)this.IORAM[address + 4].Get() << 24);
+            result |= ((uint)this.IORAM[address + 1].Get() << 8);
+            result |= ((uint)this.IORAM[address + 3].Get() << 24);
             return result;
 
         }
@@ -205,8 +213,8 @@ namespace GBAEmulator.CPU
             else
             {
                 reg.Set((ushort)(value << 8), false, true);
-                this.IORAM[address + 2].Set((ushort)(value >> 8), true, true);
-                this.IORAM[address + 4].Set((ushort)(value >> 24), true, false);
+                this.IORAM[address + 1].Set((ushort)(value >> 8), true, true);
+                this.IORAM[address + 3].Set((ushort)(value >> 24), true, false);
             }
         }
     }

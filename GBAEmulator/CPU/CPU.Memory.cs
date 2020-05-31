@@ -51,14 +51,6 @@ namespace GBAEmulator.CPU
         
         private uint GetWordAt(uint address)
         {
-            // trying to find the insane overflow bug in bigmap.gba
-            //if (address == 0x0300_0000 + 32412)  // y coord is stored at this address it seems
-            //{
-            //    Console.WriteLine(this.state);
-            //    Console.WriteLine((this.PC - 4).ToString("x8"));
-            //    Console.WriteLine(__GetWordAt__(this.iWRAM, address & 0xffff));
-            //}
-
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __WordAccessCycles__[Section];
             this.SCycle = __WordAccessCycles__[Section];
@@ -76,8 +68,11 @@ namespace GBAEmulator.CPU
                         return __GetWordAt__(this.VRAM, address & 0xffff);
                     }
                     return __GetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
-                case 4: // IORAM
+                case 4:   // IORAM
                     return this.IOGetWordAt(address & 0x3ff);
+                case 14:
+                case 15:  // SRAM
+                    return (uint)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8) | (this.GamePakSRAM[address & 0xffff] << 16) | (this.GamePakSRAM[address & 0xffff] << 24));
                 default:
                     throw new Exception("This cannot happen");
             }
@@ -92,6 +87,12 @@ namespace GBAEmulator.CPU
             
             if (__MemoryRegions__[Section] != null)
             {
+                if (Section <= 1)
+                {
+                    this.Error($"BIOS Write Attempted at PC = {this.PC.ToString("x8")}");
+                    return;
+                }
+
                 __SetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
                 return;
             }
@@ -112,6 +113,15 @@ namespace GBAEmulator.CPU
                     return;
                 case 4: // IORAM
                     this.IOSetWordAt(address & 0x3ff, value);
+                    return;
+                case 14:
+                case 15:  // SRAM
+                    /* 
+                     * Writing changes the 8bit value at the specified address only,
+                     * being set to LSB of (source_data ROR (address*8)).
+                     */
+                    byte RORValue = (byte)this.ROR(value, (byte)(8 * (address & 3)));
+                    this.GamePakSRAM[address & 0xffff] = RORValue;
                     return;
                 default:
                     throw new Exception("This cannot happen");
@@ -138,6 +148,9 @@ namespace GBAEmulator.CPU
                     return __GetHalfWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
                 case 4: // IORAM
                     return (ushort)this.IOGetHalfWordAt(address & 0x3ff);
+                case 14:
+                case 15:  // SRAM
+                    return (ushort)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8));
                 default:
                     throw new Exception("This cannot happen");
             }
@@ -151,6 +164,12 @@ namespace GBAEmulator.CPU
 
             if (__MemoryRegions__[Section] != null)
             {
+                if (Section <= 1)
+                {
+                    this.Error($"BIOS Write Attempted at PC = {this.PC.ToString("x8")}");
+                    return;
+                }
+
                 __SetHalfWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
                 return;
             }
@@ -168,6 +187,15 @@ namespace GBAEmulator.CPU
                     return;
                 case 4: // IORAM
                     this.IOSetHalfWordAt(address & 0x3ff, value);  // for now
+                    return;
+                case 14:
+                case 15:  // SRAM
+                    /* 
+                     * Writing changes the 8bit value at the specified address only,
+                     * being set to LSB of (source_data ROR (address*8)).
+                     */
+                    byte RORValue = (byte)this.ROR(value, (byte)(8 * (address & 3)));
+                    this.GamePakSRAM[address & 0xffff] = RORValue;
                     return;
                 default:
                     throw new Exception("This cannot happen");
@@ -195,6 +223,9 @@ namespace GBAEmulator.CPU
                     return this.VRAM[0x10000 | (address & 0x7fff)];
                 case 4: // IORAM
                     return (byte)this.IOGetByteAt(address & 0x3ff);
+                case 14:
+                case 15:  // SRAM
+                    return this.GamePakSRAM[address & 0xffff];  // SRAM byte reads are just normal
                 default:
                     throw new Exception("This cannot happen");
             }
@@ -258,6 +289,12 @@ namespace GBAEmulator.CPU
 
             if (__MemoryRegions__[Section] != null)
             {
+                if (Section <= 1)
+                {
+                    this.Error($"BIOS Write Attempted at PC = {this.PC.ToString("x8")}");
+                    return;
+                }
+
                 this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]] = value;
                 return;
             }
@@ -275,6 +312,10 @@ namespace GBAEmulator.CPU
                     return;
                 case 4: // IORAM
                     this.IOSetByteAt(address & 0x3ff, value);
+                    return;
+                case 14:
+                case 15:  // SRAM
+                    this.GamePakSRAM[address & 0xffff] = value;  // SRAM byte writes are just normal
                     return;
                 default:
                     throw new Exception("This cannot happen");

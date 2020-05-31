@@ -100,13 +100,19 @@ namespace GBAEmulator.CPU
                 switch (ShiftType)  // Shift type
                 {
                     case 0b00:  // Logical Left
-                        newC = (byte)((Op >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
-                        if (ShiftAmount >= 32)
+                        if (ShiftAmount > 32)
                         {
+                            Op = 0;
+                            newC = 0;
+                        }
+                        else if (ShiftAmount == 32)
+                        {
+                            newC = (byte)(Op & 0x01);  // bit 0
                             Op = 0;
                         }
                         else
                         {
+                            newC = (byte)((Op >> (32 - ShiftAmount)) & 0x01);  // Bit (32 - ShiftAmount) of contents of Rm
                             Op <<= ShiftAmount;
                         }
                         break;
@@ -141,8 +147,8 @@ namespace GBAEmulator.CPU
 
                         break;
                     case 0b11:  // Rotate Right
-                        newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                         ShiftAmount &= 0x1f;  // mod 32 gives same result
+                        newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
                         Op = (uint)((Op >> ShiftAmount) | ((Op & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
                         break;
                 }

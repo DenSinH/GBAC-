@@ -106,7 +106,7 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.F4)
             {
-                this.gba.cpu.ShowEWRAMAt(0x40000 - 4);
+                this.gba.cpu.pause = true;
             }
             else if (e.KeyCode == Keys.O)
             {

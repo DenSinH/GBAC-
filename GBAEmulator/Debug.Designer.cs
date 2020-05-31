@@ -108,25 +108,79 @@
             this.CharBlocksTab = new System.Windows.Forms.TabPage();
             this.CharBlockTabs = new System.Windows.Forms.TabControl();
             this.CharBlock0Tab = new System.Windows.Forms.TabPage();
-            this.CharBlock0 = new System.Windows.Forms.PictureBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.CharBlock1 = new System.Windows.Forms.PictureBox();
-            this.CharBlock2Tab = new System.Windows.Forms.TabPage();
-            this.CharBlock2 = new System.Windows.Forms.PictureBox();
-            this.CharBlock3Tab = new System.Windows.Forms.TabPage();
-            this.CharBlock3 = new System.Windows.Forms.PictureBox();
-            this.CharBlock1ColorMode = new System.Windows.Forms.GroupBox();
-            this.CharBlock14bpp = new System.Windows.Forms.RadioButton();
-            this.CharBlock18bpp = new System.Windows.Forms.RadioButton();
             this.CharBlock0ColorMode = new System.Windows.Forms.GroupBox();
             this.CharBlock08bpp = new System.Windows.Forms.RadioButton();
             this.CharBlock04bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock0 = new System.Windows.Forms.PictureBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.CharBlock1ColorMode = new System.Windows.Forms.GroupBox();
+            this.CharBlock18bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock14bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock1 = new System.Windows.Forms.PictureBox();
+            this.CharBlock2Tab = new System.Windows.Forms.TabPage();
             this.CharBlock2ColorMode = new System.Windows.Forms.GroupBox();
             this.CharBlock28bpp = new System.Windows.Forms.RadioButton();
             this.CharBlock24bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock2 = new System.Windows.Forms.PictureBox();
+            this.CharBlock3Tab = new System.Windows.Forms.TabPage();
             this.CharBlock3ColorMode = new System.Windows.Forms.GroupBox();
             this.CharBlock38bpp = new System.Windows.Forms.RadioButton();
             this.CharBlock34bpp = new System.Windows.Forms.RadioButton();
+            this.CharBlock3 = new System.Windows.Forms.PictureBox();
+            this.TimerTabs = new System.Windows.Forms.TabControl();
+            this.Timer0Tab = new System.Windows.Forms.TabPage();
+            this.Timer1Tab = new System.Windows.Forms.TabPage();
+            this.TimersLabel = new System.Windows.Forms.Label();
+            this.Timer0Enabled = new System.Windows.Forms.Label();
+            this.Timer0EnabledLabel = new System.Windows.Forms.Label();
+            this.Timer0IRQEnable = new System.Windows.Forms.Label();
+            this.Timer0IRQEnableLabel = new System.Windows.Forms.Label();
+            this.Timer0Prescaler = new System.Windows.Forms.Label();
+            this.Timer0PrescalerLabel = new System.Windows.Forms.Label();
+            this.Timer0Reload = new System.Windows.Forms.Label();
+            this.Timer0ReloadLabel = new System.Windows.Forms.Label();
+            this.Timer0Counter = new System.Windows.Forms.Label();
+            this.Timer0CounterLabel = new System.Windows.Forms.Label();
+            this.Timer1Enabled = new System.Windows.Forms.Label();
+            this.Timer1EnabledLabel = new System.Windows.Forms.Label();
+            this.Timer1IRQEnable = new System.Windows.Forms.Label();
+            this.Timer1IRQEnableLabel = new System.Windows.Forms.Label();
+            this.Timer1Prescaler = new System.Windows.Forms.Label();
+            this.Timer1PrescalerLabel = new System.Windows.Forms.Label();
+            this.Timer1Reload = new System.Windows.Forms.Label();
+            this.Timer1ReloadLabel = new System.Windows.Forms.Label();
+            this.Timer1Counter = new System.Windows.Forms.Label();
+            this.Timer1CounterLabel = new System.Windows.Forms.Label();
+            this.Timer2Tab = new System.Windows.Forms.TabPage();
+            this.Timer2Enabled = new System.Windows.Forms.Label();
+            this.Timer2EnableLabel = new System.Windows.Forms.Label();
+            this.Timer2IRQEnable = new System.Windows.Forms.Label();
+            this.Timer2IRQEnableLabel = new System.Windows.Forms.Label();
+            this.Timer2Prescaler = new System.Windows.Forms.Label();
+            this.Timer2PrescalerLabel = new System.Windows.Forms.Label();
+            this.Timer2Reload = new System.Windows.Forms.Label();
+            this.Timer2ReloadLabel = new System.Windows.Forms.Label();
+            this.Timer2Counter = new System.Windows.Forms.Label();
+            this.Timer2CounterLabel = new System.Windows.Forms.Label();
+            this.Timer3Tab = new System.Windows.Forms.TabPage();
+            this.Timer3Enabled = new System.Windows.Forms.Label();
+            this.Timer3EnabledLabel = new System.Windows.Forms.Label();
+            this.Timer3IRQEnable = new System.Windows.Forms.Label();
+            this.Timer3IRQEnableLabel = new System.Windows.Forms.Label();
+            this.Timer3Prescaler = new System.Windows.Forms.Label();
+            this.Timer3PrescalerLabel = new System.Windows.Forms.Label();
+            this.Timer3Reload = new System.Windows.Forms.Label();
+            this.Timer3ReloadLabel = new System.Windows.Forms.Label();
+            this.Timer3Counter = new System.Windows.Forms.Label();
+            this.Timer3CounterLabel = new System.Windows.Forms.Label();
+            this.Timer0CountUp = new System.Windows.Forms.Label();
+            this.Timer0CountUpLabel = new System.Windows.Forms.Label();
+            this.Timer1CountUp = new System.Windows.Forms.Label();
+            this.Timer1CountUpLabel = new System.Windows.Forms.Label();
+            this.Timer2CountUp = new System.Windows.Forms.Label();
+            this.Timer2CountUpLabel = new System.Windows.Forms.Label();
+            this.Timer3CountUp = new System.Windows.Forms.Label();
+            this.Timer3CountUpLabel = new System.Windows.Forms.Label();
             this.Tabs.SuspendLayout();
             this.Registers.SuspendLayout();
             this.PalettePage.SuspendLayout();
@@ -135,17 +189,22 @@
             this.CharBlocksTab.SuspendLayout();
             this.CharBlockTabs.SuspendLayout();
             this.CharBlock0Tab.SuspendLayout();
+            this.CharBlock0ColorMode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CharBlock0)).BeginInit();
             this.tabPage2.SuspendLayout();
+            this.CharBlock1ColorMode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CharBlock1)).BeginInit();
             this.CharBlock2Tab.SuspendLayout();
+            this.CharBlock2ColorMode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CharBlock2)).BeginInit();
             this.CharBlock3Tab.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.CharBlock3)).BeginInit();
-            this.CharBlock1ColorMode.SuspendLayout();
-            this.CharBlock0ColorMode.SuspendLayout();
-            this.CharBlock2ColorMode.SuspendLayout();
             this.CharBlock3ColorMode.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock3)).BeginInit();
+            this.TimerTabs.SuspendLayout();
+            this.Timer0Tab.SuspendLayout();
+            this.Timer1Tab.SuspendLayout();
+            this.Timer2Tab.SuspendLayout();
+            this.Timer3Tab.SuspendLayout();
             this.SuspendLayout();
             // 
             // Tabs
@@ -161,6 +220,8 @@
             // 
             // Registers
             // 
+            this.Registers.Controls.Add(this.TimersLabel);
+            this.Registers.Controls.Add(this.TimerTabs);
             this.Registers.Controls.Add(this.IFGamePak);
             this.Registers.Controls.Add(this.IFKeypad);
             this.Registers.Controls.Add(this.IFDMA);
@@ -1026,107 +1087,6 @@
             this.CharBlock0Tab.Text = "CharBlock 0";
             this.CharBlock0Tab.UseVisualStyleBackColor = true;
             // 
-            // CharBlock0
-            // 
-            this.CharBlock0.Location = new System.Drawing.Point(3, 3);
-            this.CharBlock0.Name = "CharBlock0";
-            this.CharBlock0.Size = new System.Drawing.Size(512, 512);
-            this.CharBlock0.TabIndex = 0;
-            this.CharBlock0.TabStop = false;
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.CharBlock1ColorMode);
-            this.tabPage2.Controls.Add(this.CharBlock1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(768, 515);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "CharBlock 1";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // CharBlock1
-            // 
-            this.CharBlock1.Location = new System.Drawing.Point(3, 3);
-            this.CharBlock1.Name = "CharBlock1";
-            this.CharBlock1.Size = new System.Drawing.Size(512, 512);
-            this.CharBlock1.TabIndex = 1;
-            this.CharBlock1.TabStop = false;
-            // 
-            // CharBlock2Tab
-            // 
-            this.CharBlock2Tab.Controls.Add(this.CharBlock2ColorMode);
-            this.CharBlock2Tab.Controls.Add(this.CharBlock2);
-            this.CharBlock2Tab.Location = new System.Drawing.Point(4, 22);
-            this.CharBlock2Tab.Name = "CharBlock2Tab";
-            this.CharBlock2Tab.Padding = new System.Windows.Forms.Padding(3);
-            this.CharBlock2Tab.Size = new System.Drawing.Size(768, 515);
-            this.CharBlock2Tab.TabIndex = 2;
-            this.CharBlock2Tab.Text = "CharBlock 2";
-            this.CharBlock2Tab.UseVisualStyleBackColor = true;
-            // 
-            // CharBlock2
-            // 
-            this.CharBlock2.Location = new System.Drawing.Point(3, 3);
-            this.CharBlock2.Name = "CharBlock2";
-            this.CharBlock2.Size = new System.Drawing.Size(512, 512);
-            this.CharBlock2.TabIndex = 1;
-            this.CharBlock2.TabStop = false;
-            // 
-            // CharBlock3Tab
-            // 
-            this.CharBlock3Tab.Controls.Add(this.CharBlock3ColorMode);
-            this.CharBlock3Tab.Controls.Add(this.CharBlock3);
-            this.CharBlock3Tab.Location = new System.Drawing.Point(4, 22);
-            this.CharBlock3Tab.Name = "CharBlock3Tab";
-            this.CharBlock3Tab.Padding = new System.Windows.Forms.Padding(3);
-            this.CharBlock3Tab.Size = new System.Drawing.Size(768, 515);
-            this.CharBlock3Tab.TabIndex = 3;
-            this.CharBlock3Tab.Text = "CharBlock 3";
-            this.CharBlock3Tab.UseVisualStyleBackColor = true;
-            // 
-            // CharBlock3
-            // 
-            this.CharBlock3.Location = new System.Drawing.Point(3, 3);
-            this.CharBlock3.Name = "CharBlock3";
-            this.CharBlock3.Size = new System.Drawing.Size(512, 512);
-            this.CharBlock3.TabIndex = 1;
-            this.CharBlock3.TabStop = false;
-            // 
-            // CharBlock1ColorMode
-            // 
-            this.CharBlock1ColorMode.Controls.Add(this.CharBlock18bpp);
-            this.CharBlock1ColorMode.Controls.Add(this.CharBlock14bpp);
-            this.CharBlock1ColorMode.Location = new System.Drawing.Point(521, 6);
-            this.CharBlock1ColorMode.Name = "CharBlock1ColorMode";
-            this.CharBlock1ColorMode.Size = new System.Drawing.Size(241, 65);
-            this.CharBlock1ColorMode.TabIndex = 2;
-            this.CharBlock1ColorMode.TabStop = false;
-            this.CharBlock1ColorMode.Text = "Color Mode";
-            // 
-            // CharBlock14bpp
-            // 
-            this.CharBlock14bpp.AutoSize = true;
-            this.CharBlock14bpp.Checked = true;
-            this.CharBlock14bpp.Location = new System.Drawing.Point(11, 17);
-            this.CharBlock14bpp.Name = "CharBlock14bpp";
-            this.CharBlock14bpp.Size = new System.Drawing.Size(128, 17);
-            this.CharBlock14bpp.TabIndex = 0;
-            this.CharBlock14bpp.TabStop = true;
-            this.CharBlock14bpp.Text = "4 bpp (16 color mode)";
-            this.CharBlock14bpp.UseVisualStyleBackColor = true;
-            // 
-            // CharBlock18bpp
-            // 
-            this.CharBlock18bpp.AutoSize = true;
-            this.CharBlock18bpp.Location = new System.Drawing.Point(11, 40);
-            this.CharBlock18bpp.Name = "CharBlock18bpp";
-            this.CharBlock18bpp.Size = new System.Drawing.Size(134, 17);
-            this.CharBlock18bpp.TabIndex = 1;
-            this.CharBlock18bpp.Text = "8 bpp (256 color mode)";
-            this.CharBlock18bpp.UseVisualStyleBackColor = true;
-            // 
             // CharBlock0ColorMode
             // 
             this.CharBlock0ColorMode.Controls.Add(this.CharBlock08bpp);
@@ -1159,6 +1119,79 @@
             this.CharBlock04bpp.TabStop = true;
             this.CharBlock04bpp.Text = "4 bpp (16 color mode)";
             this.CharBlock04bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock0
+            // 
+            this.CharBlock0.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock0.Name = "CharBlock0";
+            this.CharBlock0.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock0.TabIndex = 0;
+            this.CharBlock0.TabStop = false;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.CharBlock1ColorMode);
+            this.tabPage2.Controls.Add(this.CharBlock1);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(768, 515);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "CharBlock 1";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock1ColorMode
+            // 
+            this.CharBlock1ColorMode.Controls.Add(this.CharBlock18bpp);
+            this.CharBlock1ColorMode.Controls.Add(this.CharBlock14bpp);
+            this.CharBlock1ColorMode.Location = new System.Drawing.Point(521, 6);
+            this.CharBlock1ColorMode.Name = "CharBlock1ColorMode";
+            this.CharBlock1ColorMode.Size = new System.Drawing.Size(241, 65);
+            this.CharBlock1ColorMode.TabIndex = 2;
+            this.CharBlock1ColorMode.TabStop = false;
+            this.CharBlock1ColorMode.Text = "Color Mode";
+            // 
+            // CharBlock18bpp
+            // 
+            this.CharBlock18bpp.AutoSize = true;
+            this.CharBlock18bpp.Location = new System.Drawing.Point(11, 40);
+            this.CharBlock18bpp.Name = "CharBlock18bpp";
+            this.CharBlock18bpp.Size = new System.Drawing.Size(134, 17);
+            this.CharBlock18bpp.TabIndex = 1;
+            this.CharBlock18bpp.Text = "8 bpp (256 color mode)";
+            this.CharBlock18bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock14bpp
+            // 
+            this.CharBlock14bpp.AutoSize = true;
+            this.CharBlock14bpp.Checked = true;
+            this.CharBlock14bpp.Location = new System.Drawing.Point(11, 17);
+            this.CharBlock14bpp.Name = "CharBlock14bpp";
+            this.CharBlock14bpp.Size = new System.Drawing.Size(128, 17);
+            this.CharBlock14bpp.TabIndex = 0;
+            this.CharBlock14bpp.TabStop = true;
+            this.CharBlock14bpp.Text = "4 bpp (16 color mode)";
+            this.CharBlock14bpp.UseVisualStyleBackColor = true;
+            // 
+            // CharBlock1
+            // 
+            this.CharBlock1.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock1.Name = "CharBlock1";
+            this.CharBlock1.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock1.TabIndex = 1;
+            this.CharBlock1.TabStop = false;
+            // 
+            // CharBlock2Tab
+            // 
+            this.CharBlock2Tab.Controls.Add(this.CharBlock2ColorMode);
+            this.CharBlock2Tab.Controls.Add(this.CharBlock2);
+            this.CharBlock2Tab.Location = new System.Drawing.Point(4, 22);
+            this.CharBlock2Tab.Name = "CharBlock2Tab";
+            this.CharBlock2Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.CharBlock2Tab.Size = new System.Drawing.Size(768, 515);
+            this.CharBlock2Tab.TabIndex = 2;
+            this.CharBlock2Tab.Text = "CharBlock 2";
+            this.CharBlock2Tab.UseVisualStyleBackColor = true;
             // 
             // CharBlock2ColorMode
             // 
@@ -1193,6 +1226,26 @@
             this.CharBlock24bpp.Text = "4 bpp (16 color mode)";
             this.CharBlock24bpp.UseVisualStyleBackColor = true;
             // 
+            // CharBlock2
+            // 
+            this.CharBlock2.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock2.Name = "CharBlock2";
+            this.CharBlock2.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock2.TabIndex = 1;
+            this.CharBlock2.TabStop = false;
+            // 
+            // CharBlock3Tab
+            // 
+            this.CharBlock3Tab.Controls.Add(this.CharBlock3ColorMode);
+            this.CharBlock3Tab.Controls.Add(this.CharBlock3);
+            this.CharBlock3Tab.Location = new System.Drawing.Point(4, 22);
+            this.CharBlock3Tab.Name = "CharBlock3Tab";
+            this.CharBlock3Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.CharBlock3Tab.Size = new System.Drawing.Size(768, 515);
+            this.CharBlock3Tab.TabIndex = 3;
+            this.CharBlock3Tab.Text = "CharBlock 3";
+            this.CharBlock3Tab.UseVisualStyleBackColor = true;
+            // 
             // CharBlock3ColorMode
             // 
             this.CharBlock3ColorMode.Controls.Add(this.CharBlock38bpp);
@@ -1226,6 +1279,604 @@
             this.CharBlock34bpp.Text = "4 bpp (16 color mode)";
             this.CharBlock34bpp.UseVisualStyleBackColor = true;
             // 
+            // CharBlock3
+            // 
+            this.CharBlock3.Location = new System.Drawing.Point(3, 3);
+            this.CharBlock3.Name = "CharBlock3";
+            this.CharBlock3.Size = new System.Drawing.Size(512, 512);
+            this.CharBlock3.TabIndex = 1;
+            this.CharBlock3.TabStop = false;
+            // 
+            // TimerTabs
+            // 
+            this.TimerTabs.Controls.Add(this.Timer0Tab);
+            this.TimerTabs.Controls.Add(this.Timer1Tab);
+            this.TimerTabs.Controls.Add(this.Timer2Tab);
+            this.TimerTabs.Controls.Add(this.Timer3Tab);
+            this.TimerTabs.Location = new System.Drawing.Point(493, 51);
+            this.TimerTabs.Name = "TimerTabs";
+            this.TimerTabs.SelectedIndex = 0;
+            this.TimerTabs.Size = new System.Drawing.Size(213, 158);
+            this.TimerTabs.TabIndex = 90;
+            // 
+            // Timer0Tab
+            // 
+            this.Timer0Tab.Controls.Add(this.Timer0CountUp);
+            this.Timer0Tab.Controls.Add(this.Timer0CountUpLabel);
+            this.Timer0Tab.Controls.Add(this.Timer0Enabled);
+            this.Timer0Tab.Controls.Add(this.Timer0EnabledLabel);
+            this.Timer0Tab.Controls.Add(this.Timer0IRQEnable);
+            this.Timer0Tab.Controls.Add(this.Timer0IRQEnableLabel);
+            this.Timer0Tab.Controls.Add(this.Timer0Prescaler);
+            this.Timer0Tab.Controls.Add(this.Timer0PrescalerLabel);
+            this.Timer0Tab.Controls.Add(this.Timer0Reload);
+            this.Timer0Tab.Controls.Add(this.Timer0ReloadLabel);
+            this.Timer0Tab.Controls.Add(this.Timer0Counter);
+            this.Timer0Tab.Controls.Add(this.Timer0CounterLabel);
+            this.Timer0Tab.Location = new System.Drawing.Point(4, 22);
+            this.Timer0Tab.Name = "Timer0Tab";
+            this.Timer0Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.Timer0Tab.Size = new System.Drawing.Size(205, 132);
+            this.Timer0Tab.TabIndex = 0;
+            this.Timer0Tab.Text = "Timer 0";
+            this.Timer0Tab.UseVisualStyleBackColor = true;
+            // 
+            // Timer1Tab
+            // 
+            this.Timer1Tab.Controls.Add(this.Timer1CountUp);
+            this.Timer1Tab.Controls.Add(this.Timer1CountUpLabel);
+            this.Timer1Tab.Controls.Add(this.Timer1Enabled);
+            this.Timer1Tab.Controls.Add(this.Timer1EnabledLabel);
+            this.Timer1Tab.Controls.Add(this.Timer1IRQEnable);
+            this.Timer1Tab.Controls.Add(this.Timer1IRQEnableLabel);
+            this.Timer1Tab.Controls.Add(this.Timer1Prescaler);
+            this.Timer1Tab.Controls.Add(this.Timer1PrescalerLabel);
+            this.Timer1Tab.Controls.Add(this.Timer1Reload);
+            this.Timer1Tab.Controls.Add(this.Timer1ReloadLabel);
+            this.Timer1Tab.Controls.Add(this.Timer1Counter);
+            this.Timer1Tab.Controls.Add(this.Timer1CounterLabel);
+            this.Timer1Tab.Location = new System.Drawing.Point(4, 22);
+            this.Timer1Tab.Name = "Timer1Tab";
+            this.Timer1Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.Timer1Tab.Size = new System.Drawing.Size(205, 132);
+            this.Timer1Tab.TabIndex = 1;
+            this.Timer1Tab.Text = "Timer 1";
+            this.Timer1Tab.UseVisualStyleBackColor = true;
+            // 
+            // TimersLabel
+            // 
+            this.TimersLabel.AutoSize = true;
+            this.TimersLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TimersLabel.Location = new System.Drawing.Point(489, 3);
+            this.TimersLabel.Name = "TimersLabel";
+            this.TimersLabel.Size = new System.Drawing.Size(62, 20);
+            this.TimersLabel.TabIndex = 91;
+            this.TimersLabel.Text = "Timers";
+            // 
+            // Timer0Enabled
+            // 
+            this.Timer0Enabled.AutoSize = true;
+            this.Timer0Enabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0Enabled.Location = new System.Drawing.Point(181, 83);
+            this.Timer0Enabled.Name = "Timer0Enabled";
+            this.Timer0Enabled.Size = new System.Drawing.Size(18, 20);
+            this.Timer0Enabled.TabIndex = 80;
+            this.Timer0Enabled.Text = "0";
+            // 
+            // Timer0EnabledLabel
+            // 
+            this.Timer0EnabledLabel.AutoSize = true;
+            this.Timer0EnabledLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0EnabledLabel.Location = new System.Drawing.Point(3, 83);
+            this.Timer0EnabledLabel.Name = "Timer0EnabledLabel";
+            this.Timer0EnabledLabel.Size = new System.Drawing.Size(68, 20);
+            this.Timer0EnabledLabel.TabIndex = 79;
+            this.Timer0EnabledLabel.Text = "Enabled";
+            // 
+            // Timer0IRQEnable
+            // 
+            this.Timer0IRQEnable.AutoSize = true;
+            this.Timer0IRQEnable.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0IRQEnable.Location = new System.Drawing.Point(181, 63);
+            this.Timer0IRQEnable.Name = "Timer0IRQEnable";
+            this.Timer0IRQEnable.Size = new System.Drawing.Size(18, 20);
+            this.Timer0IRQEnable.TabIndex = 78;
+            this.Timer0IRQEnable.Text = "0";
+            // 
+            // Timer0IRQEnableLabel
+            // 
+            this.Timer0IRQEnableLabel.AutoSize = true;
+            this.Timer0IRQEnableLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0IRQEnableLabel.Location = new System.Drawing.Point(3, 63);
+            this.Timer0IRQEnableLabel.Name = "Timer0IRQEnableLabel";
+            this.Timer0IRQEnableLabel.Size = new System.Drawing.Size(92, 20);
+            this.Timer0IRQEnableLabel.TabIndex = 77;
+            this.Timer0IRQEnableLabel.Text = "IRQ Enable";
+            // 
+            // Timer0Prescaler
+            // 
+            this.Timer0Prescaler.AutoSize = true;
+            this.Timer0Prescaler.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0Prescaler.Location = new System.Drawing.Point(154, 43);
+            this.Timer0Prescaler.Name = "Timer0Prescaler";
+            this.Timer0Prescaler.Size = new System.Drawing.Size(45, 20);
+            this.Timer0Prescaler.TabIndex = 76;
+            this.Timer0Prescaler.Text = "0001";
+            // 
+            // Timer0PrescalerLabel
+            // 
+            this.Timer0PrescalerLabel.AutoSize = true;
+            this.Timer0PrescalerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0PrescalerLabel.Location = new System.Drawing.Point(3, 43);
+            this.Timer0PrescalerLabel.Name = "Timer0PrescalerLabel";
+            this.Timer0PrescalerLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer0PrescalerLabel.TabIndex = 75;
+            this.Timer0PrescalerLabel.Text = "Prescaler";
+            // 
+            // Timer0Reload
+            // 
+            this.Timer0Reload.AutoSize = true;
+            this.Timer0Reload.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0Reload.Location = new System.Drawing.Point(154, 23);
+            this.Timer0Reload.Name = "Timer0Reload";
+            this.Timer0Reload.Size = new System.Drawing.Size(45, 20);
+            this.Timer0Reload.TabIndex = 74;
+            this.Timer0Reload.Text = "0000";
+            // 
+            // Timer0ReloadLabel
+            // 
+            this.Timer0ReloadLabel.AutoSize = true;
+            this.Timer0ReloadLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0ReloadLabel.Location = new System.Drawing.Point(3, 23);
+            this.Timer0ReloadLabel.Name = "Timer0ReloadLabel";
+            this.Timer0ReloadLabel.Size = new System.Drawing.Size(60, 20);
+            this.Timer0ReloadLabel.TabIndex = 73;
+            this.Timer0ReloadLabel.Text = "Reload";
+            // 
+            // Timer0Counter
+            // 
+            this.Timer0Counter.AutoSize = true;
+            this.Timer0Counter.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0Counter.Location = new System.Drawing.Point(154, 3);
+            this.Timer0Counter.Name = "Timer0Counter";
+            this.Timer0Counter.Size = new System.Drawing.Size(45, 20);
+            this.Timer0Counter.TabIndex = 72;
+            this.Timer0Counter.Text = "0000";
+            // 
+            // Timer0CounterLabel
+            // 
+            this.Timer0CounterLabel.AutoSize = true;
+            this.Timer0CounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0CounterLabel.Location = new System.Drawing.Point(3, 3);
+            this.Timer0CounterLabel.Name = "Timer0CounterLabel";
+            this.Timer0CounterLabel.Size = new System.Drawing.Size(66, 20);
+            this.Timer0CounterLabel.TabIndex = 71;
+            this.Timer0CounterLabel.Text = "Counter";
+            // 
+            // Timer1Enabled
+            // 
+            this.Timer1Enabled.AutoSize = true;
+            this.Timer1Enabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1Enabled.Location = new System.Drawing.Point(181, 83);
+            this.Timer1Enabled.Name = "Timer1Enabled";
+            this.Timer1Enabled.Size = new System.Drawing.Size(18, 20);
+            this.Timer1Enabled.TabIndex = 90;
+            this.Timer1Enabled.Text = "0";
+            // 
+            // Timer1EnabledLabel
+            // 
+            this.Timer1EnabledLabel.AutoSize = true;
+            this.Timer1EnabledLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1EnabledLabel.Location = new System.Drawing.Point(3, 83);
+            this.Timer1EnabledLabel.Name = "Timer1EnabledLabel";
+            this.Timer1EnabledLabel.Size = new System.Drawing.Size(68, 20);
+            this.Timer1EnabledLabel.TabIndex = 89;
+            this.Timer1EnabledLabel.Text = "Enabled";
+            // 
+            // Timer1IRQEnable
+            // 
+            this.Timer1IRQEnable.AutoSize = true;
+            this.Timer1IRQEnable.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1IRQEnable.Location = new System.Drawing.Point(181, 63);
+            this.Timer1IRQEnable.Name = "Timer1IRQEnable";
+            this.Timer1IRQEnable.Size = new System.Drawing.Size(18, 20);
+            this.Timer1IRQEnable.TabIndex = 88;
+            this.Timer1IRQEnable.Text = "0";
+            // 
+            // Timer1IRQEnableLabel
+            // 
+            this.Timer1IRQEnableLabel.AutoSize = true;
+            this.Timer1IRQEnableLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1IRQEnableLabel.Location = new System.Drawing.Point(3, 63);
+            this.Timer1IRQEnableLabel.Name = "Timer1IRQEnableLabel";
+            this.Timer1IRQEnableLabel.Size = new System.Drawing.Size(92, 20);
+            this.Timer1IRQEnableLabel.TabIndex = 87;
+            this.Timer1IRQEnableLabel.Text = "IRQ Enable";
+            // 
+            // Timer1Prescaler
+            // 
+            this.Timer1Prescaler.AutoSize = true;
+            this.Timer1Prescaler.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1Prescaler.Location = new System.Drawing.Point(154, 43);
+            this.Timer1Prescaler.Name = "Timer1Prescaler";
+            this.Timer1Prescaler.Size = new System.Drawing.Size(45, 20);
+            this.Timer1Prescaler.TabIndex = 86;
+            this.Timer1Prescaler.Text = "0001";
+            // 
+            // Timer1PrescalerLabel
+            // 
+            this.Timer1PrescalerLabel.AutoSize = true;
+            this.Timer1PrescalerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1PrescalerLabel.Location = new System.Drawing.Point(3, 43);
+            this.Timer1PrescalerLabel.Name = "Timer1PrescalerLabel";
+            this.Timer1PrescalerLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer1PrescalerLabel.TabIndex = 85;
+            this.Timer1PrescalerLabel.Text = "Prescaler";
+            // 
+            // Timer1Reload
+            // 
+            this.Timer1Reload.AutoSize = true;
+            this.Timer1Reload.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1Reload.Location = new System.Drawing.Point(154, 23);
+            this.Timer1Reload.Name = "Timer1Reload";
+            this.Timer1Reload.Size = new System.Drawing.Size(45, 20);
+            this.Timer1Reload.TabIndex = 84;
+            this.Timer1Reload.Text = "0000";
+            // 
+            // Timer1ReloadLabel
+            // 
+            this.Timer1ReloadLabel.AutoSize = true;
+            this.Timer1ReloadLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1ReloadLabel.Location = new System.Drawing.Point(3, 23);
+            this.Timer1ReloadLabel.Name = "Timer1ReloadLabel";
+            this.Timer1ReloadLabel.Size = new System.Drawing.Size(60, 20);
+            this.Timer1ReloadLabel.TabIndex = 83;
+            this.Timer1ReloadLabel.Text = "Reload";
+            // 
+            // Timer1Counter
+            // 
+            this.Timer1Counter.AutoSize = true;
+            this.Timer1Counter.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1Counter.Location = new System.Drawing.Point(154, 3);
+            this.Timer1Counter.Name = "Timer1Counter";
+            this.Timer1Counter.Size = new System.Drawing.Size(45, 20);
+            this.Timer1Counter.TabIndex = 82;
+            this.Timer1Counter.Text = "0000";
+            // 
+            // Timer1CounterLabel
+            // 
+            this.Timer1CounterLabel.AutoSize = true;
+            this.Timer1CounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1CounterLabel.Location = new System.Drawing.Point(3, 3);
+            this.Timer1CounterLabel.Name = "Timer1CounterLabel";
+            this.Timer1CounterLabel.Size = new System.Drawing.Size(66, 20);
+            this.Timer1CounterLabel.TabIndex = 81;
+            this.Timer1CounterLabel.Text = "Counter";
+            // 
+            // Timer2Tab
+            // 
+            this.Timer2Tab.Controls.Add(this.Timer2CountUp);
+            this.Timer2Tab.Controls.Add(this.Timer2CountUpLabel);
+            this.Timer2Tab.Controls.Add(this.Timer2Enabled);
+            this.Timer2Tab.Controls.Add(this.Timer2EnableLabel);
+            this.Timer2Tab.Controls.Add(this.Timer2IRQEnable);
+            this.Timer2Tab.Controls.Add(this.Timer2IRQEnableLabel);
+            this.Timer2Tab.Controls.Add(this.Timer2Prescaler);
+            this.Timer2Tab.Controls.Add(this.Timer2PrescalerLabel);
+            this.Timer2Tab.Controls.Add(this.Timer2Reload);
+            this.Timer2Tab.Controls.Add(this.Timer2ReloadLabel);
+            this.Timer2Tab.Controls.Add(this.Timer2Counter);
+            this.Timer2Tab.Controls.Add(this.Timer2CounterLabel);
+            this.Timer2Tab.Location = new System.Drawing.Point(4, 22);
+            this.Timer2Tab.Name = "Timer2Tab";
+            this.Timer2Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.Timer2Tab.Size = new System.Drawing.Size(205, 132);
+            this.Timer2Tab.TabIndex = 2;
+            this.Timer2Tab.Text = "Timer 2";
+            this.Timer2Tab.UseVisualStyleBackColor = true;
+            // 
+            // Timer2Enabled
+            // 
+            this.Timer2Enabled.AutoSize = true;
+            this.Timer2Enabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2Enabled.Location = new System.Drawing.Point(181, 83);
+            this.Timer2Enabled.Name = "Timer2Enabled";
+            this.Timer2Enabled.Size = new System.Drawing.Size(18, 20);
+            this.Timer2Enabled.TabIndex = 100;
+            this.Timer2Enabled.Text = "0";
+            // 
+            // Timer2EnableLabel
+            // 
+            this.Timer2EnableLabel.AutoSize = true;
+            this.Timer2EnableLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2EnableLabel.Location = new System.Drawing.Point(3, 83);
+            this.Timer2EnableLabel.Name = "Timer2EnableLabel";
+            this.Timer2EnableLabel.Size = new System.Drawing.Size(68, 20);
+            this.Timer2EnableLabel.TabIndex = 99;
+            this.Timer2EnableLabel.Text = "Enabled";
+            // 
+            // Timer2IRQEnable
+            // 
+            this.Timer2IRQEnable.AutoSize = true;
+            this.Timer2IRQEnable.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2IRQEnable.Location = new System.Drawing.Point(181, 63);
+            this.Timer2IRQEnable.Name = "Timer2IRQEnable";
+            this.Timer2IRQEnable.Size = new System.Drawing.Size(18, 20);
+            this.Timer2IRQEnable.TabIndex = 98;
+            this.Timer2IRQEnable.Text = "0";
+            // 
+            // Timer2IRQEnableLabel
+            // 
+            this.Timer2IRQEnableLabel.AutoSize = true;
+            this.Timer2IRQEnableLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2IRQEnableLabel.Location = new System.Drawing.Point(3, 63);
+            this.Timer2IRQEnableLabel.Name = "Timer2IRQEnableLabel";
+            this.Timer2IRQEnableLabel.Size = new System.Drawing.Size(92, 20);
+            this.Timer2IRQEnableLabel.TabIndex = 97;
+            this.Timer2IRQEnableLabel.Text = "IRQ Enable";
+            // 
+            // Timer2Prescaler
+            // 
+            this.Timer2Prescaler.AutoSize = true;
+            this.Timer2Prescaler.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2Prescaler.Location = new System.Drawing.Point(154, 43);
+            this.Timer2Prescaler.Name = "Timer2Prescaler";
+            this.Timer2Prescaler.Size = new System.Drawing.Size(45, 20);
+            this.Timer2Prescaler.TabIndex = 96;
+            this.Timer2Prescaler.Text = "0001";
+            // 
+            // Timer2PrescalerLabel
+            // 
+            this.Timer2PrescalerLabel.AutoSize = true;
+            this.Timer2PrescalerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2PrescalerLabel.Location = new System.Drawing.Point(3, 43);
+            this.Timer2PrescalerLabel.Name = "Timer2PrescalerLabel";
+            this.Timer2PrescalerLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer2PrescalerLabel.TabIndex = 95;
+            this.Timer2PrescalerLabel.Text = "Prescaler";
+            // 
+            // Timer2Reload
+            // 
+            this.Timer2Reload.AutoSize = true;
+            this.Timer2Reload.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2Reload.Location = new System.Drawing.Point(154, 23);
+            this.Timer2Reload.Name = "Timer2Reload";
+            this.Timer2Reload.Size = new System.Drawing.Size(45, 20);
+            this.Timer2Reload.TabIndex = 94;
+            this.Timer2Reload.Text = "0000";
+            // 
+            // Timer2ReloadLabel
+            // 
+            this.Timer2ReloadLabel.AutoSize = true;
+            this.Timer2ReloadLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2ReloadLabel.Location = new System.Drawing.Point(3, 23);
+            this.Timer2ReloadLabel.Name = "Timer2ReloadLabel";
+            this.Timer2ReloadLabel.Size = new System.Drawing.Size(60, 20);
+            this.Timer2ReloadLabel.TabIndex = 93;
+            this.Timer2ReloadLabel.Text = "Reload";
+            // 
+            // Timer2Counter
+            // 
+            this.Timer2Counter.AutoSize = true;
+            this.Timer2Counter.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2Counter.Location = new System.Drawing.Point(154, 3);
+            this.Timer2Counter.Name = "Timer2Counter";
+            this.Timer2Counter.Size = new System.Drawing.Size(45, 20);
+            this.Timer2Counter.TabIndex = 92;
+            this.Timer2Counter.Text = "0000";
+            // 
+            // Timer2CounterLabel
+            // 
+            this.Timer2CounterLabel.AutoSize = true;
+            this.Timer2CounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2CounterLabel.Location = new System.Drawing.Point(3, 3);
+            this.Timer2CounterLabel.Name = "Timer2CounterLabel";
+            this.Timer2CounterLabel.Size = new System.Drawing.Size(66, 20);
+            this.Timer2CounterLabel.TabIndex = 91;
+            this.Timer2CounterLabel.Text = "Counter";
+            // 
+            // Timer3Tab
+            // 
+            this.Timer3Tab.Controls.Add(this.Timer3CountUp);
+            this.Timer3Tab.Controls.Add(this.Timer3CountUpLabel);
+            this.Timer3Tab.Controls.Add(this.Timer3Enabled);
+            this.Timer3Tab.Controls.Add(this.Timer3EnabledLabel);
+            this.Timer3Tab.Controls.Add(this.Timer3IRQEnable);
+            this.Timer3Tab.Controls.Add(this.Timer3IRQEnableLabel);
+            this.Timer3Tab.Controls.Add(this.Timer3Prescaler);
+            this.Timer3Tab.Controls.Add(this.Timer3PrescalerLabel);
+            this.Timer3Tab.Controls.Add(this.Timer3Reload);
+            this.Timer3Tab.Controls.Add(this.Timer3ReloadLabel);
+            this.Timer3Tab.Controls.Add(this.Timer3Counter);
+            this.Timer3Tab.Controls.Add(this.Timer3CounterLabel);
+            this.Timer3Tab.Location = new System.Drawing.Point(4, 22);
+            this.Timer3Tab.Name = "Timer3Tab";
+            this.Timer3Tab.Padding = new System.Windows.Forms.Padding(3);
+            this.Timer3Tab.Size = new System.Drawing.Size(205, 132);
+            this.Timer3Tab.TabIndex = 3;
+            this.Timer3Tab.Text = "Timer 3";
+            this.Timer3Tab.UseVisualStyleBackColor = true;
+            // 
+            // Timer3Enabled
+            // 
+            this.Timer3Enabled.AutoSize = true;
+            this.Timer3Enabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3Enabled.Location = new System.Drawing.Point(181, 83);
+            this.Timer3Enabled.Name = "Timer3Enabled";
+            this.Timer3Enabled.Size = new System.Drawing.Size(18, 20);
+            this.Timer3Enabled.TabIndex = 110;
+            this.Timer3Enabled.Text = "0";
+            // 
+            // Timer3EnabledLabel
+            // 
+            this.Timer3EnabledLabel.AutoSize = true;
+            this.Timer3EnabledLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3EnabledLabel.Location = new System.Drawing.Point(3, 83);
+            this.Timer3EnabledLabel.Name = "Timer3EnabledLabel";
+            this.Timer3EnabledLabel.Size = new System.Drawing.Size(68, 20);
+            this.Timer3EnabledLabel.TabIndex = 109;
+            this.Timer3EnabledLabel.Text = "Enabled";
+            // 
+            // Timer3IRQEnable
+            // 
+            this.Timer3IRQEnable.AutoSize = true;
+            this.Timer3IRQEnable.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3IRQEnable.Location = new System.Drawing.Point(181, 63);
+            this.Timer3IRQEnable.Name = "Timer3IRQEnable";
+            this.Timer3IRQEnable.Size = new System.Drawing.Size(18, 20);
+            this.Timer3IRQEnable.TabIndex = 108;
+            this.Timer3IRQEnable.Text = "0";
+            // 
+            // Timer3IRQEnableLabel
+            // 
+            this.Timer3IRQEnableLabel.AutoSize = true;
+            this.Timer3IRQEnableLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3IRQEnableLabel.Location = new System.Drawing.Point(3, 63);
+            this.Timer3IRQEnableLabel.Name = "Timer3IRQEnableLabel";
+            this.Timer3IRQEnableLabel.Size = new System.Drawing.Size(92, 20);
+            this.Timer3IRQEnableLabel.TabIndex = 107;
+            this.Timer3IRQEnableLabel.Text = "IRQ Enable";
+            // 
+            // Timer3Prescaler
+            // 
+            this.Timer3Prescaler.AutoSize = true;
+            this.Timer3Prescaler.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3Prescaler.Location = new System.Drawing.Point(154, 43);
+            this.Timer3Prescaler.Name = "Timer3Prescaler";
+            this.Timer3Prescaler.Size = new System.Drawing.Size(45, 20);
+            this.Timer3Prescaler.TabIndex = 106;
+            this.Timer3Prescaler.Text = "0001";
+            // 
+            // Timer3PrescalerLabel
+            // 
+            this.Timer3PrescalerLabel.AutoSize = true;
+            this.Timer3PrescalerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3PrescalerLabel.Location = new System.Drawing.Point(3, 43);
+            this.Timer3PrescalerLabel.Name = "Timer3PrescalerLabel";
+            this.Timer3PrescalerLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer3PrescalerLabel.TabIndex = 105;
+            this.Timer3PrescalerLabel.Text = "Prescaler";
+            // 
+            // Timer3Reload
+            // 
+            this.Timer3Reload.AutoSize = true;
+            this.Timer3Reload.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3Reload.Location = new System.Drawing.Point(154, 23);
+            this.Timer3Reload.Name = "Timer3Reload";
+            this.Timer3Reload.Size = new System.Drawing.Size(45, 20);
+            this.Timer3Reload.TabIndex = 104;
+            this.Timer3Reload.Text = "0000";
+            // 
+            // Timer3ReloadLabel
+            // 
+            this.Timer3ReloadLabel.AutoSize = true;
+            this.Timer3ReloadLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3ReloadLabel.Location = new System.Drawing.Point(3, 23);
+            this.Timer3ReloadLabel.Name = "Timer3ReloadLabel";
+            this.Timer3ReloadLabel.Size = new System.Drawing.Size(60, 20);
+            this.Timer3ReloadLabel.TabIndex = 103;
+            this.Timer3ReloadLabel.Text = "Reload";
+            // 
+            // Timer3Counter
+            // 
+            this.Timer3Counter.AutoSize = true;
+            this.Timer3Counter.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3Counter.Location = new System.Drawing.Point(154, 3);
+            this.Timer3Counter.Name = "Timer3Counter";
+            this.Timer3Counter.Size = new System.Drawing.Size(45, 20);
+            this.Timer3Counter.TabIndex = 102;
+            this.Timer3Counter.Text = "0000";
+            // 
+            // Timer3CounterLabel
+            // 
+            this.Timer3CounterLabel.AutoSize = true;
+            this.Timer3CounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3CounterLabel.Location = new System.Drawing.Point(3, 3);
+            this.Timer3CounterLabel.Name = "Timer3CounterLabel";
+            this.Timer3CounterLabel.Size = new System.Drawing.Size(66, 20);
+            this.Timer3CounterLabel.TabIndex = 101;
+            this.Timer3CounterLabel.Text = "Counter";
+            // 
+            // Timer0CountUp
+            // 
+            this.Timer0CountUp.AutoSize = true;
+            this.Timer0CountUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0CountUp.Location = new System.Drawing.Point(149, 103);
+            this.Timer0CountUp.Name = "Timer0CountUp";
+            this.Timer0CountUp.Size = new System.Drawing.Size(50, 20);
+            this.Timer0CountUp.TabIndex = 82;
+            this.Timer0CountUp.Text = "NULL";
+            // 
+            // Timer0CountUpLabel
+            // 
+            this.Timer0CountUpLabel.AutoSize = true;
+            this.Timer0CountUpLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer0CountUpLabel.Location = new System.Drawing.Point(3, 103);
+            this.Timer0CountUpLabel.Name = "Timer0CountUpLabel";
+            this.Timer0CountUpLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer0CountUpLabel.TabIndex = 81;
+            this.Timer0CountUpLabel.Text = "Count-up";
+            // 
+            // Timer1CountUp
+            // 
+            this.Timer1CountUp.AutoSize = true;
+            this.Timer1CountUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1CountUp.Location = new System.Drawing.Point(181, 105);
+            this.Timer1CountUp.Name = "Timer1CountUp";
+            this.Timer1CountUp.Size = new System.Drawing.Size(18, 20);
+            this.Timer1CountUp.TabIndex = 92;
+            this.Timer1CountUp.Text = "0";
+            // 
+            // Timer1CountUpLabel
+            // 
+            this.Timer1CountUpLabel.AutoSize = true;
+            this.Timer1CountUpLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer1CountUpLabel.Location = new System.Drawing.Point(3, 103);
+            this.Timer1CountUpLabel.Name = "Timer1CountUpLabel";
+            this.Timer1CountUpLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer1CountUpLabel.TabIndex = 91;
+            this.Timer1CountUpLabel.Text = "Count-up";
+            // 
+            // Timer2CountUp
+            // 
+            this.Timer2CountUp.AutoSize = true;
+            this.Timer2CountUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2CountUp.Location = new System.Drawing.Point(181, 105);
+            this.Timer2CountUp.Name = "Timer2CountUp";
+            this.Timer2CountUp.Size = new System.Drawing.Size(18, 20);
+            this.Timer2CountUp.TabIndex = 102;
+            this.Timer2CountUp.Text = "0";
+            // 
+            // Timer2CountUpLabel
+            // 
+            this.Timer2CountUpLabel.AutoSize = true;
+            this.Timer2CountUpLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer2CountUpLabel.Location = new System.Drawing.Point(3, 103);
+            this.Timer2CountUpLabel.Name = "Timer2CountUpLabel";
+            this.Timer2CountUpLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer2CountUpLabel.TabIndex = 101;
+            this.Timer2CountUpLabel.Text = "Count-up";
+            // 
+            // Timer3CountUp
+            // 
+            this.Timer3CountUp.AutoSize = true;
+            this.Timer3CountUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3CountUp.Location = new System.Drawing.Point(181, 105);
+            this.Timer3CountUp.Name = "Timer3CountUp";
+            this.Timer3CountUp.Size = new System.Drawing.Size(18, 20);
+            this.Timer3CountUp.TabIndex = 112;
+            this.Timer3CountUp.Text = "0";
+            // 
+            // Timer3CountUpLabel
+            // 
+            this.Timer3CountUpLabel.AutoSize = true;
+            this.Timer3CountUpLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Timer3CountUpLabel.Location = new System.Drawing.Point(3, 103);
+            this.Timer3CountUpLabel.Name = "Timer3CountUpLabel";
+            this.Timer3CountUpLabel.Size = new System.Drawing.Size(75, 20);
+            this.Timer3CountUpLabel.TabIndex = 111;
+            this.Timer3CountUpLabel.Text = "Count-up";
+            // 
             // Debug
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1244,21 +1895,30 @@
             this.CharBlocksTab.ResumeLayout(false);
             this.CharBlockTabs.ResumeLayout(false);
             this.CharBlock0Tab.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.CharBlock0)).EndInit();
-            this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.CharBlock1)).EndInit();
-            this.CharBlock2Tab.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.CharBlock2)).EndInit();
-            this.CharBlock3Tab.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.CharBlock3)).EndInit();
-            this.CharBlock1ColorMode.ResumeLayout(false);
-            this.CharBlock1ColorMode.PerformLayout();
             this.CharBlock0ColorMode.ResumeLayout(false);
             this.CharBlock0ColorMode.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock0)).EndInit();
+            this.tabPage2.ResumeLayout(false);
+            this.CharBlock1ColorMode.ResumeLayout(false);
+            this.CharBlock1ColorMode.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock1)).EndInit();
+            this.CharBlock2Tab.ResumeLayout(false);
             this.CharBlock2ColorMode.ResumeLayout(false);
             this.CharBlock2ColorMode.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock2)).EndInit();
+            this.CharBlock3Tab.ResumeLayout(false);
             this.CharBlock3ColorMode.ResumeLayout(false);
             this.CharBlock3ColorMode.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CharBlock3)).EndInit();
+            this.TimerTabs.ResumeLayout(false);
+            this.Timer0Tab.ResumeLayout(false);
+            this.Timer0Tab.PerformLayout();
+            this.Timer1Tab.ResumeLayout(false);
+            this.Timer1Tab.PerformLayout();
+            this.Timer2Tab.ResumeLayout(false);
+            this.Timer2Tab.PerformLayout();
+            this.Timer3Tab.ResumeLayout(false);
+            this.Timer3Tab.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1364,5 +2024,59 @@
         private System.Windows.Forms.GroupBox CharBlock3ColorMode;
         private System.Windows.Forms.RadioButton CharBlock38bpp;
         private System.Windows.Forms.RadioButton CharBlock34bpp;
+        private System.Windows.Forms.Label TimersLabel;
+        private System.Windows.Forms.TabControl TimerTabs;
+        private System.Windows.Forms.TabPage Timer0Tab;
+        private System.Windows.Forms.Label Timer0Enabled;
+        private System.Windows.Forms.Label Timer0EnabledLabel;
+        private System.Windows.Forms.Label Timer0IRQEnable;
+        private System.Windows.Forms.Label Timer0IRQEnableLabel;
+        private System.Windows.Forms.Label Timer0Prescaler;
+        private System.Windows.Forms.Label Timer0PrescalerLabel;
+        private System.Windows.Forms.Label Timer0Reload;
+        private System.Windows.Forms.Label Timer0ReloadLabel;
+        private System.Windows.Forms.Label Timer0Counter;
+        private System.Windows.Forms.Label Timer0CounterLabel;
+        private System.Windows.Forms.TabPage Timer1Tab;
+        private System.Windows.Forms.Label Timer1Enabled;
+        private System.Windows.Forms.Label Timer1EnabledLabel;
+        private System.Windows.Forms.Label Timer1IRQEnable;
+        private System.Windows.Forms.Label Timer1IRQEnableLabel;
+        private System.Windows.Forms.Label Timer1Prescaler;
+        private System.Windows.Forms.Label Timer1PrescalerLabel;
+        private System.Windows.Forms.Label Timer1Reload;
+        private System.Windows.Forms.Label Timer1ReloadLabel;
+        private System.Windows.Forms.Label Timer1Counter;
+        private System.Windows.Forms.Label Timer1CounterLabel;
+        private System.Windows.Forms.TabPage Timer2Tab;
+        private System.Windows.Forms.Label Timer2Enabled;
+        private System.Windows.Forms.Label Timer2EnableLabel;
+        private System.Windows.Forms.Label Timer2IRQEnable;
+        private System.Windows.Forms.Label Timer2IRQEnableLabel;
+        private System.Windows.Forms.Label Timer2Prescaler;
+        private System.Windows.Forms.Label Timer2PrescalerLabel;
+        private System.Windows.Forms.Label Timer2Reload;
+        private System.Windows.Forms.Label Timer2ReloadLabel;
+        private System.Windows.Forms.Label Timer2Counter;
+        private System.Windows.Forms.Label Timer2CounterLabel;
+        private System.Windows.Forms.TabPage Timer3Tab;
+        private System.Windows.Forms.Label Timer3Enabled;
+        private System.Windows.Forms.Label Timer3EnabledLabel;
+        private System.Windows.Forms.Label Timer3IRQEnable;
+        private System.Windows.Forms.Label Timer3IRQEnableLabel;
+        private System.Windows.Forms.Label Timer3Prescaler;
+        private System.Windows.Forms.Label Timer3PrescalerLabel;
+        private System.Windows.Forms.Label Timer3Reload;
+        private System.Windows.Forms.Label Timer3ReloadLabel;
+        private System.Windows.Forms.Label Timer3Counter;
+        private System.Windows.Forms.Label Timer3CounterLabel;
+        private System.Windows.Forms.Label Timer0CountUp;
+        private System.Windows.Forms.Label Timer0CountUpLabel;
+        private System.Windows.Forms.Label Timer1CountUp;
+        private System.Windows.Forms.Label Timer1CountUpLabel;
+        private System.Windows.Forms.Label Timer2CountUp;
+        private System.Windows.Forms.Label Timer2CountUpLabel;
+        private System.Windows.Forms.Label Timer3CountUp;
+        private System.Windows.Forms.Label Timer3CountUpLabel;
     }
 }
