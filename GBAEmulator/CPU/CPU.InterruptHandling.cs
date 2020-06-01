@@ -27,11 +27,11 @@ namespace GBAEmulator.CPU
 
         private bool HandleIRQs()
         {
-            if ((this.IF.raw & this.IE.raw) != 0)
+            if ((this.IF.raw & this.IE.raw & 0b0011_0000_1111_1101) != 0)
             {
                 this.HALTCNT.Halt = false;
 
-                // flipping IME makes irq_demo and Endrift's suite work, so this can be used for testing
+                // flipping IME makes irq_demo and Endrift's suite work, so this can be (ab)used for testing
                 if (this.IME.Enabled && (this.I == 0))
                 {
                     this.DoIRQ();

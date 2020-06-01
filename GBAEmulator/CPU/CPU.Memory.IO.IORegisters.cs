@@ -78,6 +78,12 @@ namespace GBAEmulator.CPU
                 get => (byte)((this._raw & 0xff00) >> 8);
             }
 
+            public void VCountMatch(bool match)
+            {
+                if (match) this._raw |= 0x0004;
+                else this._raw &= 0xfffb;
+            }
+
             public bool IsSet(DISPSTATFlags flag)
             {
                 return (this._raw & (ushort)flag) == (ushort)flag;
@@ -131,9 +137,17 @@ namespace GBAEmulator.CPU
                 set
                 {
                     this._raw = (ushort)((this._raw & 0xff00) | value);
-                    if (this.cpu.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable) && (value == this.cpu.DISPSTAT.VCountSetting))
+                    if (value == this.cpu.DISPSTAT.VCountSetting)
                     {
-                        this.cpu.IF.Request(Interrupt.LCDVCountMatch);
+                        this.cpu.DISPSTAT.VCountMatch(true);
+                        if (this.cpu.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable))
+                        {
+                            this.cpu.IF.Request(Interrupt.LCDVCountMatch);
+                        }
+                    }
+                    else
+                    {
+                        this.cpu.DISPSTAT.VCountMatch(false);
                     }
                 }
             }

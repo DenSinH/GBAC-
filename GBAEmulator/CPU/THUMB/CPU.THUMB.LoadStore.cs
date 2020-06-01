@@ -193,9 +193,13 @@ namespace GBAEmulator.CPU
             if (LoadFromMemory)
             {
                 if ((Address & 0x01) == 0)  // aligned
+                {
                     this.Registers[Rd] = this.GetHalfWordAt(Address);
+                }
                 else
+                {
                     this.Registers[Rd] = (uint)(this.GetByteAt(Address - 1) << 24) | this.GetByteAt(Address);
+                }
 
                 // Normal LDR instructions take 1S + 1N + 1I (incremental)
                 return SCycle + NCycle + ICycle;

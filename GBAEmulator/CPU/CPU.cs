@@ -60,6 +60,7 @@ namespace GBAEmulator.CPU
         const byte ICycle = 1;
 
         public string RomName { get; private set; }
+        private uint ROMSize;
         public void LoadRom(string FileName)
         {
             FileStream fs = File.OpenRead(FileName);
@@ -68,11 +69,16 @@ namespace GBAEmulator.CPU
 
             while (current != -1)
             {
-                this.GamePak[i] = (byte)current;
+                this.GamePak[i++] = (byte)current;
                 current = fs.ReadByte();
-                i++;
             }
+            ROMSize = i;
             this.Log(string.Format("{0:x8} Bytes loaded (hex)", i));
+
+            while (i < 0x0200_0000)  // unused bits in ROM
+            {
+                this.GamePak[i] = (byte)(i++ >> 1);
+            }
             this.RomName = Path.GetFileName(FileName);
         }
 
@@ -81,7 +87,7 @@ namespace GBAEmulator.CPU
             this.Pipeline.Clear();
         }
         
-        StreamReader LOGFILE = new StreamReader("../../Tests/LTTP.log");
+        StreamReader LOGFILE = new StreamReader("../../Tests/AgingCard.log");
         public int Step()
         {
             int DMACycles = 0;
@@ -152,8 +158,9 @@ namespace GBAEmulator.CPU
             //        }
             //    }
             //}
-
-            return StepCycles;
+            
+            // return StepCycles;
+            return 1;
         }
     }
 }

@@ -92,10 +92,11 @@ namespace GBAEmulator
 
         public void Run()
         {
-            // cpu.LoadRom("../../roms/ZeldaLTTP.gba");
-            // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
-            cpu.LoadRom("../../Tests/GBASuiteNew/mem.gba");
-            // cpu.LoadRom("../../Tests/Tonc/prio_demo.gba");
+            // cpu.LoadRom("../../roms/KirbyNightmare.gba");
+            // cpu.LoadRom("../../Tests/Marie/dma-test.gba");
+            // cpu.LoadRom("../../Tests/Organharvester/if_ack.gba");
+            // cpu.LoadRom("../../Tests/GBASuiteNew/mem.gba");
+            cpu.LoadRom("../../Tests/Tonc/irq_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
             // cpu.LoadRom("../../Tests/AgingCard.gba");
             cpu.SkipBios();

@@ -114,7 +114,7 @@ namespace GBAEmulator
             this.IEHBlank.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
             this.IEVCOUNT.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
             this.IETimers.Text = ((InterruptControlData.IE & 0x0078) >> 3).ToString("x1");
-            this.IESIO.Text = ((InterruptControlData.IE & 0x0f00) >> 8).ToString("x1"); ;
+            this.IEDMA.Text = ((InterruptControlData.IE & 0x0f00) >> 8).ToString("x1"); ;
             this.IEKeypad.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.Keypad) > 0) ? "1" : "0";
             this.IEGamePak.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.GamePak) > 0) ? "1" : "0";
 
@@ -122,7 +122,7 @@ namespace GBAEmulator
             this.IFHBlank.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
             this.IFVCOUNT.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
             this.IFTimers.Text = ((InterruptControlData.IF & 0x0078) >> 3).ToString("x1");
-            this.IFSIO.Text = ((InterruptControlData.IF & 0x0f00) >> 8).ToString("x1"); ;
+            this.IFDMA.Text = ((InterruptControlData.IF & 0x0f00) >> 8).ToString("x1"); ;
             this.IFKeypad.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.Keypad) > 0) ? "1" : "0";
             this.IFGamePak.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.GamePak) > 0) ? "1" : "0";
 
