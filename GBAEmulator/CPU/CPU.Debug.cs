@@ -35,14 +35,32 @@ namespace GBAEmulator.CPU
         }
     }
 
+    public struct DMAInfo
+    {
+        public string DAD, SAD, UnitCount, DestAddrControl, SourceAddrControl, Repeat, UnitLength, Timing, IRQ, Enabled;
+
+        public DMAInfo(uint DAD, uint SAD, uint UnitCount, ARM7TDMI.cDMACNT_H dmacnt_h)
+        {
+            this.DAD = DAD.ToString("x8");
+            this.SAD = SAD.ToString("x8");
+            this.UnitCount = UnitCount.ToString("x8");
+            this.DestAddrControl = ((ushort)dmacnt_h.DestAddrControl).ToString("d2");
+            this.SourceAddrControl = ((ushort)dmacnt_h.SourceAddrControl).ToString("d2");
+            this.Repeat = dmacnt_h.DMARepeat ? "1" : "0";
+            this.UnitLength = dmacnt_h.DMATransferType ? "32" : "16";
+            this.Timing = dmacnt_h.StartTiming.ToString();
+            this.IRQ = dmacnt_h.IRQOnEnd ? "1" : "0";
+            this.Enabled = dmacnt_h.DMAEnable ? "1" : "0";
+        }
+    }
+
     partial class ARM7TDMI
     {
         public bool pause;
-
-        [Conditional("DEBUG")]
+        
         private void Error(string message)
         {
-            Console.Error.WriteLine("Error: " + message);
+            Console.Error.WriteLine($"Error: {message}");
         }
         
         [Conditional("DEBUG")]
@@ -63,6 +81,23 @@ namespace GBAEmulator.CPU
         {
             return new TimerInfo(this.Timers[index]);
         } 
+
+        public bool DMAActive
+        {
+            get
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    if (this.DMACNT_H[i].Active) return true;
+                }
+                return false;
+            }
+        }
+
+        public DMAInfo GetDMAInfo(int index)
+        {
+            return new DMAInfo(this.DMADAD[index].Address, this.DMASAD[index].Address, this.DMACNT_L[index].UnitCount, this.DMACNT_H[index]);
+        }
 
         public void ShowInfo()
         {

@@ -106,6 +106,10 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.F4)
             {
+                this.gba.cpu.DoIRQ();
+            }
+            else if (e.KeyCode == Keys.F5)
+            {
                 this.gba.cpu.pause = true;
             }
             else if (e.KeyCode == Keys.O)

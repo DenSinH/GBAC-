@@ -158,8 +158,8 @@ namespace GBAEmulator.CPU
             //        }
             //    }
             //}
-            
-            // return StepCycles;
+
+            // return Step;
             return 1;
         }
     }

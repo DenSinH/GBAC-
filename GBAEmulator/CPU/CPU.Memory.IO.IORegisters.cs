@@ -508,6 +508,11 @@ namespace GBAEmulator.CPU
                 this._raw |= (ushort)request;
             }
 
+            public void Request(ushort request)
+            {
+                this._raw |= request;
+            }
+
             public ushort raw
             {
                 get => (ushort)(this._raw & 0x3fff);
@@ -518,7 +523,7 @@ namespace GBAEmulator.CPU
                 // clear written bits
                 if (setlow)
                     this._raw = (ushort)(this._raw & ~(value & 0x00ff));
-                else if (sethigh)
+                if (sethigh)
                     this._raw = (ushort)(this._raw & ~(value & 0xff00));
             }
         }
@@ -653,7 +658,7 @@ namespace GBAEmulator.CPU
         private readonly cDMACNT_L[] DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(0x3fff), new cDMACNT_L(0x3fff),
             new cDMACNT_L(0x3fff), new cDMACNT_L(0xffff) };
 
-        private enum AddrControl : byte
+        public enum AddrControl : byte
         {
             Increment = 0,
             Decrement = 1,
@@ -669,7 +674,7 @@ namespace GBAEmulator.CPU
             Special = 3
         }
 
-        private class cDMACNT_H : IORegister2
+        public class cDMACNT_H : IORegister2
         {
             private bool AllowGamePakDRQ;
             public bool Active;

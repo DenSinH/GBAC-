@@ -27,7 +27,7 @@ namespace GBAEmulator.CPU
 
         private bool HandleIRQs()
         {
-            if ((this.IF.raw & this.IE.raw & 0b0011_0000_1111_1101) != 0)
+            if ((this.IF.raw & this.IE.raw) != 0)  //  & 0b0011_1111_1111_1100  // mask interrupts manually for testing
             {
                 this.HALTCNT.Halt = false;
 
@@ -41,6 +41,7 @@ namespace GBAEmulator.CPU
             return false;
         }
 
+        // public to allow for manual IRQ throwing for testing (unstable)
         public void DoIRQ()
         {
             this.Log("Doing IRQ: " + (this.IF.raw & this.IE.raw).ToString("x8"));

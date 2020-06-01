@@ -618,6 +618,11 @@ namespace GBAEmulator.CPU
             return true;
         }
 
+        public void UseNormattsBios()
+        {
+            this.BIOS = this.NormattsBIOS;
+        }
+
         public void SkipBios()
         {
             // From Dillon

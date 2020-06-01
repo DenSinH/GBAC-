@@ -18,6 +18,7 @@ namespace GBAEmulator
         private ushort[] RawCharBlock;
 
         Label[] TimerCounters, TimerReloads, TimerPrescalers, TimerIRQEnables, TimerEnables, TimerCountUps;
+        Label[] DMASAD, DMADAD, DMAUnitCount, DMADestAddrControl, DMASourceAddrControl, DMARepeat, DMAUnitLength, DMAStartTiming, DMAIRQ, DMAEnabled;
 
         const int CharBlockSize = 16 * 8;
 
@@ -37,9 +38,20 @@ namespace GBAEmulator
             this.TimerEnables = new Label[4] { Timer0Enabled, Timer1Enabled, Timer2Enabled, Timer3Enabled };
             this.TimerCountUps = new Label[4] { null, Timer1CountUp, Timer2CountUp, Timer3CountUp };
 
+            this.DMASAD = new Label[4] { DMA0SAD, DMA1SAD, DMA2SAD, DMA3SAD };
+            this.DMADAD = new Label[4] { DMA0DAD, DMA1DAD, DMA2DAD, DMA3DAD };
+            this.DMAUnitCount = new Label[4] { DMA0UnitCount, DMA1UnitCount, DMA2UnitCount, DMA3UnitCount };
+            this.DMADestAddrControl = new Label[4] { DMA0DestAddrControl, DMA1DestAddrControl, DMA2DestAddrControl, DMA3DestAddrControl };
+            this.DMASourceAddrControl = new Label[4] { DMA0SourceAddrControl, DMA1SourceAddrControl, DMA2SourceAddrControl, DMA3SourceAddrControl };
+            this.DMARepeat = new Label[4] { DMA0Repeat, DMA1Repeat, DMA2Repeat, DMA3Repeat };
+            this.DMAUnitLength = new Label[4] { DMA0UnitLength, DMA1UnitLength, DMA2UnitLength, DMA3UnitLength };
+            this.DMAStartTiming = new Label[4] { DMA0Timing, DMA1Timing, DMA2Timing, DMA3Timing };
+            this.DMAIRQ = new Label[4] { DMA0IRQ, DMA1IRQ, DMA2IRQ, DMA3IRQ };
+            this.DMAEnabled = new Label[4] { DMA0Enabled, DMA1Enabled, DMA2Enabled, DMA3Enabled };
+
             this.gba = gba;
             this.CharBlocks = new PictureBox[4] { this.CharBlock0, this.CharBlock1, this.CharBlock2, this.CharBlock3 };
-            this.CharBlockColorModes = new RadioButton[4] { this.CharBlock04bpp, this.CharBlock14bpp, this.CharBlock14bpp, this.CharBlock14bpp };
+            this.CharBlockColorModes = new RadioButton[4] { this.CharBlock04bpp, this.CharBlock14bpp, this.CharBlock24bpp, this.CharBlock34bpp };
             this.RawCharBlock = new ushort[CharBlockSize * CharBlockSize];
         }
 
@@ -144,6 +156,24 @@ namespace GBAEmulator
             if (index != 0) this.TimerCountUps[index].Text = info.CountUp;
         }
 
+        private void UpdateDMA()
+        {
+            int index = this.DMATabs.SelectedIndex;
+            DMAInfo info = this.gba.cpu.GetDMAInfo(index);
+
+            this.DMALabel.ForeColor = this.gba.cpu.DMAActive ? Color.Green : Color.Red;
+            this.DMASAD[index].Text = info.SAD;
+            this.DMADAD[index].Text = info.DAD;
+            this.DMAUnitCount[index].Text = info.UnitCount;
+            this.DMADestAddrControl[index].Text = info.DestAddrControl;
+            this.DMASourceAddrControl[index].Text = info.SourceAddrControl;
+            this.DMARepeat[index].Text = info.Repeat;
+            this.DMAUnitLength[index].Text = info.UnitLength;
+            this.DMAStartTiming[index].Text = info.Timing;
+            this.DMAIRQ[index].Text = info.IRQ;
+            this.DMAEnabled[index].Text = info.Enabled;
+        }
+
         private void UpdateRegisterTab()
         {
             this.UpdateDISPCNT();
@@ -151,6 +181,7 @@ namespace GBAEmulator
             this.UpdateVCOUNT();
             this.UpdateInterruptControl();
             this.UpdateTimers();
+            this.UpdateDMA();
         }
 
         private void GenCharBlock8bpp(uint index)
@@ -158,7 +189,7 @@ namespace GBAEmulator
             uint Address = index * 0x4000;
             uint PixelAddress;
 
-            for (uint dTileY = 0; dTileY < 8; dTileY++)  // 16 to not go out of range
+            for (uint dTileY = 0; dTileY < 16; dTileY++)  // 16 to not go out of range
             {
                 for (uint dTileX = 0; dTileX < 16; dTileX++)
                 {
@@ -175,6 +206,7 @@ namespace GBAEmulator
                     Address += 0x40;
                 }
             }
+            return;
         }
 
         private void GenCharBlock4bpp(uint index)

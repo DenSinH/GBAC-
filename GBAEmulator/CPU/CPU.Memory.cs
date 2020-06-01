@@ -10,7 +10,7 @@ namespace GBAEmulator.CPU
         private void MemoryAccess(uint Address)
         {
             Console.WriteLine("Memory Access: " + Address.ToString("x8"));
-            //if (Address >= 0x0300_7c04 && Address < 0x0300_7c0c)
+            //if (Address >= 0x0300_7c04 && Address < 0x0300_7c10)
             //{
             //    Console.WriteLine(this.iWRAM[0x7c04]);
             //    Console.WriteLine(this.iWRAM[0x7c05]);
@@ -61,7 +61,13 @@ namespace GBAEmulator.CPU
             OAM = 7
             // otherwise GamePak
         }
-        
+
+        /*
+         todo:
+         When accessing OAM (7000000h) or OBJ VRAM (6010000h) by HBlank Timing,
+         then the "H-Blank Interval Free" bit in DISPCNT register must be set.
+        */
+
         private uint GetWordAt(uint address)
         {
             this.MemoryAccess(address);
@@ -69,41 +75,46 @@ namespace GBAEmulator.CPU
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __WordAccessCycles__[Section];
             this.SCycle = __WordAccessCycles__[Section];
-
-            if (Section < 8 && __MemoryRegions__[Section] != null)
-                return __GetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section]);
-            else
+            switch (Section)
             {
-                switch (Section)
-                {
-                    case 6:  // VRAM Mirrors
-                        if ((address & 0x1ffff) < 0x10000)
-                        {
-                            // first bit is already 0
-                            return __GetWordAt__(this.VRAM, address & 0xffff);
-                        }
-                        return __GetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
-                    case 4:   // IORAM
-                        return this.IOGetWordAt(address & 0x3ff);
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:  // GamePak
-                        address &= 0x01ff_ffff;
-                        if (address < ROMSize)
-                        {
-                            return __GetWordAt__(this.GamePak, address);
-                        }
-                        return 0;
-                        return ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);
-                    case 14:
-                    case 15:  // SRAM
-                        return (uint)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8) | (this.GamePakSRAM[address & 0xffff] << 16) | (this.GamePakSRAM[address & 0xffff] << 24));
-                    default:
-                        throw new Exception("This cannot happen");
-                }
+                case 0:
+                case 1:
+                    return __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                case 2:
+                    return __GetWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
+                case 3:
+                    return __GetWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
+                case 4:   // IORAM
+                    return this.IOGetWordAt(address & 0x3ff);
+                case 5:
+                    return __GetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
+                case 6:  // VRAM Mirrors
+                    if ((address & 0x1ffff) < 0x10000)
+                    {
+                        // first bit is already 0
+                        return __GetWordAt__(this.VRAM, address & 0xffff);
+                    }
+                    return __GetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
+                case 7:
+                    return __GetWordAt__(this.OAM, address & __MemoryMasks__[Section]);
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:  // GamePak
+                    uint _address = address & 0x01ff_ffff;
+                    if (_address < ROMSize)
+                    {
+                        return __GetWordAt__(this.GamePak, _address);
+                    }
+                    return ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);  // seems to be what mGBA is doing...
+                    return ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);
+                case 14:
+                case 15:  // SRAM
+                    return (uint)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8) | (this.GamePakSRAM[address & 0xffff] << 16) | (this.GamePakSRAM[address & 0xffff] << 24));
+                default:
+                    throw new Exception("This cannot happen");
             }
         }
 
@@ -114,25 +125,26 @@ namespace GBAEmulator.CPU
             byte Section = (byte)((address & 0x0f00_0000) >> 24);
             this.NCycle = __WordAccessCycles__[Section];
             this.SCycle = __WordAccessCycles__[Section];
-            
-            if (Section < 8 && __MemoryRegions__[Section] != null)
-            {
-                if (Section <= 1)
-                {
-                    this.Error($"BIOS Write Attempted at PC = {this.PC.ToString("x8")}");
-                    return;
-                }
-
-                __SetWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
-                return;
-            }
 
             switch (Section)
             {
+                case 0:
+                case 1:
+                    this.Error($"BIOS Word Write Attempted at PC = {this.PC.ToString("x8")}");
+                    return;
+                case 2:
+                    __SetWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
+                    return;
+                case 3:
+                    __SetWordAt__(this.iWRAM, address & __MemoryMasks__[Section], value);
+                    return;
+                case 4: // IORAM
+                    this.IOSetWordAt(address & 0x3ff, value);
+                    return;
+                case 5:
+                    __SetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section], value);
+                    return;
                 case 6:  // VRAM Mirrors
-                    //Console.WriteLine("PC: " + (this.PC - 8).ToString("x8"));
-                    //this.ShowInfo();
-
                     if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
@@ -141,8 +153,8 @@ namespace GBAEmulator.CPU
                     }
                     __SetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff), value);
                     return;
-                case 4: // IORAM
-                    this.IOSetWordAt(address & 0x3ff, value);
+                case 7:
+                    __SetWordAt__(this.OAM, address & __MemoryMasks__[Section], value);
                     return;
                 case 8:
                 case 9:
@@ -150,7 +162,7 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    this.Error("ROMw word write attempted");
+                    this.Error($"ROM Word Write Attempted at PC = {this.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM
@@ -174,11 +186,19 @@ namespace GBAEmulator.CPU
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
 
-            if (Section < 8 && __MemoryRegions__[Section] != null)
-                return __GetHalfWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section]);
-
             switch (Section)
             {
+                case 0:
+                case 1:
+                    return __GetHalfWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                case 2:
+                    return __GetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
+                case 3:
+                    return __GetHalfWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
+                case 4: // IORAM
+                    return (ushort)this.IOGetHalfWordAt(address & 0x3ff);
+                case 5:
+                    return __GetHalfWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
                     if ((address & 0x1ffff) < 0x10000)
                     {
@@ -186,21 +206,21 @@ namespace GBAEmulator.CPU
                         return __GetHalfWordAt__(this.VRAM, address & 0xffff);
                     }
                     return __GetHalfWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
-                case 4: // IORAM
-                    return (ushort)this.IOGetHalfWordAt(address & 0x3ff);
+                case 7:
+                    return __GetHalfWordAt__(this.OAM, address & __MemoryMasks__[Section]);
                 case 8:
                 case 9:
                 case 10:
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    address &= 0x01ff_ffff;
-                    if (address < ROMSize)
+                    uint _address = address & 0x01ff_ffff;
+                    if (_address < ROMSize)
                     {
-                        return __GetHalfWordAt__(this.GamePak, address);
+                        return __GetHalfWordAt__(this.GamePak, _address);
                     }
                     else if (address >= 0x0d00_0000) return 1;  // this is what mGBA seems to do...
-                    return 0;
+                    return (ushort)((address >> 1) & 0xffff);
                     return (ushort)((address >> 1) & 0xffff);
                 case 14:
                 case 15:  // SRAM
@@ -218,20 +238,24 @@ namespace GBAEmulator.CPU
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
 
-            if (Section < 8 && __MemoryRegions__[Section] != null)
-            {
-                if (Section <= 1)
-                {
-                    this.Error($"BIOS Write Attempted at PC = {this.PC.ToString("x8")}");
-                    return;
-                }
-
-                __SetHalfWordAt__(this.__MemoryRegions__[Section], address & __MemoryMasks__[Section], value);
-                return;
-            }
-
             switch (Section)
             {
+                case 0:
+                case 1:
+                    this.Error($"BIOS Halfword Write Attempted at PC = {this.PC.ToString("x8")}");
+                    return;
+                case 2:
+                    __SetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
+                    return;
+                case 3:
+                    __SetHalfWordAt__(this.iWRAM, address & __MemoryMasks__[Section], value);
+                    return;
+                case 4: // IORAM
+                    this.IOSetHalfWordAt(address & 0x3ff, value);  // for now
+                    return;
+                case 5:
+                    __SetHalfWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section], value);
+                    return;
                 case 6:  // VRAM Mirrors
                     if ((address & 0x1ffff) < 0x10000)
                     {
@@ -241,8 +265,8 @@ namespace GBAEmulator.CPU
                     }
                     __SetHalfWordAt__(this.VRAM, 0x10000 | (address & 0x7fff), value);
                     return;
-                case 4: // IORAM
-                    this.IOSetHalfWordAt(address & 0x3ff, value);  // for now
+                case 7:
+                    __SetHalfWordAt__(this.OAM, address & __MemoryMasks__[Section], value);
                     return;
                 case 8:
                 case 9:
@@ -250,7 +274,7 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    this.Error("ROM halfword write attempted");
+                    this.Error($"ROM Halfword Write Attempted at PC = {this.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM
@@ -276,11 +300,19 @@ namespace GBAEmulator.CPU
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
 
-            if (Section < 8 && __MemoryRegions__[Section] != null)
-                return this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]];
-
             switch (Section)
             {
+                case 0:
+                case 1:
+                    return this.BIOS[address & __MemoryMasks__[Section]];
+                case 2:
+                    return this.eWRAM[address & __MemoryMasks__[Section]];
+                case 3:
+                    return this.iWRAM[address & __MemoryMasks__[Section]];
+                case 4: // IORAM
+                    return (byte)this.IOGetByteAt(address & 0x3ff);
+                case 5:
+                    return this.PaletteRAM[address & __MemoryMasks__[Section]];
                 case 6:  // VRAM Mirrors
                     if ((address & 0x1ffff) < 0x10000)
                     {
@@ -288,8 +320,8 @@ namespace GBAEmulator.CPU
                         return this.VRAM[address & 0xffff];
                     }
                     return this.VRAM[0x10000 | (address & 0x7fff)];
-                case 4: // IORAM
-                    return (byte)this.IOGetByteAt(address & 0x3ff);
+                case 7:
+                    return this.OAM[address & __MemoryMasks__[Section]];
                 case 8:
                 case 9:
                 case 10:
@@ -319,81 +351,63 @@ namespace GBAEmulator.CPU
             this.NCycle = __ByteAccessCycles__[Section];
             this.SCycle = __ByteAccessCycles__[Section];
 
-            if (Section >= 5)
+            switch (Section)
             {
-                /*
-                 Writing 8bit Data to Video Memory
-                Video Memory (BG, OBJ, OAM, Palette) can be written to in 16bit and 32bit units only.
-                Attempts to write 8bit data (by STRB opcode) won't work:
+                case 0:
+                case 1:
+                    this.Error($"BIOS Byte Write Attempted at PC = {this.PC.ToString("x8")}");
+                    return;
+                case 2:
+                    this.eWRAM[address & __MemoryMasks__[Section]] = value;
+                    return;
+                case 3:
+                    this.iWRAM[address & __MemoryMasks__[Section]] = value;
+                    return;
+                case 4: // IORAM
+                    this.IOSetByteAt(address & 0x3ff, value);
+                    return;
+                    /*
+                         Writing 8bit Data to Video Memory
+                        Video Memory (BG, OBJ, OAM, Palette) can be written to in 16bit and 32bit units only.
+                        Attempts to write 8bit data (by STRB opcode) won't work:
 
-                Writes to OBJ (6010000h-6017FFFh) (or 6014000h-6017FFFh in Bitmap mode)
-                and to OAM (7000000h-70003FFh) are ignored, the memory content remains unchanged.
+                        Writes to OBJ (6010000h-6017FFFh) (or 6014000h-6017FFFh in Bitmap mode)
+                        and to OAM (7000000h-70003FFh) are ignored, the memory content remains unchanged.
 
-                Writes to BG (6000000h-600FFFFh) (or 6000000h-6013FFFh in Bitmap mode)
-                and to Palette (5000000h-50003FFh) are writing the new 8bit value to BOTH upper and
-                lower 8bits of the addressed halfword, ie. "[addr AND NOT 1]=data*101h".
-                 */
-                switch ((MemorySection)Section)
-                {
-                    case MemorySection.VRAM:   // ignore OAM byte stores
-                        if (this.DISPCNT.BGMode >= 3)
+                        Writes to BG (6000000h-600FFFFh) (or 6000000h-6013FFFh in Bitmap mode)
+                        and to Palette (5000000h-50003FFh) are writing the new 8bit value to BOTH upper and
+                        lower 8bits of the addressed halfword, ie. "[addr AND NOT 1]=data*101h".
+                    */
+                case 5:  // ignore PaletteRAM byte stores
+                    this.PaletteRAM[address & 0x3fe] = value;
+                    this.PaletteRAM[(address & 0x3fe) | 1] = value;
+                    return;
+                case 6:   // ignore OAM byte stores
+                    if (this.DISPCNT.BGMode >= 3)
+                    {
+                        if (address >= 0x0601_4000)
                         {
-                            if (address >= 0x0601_4000)
-                            {
-                                return;
-                            }
-                            else
-                            {
-                                this.VRAM[address & 0x17ffe] = value;
-                                this.VRAM[(address & 0x17ffe) | 1] = value;
-                                return;
-                            }
-                        }
-                        else if (address >= 0x0601_0000)
-                        {
-                            // non-bitmap modes
                             return;
                         }
                         else
                         {
-                            this.VRAM[address & 0xfffe] = value;
-                            this.VRAM[(address & 0xfffe) | 1] = value;
+                            this.VRAM[address & 0x17ffe] = value;
+                            this.VRAM[(address & 0x17ffe) | 1] = value;
                             return;
                         }
-                    case MemorySection.OAM:
-                        return;
-                    case MemorySection.PaletteRAM:  // ignore PaletteRAM byte stores
-                        this.PaletteRAM[address & 0x3fe] = value;
-                        this.PaletteRAM[(address & 0x3fe) | 1] = value;
-                        return;
-                }
-            }
-
-            if (Section < 8 && __MemoryRegions__[Section] != null)
-            {
-                if (Section <= 1)
-                {
-                    this.Error($"BIOS Write Attempted at PC = {this.PC.ToString("x8")}");
-                    return;
-                }
-
-                this.__MemoryRegions__[Section][address & __MemoryMasks__[Section]] = value;
-                return;
-            }
-
-            switch (Section)
-            {
-                case 6:  // VRAM Mirrors
-                    if ((address & 0x1ffff) < 0x10000)
+                    }
+                    else if (address >= 0x0601_0000)
                     {
-                        // first bit is already 0
-                        this.VRAM[address & 0xffff] = value;
+                        // non-bitmap modes
                         return;
                     }
-                    this.VRAM[0x10000 | (address & 0x7fff)] = value;
-                    return;
-                case 4: // IORAM
-                    this.IOSetByteAt(address & 0x3ff, value);
+                    else
+                    {
+                        this.VRAM[address & 0xfffe] = value;
+                        this.VRAM[(address & 0xfffe) | 1] = value;
+                        return;
+                    }
+                case 7:  // ignore OAM byte writes
                     return;
                 case 8:
                 case 9:
@@ -401,7 +415,7 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    this.Error("ROM byte write attempted");
+                    this.Error($"ROM Byte Write Attempted at PC = {this.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM

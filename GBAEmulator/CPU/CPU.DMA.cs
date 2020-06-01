@@ -26,6 +26,8 @@ namespace GBAEmulator.CPU
             cDMAAddress dmasad = this.DMASAD[i];
             cDMAAddress dmadad = this.DMADAD[i];
 
+            this.Log($"DMA: {dmasad.Address.ToString("x8")} -> {dmadad.Address.ToString("x8")}");
+
             uint UnitLength = (uint)(dmacnt_h.DMATransferType ? 4 : 2);  // bytes: 16 / 32 bits
             
             if (UnitLength == 4)
@@ -50,14 +52,14 @@ namespace GBAEmulator.CPU
         {
             switch (control)
             {
-                case AddrControl.IncrementReload:
-                case AddrControl.Increment:
+                case AddrControl.IncrementReload:   // 11 (prohibited for DMASAD)
+                case AddrControl.Increment:         // 00
                     dmaxad.Address += amount;
                     break;
-                case AddrControl.Decrement:
+                case AddrControl.Decrement:         // 01
                     dmaxad.Address -= amount;
                     break;
-                case AddrControl.Fixed:
+                case AddrControl.Fixed:             // 10
                     break;
             }
         }
@@ -78,9 +80,9 @@ namespace GBAEmulator.CPU
                 // end of the transfer
                 if (dmacnt_h.IRQOnEnd)
                 {
-                    this.IF.Request((Interrupt)((ushort)Interrupt.DMA << dmacnt_h.index));
+                    this.IF.Request((ushort)((ushort)Interrupt.DMA << dmacnt_h.index));
                 }
-                dmacnt_h.Disable();
+                dmacnt_h.Disable();  // clear enabled bit
             }
             dmacnt_h.Active = false;
         }
