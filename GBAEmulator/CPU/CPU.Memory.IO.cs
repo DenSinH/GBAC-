@@ -117,12 +117,18 @@ namespace GBAEmulator.CPU
 
             this.IORAM[0x10c] = this.IORAM[0x10d] = this.Timers[3].Data;
             this.IORAM[0x10e] = this.IORAM[0x10f] = this.Timers[3].Control;
+            this.IORAM[0x110] = this.IORAM[0x111] = new UnusedRegister();
+
+            // GAP (SIO)
 
             this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(this.KEYCNT, this);
             this.IORAM[0x0132] = this.IORAM[0x0133] = this.KEYCNT;
 
+            // GAP (SIO)
+
             this.IORAM[0x0200] = this.IORAM[0x0201] = this.IE;
             this.IORAM[0x0202] = this.IORAM[0x0203] = this.IF;
+            // WAITCNT
 
             this.IORAM[0x0206] = this.IORAM[0x0207] = new UnusedRegister();  // unused
             this.IORAM[0x0208] = this.IORAM[0x0209] = this.IME;
@@ -163,7 +169,7 @@ namespace GBAEmulator.CPU
             if (!offset)
                 return (ushort)reg.Get();
 
-            return (ushort)(((reg.Get() & 0xff00) >> 8) | ((this.IORAM[address + 1].Get() & 0x00ff) << 8));
+            return (ushort)(((reg.Get() & 0xff00) >> 8) | ((this.IORAM[address + 2].Get() & 0x00ff) << 8));
         }
 
         private void IOSetHalfWordAt(uint address, ushort value)

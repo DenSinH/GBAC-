@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 using GBAEmulator.CPU;
 
@@ -40,7 +41,7 @@ namespace GBAEmulator
             byte priority;
             for (int x = 0; x < width; x++)
             {
-                for (priority = 0; priority < 3; priority++)
+                for (priority = 0; priority < 4; priority++)
                 {
                     if (RenderOBJ)
                     {
@@ -69,7 +70,7 @@ namespace GBAEmulator
                     }
                 }
 
-                if (priority == 3)  // we found no non-transparent pixel
+                if (priority == 4)  // we found no non-transparent pixel
                 {
                     this.Display[width * scanline + x] = Backdrop;
                 }
@@ -203,7 +204,7 @@ namespace GBAEmulator
             {
                 Address |= (ushort)(TileID * 0x20);   // Beginning of tile
                 Address |= (ushort)(dy * 4);          // Beginning of tile sliver
-                
+
                 this.Render4bpp(ref Line, StartX, XSign, Address, (uint)(PaletteBank * 0x20), Mosaic, MosaicHSize);
             }
             else             // 8bpp
@@ -273,14 +274,18 @@ namespace GBAEmulator
 
         private static readonly ushort[] AffineSizes = new ushort[4] { 128, 256, 512, 1024 };
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ushort GetAffinePixel(byte TileID, uint ScreenX, byte CharBaseBlock, byte dx, byte dy)
         {
             // TileID is equivalent with ScreenEntry in affine backgrounds
             // we only use 8bpp mode for affine layers (Tonc)
             
             ushort Address = (ushort)(CharBaseBlock * 0x4000 | (TileID * 0x40) | (dy * 8) | dx);
+            byte VRAMEntry = this.gba.cpu.VRAM[Address];
 
-            return this.GetPaletteEntry((uint)2 * this.gba.cpu.VRAM[Address]);
+            if (VRAMEntry == 0) return 0x8000;  // transparent
+
+            return this.GetPaletteEntry((uint)2 * VRAMEntry);
         }
 
         // based on y = scanline
@@ -327,8 +332,7 @@ namespace GBAEmulator
 
                 // similar to regular now
                 ScreenEntryIndex = (ScreenEntryBaseAddress | (uint)((ScreenEntryY >> 3) * (BGSize >> 3))| (uint)(ScreenEntryX >> 3));
-
-                // Console.Write(ScreenEntryIndex.ToString("x3") + " ");
+                
                 AffineScreenEntry = this.gba.cpu.VRAM[ScreenEntryIndex];
 
                 this.BGScanlines[BG][ScreenX] = this.GetAffinePixel(AffineScreenEntry, (byte)ScreenX, CharBaseBlock,

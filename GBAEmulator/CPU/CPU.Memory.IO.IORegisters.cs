@@ -11,6 +11,7 @@ namespace GBAEmulator.CPU
             // Register full of unused bits (always returns 0)
             public ushort Get()
             {
+                // todo: open bus?
                 return 0;
             }
 
