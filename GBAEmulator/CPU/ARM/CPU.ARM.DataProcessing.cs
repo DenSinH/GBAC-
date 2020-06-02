@@ -55,11 +55,7 @@ namespace GBAEmulator.CPU
             */
             byte Rd = (byte)((Instruction & 0x0000_f000) >> 12);  // Destination register
             
-            if (Rd == 15)
-            {
-                SetConditions = false;
-                this.PipelineFlush();
-            }
+            if (Rd == 15) SetConditions = false;
 
             if (!ImmediateOperand)
             {
@@ -92,7 +88,7 @@ namespace GBAEmulator.CPU
                 Op2 = Instruction & 0x0ff;
                 byte ShiftAmount = (byte)((Instruction & 0xf00) >> 7);  // rotated right by twice the value of the operand
 
-                this.Log(string.Format("Data Processing, Op2 = immediate (hex){0:2x} ROR {1}", Op2, ShiftAmount));
+                this.Log(string.Format("Data Processing, Op2 = immediate (hex){0:x2} ROR {1}", Op2, ShiftAmount));
 
                 // Rotate right
                 if (ShiftAmount > 0)
@@ -216,13 +212,16 @@ namespace GBAEmulator.CPU
             }
             else if (Rd == 15)
             {
+                // Setconditions is always false if Rd == 15
+                this.PipelineFlush();
+
                 // Special cases for writing to PC
                 if ((Instruction & 0x0010_0000) > 0)  // S bit
                 {
                     this.CPSR = this.SPSR;
                 }
             }
-
+                
             /*
              Processing Type                                                Cycles
              Normal Data Processing                                         1S

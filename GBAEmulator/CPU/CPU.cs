@@ -87,7 +87,7 @@ namespace GBAEmulator.CPU
             this.Pipeline.Clear();
         }
         
-        StreamReader LOGFILE = new StreamReader("../../Tests/AgingCard.log");
+        StreamReader LOGFILE = new StreamReader("../../Tests/isr_subroutine.log");
         public int Step()
         {
             int DMACycles = 0;
@@ -122,7 +122,8 @@ namespace GBAEmulator.CPU
                     }
                     else
                     {
-                        StepCycles = 1;  // how many cycles?
+                        StepCycles = 0;
+                        // throw new Exception("Pipeline empty!");
                     }
                 }
                 else
@@ -136,7 +137,8 @@ namespace GBAEmulator.CPU
                     }
                     else
                     {
-                        StepCycles = 1;  // how many cycles?
+                        StepCycles = 0;
+                        // throw new Exception("Pipeline empty!");
                     }
                 }
             }
@@ -145,7 +147,7 @@ namespace GBAEmulator.CPU
 
             //if (!this.HALTCNT.Halt && (DMACycles == 0))
             //{
-            //    if (this.Pipeline.Count == 1)
+            //    if (this.Pipeline.Count == 1 && enable > 0)
             //    {
             //        string Line = LOGFILE.ReadLine();
             //        Console.WriteLine("LOG " + Line);

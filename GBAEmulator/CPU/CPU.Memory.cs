@@ -10,12 +10,6 @@ namespace GBAEmulator.CPU
         private void MemoryAccess(uint Address)
         {
             Console.WriteLine("Memory Access: " + Address.ToString("x8"));
-            //if (Address >= 0x0300_7c04 && Address < 0x0300_7c10)
-            //{
-            //    Console.WriteLine(this.iWRAM[0x7c04]);
-            //    Console.WriteLine(this.iWRAM[0x7c05]);
-            //    Console.ReadKey();
-            //}
         }
 
         /* BIOS is defined in CPU.BIOS.cs */

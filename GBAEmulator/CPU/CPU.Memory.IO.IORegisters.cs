@@ -452,7 +452,7 @@ namespace GBAEmulator.CPU
                     }
                 }
 
-                return (ushort)~state;
+                return (ushort)(((ushort)~state) & 0x03ff);
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh) { }

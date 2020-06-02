@@ -47,8 +47,8 @@ namespace GBAEmulator.CPU
                     this.Registers[Rd] = Op1 + Op2;
                     if (Rd == 15)
                     {
-                        this.PipelineFlush();
                         this.PC &= 0xffff_fffe;
+                        this.PipelineFlush();
                     }
                     break;
                 case 0b01:
@@ -62,8 +62,8 @@ namespace GBAEmulator.CPU
                     this.Registers[Rd] = Op2;
                     if (Rd == 15)
                     {
-                        this.PipelineFlush();
                         this.PC &= 0xffff_fffe;
+                        this.PipelineFlush();
                     }
                     break;
                 case 0b11:
