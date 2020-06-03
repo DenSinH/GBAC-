@@ -65,14 +65,10 @@ namespace GBAEmulator
             
             this.ResetBGScanlines(0, 1, 2, 3);
             this.ResetBGWindows(0, 1, 2, 3);
+            this.ResetOBJWindow();
 
             if (DoRenderOBJs)
             {
-                // reset OBJ layer with priority 0
-                this.ResetOBJScanlines(true);
-                this.RenderOBJs(true);
-
-                this.ResetOBJWindow();
                 this.RenderOBJs();
             }
 
@@ -86,14 +82,10 @@ namespace GBAEmulator
             
             this.ResetBGScanlines(0, 1, 2);
             this.ResetBGWindows(0, 1, 2);
+            this.ResetOBJWindow();
 
             if (DoRenderOBJs)
             {
-                // reset OBJ layer with priority 0
-                this.ResetOBJScanlines(true);
-                this.RenderOBJs(true);
-
-                this.ResetOBJWindow();
                 this.RenderOBJs();
             }
 
@@ -109,14 +101,10 @@ namespace GBAEmulator
             
             this.ResetBGScanlines(2, 3);
             this.ResetBGWindows(2, 3);
+            this.ResetOBJWindow();
 
             if (DoRenderOBJs)
             {
-                // reset OBJ layer with priority 0
-                this.ResetOBJScanlines(true);
-                this.RenderOBJs(true);
-
-                this.ResetOBJWindow();
                 this.RenderOBJs();
             }
 

@@ -115,6 +115,7 @@
     <Compile Include="Input.cs" />
     <Compile Include="PPU\PPU.Aux.cs" />
     <Compile Include="PPU\PPU.cs" />
+    <Compile Include="PPU\PPU.Render.Aux.cs" />
     <Compile Include="PPU\PPU.Render.cs" />
     <Compile Include="PPU\PPU.Render.BG.cs" />
     <Compile Include="PPU\PPU.Render.OBJ.cs" />
