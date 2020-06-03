@@ -94,9 +94,9 @@ namespace GBAEmulator
             this.HBlankIntervalFree.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.HBlankIntervalFree) ? "1" : "0";
             this.OBJVRAMMapping.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.OBJVRAMMapping) ? "1" : "0";
             this.ForcedBlank.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.ForcedBlank) ? "1" : "0";
-            this.Window0Display.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.WindowDisplay0) ? "1" : "0";
-            this.Window1Display.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.WindowDisplay1) ? "1" : "0";
-            this.OBJWindowDisplay.Text = this.gba.cpu.DISPCNT.IsSet(CPU.ARM7TDMI.DISPCNTFlags.OBJWindowDisplay) ? "1" : "0";
+            this.Window0Display.Text = this.gba.cpu.DISPCNT.DisplayBGWindow(0) ? "1" : "0";
+            this.Window1Display.Text = this.gba.cpu.DISPCNT.DisplayBGWindow(1) ? "1" : "0";
+            this.OBJWindowDisplay.Text = this.gba.cpu.DISPCNT.DisplayOBJWindow() ? "1" : "0";
         }
 
         private void UpdateDISPSTAT()

@@ -8,15 +8,23 @@ namespace GBAEmulator
     {
         ushort[][] OBJLayers = new ushort[4][] { new ushort[width], new ushort[width], new ushort[width], new ushort[width] };
 
-        private void ResetOBJScanlines()
+        private void ResetOBJScanlines(bool Only0 = false)
         {
-            for (int Priority = 0; Priority < 4; Priority++)
+            for (int Priority = 0; Priority < (Only0 ? 1 : 4); Priority++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     OBJLayers[Priority][x] = 0x8000;  // transparent
                 }
             }
+        }
+
+        bool[] OBJWindow = new bool[width];
+
+        private void ResetOBJWindow()
+        {
+            this.ResetWindow(ref OBJWindow, this.gba.cpu.WININ.WindowOBJEnable(0), this.gba.cpu.WININ.WindowOBJEnable(1),
+                this.gba.cpu.WINOUT.WindowOBJEnable(1), this.gba.cpu.WININ.WindowOBJEnable(0));
         }
 
         struct OBJSize
@@ -39,7 +47,7 @@ namespace GBAEmulator
 
         bool OAM2DMap;  // false for 1D mapping, true for 2D
 
-        private void RenderOBJs()  // assumes y = scanline
+        private void RenderOBJs(bool OBJWindowMask = false)  // assumes y = scanline
         {
             this.ResetOBJScanlines();
 
@@ -72,29 +80,40 @@ namespace GBAEmulator
                     OBJy = (short)(OBJy - 0x100);
 
                 GFXMode = (byte)((OBJ_ATTR0 & 0x0c00) >> 10);
+
+                // set priority to 0 for all objects if we are creating the OBJ window
+                if (GFXMode == 0b10)
+                {
+                    OBJ_ATTR1 &= 0xf3ff;
+                }
+
                 Mosaic = (OBJ_ATTR0 & 0x1000) > 0;
                 ColorMode = (OBJ_ATTR0 & 0x2000) > 0;
 
                 OBJsz = PPU.GetOBJSize[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
 
                 /* Draw object */
-                if (OBJMode == 0b00)
+                if (!OBJWindowMask ^ GFXMode == 0b10)
                 {
-                    if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
-                        this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2);
-                }
-                else if (OBJMode == 0b01)
-                {
-                    if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
+                    // normal / alphablend
+                    if (OBJMode == 0b00)
                     {
-                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, false);
+                        if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
+                            this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2);
                     }
-                }
-                else if (OBJMode == 0b11)
-                {
-                    if ((OBJy <= scanline) && (OBJy + 2 * OBJsz.Height > scanline))
+                    else if (OBJMode == 0b01)
                     {
-                        this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, true);
+                        if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
+                        {
+                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, false);
+                        }
+                    }
+                    else if (OBJMode == 0b11)
+                    {
+                        if ((OBJy <= scanline) && (OBJy + 2 * OBJsz.Height > scanline))
+                        {
+                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, true);
+                        }
                     }
                 }
             }
@@ -148,7 +167,7 @@ namespace GBAEmulator
                 {
                     // foreground palette starts at 0x0500_0200
                     // we can use our same rendering method as for background, as we simply render a tile
-                    this.Render4bpp(ref this.OBJLayers[Priority], StartX, XSign,
+                    this.Render4bpp(ref this.OBJLayers[Priority], ref this.OBJWindow, StartX, XSign,
                         (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
                     StartX += 8 * XSign;
@@ -171,7 +190,7 @@ namespace GBAEmulator
                 for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
                 {
                     // we can use our same rendering method as for background, as we simply render a tile
-                    this.Render8bpp(ref this.OBJLayers[Priority], StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
+                    this.Render8bpp(ref this.OBJLayers[Priority], ref this.OBJWindow, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
                     StartX += 8 * XSign;
                 }

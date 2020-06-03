@@ -29,9 +29,6 @@ namespace GBAEmulator.CPU
             ForcedBlank = 0x0080,
 
             DisplayOBJ = 0x1000,
-            WindowDisplay0 = 0x2000,
-            WindowDisplay1 = 0x4000,
-            OBJWindowDisplay = 0x8000,
         }
 
         public class cDISPCNT : IORegister2
@@ -46,6 +43,17 @@ namespace GBAEmulator.CPU
             public bool DisplayBG(byte BG)
             {
                 return (this._raw & (0x0100 << BG)) > 0;
+            }
+
+            public bool DisplayBGWindow(byte Window)
+            {
+                if (Window == 0) return (this._raw & 0x2000) > 0;
+                return (this._raw & 0x4000) > 0;
+            }
+
+            public bool DisplayOBJWindow()
+            {
+                return (this._raw & 0x8000) > 0;
             }
         }
 
@@ -354,9 +362,9 @@ namespace GBAEmulator.CPU
             public bool WindowBGEnable(byte Window, byte BG)
             {
                 if (Window == 0)
-                    return (this._raw & (1 << BG)) > 0;
+                    return (this._raw & (0x0001 << BG)) > 0;
                 else
-                    return (this._raw & (1 << BG)) > 0;
+                    return (this._raw & (0x0100 << BG)) > 0;
             }
 
             public bool WindowOBJEnable(byte Window)
@@ -379,6 +387,12 @@ namespace GBAEmulator.CPU
             {
                 // top 2 bits unused
                 base.Set((ushort)(value & 0x3fff), setlow, sethigh);
+            }
+
+            public override ushort Get()
+            {
+                // bits 5,6, 14, 15 unused
+                return (ushort)(0x3f3f & this._raw);
             }
         }
 
@@ -787,6 +801,7 @@ namespace GBAEmulator.CPU
 
             public bool TickDirect(ushort cycles)
             {
+                // don't account for the prescaler
                 bool Overflow = false;
                 if (this.Counter + cycles > 0xffff)  // overflow
                 {

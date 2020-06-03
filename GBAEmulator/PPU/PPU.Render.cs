@@ -62,13 +62,20 @@ namespace GBAEmulator
         private void Mode0Scanline()
         {
             bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            
+            this.ResetBGScanlines(0, 1, 2, 3);
+            this.ResetBGWindows(0, 1, 2, 3);
 
             if (DoRenderOBJs)
             {
+                // reset OBJ layer with priority 0
+                this.ResetOBJScanlines(true);
+                this.RenderOBJs(true);
+
+                this.ResetOBJWindow();
                 this.RenderOBJs();
             }
 
-            this.ResetBGScanlines(0, 1, 2, 3);
             this.RenderRegularBGScanlines(0, 1, 2, 3);
             this.MergeBGs(DoRenderOBJs, 0, 1, 2, 3);
         }
@@ -76,13 +83,20 @@ namespace GBAEmulator
         private void Mode1Scanline()
         {
             bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            
+            this.ResetBGScanlines(0, 1, 2);
+            this.ResetBGWindows(0, 1, 2);
 
             if (DoRenderOBJs)
             {
+                // reset OBJ layer with priority 0
+                this.ResetOBJScanlines(true);
+                this.RenderOBJs(true);
+
+                this.ResetOBJWindow();
                 this.RenderOBJs();
             }
 
-            this.ResetBGScanlines(0, 1, 2);
             this.RenderRegularBGScanlines(0, 1);
             this.RenderAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
@@ -92,19 +106,28 @@ namespace GBAEmulator
         private void Mode2Scanline()
         {
             bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            
+            this.ResetBGScanlines(2, 3);
+            this.ResetBGWindows(2, 3);
 
             if (DoRenderOBJs)
             {
+                // reset OBJ layer with priority 0
+                this.ResetOBJScanlines(true);
+                this.RenderOBJs(true);
+
+                this.ResetOBJWindow();
                 this.RenderOBJs();
             }
 
-            this.ResetBGScanlines(2, 3);
             this.RenderAffineBGScanline(2, this.gba.cpu.BG2X, this.gba.cpu.BG2Y,
                 this.gba.cpu.BG2PA, this.gba.cpu.BG2PB, this.gba.cpu.BG2PC, this.gba.cpu.BG2PD);
             this.RenderAffineBGScanline(3, this.gba.cpu.BG3X, this.gba.cpu.BG3Y,
                 this.gba.cpu.BG3PA, this.gba.cpu.BG3PB, this.gba.cpu.BG3PC, this.gba.cpu.BG3PD);
             this.MergeBGs(DoRenderOBJs, 2, 3);
         }
+
+        // todo: special effects / OBJ in bitmap modes
 
         private void Mode3Scanline()
         {
