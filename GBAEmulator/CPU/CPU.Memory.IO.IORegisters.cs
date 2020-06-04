@@ -760,7 +760,9 @@ namespace GBAEmulator.CPU
                 if ((this._raw & 0x8000) > 0)  // enabled
                 {
                     if (timing == this.StartTiming)
+                    {
                         this.Active = true;
+                    }
                 }
             }
 
@@ -777,7 +779,9 @@ namespace GBAEmulator.CPU
                 }
 
                 if ((this._raw & 0xb000) == 0x8000)  // DMA Enable set AND DMA start timing immediate
+                {
                     this.Active = true;
+                }
             }
         }
 

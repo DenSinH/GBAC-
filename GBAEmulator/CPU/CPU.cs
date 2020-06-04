@@ -86,12 +86,19 @@ namespace GBAEmulator.CPU
         {
             this.Pipeline.Clear();
         }
-        
-        StreamReader LOGFILE = new StreamReader("../../Tests/isr_subroutine.log");
+
+        bool COMPLOG;
+        StreamReader LOGFILE = new StreamReader("../../Tests/ags.log");
         public int Step()
         {
             int DMACycles = 0;
             int StepCycles;
+
+            //if (this.PC == 0x3007bd4)
+            //{
+            //    Console.WriteLine(this.Pipeline.Peek().ToString("x8"));
+            //    COMPLOG = Console.ReadKey().KeyChar == 'c';
+            //}
 
             if (pause)
                 return 1;
@@ -145,24 +152,33 @@ namespace GBAEmulator.CPU
 
             for (int i = 0; i < 4; i++) this.Timers[i].Tick(StepCycles);
 
-            //if (!this.HALTCNT.Halt && (DMACycles == 0))
+            //if (COMPLOG)
             //{
-            //    if (this.Pipeline.Count == 1 && enable > 0)
+            //    if (!this.HALTCNT.Halt && (DMACycles == 0))
             //    {
-            //        string Line = LOGFILE.ReadLine();
-            //        Console.WriteLine("LOG " + Line);
-            //        Console.Write("ACT ");
-            //        this.ShowInfo();
-
-            //        if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //        if (this.Pipeline.Count == 1)
             //        {
-            //            Console.ReadKey();
+            //            string Line = LOGFILE.ReadLine();
+            //            Console.WriteLine("LOG " + Line);
+            //            Console.Write("ACT ");
+            //            this.ShowInfo();
+
+            //            //// all registers
+            //            //if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            //{
+            //            //    Console.ReadKey();
+            //            //}
+
+            //            // wrong branch
+            //            if (!Line.Contains(this.Registers[15].ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            {
+            //                Console.ReadKey();
+            //            }
             //        }
             //    }
             //}
 
             return StepCycles;
-            return 1;
         }
     }
 }

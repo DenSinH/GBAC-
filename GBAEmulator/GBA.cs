@@ -52,7 +52,8 @@ namespace GBAEmulator
                 this.cpu.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.VBlank);
             }
-            else if (this.ppu.scanline == 0) this.cpu.DISPSTAT.SetVBlank(false);
+            // no VBlank in 227
+            else if (this.ppu.scanline == 227) this.cpu.DISPSTAT.SetVBlank(false);
 
             if (this.ppu.IsVBlank)
             {
@@ -77,7 +78,7 @@ namespace GBAEmulator
 
             /* HBLANK */
             this.cpu.DISPSTAT.SetHBlank(true);
-            this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.HBlank);
+            if (!ppu.IsVBlank) this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.HBlank);
             this.ppu.DrawScanline();
 
             this.cycle += HBlankCycles;

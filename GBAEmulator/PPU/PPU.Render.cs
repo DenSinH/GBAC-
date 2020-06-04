@@ -52,7 +52,7 @@ namespace GBAEmulator
             }
             
             scanline++;
-            if (scanline == 227)
+            if (scanline == 228)
             {
                 scanline = 0;
                 frame++;

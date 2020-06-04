@@ -103,7 +103,6 @@ namespace GBAEmulator.CPU
                         return __GetWordAt__(this.GamePak, _address);
                     }
                     return ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);  // seems to be what mGBA is doing...
-                    return ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);
                 case 14:
                 case 15:  // SRAM
                     return (uint)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8) | (this.GamePakSRAM[address & 0xffff] << 16) | (this.GamePakSRAM[address & 0xffff] << 24));
@@ -124,7 +123,7 @@ namespace GBAEmulator.CPU
             {
                 case 0:
                 case 1:
-                    this.Error($"BIOS Word Write Attempted at PC = {this.PC.ToString("x8")}");
+                    this.Error($"BIOS Word Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 2:
                     __SetWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
@@ -215,7 +214,6 @@ namespace GBAEmulator.CPU
                     }
                     else if (address >= 0x0d00_0000) return 1;  // this is what mGBA seems to do...
                     return (ushort)((address >> 1) & 0xffff);
-                    return (ushort)((address >> 1) & 0xffff);
                 case 14:
                 case 15:  // SRAM
                     return (ushort)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8));
@@ -236,7 +234,7 @@ namespace GBAEmulator.CPU
             {
                 case 0:
                 case 1:
-                    this.Error($"BIOS Halfword Write Attempted at PC = {this.PC.ToString("x8")}");
+                    this.Error($"BIOS Halfword Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 2:
                     __SetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
@@ -327,7 +325,6 @@ namespace GBAEmulator.CPU
                     {
                         return this.GamePak[address];
                     }
-                    return 0;
                     return (byte)((address >> 1) & 0xff);
                 case 14:
                 case 15:  // SRAM
@@ -349,7 +346,7 @@ namespace GBAEmulator.CPU
             {
                 case 0:
                 case 1:
-                    this.Error($"BIOS Byte Write Attempted at PC = {this.PC.ToString("x8")}");
+                    this.Error($"BIOS Byte Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 2:
                     this.eWRAM[address & __MemoryMasks__[Section]] = value;

@@ -7,7 +7,7 @@ namespace GBAEmulator
     {
         public bool IsVBlank
         {
-            get { return (scanline >= 160) && (scanline < 227); }
+            get { return (scanline >= 160) && (scanline < ScanlinesPerFrame); }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

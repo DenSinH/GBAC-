@@ -20,6 +20,8 @@ namespace GBAEmulator
         const int width = 240;
         const int height = 160;
 
+        const int ScanlinesPerFrame = 228;
+
         public PPU(GBA gba, ushort[] display)
         {
             this.gba = gba;
