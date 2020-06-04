@@ -6,13 +6,16 @@ Done:
   - THUMB instructions
   - Render mode 0, 1, 2, 3, 4 (, 5?)
   - SWI's
-  - Some IRQ handling (ohhh boy was this annoying)
-  - DMA
-  - Timers
+  - Most IRQ handling (ohhh boy was this annoying)
+  - DMA (seems to be a small problem with this still)
+  - Timers (though still pretty inacurrate)
+  - Windowing
   
 To do:
-  - fix stuff (IRQs mainly)
-  - some background stuff doesn't always display properly...
-  - alpha blending / windowing
+  - fix stuff
+  - alpha blending
   - sound
   - Other registers
+  - open bus
+  - more accurate cycles
+  - OBJs and windowing in BM rendering modes
