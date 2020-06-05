@@ -13,7 +13,7 @@ namespace GBAEmulator.CPU
          Emulation of the ARM7TDMI CPU
         */
         public State state { get; private set; }
-        private readonly Queue<uint> Pipeline = new Queue<uint>(3);
+        private readonly cPipeline Pipeline = new cPipeline();
         GBA gba;
         
         public ARM7TDMI(GBA gba)
@@ -87,17 +87,17 @@ namespace GBAEmulator.CPU
             this.Pipeline.Clear();
         }
 
-        bool COMPLOG;
-        StreamReader LOGFILE = new StreamReader("../../Tests/ags.log");
+        //bool COMPLOG;
+        //StreamReader LOGFILE = new StreamReader("../../Tests/ags_IO.log");
         public int Step()
         {
             int DMACycles = 0;
             int StepCycles;
 
-            //if (this.PC == 0x3007bd4)
+            //if (pause && this.PC == 0x080030CE)
             //{
-            //    Console.WriteLine(this.Pipeline.Peek().ToString("x8"));
-            //    COMPLOG = Console.ReadKey().KeyChar == 'c';
+            //    Console.WriteLine("BREAKPOINT!");
+            //    COMPLOG = COMPLOG || Console.ReadKey().KeyChar == 'c';
             //}
 
             if (pause)
@@ -164,16 +164,16 @@ namespace GBAEmulator.CPU
             //            this.ShowInfo();
 
             //            //// all registers
-            //            //if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
-            //            //{
-            //            //    Console.ReadKey();
-            //            //}
-
-            //            // wrong branch
-            //            if (!Line.Contains(this.Registers[15].ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
             //            {
             //                Console.ReadKey();
             //            }
+
+            //            // wrong branch
+            //            //if (!Line.Contains(this.Registers[15].ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            //{
+            //            //    Console.ReadKey();
+            //            //}
             //        }
             //    }
             //}

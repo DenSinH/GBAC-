@@ -8,6 +8,8 @@ namespace GBAEmulator
     {
         public ARM7TDMI cpu;
         public PPU ppu;
+
+        public Visual vis;
         public ushort[] display;
 
         public bool ShutDown;
@@ -51,6 +53,7 @@ namespace GBAEmulator
             {
                 this.cpu.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.VBlank);
+                this.vis.Tick();
             }
             // no VBlank in 227
             else if (this.ppu.scanline == 227) this.cpu.DISPSTAT.SetVBlank(false);
@@ -93,14 +96,14 @@ namespace GBAEmulator
 
         public void Run()
         {
-            // cpu.LoadRom("../../roms/PMD.gba");
+            // cpu.LoadRom("../../roms/SonicAdvance.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
             // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");
             // cpu.LoadRom("../../Tests/GBASuiteNew/mem.gba");
-            cpu.LoadRom("../../Tests/Tonc/dma_demo.gba");
+            cpu.LoadRom("../../Tests/Tonc/bld_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
-            // cpu.LoadRom("../../Tests/AgingCard.gba");
+            // cpu.LoadRom("../../Tests/EndriftSuite.gba");
             
             // this.cpu.UseNormattsBios();
             cpu.SkipBios();

@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace GBAEmulator
@@ -19,6 +20,7 @@ namespace GBAEmulator
         private readonly int MenuStripHeight;
         private const double scale = 2;
 
+        private readonly Stopwatch FPSTimer;
         private const byte interval = 17; // ms
         private double time;
 
@@ -54,8 +56,10 @@ namespace GBAEmulator
 
             System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
             timer.Interval = interval;
-            timer.Tick += new EventHandler(Tick);
+            timer.Tick += new EventHandler(TickDebug);
             timer.Start();
+
+            this.FPSTimer = Stopwatch.StartNew();
 
             ToolStripMenuItem GameMenu = new ToolStripMenuItem("Game");
             ToolStripMenuItem GameOpenItem = new ToolStripMenuItem("Open", null, new EventHandler(LoadGame));
@@ -158,13 +162,14 @@ namespace GBAEmulator
 
         private void LoadDisplay()
         {
-            // converting BRG555 to RGB555
-            for (int x = 0; x < width; x++)
+            // converting BRG555 to RGB555 into this._display
+            int ScreenCoord = 0;
+            for (int y = 0; y < height; y++)
             {
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                 {
-                    ushort BRGEntry = this.gba.display[width * y + x];
-                    this._display[width * y + x] = (ushort)(((BRGEntry & 0x001f) << 10) | (BRGEntry & 0x03e0) | ((BRGEntry & 0x7c00) >> 10));
+                    ushort BRGEntry = this.gba.display[ScreenCoord];
+                    this._display[ScreenCoord++] = (ushort)(((BRGEntry & 0x001f) << 10) | (BRGEntry & 0x03e0) | ((BRGEntry & 0x7c00) >> 10));
                 }
             }
         }
@@ -201,22 +206,24 @@ namespace GBAEmulator
             this.DebugActive = true;
         }
 
-        private void Tick(object sender, EventArgs e)
+        private void TickDebug(object sender, EventArgs e)
         {
-            Draw();
-
-            time += interval;
-            this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.RomName, (1000 * this.gba.ppu.frame / this.time));
-
             if (this.DebugActive)
             {
                 this.DebugScreen.UpdateAll();
             }
+        }
+
+        public void Tick()
+        {
+            Draw();
+            
+            this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.RomName, (1000 * this.gba.ppu.frame / (ulong)this.FPSTimer.ElapsedMilliseconds));
 
             if (time > 2000)
             {
                 this.gba.ppu.frame = 0;
-                this.time = 0;
+                this.FPSTimer.Restart();
             }
         }
 

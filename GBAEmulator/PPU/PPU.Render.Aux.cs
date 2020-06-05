@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
+using GBAEmulator.CPU;
+
 namespace GBAEmulator
 {
     partial class PPU
@@ -101,10 +103,124 @@ namespace GBAEmulator
                     X1, X2, Y1, Y2);
             }
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ushort Blend(ushort ColorA, ushort ColorB, ushort EVA, ushort EVB)
+        {
+            ushort Blend = 0;
+            
+            // colors in BGR555 format
+            ushort BGR;
 
+            // Blend red
+            BGR = (ushort)(((ColorA & 0x001f) * EVA + (ColorB & 0x001f) * EVB) >> 4);  // 1.4 fixed point
+            Blend |= (ushort)(BGR >= 0x1f ? 0x001f : BGR);
+
+            // Blend green
+            BGR = (ushort)((((ColorA & 0x03e0) >> 5) * EVA + ((ColorB & 0x03e0) >> 5) * EVB) >> 4);  // 1.4 fixed point
+            Blend |= (ushort)(BGR >= 0x1f ? 0x03e0 : (BGR << 5));
+
+            // Blend blue
+            BGR = (ushort)((((ColorA & 0x7c00) >> 10) * EVA + ((ColorB & 0x7c00) >> 10) * EVB) >> 4);  // 1.4 fixed point
+            Blend |= (ushort)(BGR >= 0x1f ? 0x7c00 : (BGR << 10));
+
+            return Blend;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool SetPixel(int ScreenX, ushort Color, ARM7TDMI.BlendMode AlphaBlending, bool IsTop, bool IsBottom, bool WasOBJ, bool IsOBJ = false)
+        {
+            // returns if the pixel has final value
+
+            // Sprites behave in a different way with respect to alpha blending
+            // I copied the Tonc text into case ARM7TDMI.BlendMode.White
+            // If there ever was an object in this pixel, we know that AlphaBlending cannot be off,
+            // as otherwise the color was final
+            if (WasOBJ && IsBottom) AlphaBlending = ARM7TDMI.BlendMode.Normal;
+
+            // assumes Color != 0x8000
+            // assumes that if Blendmode is off, Display[ScreenX] = 0x8000
+            switch (AlphaBlending)
+            {
+                case ARM7TDMI.BlendMode.Off:
+                    this.Display[ScreenX] = Color;
+                    return true;
+                case ARM7TDMI.BlendMode.Normal:
+                    if (this.Display[ScreenX] != 0x8000)
+                    {
+                        if (IsBottom)
+                        {
+                            this.Display[ScreenX] = Blend(this.Display[ScreenX], Color, this.gba.cpu.BLDALPHA.EVA, this.gba.cpu.BLDALPHA.EVB);
+                            return true;
+                        }
+
+                        // value is not bottom, but previous value was top
+                        return false;
+                    }
+                    else
+                    {
+                        this.Display[ScreenX] = Color;
+                        return !IsTop;  // if it is not top, this is the final color, otherwise, there is a possibility to blend
+                    }
+                case ARM7TDMI.BlendMode.White:
+                    // Display[ScreenX] should always be 0x8000 in this case, as we always return true (color is always final)
+                    if (WasOBJ)
+                    {
+                        this.Display[ScreenX] = Blend(this.Display[ScreenX], 0x7fff, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                        return true;
+                    }
+
+                    if (IsTop)
+                    {
+                        // blend with white and color is final
+                        // EY <= 0x10 so 0x10 - EY >= 0
+                        this.Display[ScreenX] = Blend(Color, 0x7fff, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                    }
+                    else
+                    {
+                        this.Display[ScreenX] = Color;
+                    }
+
+                    // color is always final, except when we are rendering an object
+                    // this is because of the strange behavior for sprites in White/Black blending modes
+                    /*
+                     Sprites are affected differently than backgrounds. In particular,
+                     the blend mode specified by REG_BLDCNT{6,7} is applied only to the
+                     non-overlapping sections (so that effectively only fading works).
+                        For the overlapping pixels, the standard blend is always in effect,
+                    regardless of the current blend-mode.
+                    (Tonc)
+                     */
+                    return !IsOBJ;
+                case ARM7TDMI.BlendMode.Black:
+                    // Display[ScreenX] should always be 0x8000 in this case, as we always return true (color is always final)
+                    if (WasOBJ)
+                    {
+                        this.Display[ScreenX] = Blend(this.Display[ScreenX], 0x0000, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                        return true;
+                    }
+
+                    if (IsTop)
+                    {
+                        // blend with white and color is final
+                        // EY <= 0x10 so 0x10 - EY >= 0
+                        this.Display[ScreenX] = Blend(Color, 0x0000, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                    }
+                    else
+                    {
+                        this.Display[ScreenX] = Color;
+                    }
+
+                    // color is always final
+                    return !IsOBJ;
+                default:
+                    throw new Exception("Yo this does not exist");
+            }
+        }
 
         private void MergeBGs(bool RenderOBJ, params byte[] BGs)  // into current scanline
         {
+            // default parameters
             ushort Backdrop = this.Backdrop;
             byte[] Priorities = new byte[4];
             bool[] Enabled = new bool[4];
@@ -115,19 +231,43 @@ namespace GBAEmulator
                 Enabled[BG] = this.gba.cpu.DISPCNT.DisplayBG(BG);
             }
 
-            // only to be called after drawing into the DrawRegularBGScanline array
+            // blending parameters
+            ARM7TDMI.BlendMode AlphaBlending = this.gba.cpu.BLDCNT.BlendMode;
+            bool[] BGTop = new bool[4], BGBottom = new bool[4];
+            foreach (byte BG in BGs)
+            {
+                BGTop[BG] = this.gba.cpu.BLDCNT.BGIsTop(BG);
+                BGBottom[BG] = this.gba.cpu.BLDCNT.BGIsBottom(BG);
+            }
+
+            bool OBJTop, OBJBottom, BDTop, BDBottom;
+            OBJTop = this.gba.cpu.BLDCNT.OBJIsTop();
+            OBJBottom = this.gba.cpu.BLDCNT.OBJIsBottom();
+            BDTop = this.gba.cpu.BLDCNT.BDIsTop();
+            BDBottom = this.gba.cpu.BLDCNT.BDIsBottom();
+
+            // only to be called after drawing into the BGScanlines and OBJLayers
             byte priority;
+            bool WasOBJ;  // signify that a nontransparent OBJ pixel was present
+            int ScreenX = width * scanline;
+            
             for (int x = 0; x < width; x++)
             {
+                this.Display[ScreenX] = 0x8000;  // reset 1 pixel at a time to prevent artifacts
+                WasOBJ = false;
+
                 for (priority = 0; priority < 4; priority++)
                 {
                     if (RenderOBJ)
                     {
                         if (this.OBJLayers[priority][x] != 0x8000)
                         {
-                            this.Display[width * scanline + x] = this.OBJLayers[priority][x];
-                            priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
-                            break;
+                            if (this.SetPixel(ScreenX, this.OBJLayers[priority][x], AlphaBlending, OBJTop, OBJBottom, WasOBJ, IsOBJ: true))
+                            {
+                                priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                                break;
+                            }
+                            WasOBJ = true;
                         }
                     }
 
@@ -141,17 +281,21 @@ namespace GBAEmulator
 
                         if (this.BGScanlines[BG][x] != 0x8000)
                         {
-                            this.Display[width * scanline + x] = this.BGScanlines[BG][x];
-                            priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
-                            break;
+                            if (this.SetPixel(ScreenX, this.BGScanlines[BG][x], AlphaBlending, BGTop[BG], BGBottom[BG], WasOBJ))
+                            {
+                                priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                                break;
+                            }
                         }
                     }
                 }
 
-                if (priority == 4)  // we found no non-transparent pixel
+                if (priority == 4)  // we found no final non-transparent pixel
                 {
-                    this.Display[width * scanline + x] = Backdrop;
+                    this.SetPixel(ScreenX, Backdrop, AlphaBlending, BDTop, BDBottom, WasOBJ);
                 }
+
+                ScreenX++;
             }
         }
 

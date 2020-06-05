@@ -66,14 +66,20 @@ namespace GBAEmulator.CPU
         {
             this.MemoryAccess(address);
 
-            byte Section = (byte)((address & 0x0f00_0000) >> 24);
-            this.NCycle = __WordAccessCycles__[Section];
-            this.SCycle = __WordAccessCycles__[Section];
+            byte Section = (byte)((address & 0xff00_0000) >> 24);
+            if (Section < 0x10)
+            {
+                this.NCycle = __WordAccessCycles__[Section];
+                this.SCycle = __WordAccessCycles__[Section];
+            }
+
             switch (Section)
             {
                 case 0:
+                    if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                    return this.Pipeline.Peek();
                 case 1:
-                    return __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                    return this.Pipeline.Peek();
                 case 2:
                     return __GetWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
@@ -107,7 +113,7 @@ namespace GBAEmulator.CPU
                 case 15:  // SRAM
                     return (uint)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8) | (this.GamePakSRAM[address & 0xffff] << 16) | (this.GamePakSRAM[address & 0xffff] << 24));
                 default:
-                    throw new Exception("This cannot happen");
+                    return this.Pipeline.Peek();
             }
         }
 
@@ -115,9 +121,12 @@ namespace GBAEmulator.CPU
         {
             this.MemoryAccess(address);
 
-            byte Section = (byte)((address & 0x0f00_0000) >> 24);
-            this.NCycle = __WordAccessCycles__[Section];
-            this.SCycle = __WordAccessCycles__[Section];
+            byte Section = (byte)((address & 0xff00_0000) >> 24);
+            if (Section < 0x10)
+            {
+                this.NCycle = __WordAccessCycles__[Section];
+                this.SCycle = __WordAccessCycles__[Section];
+            }
 
             switch (Section)
             {
@@ -167,7 +176,7 @@ namespace GBAEmulator.CPU
                     this.GamePakSRAM[address & 0xffff] = RORValue;
                     return;
                 default:
-                    throw new Exception("This cannot happen");
+                    return;
             }
         }
 
@@ -175,15 +184,20 @@ namespace GBAEmulator.CPU
         {
             this.MemoryAccess(address);
 
-            byte Section = (byte)((address & 0x0f00_0000) >> 24);
-            this.NCycle = __ByteAccessCycles__[Section];
-            this.SCycle = __ByteAccessCycles__[Section];
+            byte Section = (byte)((address & 0xff00_0000) >> 24);
+            if (Section < 0x10)
+            {
+                this.NCycle = __ByteAccessCycles__[Section];
+                this.SCycle = __ByteAccessCycles__[Section];
+            }
 
             switch (Section)
             {
                 case 0:
+                    if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return __GetHalfWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                    return (ushort)this.Pipeline.Peek();
                 case 1:
-                    return __GetHalfWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                    return (ushort)this.Pipeline.Peek();
                 case 2:
                     return __GetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
@@ -218,7 +232,7 @@ namespace GBAEmulator.CPU
                 case 15:  // SRAM
                     return (ushort)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8));
                 default:
-                    throw new Exception("This cannot happen");
+                    return (ushort)this.Pipeline.Peek();
             }
         }
 
@@ -226,9 +240,12 @@ namespace GBAEmulator.CPU
         {
             this.MemoryAccess(address);
 
-            byte Section = (byte)((address & 0x0f00_0000) >> 24);
-            this.NCycle = __ByteAccessCycles__[Section];
-            this.SCycle = __ByteAccessCycles__[Section];
+            byte Section = (byte)((address & 0xff00_0000) >> 24);
+            if (Section < 0x10)
+            {
+                this.NCycle = __ByteAccessCycles__[Section];
+                this.SCycle = __ByteAccessCycles__[Section];
+            }
 
             switch (Section)
             {
@@ -278,7 +295,7 @@ namespace GBAEmulator.CPU
                     this.GamePakSRAM[address & 0xffff] = RORValue;
                     return;
                 default:
-                    throw new Exception("This cannot happen");
+                    return;
             }
         }
 
@@ -287,16 +304,20 @@ namespace GBAEmulator.CPU
             this.MemoryAccess(address);
             if (address >= 0x0e00_1004) return 0xff;
 
-            byte Section = (byte)((address & 0x0f00_0000) >> 24);
-
-            this.NCycle = __ByteAccessCycles__[Section];
-            this.SCycle = __ByteAccessCycles__[Section];
+            byte Section = (byte)((address & 0xff00_0000) >> 24);
+            if (Section < 0x10)
+            {
+                this.NCycle = __ByteAccessCycles__[Section];
+                this.SCycle = __ByteAccessCycles__[Section];
+            }
 
             switch (Section)
             {
                 case 0:
+                    if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return this.BIOS[address & __MemoryMasks__[Section]];
+                    return (byte)this.Pipeline.Peek();
                 case 1:
-                    return this.BIOS[address & __MemoryMasks__[Section]];
+                    return (byte)this.Pipeline.Peek();
                 case 2:
                     return this.eWRAM[address & __MemoryMasks__[Section]];
                 case 3:
@@ -330,7 +351,7 @@ namespace GBAEmulator.CPU
                 case 15:  // SRAM
                     return this.GamePakSRAM[address & 0xffff];  // SRAM byte reads are just normal
                 default:
-                    throw new Exception("This cannot happen");
+                    return (byte)this.Pipeline.Peek();
             }
         }
 
@@ -338,9 +359,12 @@ namespace GBAEmulator.CPU
         {
             this.MemoryAccess(address);
 
-            byte Section = (byte)((address & 0x0f00_0000) >> 24);
-            this.NCycle = __ByteAccessCycles__[Section];
-            this.SCycle = __ByteAccessCycles__[Section];
+            byte Section = (byte)((address & 0xff00_0000) >> 24);
+            if (Section < 0x10)
+            {
+                this.NCycle = __ByteAccessCycles__[Section];
+                this.SCycle = __ByteAccessCycles__[Section];
+            }
 
             switch (Section)
             {
@@ -413,7 +437,7 @@ namespace GBAEmulator.CPU
                     this.GamePakSRAM[address & 0xffff] = value;  // SRAM byte writes are just normal
                     return;
                 default:
-                    throw new Exception("This cannot happen");
+                    return;
             }
         }
 

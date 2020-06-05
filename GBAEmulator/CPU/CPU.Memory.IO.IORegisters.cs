@@ -174,6 +174,14 @@ namespace GBAEmulator.CPU
 
         public class cBGControl : IORegister2
         {
+            // BG0/1 have bit 13 unused
+            private readonly ushort BitMask;
+
+            public cBGControl(ushort BitMask) : base()
+            {
+                this.BitMask = BitMask;
+            }
+
             public byte BGPriority
             {
                 get => (byte)(this._raw & 0x03);
@@ -209,9 +217,16 @@ namespace GBAEmulator.CPU
             {
                 get => (byte)((this._raw & 0xc000) >> 14);
             }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set((ushort)(value & BitMask), setlow, sethigh);
+            }
         }
 
-        public readonly cBGControl[] BGCNT = new cBGControl[4] { new cBGControl(), new cBGControl(), new cBGControl(), new cBGControl() };
+        public readonly cBGControl[] BGCNT = new cBGControl[4] {
+            new cBGControl(0xdfff), new cBGControl(0xdfff), new cBGControl(0xffff), new cBGControl(0xffff)
+        };
         #endregion
 
         #region BGScrolling
@@ -425,6 +440,100 @@ namespace GBAEmulator.CPU
         }
 
         public cMosaic MOSAIC = new cMosaic();
+        #endregion
+
+        #region Color Special Effects
+        public enum BlendMode : byte
+        {
+            Off = 0,
+            Normal = 1,
+            White = 2,
+            Black = 3
+        }
+
+        public class cBLDCNT : IORegister2
+        {
+            public bool BGIsTop(byte BG)
+            {
+                return (this._raw & (1 << BG)) > 0;
+            }
+
+            public bool OBJIsTop() => (this._raw & 0x10) > 0;
+
+            public bool BDIsTop() => (this._raw & 0x20) > 0;
+
+            public BlendMode BlendMode
+            {
+                get => (BlendMode)((this._raw & 0xc0) >> 6);
+            }
+
+            public bool BGIsBottom(byte BG)
+            {
+                return (this._raw & (0x100 << BG)) > 0;
+            }
+
+            public bool OBJIsBottom() => (this._raw & 0x1000) > 0;
+
+            public bool BDIsBottom() => (this._raw & 0x2000) > 0;
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                // top 2 bits unused
+                base.Set((ushort)(value & 0x3fff), setlow, sethigh);
+            }
+        }
+
+        public cBLDCNT BLDCNT = new cBLDCNT();
+
+        public class cBLDALPHA : IORegister2
+        {
+            public byte EVA
+            {
+                // allow up to 0x10 (1.4 fixed point)
+                get
+                {
+                    byte value = (byte)(this._raw & 0x001f);
+                    return (byte)(value > 0x10 ? 0x10 : value);
+                }
+            }
+
+            public byte EVB
+            {
+                // allow up to 0x10 (1.4 fixed point)
+                get
+                {
+                    byte value = (byte)((this._raw & 0x1f00) >> 8);
+                    return (byte)(value > 0x10 ? 0x10 : value);
+                }
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set((ushort)(value & 0x1f1f), setlow, sethigh);
+            }
+        }
+
+        public cBLDALPHA BLDALPHA = new cBLDALPHA();
+
+        public class cBLDY : IORegister2
+        {
+            public byte EY
+            {
+                // allow up to 0x10 (1.4 fixed point)
+                get
+                {
+                    byte value = (byte)(this._raw & 0x1f);
+                    return (byte)(value > 0x10 ? 0x10 : value);
+                }
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                base.Set((ushort)(value & 0x001f), setlow, sethigh);
+            }
+        }
+
+        public cBLDY BLDY = new cBLDY();
         #endregion
 
         #region KEYINPUT

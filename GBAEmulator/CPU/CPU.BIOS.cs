@@ -605,7 +605,7 @@ namespace GBAEmulator.CPU
                 return false;
             }
 
-            this.BIOS = new byte[0x4000];
+            this.BIOS = new byte[BIOS_SIZE];
             int current = fs.ReadByte();
             uint i = 0;
 

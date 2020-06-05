@@ -115,17 +115,45 @@ namespace GBAEmulator
             this.MergeBGs(DoRenderOBJs, 2, 3);
         }
 
-        // todo: special effects / OBJ in bitmap modes
-
         private void Mode3Scanline()
         {
             // we render on BG2
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            
+            this.ResetBGWindows(2);
+            this.ResetOBJWindow();
+
+            if (DoRenderOBJs)
+            {
+                this.RenderOBJs();
+            }
+
             if (this.gba.cpu.DISPCNT.DisplayBG(2))
             {
+                int priority = 0;
+
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[width * scanline + x] = (ushort)((this.gba.cpu.VRAM[2 * width * scanline + 2 * x + 1] << 8) |
-                                                                 this.gba.cpu.VRAM[2 * width * scanline + 2 * x]);
+                    if (OBJWindow[x])
+                    {
+                        for (priority = 0; priority < 4; priority++)
+                        {
+                            if (this.OBJLayers[priority][x] != 0x8000)
+                            {
+                                this.Display[width * scanline + x] = this.OBJLayers[priority][x];
+                                priority = 0xff;  // break out of both loops
+                                break;
+                            }
+                        }
+                    }
+                    if (priority == 4)  // no sprite found
+                    {
+                        if (this.BGWindows[2][x])
+                        {
+                            this.Display[width * scanline + x] = (ushort)((this.gba.cpu.VRAM[2 * width * scanline + 2 * x + 1] << 8) |
+                                                                         this.gba.cpu.VRAM[2 * width * scanline + 2 * x]);
+                        }
+                    }
                 }
             }
             else
@@ -139,14 +167,43 @@ namespace GBAEmulator
         
         private void Mode4Scanline()
         {
-            ushort offset = (ushort)(this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
-
             // we render on BG2
+            ushort offset = (ushort)(this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+
+            this.ResetBGWindows(2);
+            this.ResetOBJWindow();
+
+            if (DoRenderOBJs)
+            {
+                this.RenderOBJs();
+            }
+
             if (this.gba.cpu.DISPCNT.DisplayBG(2))
             {
+                int priority = 0;
+
                 for (int x = 0; x < width; x++)
                 {
-                    this.Display[width * scanline + x] = this.GetPaletteEntry((uint)this.gba.cpu.VRAM[offset + width * scanline + x] << 1);
+                    if (OBJWindow[x])
+                    {
+                        for (priority = 0; priority < 4; priority++)
+                        {
+                            if (this.OBJLayers[priority][x] != 0x8000)
+                            {
+                                this.Display[width * scanline + x] = this.OBJLayers[priority][x];
+                                priority = 0xff;  // break out of both loops
+                                break;
+                            }
+                        }
+                    }
+                    if (priority == 4)  // no sprite found
+                    {
+                        if (this.BGWindows[2][x])
+                        {
+                            this.Display[width * scanline + x] = this.GetPaletteEntry((uint)this.gba.cpu.VRAM[offset + width * scanline + x] << 1);
+                        }
+                    }
                 }
             }
             else

@@ -22,11 +22,13 @@ namespace GBAEmulator
 
             Thread t = new Thread(() => Run(gba));
             t.SetApartmentState(ApartmentState.STA);
-            t.Start();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Visual(gba));
+            gba.vis = new Visual(gba);
+            
+            t.Start();
+            Application.Run(gba.vis);
         }
     }
 }

@@ -68,8 +68,12 @@ namespace GBAEmulator.CPU
 
             this.IORAM[0x4c] = this.IORAM[0x4d] = this.MOSAIC;
             this.IORAM[0x4e] = this.IORAM[0x4f] = new UnusedRegister();  // unused MOSAIC bits
+
+            this.IORAM[0x50] = this.IORAM[0x51] = this.BLDCNT;
+            this.IORAM[0x52] = this.IORAM[0x53] = this.BLDALPHA;
+            this.IORAM[0x54] = this.IORAM[0x55] = this.BLDY;
             
-            for (int i = 0x50; i < IORAM.Length; i+= 2)
+            for (int i = 0x56; i < IORAM.Length; i+= 2)
             {
                 // double length no registers
                 this.IORAM[i] = this.IORAM[i + 1] = new EmptyRegister();
