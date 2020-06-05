@@ -29,12 +29,6 @@ namespace GBAEmulator
 
         private void RunLine()
         {
-            // Console.Write("y_lo: "); this.cpu.ShowIWRAMAt(32412);
-            // Console.Write("y_hi: "); this.cpu.ShowIWRAMAt(32448);
-
-            // Console.Write("x_lo: "); this.cpu.ShowIWRAMAt(32416);
-            // Console.Write("x_hi: "); this.cpu.ShowIWRAMAt(32444);
-
             /*
             subject	    length	cycles
             pixel	    1	            4
@@ -53,10 +47,22 @@ namespace GBAEmulator
             {
                 this.cpu.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(DMAStartTiming.VBlank);
-                this.vis.Tick();
+
+                // refresh screen, vis might have been destroyed because we ended the thread
+                try
+                {
+                    this.vis?.Invoke(this.vis.Tick);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // disgusting I know... 
+                }
             }
             // no VBlank in 227
-            else if (this.ppu.scanline == 227) this.cpu.DISPSTAT.SetVBlank(false);
+            else if (this.ppu.scanline == 227)
+            {
+                this.cpu.DISPSTAT.SetVBlank(false);
+            }
 
             if (this.ppu.IsVBlank)
             {
@@ -96,17 +102,17 @@ namespace GBAEmulator
 
         public void Run()
         {
-            // cpu.LoadRom("../../roms/SonicAdvance.gba");
+            cpu.LoadRom("../../roms/PokemonEmerald.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
-            cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
+            // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");
             // cpu.LoadRom("../../Tests/GBASuiteNew/mem.gba");
             // cpu.LoadRom("../../Tests/Tonc/bld_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
-            // cpu.LoadRom("../../Tests/AgingCard.gba");
+            // cpu.LoadRom("../../Tests/EndriftSuite.gba");
             
             // this.cpu.UseNormattsBios();
-            // cpu.SkipBios();
+            cpu.SkipBios();
 
             while (!this.ShutDown)
             {

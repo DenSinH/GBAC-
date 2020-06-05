@@ -9,7 +9,7 @@ namespace GBAEmulator.CPU
         [Conditional("DEBUG")]
         private void MemoryAccess(uint Address)
         {
-            Console.WriteLine("Memory Access: " + Address.ToString("x8"));
+            // Console.WriteLine("Memory Access: " + Address.ToString("x8"));
         }
 
         /* BIOS is defined in CPU.BIOS.cs */
@@ -85,7 +85,8 @@ namespace GBAEmulator.CPU
                 case 3:
                     return __GetWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4:   // IORAM
-                    return this.IOGetWordAt(address & 0x3ff);
+                    if ((address & 0x00ff_ffff) < 0x400) return this.IOGetWordAt(address & 0x3ff);
+                    return this.Pipeline.Peek();
                 case 5:
                     return __GetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -141,7 +142,7 @@ namespace GBAEmulator.CPU
                     __SetWordAt__(this.iWRAM, address & __MemoryMasks__[Section], value);
                     return;
                 case 4: // IORAM
-                    this.IOSetWordAt(address & 0x3ff, value);
+                    if ((address & 0x00ff_ffff) < 0x400) this.IOSetWordAt(address & 0x3ff, value);
                     return;
                 case 5:
                     __SetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section], value);
@@ -203,7 +204,8 @@ namespace GBAEmulator.CPU
                 case 3:
                     return __GetHalfWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4: // IORAM
-                    return (ushort)this.IOGetHalfWordAt(address & 0x3ff);
+                    if ((address & 0x00ff_ffff) < 0x400) return this.IOGetHalfWordAt(address & 0x3ff);
+                    return (ushort)this.Pipeline.Peek();
                 case 5:
                     return __GetHalfWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -260,7 +262,7 @@ namespace GBAEmulator.CPU
                     __SetHalfWordAt__(this.iWRAM, address & __MemoryMasks__[Section], value);
                     return;
                 case 4: // IORAM
-                    this.IOSetHalfWordAt(address & 0x3ff, value);  // for now
+                    if ((address & 0x00ff_ffff) < 0x400) this.IOSetHalfWordAt(address & 0x3ff, value);  // for now
                     return;
                 case 5:
                     __SetHalfWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section], value);
@@ -323,7 +325,8 @@ namespace GBAEmulator.CPU
                 case 3:
                     return this.iWRAM[address & __MemoryMasks__[Section]];
                 case 4: // IORAM
-                    return (byte)this.IOGetByteAt(address & 0x3ff);
+                    if ((address & 0x00ff_ffff) < 0x400) return (byte)this.IOGetByteAt(address & 0x3ff);
+                    return (byte)this.Pipeline.Peek();
                 case 5:
                     return this.PaletteRAM[address & __MemoryMasks__[Section]];
                 case 6:  // VRAM Mirrors
@@ -379,7 +382,7 @@ namespace GBAEmulator.CPU
                     this.iWRAM[address & __MemoryMasks__[Section]] = value;
                     return;
                 case 4: // IORAM
-                    this.IOSetByteAt(address & 0x3ff, value);
+                    if ((address & 0x00ff_ffff) < 0x400) this.IOSetByteAt(address & 0x3ff, value);
                     return;
                     /*
                          Writing 8bit Data to Video Memory

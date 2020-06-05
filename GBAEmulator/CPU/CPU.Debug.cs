@@ -66,7 +66,7 @@ namespace GBAEmulator.CPU
         [Conditional("DEBUG")]
         private void Log(string message)
         {
-            Console.WriteLine(message);
+            // Console.WriteLine(message);
         }
 
         public InterruptControlInfo GetInterruptControl()

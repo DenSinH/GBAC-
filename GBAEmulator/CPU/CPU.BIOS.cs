@@ -645,6 +645,8 @@ namespace GBAEmulator.CPU
             
             this.PC = 0x08000000;
             this.CPSR = 0x6000001F;
+
+            this.IORAM[0x134].Set(0x8000, true, true);  // set RCNT to 8000 to prevent Sonic glitch
         }
     }
 }

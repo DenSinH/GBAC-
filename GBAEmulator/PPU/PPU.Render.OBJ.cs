@@ -119,33 +119,37 @@ namespace GBAEmulator
                 Mosaic = (OBJ_ATTR0 & 0x1000) > 0;
                 ColorMode = (OBJ_ATTR0 & 0x2000) > 0;
 
+                if ((OBJ_ATTR0 & 0xc000) == 0xc000) continue;  // forbidden
+
                 OBJsz = PPU.GetOBJSize[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
 
                 /* Draw object */
                 if ((!UseOBJWindowMask) ^ GFXMode == 0b10)
                 {
                     // normal / alphablend
-                    if (OBJMode == 0b00)
+                    switch (OBJMode)
                     {
-                        if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
-                            this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2,
-                                GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
-                    }
-                    else if (OBJMode == 0b01)
-                    {
-                        if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
-                        {
-                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, false,
-                                GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
-                        }
-                    }
-                    else if (OBJMode == 0b11)
-                    {
-                        if ((OBJy <= scanline) && (OBJy + 2 * OBJsz.Height > scanline))
-                        {
-                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, true,
-                                GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
-                        }
+                        case 0b00:
+                            if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
+                            {
+                                this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2,
+                                    GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
+                            }
+                            break;
+                        case 0b01:
+                            if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
+                            {
+                                this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, false,
+                                    GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
+                            }
+                            break;
+                        case 0b11:
+                            if ((OBJy <= scanline) && (OBJy + 2 * OBJsz.Height > scanline))
+                            {
+                                this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, true,
+                                    GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
+                            }
+                            break;
                     }
                 }
             }
@@ -220,6 +224,7 @@ namespace GBAEmulator
                         {
                             if (0 <= StartX + dx && StartX + dx < width)
                             {
+                                // set the blending mask to true only if GFXMode == 10 (EnableBlending) and we drew a non-transparent pixel
                                 this.OBJBlendingMask[StartX + dx] = EnableBlending && this.OBJLayers[Priority][StartX + dx] != 0x8000;
                             }
                         }

@@ -5,6 +5,7 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
         private IORegister[] IORAM = new IORegister[0x400];           // 1kB IO RAM
+        private UnusedRegister MasterUnusedRegster = new UnusedRegister();
 
         private void InitRegisters()
         {
@@ -18,8 +19,9 @@ namespace GBAEmulator.CPU
             this.Timers[1] = new cTimer(this, 1, this.Timers[2]);
             this.Timers[0] = new cTimer(this, 0, this.Timers[1]);
 
+            // LCD I/O Registers
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;
-            this.IORAM[0x02] = this.IORAM[0x03] = new EmptyRegister();
+            this.IORAM[0x02] = this.IORAM[0x03] = new EmptyRegister();  // green swap
             this.IORAM[0x04] = this.IORAM[0x05] = this.DISPSTAT;
             this.IORAM[0x06] = this.IORAM[0x07] = this.VCOUNT;
 
@@ -67,18 +69,30 @@ namespace GBAEmulator.CPU
             this.IORAM[0x4a] = this.IORAM[0x4b] = this.WINOUT;
 
             this.IORAM[0x4c] = this.IORAM[0x4d] = this.MOSAIC;
-            this.IORAM[0x4e] = this.IORAM[0x4f] = new UnusedRegister();  // unused MOSAIC bits
+            this.IORAM[0x4e] = this.IORAM[0x4f] = this.MasterUnusedRegster;  // unused MOSAIC bits
 
             this.IORAM[0x50] = this.IORAM[0x51] = this.BLDCNT;
             this.IORAM[0x52] = this.IORAM[0x53] = this.BLDALPHA;
             this.IORAM[0x54] = this.IORAM[0x55] = this.BLDY;
-            
-            for (int i = 0x56; i < IORAM.Length; i+= 2)
+
+            for (int i = 0x56; i < 0x60; i++)
+            {
+                this.IORAM[i] = this.MasterUnusedRegster;
+            }
+
+            // Sound Registers
+            for (int i = 0x60; i <= 0xa6; i += 2)
             {
                 // double length no registers
                 this.IORAM[i] = this.IORAM[i + 1] = new EmptyRegister();
             }
 
+            for (int i = 0xa8; i < 0xb0; i++)
+            {
+                this.IORAM[i] = this.MasterUnusedRegster;
+            }
+
+            // DMA Transfer Channels
             this.IORAM[0xb0] = this.IORAM[0xb1] = this.DMASAD[0].lower;
             this.IORAM[0xb2] = this.IORAM[0xb3] = this.DMASAD[0].upper;
             this.IORAM[0xb4] = this.IORAM[0xb5] = this.DMADAD[0].lower;
@@ -107,9 +121,12 @@ namespace GBAEmulator.CPU
             this.IORAM[0xdc] = this.IORAM[0xdd] = this.DMACNT_L[3];
             this.IORAM[0xde] = this.IORAM[0xdf] = this.DMACNT_H[3];
 
-            this.IORAM[0xe0] = this.IORAM[0xe1] = new UnusedRegister();
-            // todo: 0xe2 - 0xff
+            for (int i = 0xe0; i < 0x100; i++)
+            {
+                this.IORAM[i] = this.MasterUnusedRegster;
+            }
 
+            // Timer Registers
             this.IORAM[0x100] = this.IORAM[0x101] = this.Timers[0].Data;
             this.IORAM[0x102] = this.IORAM[0x103] = this.Timers[0].Control;
 
@@ -121,24 +138,57 @@ namespace GBAEmulator.CPU
 
             this.IORAM[0x10c] = this.IORAM[0x10d] = this.Timers[3].Data;
             this.IORAM[0x10e] = this.IORAM[0x10f] = this.Timers[3].Control;
-            this.IORAM[0x110] = this.IORAM[0x111] = new UnusedRegister();
+            
+            for (int i = 0x110; i < 0x120; i++)
+            {
+                this.IORAM[i] = this.MasterUnusedRegster;
+            }
 
-            // GAP (SIO)
+            // Serial Communication (1)
+            for (int i = 0x120; i <= 0x12a; i += 2)
+            {
+                // double length no registers
+                this.IORAM[i] = this.IORAM[i + 1] = new EmptyRegister();
+            }
 
+            this.IORAM[0x012c] = this.IORAM[0x012d] = this.MasterUnusedRegster;
+            this.IORAM[0x012e] = this.IORAM[0x012f] = this.MasterUnusedRegster;
+
+            // Keypad Input
             this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(this.KEYCNT, this);
             this.IORAM[0x0132] = this.IORAM[0x0133] = this.KEYCNT;
 
-            // GAP (SIO)
+            // Serial Communication (2)
+            for (int i = 0x134; i <= 0x158; i += 2)
+            {
+                // double length no registers
+                this.IORAM[i] = this.IORAM[i + 1] = new EmptyRegister();
+            }
 
+            for (int i = 0x015a; i < 0x200; i++)
+            {
+                this.IORAM[i] = this.MasterUnusedRegster;
+            }
+
+            // Interrupt, Waitstate and Power-Down Control
             this.IORAM[0x0200] = this.IORAM[0x0201] = this.IE;
             this.IORAM[0x0202] = this.IORAM[0x0203] = this.IF;
-            // WAITCNT
+            this.IORAM[0x0204] = this.IORAM[0x0205] = new EmptyRegister(); // WAITCNT
 
-            this.IORAM[0x0206] = this.IORAM[0x0207] = new UnusedRegister();  // unused
+            this.IORAM[0x0206] = this.IORAM[0x0207] = this.MasterUnusedRegster;
             this.IORAM[0x0208] = this.IORAM[0x0209] = this.IME;
-            this.IORAM[0x020a] = this.IORAM[0x020b] = new UnusedRegister();  // unused IME bits
+
+            for (int i = 0x20a; i < 0x300; i++)
+            {
+                this.IORAM[i] = this.MasterUnusedRegster;
+            }
 
             this.IORAM[0x0300] = this.IORAM[0x0301] = this.HALTCNT;
+
+            for (int i = 0x302; i < 0x400; i++)
+            {
+                this.IORAM[i] = this.MasterUnusedRegster;
+            }
         }
 
         private byte IOGetByteAt(uint address)

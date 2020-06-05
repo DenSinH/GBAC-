@@ -21,8 +21,8 @@ namespace GBAEmulator
         private const double scale = 2;
 
         private readonly Stopwatch FPSTimer;
+        public TickDelegate Tick;
         private const byte interval = 17; // ms
-        private double time;
 
         private GBA gba;
 
@@ -38,6 +38,7 @@ namespace GBAEmulator
             this.ClientSize = new Size((int)(scale * width), (int)(scale * height) + MenuStripHeight);
 
             this.gba = gba;
+            this.Tick = new TickDelegate(TickMethod);
             this.DebugScreen = new Debug(gba);
             this._display = new ushort[width * height];
 
@@ -203,6 +204,7 @@ namespace GBAEmulator
         private void OpenDebug(object sender, EventArgs e)
         {
             this.DebugScreen.Show();
+            this.DebugScreen.BringToFront();
             this.DebugActive = true;
         }
 
@@ -214,13 +216,15 @@ namespace GBAEmulator
             }
         }
 
-        public void Tick()
+        public delegate void TickDelegate();
+
+        public void TickMethod()
         {
             Draw();
             
             this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.RomName, (1000 * this.gba.ppu.frame / (ulong)this.FPSTimer.ElapsedMilliseconds));
 
-            if (time > 2000)
+            if (this.FPSTimer.ElapsedMilliseconds > 2000)
             {
                 this.gba.ppu.frame = 0;
                 this.FPSTimer.Restart();
