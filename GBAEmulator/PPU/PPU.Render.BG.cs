@@ -35,8 +35,8 @@ namespace GBAEmulator
         {
             foreach (byte BG in BGs)
             {
-                this.ResetWindow(ref BGWindows[BG], this.gba.cpu.WININ.WindowBGEnable(0, BG), this.gba.cpu.WININ.WindowBGEnable(1, BG),
-                    this.gba.cpu.WINOUT.WindowBGEnable(1, BG), this.gba.cpu.WINOUT.WindowBGEnable(0, BG));
+                this.ResetWindow<bool>(ref BGWindows[BG], this.gba.cpu.WININ.WindowBGEnable(0, BG), this.gba.cpu.WININ.WindowBGEnable(1, BG),
+                    this.gba.cpu.WINOUT.WindowBGEnable(1, BG), this.gba.cpu.WINOUT.WindowBGEnable(0, BG), true);
             }
         }
 
@@ -44,6 +44,7 @@ namespace GBAEmulator
         //                                      Regular layers
         // ===================================================================================================
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint VRAMIndexRegular(int TileX, int TileY, byte ScreenblockSize)
         {
             // TileX and TileY are indices of the tile, not of the pixels of the tile

@@ -112,6 +112,7 @@
     <Compile Include="Debug.Designer.cs">
       <DependentUpon>Debug.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums.cs" />
     <Compile Include="GBA.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="PPU\PPU.Aux.cs" />

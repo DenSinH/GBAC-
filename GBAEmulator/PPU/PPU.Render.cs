@@ -61,7 +61,7 @@ namespace GBAEmulator
 
         private void Mode0Scanline()
         {
-            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(0, 1, 2, 3);
             this.ResetBGWindows(0, 1, 2, 3);
@@ -78,7 +78,7 @@ namespace GBAEmulator
 
         private void Mode1Scanline()
         {
-            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(0, 1, 2);
             this.ResetBGWindows(0, 1, 2);
@@ -97,7 +97,7 @@ namespace GBAEmulator
 
         private void Mode2Scanline()
         {
-            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(2, 3);
             this.ResetBGWindows(2, 3);
@@ -118,7 +118,7 @@ namespace GBAEmulator
         private void Mode3Scanline()
         {
             // we render on BG2
-            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
@@ -168,8 +168,8 @@ namespace GBAEmulator
         private void Mode4Scanline()
         {
             // we render on BG2
-            ushort offset = (ushort)(this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
-            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DisplayOBJ);
+            ushort offset = (ushort)(this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
+            bool DoRenderOBJs = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
 
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
@@ -221,7 +221,7 @@ namespace GBAEmulator
             // I can't find much on mode 5 rendering though, so I'll just leave it
             if (scanline < 128 && this.gba.cpu.DISPCNT.DisplayBG(2))
             {
-                ushort offset = (ushort)(this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
+                ushort offset = (ushort)(this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
 
                 // smaller format
                 for (int x = 0; x < 160; x++)

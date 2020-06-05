@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 using GBAEmulator.CPU;
 
@@ -6,17 +7,10 @@ namespace GBAEmulator
 {
     partial class PPU
     {
+        // stores pixels before they are put into the actual display
         ushort[][] OBJLayers = new ushort[4][] { new ushort[width], new ushort[width], new ushort[width], new ushort[width] };
 
-        private void ResetOBJMask()
-        {
-            // used to clear OBJLayers[0] for creating the OBJ window mask
-            for (int x = 0; x < width; x++)
-            {
-                OBJMask[x] = 0x8000;  // transparent
-            }
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetOBJScanlines()
         {
             for (int Priority = 0; Priority < 4; Priority++)
@@ -28,19 +22,37 @@ namespace GBAEmulator
             }
         }
 
-        private ushort[] OBJMask = new ushort[width];
+        // used to mask OBJWindow for every window (BG0-3 and OBJ)
+        private ushort[] OBJWindowMask = new ushort[width];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ResetOBJMask()
+        {
+            // used to clear OBJLayers[0] for creating the OBJ window mask
+            for (int x = 0; x < width; x++)
+            {
+                OBJWindowMask[x] = 0x8000;  // transparent
+            }
+        }
+
+        // used for sprites with GFXMode 0b10 (enable alpha blending)
+        private bool[] OBJBlendingMask = new bool[width];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ResetOBJBlendingMask()
+        {
+            this.OBJBlendingMask = new bool[width];
+        }
+
+        // the actual OBJ window (combined window 0, 1, OBJWindowMask and WINOUT)
         private bool[] OBJWindow = new bool[width];
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetOBJWindow()
         {
-            //Console.WriteLine($"Window 0 enable: {this.gba.cpu.WININ.WindowOBJEnable(0)}");
-            //Console.WriteLine($"Window 1 enable: {this.gba.cpu.WININ.WindowOBJEnable(0)}");
-            //Console.WriteLine($"Window OBJ enable: {this.gba.cpu.WINOUT.WindowOBJEnable(1)}");
-            //Console.WriteLine($"Outside enable: {this.gba.cpu.WINOUT.WindowOBJEnable(0)}");
-
             this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
-            this.ResetWindow(ref OBJWindow, this.gba.cpu.WININ.WindowOBJEnable(0), this.gba.cpu.WININ.WindowOBJEnable(1),
-                this.gba.cpu.WINOUT.WindowOBJEnable(1), this.gba.cpu.WINOUT.WindowOBJEnable(0));
+            this.ResetWindow<bool>(ref OBJWindow, this.gba.cpu.WININ.WindowOBJEnable(0), this.gba.cpu.WININ.WindowOBJEnable(1),
+                this.gba.cpu.WINOUT.WindowOBJEnable(1), this.gba.cpu.WINOUT.WindowOBJEnable(0), true);
         }
 
         private struct OBJSize
@@ -63,12 +75,16 @@ namespace GBAEmulator
 
         bool OAM2DMap;  // false for 1D mapping, true for 2D
 
-        private void RenderOBJs(bool UseOBJMask = false)  // assumes y = scanline
+        // Render all objects, or only determine the mask (when UseOBJMask == true)
+        private void RenderOBJs(bool UseOBJWindowMask = false)  // assumes y = scanline
         {
-            if (UseOBJMask)
+            if (UseOBJWindowMask)
                 this.ResetOBJMask();
             else
+            {
                 this.ResetOBJScanlines();
+                this.ResetOBJBlendingMask();
+            }
 
             ushort OBJ_ATTR0, OBJ_ATTR1, OBJ_ATTR2;
             short OBJy;
@@ -77,7 +93,7 @@ namespace GBAEmulator
 
             OBJSize OBJsz;
 
-            this.OAM2DMap = this.gba.cpu.DISPCNT.IsSet(ARM7TDMI.DISPCNTFlags.OBJVRAMMapping);
+            this.OAM2DMap = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping);
 
             for (ushort i = 0; i < 0x400; i += 8)  // 128 objects in OAM
             {
@@ -100,38 +116,35 @@ namespace GBAEmulator
 
                 GFXMode = (byte)((OBJ_ATTR0 & 0x0c00) >> 10);
 
-                // set priority to 0 for all objects if we are creating the OBJ window mask
-                if (UseOBJMask)
-                {
-                    OBJ_ATTR2 &= 0xf3ff;
-                }
-
                 Mosaic = (OBJ_ATTR0 & 0x1000) > 0;
                 ColorMode = (OBJ_ATTR0 & 0x2000) > 0;
 
                 OBJsz = PPU.GetOBJSize[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
 
                 /* Draw object */
-                if ((!UseOBJMask) ^ GFXMode == 0b10)
+                if ((!UseOBJWindowMask) ^ GFXMode == 0b10)
                 {
                     // normal / alphablend
                     if (OBJMode == 0b00)
                     {
                         if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
-                            this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, UseOBJMask: UseOBJMask);
+                            this.RenderRegularOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2,
+                                GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
                     }
                     else if (OBJMode == 0b01)
                     {
                         if ((OBJy <= scanline) && (OBJy + OBJsz.Height > scanline))
                         {
-                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, false, UseOBJMask: UseOBJMask);
+                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, false,
+                                GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
                         }
                     }
                     else if (OBJMode == 0b11)
                     {
                         if ((OBJy <= scanline) && (OBJy + 2 * OBJsz.Height > scanline))
                         {
-                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, true, UseOBJMask: UseOBJMask);
+                            this.RenderAffineOBJ(OBJy, OBJsz, ColorMode, Mosaic, OBJ_ATTR1, OBJ_ATTR2, true,
+                                GFXMode == 0b01, UseOBJWindowMask: UseOBJWindowMask);
                         }
                     }
                 }
@@ -143,7 +156,7 @@ namespace GBAEmulator
         // ===================================================================================================
 
         private void RenderRegularOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic,
-            ushort OBJ_ATTR1, ushort OBJ_ATTR2, bool UseOBJMask = false)
+            ushort OBJ_ATTR1, ushort OBJ_ATTR2, bool EnableBlending, bool UseOBJWindowMask = false)
         {
             int StartX = OBJ_ATTR1 & 0x01ff;
             if ((OBJ_ATTR1 & 0x0100) > 0) StartX = (int)(StartX | 0xffff_ff00);  // sign extend
@@ -191,9 +204,9 @@ namespace GBAEmulator
                 {
                     // foreground palette starts at 0x0500_0200
                     // we can use our same rendering method as for background, as we simply render a tile
-                    if (UseOBJMask)
+                    if (UseOBJWindowMask)
                     {
-                        this.Render4bpp(ref this.OBJMask, null, StartX, XSign,
+                        this.Render4bpp(ref this.OBJWindowMask, null, StartX, XSign,
                         (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
                     }
@@ -202,6 +215,14 @@ namespace GBAEmulator
                         this.Render4bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign,
                         (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
+                        
+                        for (int dx = 0; dx < 8; dx++)
+                        {
+                            if (0 <= StartX + dx && StartX + dx < width)
+                            {
+                                this.OBJBlendingMask[StartX + dx] = EnableBlending && this.OBJLayers[Priority][StartX + dx] != 0x8000;
+                            }
+                        }
                     }
                     
                     StartX += 8 * XSign;
@@ -224,15 +245,23 @@ namespace GBAEmulator
                 for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
                 {
                     // we can use our same rendering method as for background, as we simply render a tile
-                    if (UseOBJMask)
+                    if (UseOBJWindowMask)
                     {
-                        this.Render8bpp(ref this.OBJMask, null, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
+                        this.Render8bpp(ref this.OBJWindowMask, null, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
                     }
                     else
                     {
                         this.Render8bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
                         Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
+                        
+                        for (int dx = 0; dx < 8; dx++)
+                        {
+                            if (0 <= StartX + dx && StartX + dx < width)
+                            {
+                                this.OBJBlendingMask[StartX + dx] = EnableBlending && this.OBJLayers[Priority][StartX + dx] != 0x8000;
+                            }
+                        }
                     }
                     
                     StartX += 8 * XSign;
@@ -288,7 +317,7 @@ namespace GBAEmulator
         }
 
         private void RenderAffineOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic,
-            ushort OBJ_ATTR1, ushort OBJ_ATTR2, bool DoubleRendering, bool UseOBJMask = false)
+            ushort OBJ_ATTR1, ushort OBJ_ATTR2, bool DoubleRendering, bool EnableBlending, bool UseOBJWindowMask = false)
         {
             int StartX = OBJ_ATTR1 & 0x01ff;
             if ((OBJ_ATTR1 & 0x0100) > 0) StartX = (int)(StartX | 0xffff_ff00);  // sign extend
@@ -349,13 +378,15 @@ namespace GBAEmulator
                 if (px >= OBJsz.Width || py >= OBJsz.Height)
                     continue;
 
-                if (UseOBJMask)
+                if (UseOBJWindowMask)
                 {
-                    this.OBJMask[StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, (byte)px, (byte)py, ColorMode, PaletteBank);
+                    this.OBJWindowMask[StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, (byte)px, (byte)py, ColorMode, PaletteBank);
                 }
                 else
                 {
                     this.OBJLayers[Priority][StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, (byte)px, (byte)py, ColorMode, PaletteBank);
+                    
+                    this.OBJBlendingMask[StartX + ix] = EnableBlending && this.OBJLayers[Priority][StartX + ix] != 0x8000;
                 }
             }
         }

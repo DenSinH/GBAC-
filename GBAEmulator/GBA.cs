@@ -52,7 +52,7 @@ namespace GBAEmulator
             if (this.ppu.scanline == 160)
             {
                 this.cpu.DISPSTAT.SetVBlank(true);
-                this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.VBlank);
+                this.cpu.TriggerDMA(DMAStartTiming.VBlank);
                 this.vis.Tick();
             }
             // no VBlank in 227
@@ -81,7 +81,7 @@ namespace GBAEmulator
 
             /* HBLANK */
             this.cpu.DISPSTAT.SetHBlank(true);
-            if (!ppu.IsVBlank) this.cpu.TriggerDMA(ARM7TDMI.DMAStartTiming.HBlank);
+            if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
             this.ppu.DrawScanline();
 
             this.cycle += HBlankCycles;
@@ -98,15 +98,15 @@ namespace GBAEmulator
         {
             // cpu.LoadRom("../../roms/SonicAdvance.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
-            // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
+            cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");
             // cpu.LoadRom("../../Tests/GBASuiteNew/mem.gba");
-            cpu.LoadRom("../../Tests/Tonc/bld_demo.gba");
+            // cpu.LoadRom("../../Tests/Tonc/bld_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
-            // cpu.LoadRom("../../Tests/EndriftSuite.gba");
+            // cpu.LoadRom("../../Tests/AgingCard.gba");
             
             // this.cpu.UseNormattsBios();
-            cpu.SkipBios();
+            // cpu.SkipBios();
 
             while (!this.ShutDown)
             {

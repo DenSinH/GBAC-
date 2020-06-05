@@ -19,18 +19,6 @@ namespace GBAEmulator.CPU
         }
 
         #region DISPCNT
-        [Flags]
-        public enum DISPCNTFlags : ushort
-        {
-            CGBMode = 0x0008,
-            DPFrameSelect = 0x0010,
-            HBlankIntervalFree = 0x0020,
-            OBJVRAMMapping = 0x0040,
-            ForcedBlank = 0x0080,
-
-            DisplayOBJ = 0x1000,
-        }
-
         public class cDISPCNT : IORegister2
         {
             public byte BGMode
@@ -61,18 +49,6 @@ namespace GBAEmulator.CPU
         #endregion
 
         #region DISPSTAT
-
-        [Flags]
-        public enum DISPSTATFlags : ushort
-        {
-            VBlankFlag = 0x0001,
-            HBlankFlag = 0x0002,
-            VCounterFlag = 0x0004,
-            VBlankIRQEnable = 0x0008,
-            HBlankIRQEnable = 0x0010,
-            VCounterIRQEnable = 0x0020,
-        }
-
         public class cDISPSTAT : IORegister2
         {
             ARM7TDMI cpu;
@@ -414,7 +390,7 @@ namespace GBAEmulator.CPU
         public cWindowControl WININ = new cWindowControl();
         public cWindowControl WINOUT = new cWindowControl();
         #endregion
-
+        
         #region Mosaic Function
         public class cMosaic : IORegister2
         {
@@ -443,14 +419,6 @@ namespace GBAEmulator.CPU
         #endregion
 
         #region Color Special Effects
-        public enum BlendMode : byte
-        {
-            Off = 0,
-            Normal = 1,
-            White = 2,
-            Black = 3
-        }
-
         public class cBLDCNT : IORegister2
         {
             public bool BGIsTop(byte BG)
@@ -781,22 +749,6 @@ namespace GBAEmulator.CPU
 
         private readonly cDMACNT_L[] DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(0x3fff), new cDMACNT_L(0x3fff),
             new cDMACNT_L(0x3fff), new cDMACNT_L(0xffff) };
-
-        public enum AddrControl : byte
-        {
-            Increment = 0,
-            Decrement = 1,
-            Fixed = 2,
-            IncrementReload = 3
-        }
-
-        public enum DMAStartTiming : byte
-        {
-            Immediately = 0,
-            VBlank = 1,
-            HBlank = 2,
-            Special = 3
-        }
 
         public class cDMACNT_H : IORegister2
         {
