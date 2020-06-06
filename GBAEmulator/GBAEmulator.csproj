@@ -95,9 +95,13 @@
     <Compile Include="Memory\Memory.Access.cs" />
     <Compile Include="Memory\Memory.EEPROM.cs" />
     <Compile Include="Memory\Memory.IO.cs" />
-    <Compile Include="Memory\Memory.IO.IORegisters.base.cs" />
-    <Compile Include="Memory\Memory.IO.IORegisters.cs" />
+    <Compile Include="Memory\Memory.IO.DMA.cs" />
+    <Compile Include="Memory\Memory.IO.InterruptControl.cs" />
+    <Compile Include="Memory\Memory.IO.Keypad.cs" />
+    <Compile Include="Memory\Memory.IO.LCD.cs" />
+    <Compile Include="Memory\Memory.IO.Regs.base.cs" />
     <Compile Include="CPU\CPU.InterruptHandling.cs" />
+    <Compile Include="Memory\Memory.IO.Timers.cs" />
     <Compile Include="Memory\Memory.ROM.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.AddOffsetToSP.cs" />
     <Compile Include="CPU\THUMB\CPU.THUMB.AddSubtract.cs" />

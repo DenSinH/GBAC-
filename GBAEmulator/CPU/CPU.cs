@@ -26,16 +26,13 @@ namespace GBAEmulator.CPU
         public ARM7TDMI(GBA gba)
         {
             this.gba = gba;
-
-            this.mem = new MEM(this);
-
+            
             this.InitARM();
             this.InitTHUMB();
             this.InitTimers();
 
             // cpu is required to be initialized before memory is
-            this.mem.InitBIOS();
-            this.mem.InitRegisters();
+            this.mem = new MEM(this);
 
             this.SystemBank = new uint[16];
             this.FIQBank = new uint[16];

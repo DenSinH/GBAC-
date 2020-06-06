@@ -44,6 +44,9 @@ namespace GBAEmulator.Memory
         {
             this.cpu = cpu;
             
+            this.InitBIOS();
+            this.InitRegisters();
+
             this.__MemoryRegions__ = new byte[16][]
             {
                 this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,

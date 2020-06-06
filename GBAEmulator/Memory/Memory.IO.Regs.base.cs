@@ -44,7 +44,20 @@ namespace GBAEmulator.Memory
                 this.lower = lower;
                 this.upper = upper;
             }
+        }
+        
+        private class EmptyRegister : IORegister2 { }  // basically default register (name might be a bit misleading)
 
+        private class UnusedRegister : IORegister
+        {
+            // Register full of unused bits (always returns 0)
+            public ushort Get()
+            {
+                // todo: open bus?
+                return 0;
+            }
+
+            public void Set(ushort value, bool setlow, bool sethigh) { }
         }
     }
 }
