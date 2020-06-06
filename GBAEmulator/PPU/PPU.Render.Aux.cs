@@ -13,7 +13,6 @@ namespace GBAEmulator
         {
             BlendMode AlphaBlending = this.gba.cpu.BLDCNT.BlendMode;
             FillWindow<BlendMode>(ref WindowBlendMode, AlphaBlending);
-            return;
 
             BlendMode Win0In, Win1In, OBJWinIn, WinOut;
 
@@ -29,9 +28,9 @@ namespace GBAEmulator
 
             for (int x = 0; x < width; x++)
             {
-                if (this.OBJBlendingMask[x])
+                if (this.OBJBlendingMask[x] != null)  // null means no sprite present, so don't enable the blendmode
                 {
-                    WindowBlendMode[x] = OBJBlendMode;
+                    WindowBlendMode[x] = this.OBJBlendingMask[x] ?? false ? OBJBlendMode : BlendMode.Off;
                 }
             }
         }
@@ -193,10 +192,12 @@ namespace GBAEmulator
                         return !IsTop;  // if it is not top, this is the final color, otherwise, there is a possibility to blend
                     }
                 case BlendMode.White:
+                case BlendMode.Black:
                     // Display[ScreenX] should always be 0x8000 in this case, as we always return true (color is always final)
                     if (WasOBJ)
                     {
-                        this.Display[ScreenX] = Blend(this.Display[ScreenX], 0x7fff, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                        this.Display[ScreenX] = Blend(this.Display[ScreenX], (ushort)(AlphaBlending == BlendMode.White ? 0x7fff : 0),
+                            (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
                         return true;
                     }
 
@@ -204,7 +205,8 @@ namespace GBAEmulator
                     {
                         // blend with white and color is final
                         // EY <= 0x10 so 0x10 - EY >= 0
-                        this.Display[ScreenX] = Blend(Color, 0x7fff, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                        this.Display[ScreenX] = Blend(Color, (ushort)(AlphaBlending == BlendMode.White ? 0x7fff : 0),
+                            (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
                     }
                     else
                     {
@@ -221,27 +223,6 @@ namespace GBAEmulator
                     regardless of the current blend-mode.
                     (Tonc)
                      */
-                    return !IsOBJ;
-                case BlendMode.Black:
-                    // Display[ScreenX] should always be 0x8000 in this case, as we always return true (color is always final)
-                    if (WasOBJ)
-                    {
-                        this.Display[ScreenX] = Blend(this.Display[ScreenX], 0x0000, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
-                        return true;
-                    }
-
-                    if (IsTop)
-                    {
-                        // blend with white and color is final
-                        // EY <= 0x10 so 0x10 - EY >= 0
-                        this.Display[ScreenX] = Blend(Color, 0x0000, (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
-                    }
-                    else
-                    {
-                        this.Display[ScreenX] = Color;
-                    }
-
-                    // color is always final
                     return !IsOBJ;
                 default:
                     throw new Exception("Yo this does not exist");

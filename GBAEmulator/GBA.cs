@@ -102,12 +102,12 @@ namespace GBAEmulator
 
         public void Run()
         {
-            cpu.LoadRom("../../roms/PokemonEmerald.gba");
+            // cpu.LoadRom("../../roms/PokemonPinball.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
             // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");
             // cpu.LoadRom("../../Tests/GBASuiteNew/mem.gba");
-            // cpu.LoadRom("../../Tests/Tonc/bld_demo.gba");
+            cpu.LoadRom("../../Tests/Tonc/win_demo.gba");
             // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
             // cpu.LoadRom("../../Tests/EndriftSuite.gba");
             

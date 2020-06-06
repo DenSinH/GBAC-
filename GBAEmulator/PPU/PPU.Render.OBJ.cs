@@ -26,7 +26,7 @@ namespace GBAEmulator
         private ushort[] OBJWindowMask = new ushort[width];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ResetOBJMask()
+        private void ResetOBJWindowMask()
         {
             // used to clear OBJLayers[0] for creating the OBJ window mask
             for (int x = 0; x < width; x++)
@@ -36,12 +36,15 @@ namespace GBAEmulator
         }
 
         // used for sprites with GFXMode 0b10 (enable alpha blending)
-        private bool[] OBJBlendingMask = new bool[width];
+        private bool?[] OBJBlendingMask = new bool?[width];
+        private byte?[] OBJMaxPriority = new byte?[width];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetOBJBlendingMask()
         {
-            this.OBJBlendingMask = new bool[width];
+            // reset to null
+            this.OBJBlendingMask = new bool?[width];
+            this.OBJMaxPriority = new byte?[width];
         }
 
         // the actual OBJ window (combined window 0, 1, OBJWindowMask and WINOUT)
@@ -79,7 +82,7 @@ namespace GBAEmulator
         private void RenderOBJs(bool UseOBJWindowMask = false)  // assumes y = scanline
         {
             if (UseOBJWindowMask)
-                this.ResetOBJMask();
+                this.ResetOBJWindowMask();
             else
             {
                 this.ResetOBJScanlines();
@@ -159,6 +162,23 @@ namespace GBAEmulator
         //                                      Regular objects
         // ===================================================================================================
 
+        private void UpdateOBJMask(int StartX, byte Priority, bool EnableBlending)
+        {
+            for (int dx = 0; dx < 8; dx++)
+            {
+                if (0 <= StartX + dx && StartX + dx < width)
+                {
+                    // comparison operators are always false comparing to null
+                    // only change blending mask value if we have drawn a nontransparent pixel
+                    if (!(Priority >= OBJMaxPriority[StartX + dx]) && this.OBJLayers[Priority][StartX + dx] != 0x8000)
+                    {
+                        this.OBJMaxPriority[StartX + dx] = Priority;
+                        this.OBJBlendingMask[StartX + dx] = EnableBlending;
+                    }
+                }
+            }
+        }
+
         private void RenderRegularOBJ(short OBJy, OBJSize OBJsz, bool ColorMode, bool Mosaic,
             ushort OBJ_ATTR1, ushort OBJ_ATTR2, bool EnableBlending, bool UseOBJWindowMask = false)
         {
@@ -188,7 +208,7 @@ namespace GBAEmulator
                 StartX += OBJsz.Width;
             }
 
-            if (!ColorMode)  // 4bpp
+            if (!ColorMode)     // ========================= 4bpp =============================
             {
                 SliverBaseAddress = (uint)(TileID * 0x20);
                 // removed shifting for less arithmetic, logically OBJsz.Width should be OBJsz.Width >> 3 for the width in tiles, and
@@ -217,28 +237,22 @@ namespace GBAEmulator
                     else
                     {
                         this.Render4bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign,
-                        (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
-                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
-                        
-                        for (int dx = 0; dx < 8; dx++)
-                        {
-                            if (0 <= StartX + dx && StartX + dx < width)
-                            {
-                                // set the blending mask to true only if GFXMode == 10 (EnableBlending) and we drew a non-transparent pixel
-                                this.OBJBlendingMask[StartX + dx] = EnableBlending && this.OBJLayers[Priority][StartX + dx] != 0x8000;
-                            }
-                        }
+                            (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
+                            Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
+
+                        // update sprite blending mode override
+                        this.UpdateOBJMask(StartX, Priority, EnableBlending);
                     }
                     
                     StartX += 8 * XSign;
                 }
             }
-            else
+            else                // ========================= 8bpp =============================
             {
                 // Tonc about Sprite tile memory offsets: Always per 4bpp tile size: start = base + id * 32
                 SliverBaseAddress = (uint)(TileID * 0x20);
                 // removed shifting for less arithmetic, like in 4bpp
-                SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 4) : (32 * 0x20 * (dy >> 3)));
+                SliverBaseAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (dy >> 3) * 8) : (32 * 0x20 * (dy >> 3)));
                 SliverBaseAddress += (uint)(8 * (dy & 0x07));   // offset within tile
 
                 // prevent overflow, not sure what is supposed to happen
@@ -253,20 +267,15 @@ namespace GBAEmulator
                     if (UseOBJWindowMask)
                     {
                         this.Render8bpp(ref this.OBJWindowMask, null, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
-                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
+                                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
                     }
                     else
                     {
                         this.Render8bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
-                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
-                        
-                        for (int dx = 0; dx < 8; dx++)
-                        {
-                            if (0 <= StartX + dx && StartX + dx < width)
-                            {
-                                this.OBJBlendingMask[StartX + dx] = EnableBlending && this.OBJLayers[Priority][StartX + dx] != 0x8000;
-                            }
-                        }
+                                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
+
+                        // update sprite blending mode override
+                        this.UpdateOBJMask(StartX, Priority, EnableBlending);
                     }
                     
                     StartX += 8 * XSign;
@@ -390,8 +399,14 @@ namespace GBAEmulator
                 else
                 {
                     this.OBJLayers[Priority][StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, (byte)px, (byte)py, ColorMode, PaletteBank);
-                    
-                    this.OBJBlendingMask[StartX + ix] = EnableBlending && this.OBJLayers[Priority][StartX + ix] != 0x8000;
+
+                    // update sprite blending mode override
+                    // comparison operators are always false comparing to null
+                    if (!(Priority >= OBJMaxPriority[StartX + ix]))
+                    {
+                        this.OBJMaxPriority[StartX + ix] = Priority;
+                        this.OBJBlendingMask[StartX + ix] = EnableBlending && this.OBJLayers[Priority][StartX + ix] != 0x8000;
+                    }
                 }
             }
         }

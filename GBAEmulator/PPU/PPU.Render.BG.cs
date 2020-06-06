@@ -70,7 +70,7 @@ namespace GBAEmulator
             bool VFlip = (ScreenEntry & 0x0800) > 0, HFlip = (ScreenEntry & 0x0400) > 0;
             ushort TileID = (ushort)(ScreenEntry & 0x03ff);
 
-            ushort Address = (ushort)(CharBaseBlock * 0x4000);
+            uint Address = (uint)(CharBaseBlock * 0x4000);
 
             if (VFlip)
                 dy = (byte)(7 - dy);
@@ -85,15 +85,15 @@ namespace GBAEmulator
 
             if (!ColorMode)  // 4bpp
             {
-                Address |= (ushort)(TileID * 0x20);   // Beginning of tile
-                Address |= (ushort)(dy * 4);          // Beginning of tile sliver
+                Address += (uint)(TileID * 0x20);   // Beginning of tile
+                Address += (uint)(dy * 4);          // Beginning of tile sliver
 
                 this.Render4bpp(ref Line, Window, StartX, XSign, Address, (uint)(PaletteBank * 0x20), Mosaic, MosaicHSize);
             }
             else             // 8bpp
             {
-                Address |= (ushort)(TileID * 0x40);    // similar to 4bpp
-                Address |= (ushort)(dy * 8);
+                Address += (uint)(TileID * 0x40);    // similar to 4bpp
+                Address += (uint)(dy * 8);
 
                 this.Render8bpp(ref Line, Window, StartX, XSign, Address, Mosaic, MosaicHSize);
             }

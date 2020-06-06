@@ -313,6 +313,15 @@ namespace GBAEmulator.CPU
                 this.SCycle = __ByteAccessCycles__[Section];
             }
 
+            if (address == 0x0E000000)
+            {
+                return 0x62; // Stubbing flash
+            }
+            else if (address == 0x0E000001)
+            {
+                return 0x13; // Stubbing flash
+            }
+
             switch (Section)
             {
                 case 0:

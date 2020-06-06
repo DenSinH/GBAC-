@@ -48,7 +48,7 @@ namespace GBAEmulator
         Special = 3
     }
     
-    public enum BlendMode : byte
+    public enum BlendMode : ushort
     {
         Off = 0,
         Normal = 1,
