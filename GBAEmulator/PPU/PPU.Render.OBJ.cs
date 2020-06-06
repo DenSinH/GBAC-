@@ -405,8 +405,11 @@ namespace GBAEmulator
                     // comparison operators are always false comparing to null
                     if (!(Priority >= OBJMaxPriority[StartX + ix]))
                     {
-                        this.OBJMaxPriority[StartX + ix] = Priority;
-                        this.OBJBlendingMask[StartX + ix] = EnableBlending && this.OBJLayers[Priority][StartX + ix] != 0x8000;
+                        if (this.OBJLayers[Priority][StartX + ix] != 0x8000)
+                        {
+                            this.OBJMaxPriority[StartX + ix] = Priority;
+                            this.OBJBlendingMask[StartX + ix] = EnableBlending;
+                        }
                     }
                 }
             }
