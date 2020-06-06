@@ -237,7 +237,7 @@ namespace GBAEmulator.CPU
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private uint ROR(uint Operand, byte RotateAmount)
+        public static uint ROR(uint Operand, byte RotateAmount)
         {
             RotateAmount &= 0x1f;
             return (uint)((Operand >> RotateAmount) |

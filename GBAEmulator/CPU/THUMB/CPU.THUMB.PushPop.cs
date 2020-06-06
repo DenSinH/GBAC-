@@ -27,7 +27,7 @@ namespace GBAEmulator.CPU
                     {
                         // Pop from stack
                         this.Log(string.Format("POP Mem[{0:x8}] -> R{1}", SP, i));
-                        this.Registers[i] = this.GetWordAt(SP);
+                        this.Registers[i] = this.mem.GetWordAt(SP);
                         SP += 4;
                         RegisterCount++;
                     }
@@ -35,7 +35,7 @@ namespace GBAEmulator.CPU
 
                 if (PCLR)
                 {
-                    PC = this.GetWordAt(SP) & 0xffff_fffe;
+                    PC = this.mem.GetWordAt(SP) & 0xffff_fffe;
                     SP += 4;
                     this.PipelineFlush();
 
@@ -74,7 +74,7 @@ namespace GBAEmulator.CPU
                 while (RegisterQueue.Count > 0)
                 {
                     this.Log(string.Format("PUSH R{1} -> Mem[{0:x8}]", Address, RegisterQueue.Peek()));
-                    this.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
+                    this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
 

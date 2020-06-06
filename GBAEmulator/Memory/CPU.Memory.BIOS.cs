@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace GBAEmulator.CPU
+namespace GBAEmulator.Memory
 {
-    partial class ARM7TDMI
+    partial class MEM
     {
         /* Normatt's GBA BIOS */
         private const int BIOS_SIZE = 0x4000;
@@ -591,7 +591,7 @@ namespace GBAEmulator.CPU
             0x39, 0xBF, 0xA1, 0xF1, 0x64, 0x6B, 0x41, 0x52, 0x4D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        private bool InitBIOS()
+        public bool InitBIOS()
         {
             FileStream fs;
             try
@@ -621,32 +621,6 @@ namespace GBAEmulator.CPU
         public void UseNormattsBios()
         {
             this.BIOS = this.NormattsBIOS;
-        }
-
-        public void SkipBios()
-        {
-            // From Dillon
-            this.Registers[0] = 0x08000000;
-            this.Registers[1] = 0xEA;
-
-            /*
-            The three stack pointers are initially initialized at the TOP of the respective areas:
-                  SP_svc=03007FE0h
-                  SP_irq=03007FA0h
-                  SP_usr=03007F00h
-            (GBATek)
-             */
-            this.SP = 0x03007F00;
-            this.FIQBank[13] = 0x03007F00;          // mode does not exist
-            this.SupervisorBank[13] = 0x03007FE0;
-            this.AbortBank[13] = 0x03007F00;        // mode does not exist
-            this.IRQBank[13] = 0x03007FA0;
-            this.UndefinedBank[13] = 0x03007F00;    // mode does not exist
-            
-            this.PC = 0x08000000;
-            this.CPSR = 0x6000001F;
-
-            this.IORAM[0x134].Set(0x8000, true, true);  // set RCNT to 8000 to prevent Sonic glitch
         }
     }
 }

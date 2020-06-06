@@ -11,13 +11,13 @@ namespace GBAEmulator
 
         public void ResetWindowBlendMode()
         {
-            BlendMode AlphaBlending = this.gba.cpu.BLDCNT.BlendMode;
+            BlendMode AlphaBlending = this.gba.mem.BLDCNT.BlendMode;
             BlendMode Win0In, Win1In, OBJWinIn, WinOut;
 
-            Win0In = this.gba.cpu.WININ.WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
-            Win1In = this.gba.cpu.WININ.WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
-            OBJWinIn = this.gba.cpu.WINOUT.WindowSpecialEffects(Window.OBJ)   ? AlphaBlending : BlendMode.Off;
-            WinOut = this.gba.cpu.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
+            Win0In = this.gba.mem.WININ.WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
+            Win1In = this.gba.mem.WININ.WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
+            OBJWinIn = this.gba.mem.WINOUT.WindowSpecialEffects(Window.OBJ)   ? AlphaBlending : BlendMode.Off;
+            WinOut = this.gba.mem.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
 
             this.ResetWindow<BlendMode>(ref WindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
 
@@ -84,9 +84,9 @@ namespace GBAEmulator
 
         private void ResetWindow<T>(ref T[] Window, T Win0In, T Win1In, T OBJWinIn, T WinOut, T Default)
         {
-            if (!this.gba.cpu.DISPCNT.DisplayOBJWindow() && 
-                !this.gba.cpu.DISPCNT.DisplayBGWindow(0) &&
-                !this.gba.cpu.DISPCNT.DisplayBGWindow(1))
+            if (!this.gba.mem.DISPCNT.DisplayOBJWindow() && 
+                !this.gba.mem.DISPCNT.DisplayBGWindow(0) &&
+                !this.gba.mem.DISPCNT.DisplayBGWindow(1))
             {
                 FillWindow<T>(ref Window, Default);
                 return;
@@ -97,7 +97,7 @@ namespace GBAEmulator
             byte X1, X2, Y1, Y2;
 
             // OBJ layer lowest priority
-            if (this.gba.cpu.DISPCNT.DisplayOBJWindow())
+            if (this.gba.mem.DISPCNT.DisplayOBJWindow())
             {
                 // assume OBJ layer 0 is the mask!
                 // has to be filled BEFORE calling this method
@@ -113,17 +113,17 @@ namespace GBAEmulator
 
             for (byte window = 1; window <= 1; window--)
             {
-                if (!this.gba.cpu.DISPCNT.DisplayBGWindow(window))
+                if (!this.gba.mem.DISPCNT.DisplayBGWindow(window))
                 {
                     continue;
                 }
                 
-                X1 = this.gba.cpu.WINH[window].LowCoord;
-                X2 = this.gba.cpu.WINH[window].HighCoord;
+                X1 = this.gba.mem.WINH[window].LowCoord;
+                X2 = this.gba.mem.WINH[window].HighCoord;
                 if (X2 > width) X2 = width;
 
-                Y1 = this.gba.cpu.WINV[window].LowCoord;
-                Y2 = this.gba.cpu.WINV[window].HighCoord;
+                Y1 = this.gba.mem.WINV[window].LowCoord;
+                Y2 = this.gba.mem.WINV[window].HighCoord;
                 // if (Y2 > height) Y2 = height;
 
                 this.MaskWindow<T>(ref Window, (window == 0) ? Win0In : Win1In,
@@ -177,7 +177,7 @@ namespace GBAEmulator
                     {
                         if (IsBottom)
                         {
-                            this.Display[ScreenX] = Blend(this.Display[ScreenX], Color, this.gba.cpu.BLDALPHA.EVA, this.gba.cpu.BLDALPHA.EVB);
+                            this.Display[ScreenX] = Blend(this.Display[ScreenX], Color, this.gba.mem.BLDALPHA.EVA, this.gba.mem.BLDALPHA.EVB);
                             return true;
                         }
 
@@ -195,7 +195,7 @@ namespace GBAEmulator
                     if (WasOBJ)
                     {
                         this.Display[ScreenX] = Blend(this.Display[ScreenX], (ushort)(AlphaBlending == BlendMode.White ? 0x7fff : 0),
-                            (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                            (byte)(0x10 - this.gba.mem.BLDY.EY), this.gba.mem.BLDY.EY);
                         return true;
                     }
 
@@ -204,7 +204,7 @@ namespace GBAEmulator
                         // blend with white and color is final
                         // EY <= 0x10 so 0x10 - EY >= 0
                         this.Display[ScreenX] = Blend(Color, (ushort)(AlphaBlending == BlendMode.White ? 0x7fff : 0),
-                            (byte)(0x10 - this.gba.cpu.BLDY.EY), this.gba.cpu.BLDY.EY);
+                            (byte)(0x10 - this.gba.mem.BLDY.EY), this.gba.mem.BLDY.EY);
                     }
                     else
                     {
@@ -239,23 +239,23 @@ namespace GBAEmulator
 
             foreach (byte BG in BGs)
             {
-                Priorities[BG] = this.gba.cpu.BGCNT[BG].BGPriority;
-                Enabled[BG] = this.gba.cpu.DISPCNT.DisplayBG(BG);
+                Priorities[BG] = this.gba.mem.BGCNT[BG].BGPriority;
+                Enabled[BG] = this.gba.mem.DISPCNT.DisplayBG(BG);
             }
 
             // blending parameters
             bool[] BGTop = new bool[4], BGBottom = new bool[4];
             foreach (byte BG in BGs)
             {
-                BGTop[BG] = this.gba.cpu.BLDCNT.BGIsTop(BG);
-                BGBottom[BG] = this.gba.cpu.BLDCNT.BGIsBottom(BG);
+                BGTop[BG] = this.gba.mem.BLDCNT.BGIsTop(BG);
+                BGBottom[BG] = this.gba.mem.BLDCNT.BGIsBottom(BG);
             }
 
             bool OBJTop, OBJBottom, BDTop, BDBottom;
-            OBJTop = this.gba.cpu.BLDCNT.OBJIsTop();
-            OBJBottom = this.gba.cpu.BLDCNT.OBJIsBottom();
-            BDTop = this.gba.cpu.BLDCNT.BDIsTop();
-            BDBottom = this.gba.cpu.BLDCNT.BDIsBottom();
+            OBJTop = this.gba.mem.BLDCNT.OBJIsTop();
+            OBJBottom = this.gba.mem.BLDCNT.OBJIsBottom();
+            BDTop = this.gba.mem.BLDCNT.BDIsTop();
+            BDBottom = this.gba.mem.BLDCNT.BDIsBottom();
 
             // only to be called after drawing into the BGScanlines and OBJLayers
             byte priority;
@@ -335,7 +335,7 @@ namespace GBAEmulator
                     UpperNibble = false;
                 }
 
-                VRAMEntry = this.gba.cpu.VRAM[MosaicCorrectedAddress];
+                VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
 
                 if (0 <= ScreenX && ScreenX < width)  // ScreenX is a byte, so always greater than 0
                 {
@@ -381,7 +381,7 @@ namespace GBAEmulator
                 {
                     if (Line[ScreenX] == 0x8000)
                     {
-                        VRAMEntry = this.gba.cpu.VRAM[MosaicCorrectedAddress];
+                        VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
                         if (VRAMEntry != 0 && (Window?[ScreenX] ?? true))
                             Line[ScreenX] = this.GetPaletteEntry(PaletteOffset + 2 * (uint)VRAMEntry);
                     }

@@ -1,6 +1,7 @@
 ﻿using System;
 
 using GBAEmulator.CPU;
+using GBAEmulator.Memory;
 
 namespace GBAEmulator
 {
@@ -8,6 +9,7 @@ namespace GBAEmulator
     {
         public ARM7TDMI cpu;
         public PPU ppu;
+        public MEM mem;
 
         public Visual vis;
         public ushort[] display;
@@ -19,6 +21,7 @@ namespace GBAEmulator
         {
             this.cpu = new ARM7TDMI(this);
             this.ppu = new PPU(this, display);
+            this.mem = this.cpu.mem;
 
             this.display = display;
         }
@@ -46,7 +49,7 @@ namespace GBAEmulator
             // set VBlank
             if (this.ppu.scanline == 160)
             {
-                this.cpu.DISPSTAT.SetVBlank(true);
+                this.mem.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(DMAStartTiming.VBlank);
 
                 // refresh screen, vis might have been destroyed because we ended the thread
@@ -62,20 +65,20 @@ namespace GBAEmulator
             // no VBlank in 227
             else if (this.ppu.scanline == 227)
             {
-                this.cpu.DISPSTAT.SetVBlank(false);
+                this.mem.DISPSTAT.SetVBlank(false);
             }
 
             if (this.ppu.IsVBlank)
             {
-                this.cpu.BG2X.ResetInternal();
-                this.cpu.BG2Y.ResetInternal();
-                this.cpu.BG3X.ResetInternal();
-                this.cpu.BG3Y.ResetInternal();
+                this.mem.BG2X.ResetInternal();
+                this.mem.BG2Y.ResetInternal();
+                this.mem.BG3X.ResetInternal();
+                this.mem.BG3Y.ResetInternal();
             }
 
             /* NON-HBLANK */
-            this.cpu.DISPSTAT.SetHBlank(false);
-            this.cpu.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
+            this.mem.DISPSTAT.SetHBlank(false);
+            this.mem.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
             if (this.ppu.scanline >= 2 && this.ppu.scanline < 162)
             {
                 // DMA 3 video capture mode (special DMA trigger)
@@ -87,7 +90,7 @@ namespace GBAEmulator
                 this.cycle -= this.cpu.Step();
 
             /* HBLANK */
-            this.cpu.DISPSTAT.SetHBlank(true);
+            this.mem.DISPSTAT.SetHBlank(true);
             if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
             this.ppu.DrawScanline();
 
@@ -95,15 +98,15 @@ namespace GBAEmulator
             while (this.cycle > 0)
                 this.cycle -= this.cpu.Step();
 
-            this.cpu.BG2X.UpdateInternal((uint)this.cpu.BG2PB.Full);
-            this.cpu.BG2Y.UpdateInternal((uint)this.cpu.BG2PD.Full);
-            this.cpu.BG3X.UpdateInternal((uint)this.cpu.BG3PB.Full);
-            this.cpu.BG3Y.UpdateInternal((uint)this.cpu.BG3PD.Full);
+            this.mem.BG2X.UpdateInternal((uint)this.mem.BG2PB.Full);
+            this.mem.BG2Y.UpdateInternal((uint)this.mem.BG2PD.Full);
+            this.mem.BG3X.UpdateInternal((uint)this.mem.BG3PB.Full);
+            this.mem.BG3Y.UpdateInternal((uint)this.mem.BG3PD.Full);
         }
 
         public void Run()
         {
-            cpu.LoadRom("../../roms/ZeldaMinishCap.gba");
+            cpu.mem.LoadRom("../../roms/PokemonEmerald.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
             // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");

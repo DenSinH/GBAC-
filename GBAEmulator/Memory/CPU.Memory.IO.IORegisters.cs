@@ -1,8 +1,10 @@
 ﻿using System;
 
-namespace GBAEmulator.CPU
+using GBAEmulator.CPU;
+
+namespace GBAEmulator.Memory
 {
-    partial class ARM7TDMI
+    partial class MEM
     {
         private class EmptyRegister : IORegister2 { }  // basically default register (name might be a bit misleading)
 
@@ -51,11 +53,11 @@ namespace GBAEmulator.CPU
         #region DISPSTAT
         public class cDISPSTAT : IORegister2
         {
-            ARM7TDMI cpu;
+            MEM mem;
 
-            public cDISPSTAT(ARM7TDMI cpu) : base()
+            public cDISPSTAT(MEM mem) : base()
             {
-                this.cpu = cpu;
+                this.mem = mem;
             }
             
             public byte VCountSetting
@@ -81,7 +83,7 @@ namespace GBAEmulator.CPU
                     this._raw |= 1;
                     if (this.IsSet(DISPSTATFlags.VBlankIRQEnable))
                     {
-                        this.cpu.IF.Request(Interrupt.LCDVBlank);
+                        this.mem.IF.Request(Interrupt.LCDVBlank);
                     }
                 }
                 else
@@ -94,7 +96,7 @@ namespace GBAEmulator.CPU
                 {
                     this._raw |= 2;
                     if (this.IsSet(DISPSTATFlags.HBlankIRQEnable))
-                        this.cpu.IF.Request(Interrupt.LCDHBlank);
+                        this.mem.IF.Request(Interrupt.LCDHBlank);
                 }
                 else
                     this._raw &= 0xfffd;
@@ -107,10 +109,10 @@ namespace GBAEmulator.CPU
         #region VCOUNT
         public class cVCOUNT : IORegister2
         {
-            ARM7TDMI cpu;
-            public cVCOUNT(ARM7TDMI cpu) : base()
+            MEM mem;
+            public cVCOUNT(MEM mem) : base()
             {
-                this.cpu = cpu;
+                this.mem = mem;
             }
 
             public byte CurrentScanline
@@ -122,24 +124,24 @@ namespace GBAEmulator.CPU
                 set
                 {
                     this._raw = (ushort)((this._raw & 0xff00) | value);
-                    if (value == this.cpu.DISPSTAT.VCountSetting)
+                    if (value == this.mem.DISPSTAT.VCountSetting)
                     {
-                        this.cpu.DISPSTAT.VCountMatch(true);
-                        if (this.cpu.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable))
+                        this.mem.DISPSTAT.VCountMatch(true);
+                        if (this.mem.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable))
                         {
-                            this.cpu.IF.Request(Interrupt.LCDVCountMatch);
+                            this.mem.IF.Request(Interrupt.LCDVCountMatch);
                         }
                     }
                     else
                     {
-                        this.cpu.DISPSTAT.VCountMatch(false);
+                        this.mem.DISPSTAT.VCountMatch(false);
                     }
                 }
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
-                this.cpu.Error("Cannot write to VCOUNT register");
+                this.mem.Error("Cannot write to VCOUNT register");
             }
         }
 
@@ -509,12 +511,12 @@ namespace GBAEmulator.CPU
         {
             Controller controller = new XInputController();
             cKeyInterruptControl KEYCNT;
-            ARM7TDMI cpu;
+            MEM mem;
 
-            public cKeyInput(cKeyInterruptControl KEYCNT, ARM7TDMI cpu)
+            public cKeyInput(cKeyInterruptControl KEYCNT, MEM cpu)
             {
                 this.KEYCNT = KEYCNT;
-                this.cpu = cpu;
+                this.mem = cpu;
 
                 try
                 {
@@ -534,12 +536,12 @@ namespace GBAEmulator.CPU
                     if (this.KEYCNT.IRQCondition)   // AND
                     {
                         if ((state & this.KEYCNT.Mask) == this.KEYCNT.Mask)
-                            this.cpu.IF.Request(Interrupt.Keypad);
+                            this.mem.IF.Request(Interrupt.Keypad);
                     }
                     else                            // OR
                     {
                         if ((state & this.KEYCNT.Mask) > 0)
-                            this.cpu.IF.Request(Interrupt.Keypad);
+                            this.mem.IF.Request(Interrupt.Keypad);
                     }
                 }
 
@@ -549,7 +551,7 @@ namespace GBAEmulator.CPU
             public override void Set(ushort value, bool setlow, bool sethigh) { }
         }
 
-        private class cKeyInterruptControl : IORegister2
+        public class cKeyInterruptControl : IORegister2
         {
             public ushort Mask
             {
@@ -567,7 +569,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
+        public cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
         #endregion
 
         #region Interrupt Control
@@ -620,14 +622,14 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private readonly cIME IME = new cIME();
-        private readonly cIE IE = new cIE();
-        private readonly cIF IF = new cIF();
+        public readonly cIME IME = new cIME();
+        public readonly cIE IE = new cIE();
+        public readonly cIF IF = new cIF();
 
         #endregion
 
         #region HALTCNT
-        private class cPOSTFLG_HALTCNT : IORegister2
+        public class cPOSTFLG_HALTCNT : IORegister2
         {
             // 2 1 byte registers combined
             public bool Halt;
@@ -643,11 +645,11 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
+        public readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
         #endregion
 
         #region DMA Transfers
-        private class cDMAAddressHalf : IORegister2
+        public class cDMAAddressHalf : IORegister2
         {
             private ushort BitMask;
             public ushort InternalRegister;
@@ -674,7 +676,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private class cDMAAddress : IORegister4<cDMAAddressHalf>
+        public class cDMAAddress : IORegister4<cDMAAddressHalf>
         {
             private bool InternalMemory;
 
@@ -702,12 +704,12 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private readonly cDMAAddress[] DMASAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(false),
+        public readonly cDMAAddress[] DMASAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(false),
             new cDMAAddress(false), new cDMAAddress(false) };
-        private readonly cDMAAddress[] DMADAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(true),
+        public readonly cDMAAddress[] DMADAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(true),
             new cDMAAddress(true), new cDMAAddress(false) };
 
-        private class cDMACNT_L : IORegister2
+        public class cDMACNT_L : IORegister2
         {
             private ushort BitMask;
             private ushort InternalRegister;
@@ -747,7 +749,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private readonly cDMACNT_L[] DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(0x3fff), new cDMACNT_L(0x3fff),
+        public readonly cDMACNT_L[] DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(0x3fff), new cDMACNT_L(0x3fff),
             new cDMACNT_L(0x3fff), new cDMACNT_L(0xffff) };
 
         public class cDMACNT_H : IORegister2
@@ -755,16 +757,16 @@ namespace GBAEmulator.CPU
             private bool AllowGamePakDRQ;
             public bool Active;
 
-            private ARM7TDMI cpu;
+            private MEM mem;
             public readonly int index;
 
-            public cDMACNT_H(ARM7TDMI cpu, int index) : base()
+            public cDMACNT_H(MEM mem, int index) : base()
             {
                 this.index = index;
-                this.cpu = cpu;
+                this.mem = mem;
             }
 
-            public cDMACNT_H(ARM7TDMI cpu, int index, bool AllowGamePakDRQ) : this(cpu, index)
+            public cDMACNT_H(MEM mem, int index, bool AllowGamePakDRQ) : this(mem, index)
             {
                 this.AllowGamePakDRQ = AllowGamePakDRQ;
             }
@@ -834,9 +836,9 @@ namespace GBAEmulator.CPU
                 base.Set(value, setlow, sethigh);
                 if (DoReload && this.DMAEnable)
                 {
-                    this.cpu.DMADAD[this.index].Reload();
-                    this.cpu.DMASAD[this.index].Reload();
-                    this.cpu.DMACNT_L[this.index].Reload();
+                    this.mem.DMADAD[this.index].Reload();
+                    this.mem.DMASAD[this.index].Reload();
+                    this.mem.DMACNT_L[this.index].Reload();
                 }
 
                 if ((this._raw & 0xb000) == 0x8000)  // DMA Enable set AND DMA start timing immediate
@@ -846,7 +848,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private cDMACNT_H[] DMACNT_H;
+        public cDMACNT_H[] DMACNT_H;
 
         #endregion
 
@@ -947,51 +949,6 @@ namespace GBAEmulator.CPU
                 if (!WasEnabled && this.Enabled) this.Data.TimerReload();
             }
         }
-
-        public class cTimer
-        {
-            private cTimer Next;
-
-            private ARM7TDMI cpu;
-            private int index;
-
-            public cTMCNT_L Data;
-            public cTMCNT_H Control;
-
-            public cTimer(ARM7TDMI cpu, int index)
-            {
-                this.cpu = cpu;
-                this.index = index;
-                this.Data = new cTMCNT_L();
-                this.Control = new cTMCNT_H(this.Data);
-            }
-
-            public cTimer(ARM7TDMI cpu, int index, cTimer Next) : this(cpu, index)
-            {
-                this.Next = Next;
-            }
-
-            public void TickDirect(int cycles)
-            {
-                // countup tick calls
-                this.Data.TickDirect((ushort)cycles);
-            }
-
-            public void Tick(int cycles)
-            {
-                if (this.Control.Enabled && !this.Control.CountUpTiming)
-                {
-                    if (this.Data.Tick((ushort)cycles))  // overflow
-                    {
-                        if (this.Next?.Control.CountUpTiming ?? false) this.Next?.TickDirect(1);
-
-                        if (this.Control.TimerIRQEnable) this.cpu.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
-                    }
-                }
-            }
-        }
-
-        cTimer[] Timers = new cTimer[4];
         #endregion
     }
 }

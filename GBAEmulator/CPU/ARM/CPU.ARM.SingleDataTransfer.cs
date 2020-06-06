@@ -62,17 +62,17 @@ namespace GBAEmulator.CPU
                 this.Log(string.Format("Single Data Transfer: Mem{0:x8} -> R{1}", Address, Rd));
                 if (ByteQuantity)
                 {
-                    this.Registers[Rd] = this.GetByteAt(Address);
+                    this.Registers[Rd] = this.mem.GetByteAt(Address);
                 }
                 else
                 {
                     // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
-                    uint Result = this.GetWordAt(Address & 0xffff_fffc);
+                    uint Result = this.mem.GetWordAt(Address & 0xffff_fffc);
                     byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                     // ROR result for misaligned adresses
                     if (RotateAmount != 0)
-                        Result = this.ROR(Result, RotateAmount);
+                        Result = ROR(Result, RotateAmount);
                     
                     this.Registers[Rd] = Result;
                 }
@@ -104,12 +104,12 @@ namespace GBAEmulator.CPU
 
                 if (ByteQuantity)
                 {
-                    this.SetByteAt(Address, (byte)(Value & 0x00ff));
+                    this.mem.SetByteAt(Address, (byte)(Value & 0x00ff));
                 }
                 else
                 {
                     Address &= 0xffff_fffc;  // forced align for STR
-                    this.SetWordAt(Address, Value);
+                    this.mem.SetWordAt(Address, Value);
                 }
 
                 // STR instructions take 2N incremental cycles to execute.

@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 
 using GBAEmulator.CPU;
+using GBAEmulator.Memory;
 
 namespace GBAEmulator
 {
@@ -36,8 +37,8 @@ namespace GBAEmulator
             foreach (byte BG in BGs)
             {
                 this.ResetWindow<bool>(ref BGWindows[BG],
-                    this.gba.cpu.WININ.WindowBGEnable(Window.Window0, BG), this.gba.cpu.WININ.WindowBGEnable(Window.Window1, BG),
-                    this.gba.cpu.WINOUT.WindowBGEnable(Window.OBJ, BG), this.gba.cpu.WINOUT.WindowBGEnable(Window.Outside, BG), true);
+                    this.gba.mem.WININ.WindowBGEnable(Window.Window0, BG), this.gba.mem.WININ.WindowBGEnable(Window.Window1, BG),
+                    this.gba.mem.WINOUT.WindowBGEnable(Window.OBJ, BG), this.gba.mem.WINOUT.WindowBGEnable(Window.Outside, BG), true);
             }
         }
 
@@ -110,17 +111,17 @@ namespace GBAEmulator
             uint ScreenEntryIndex;
             ushort ScreenEntry;
 
-            ARM7TDMI.cBGControl BGCNT;
+            MEM.cBGControl BGCNT;
 
             foreach (byte BG in BGs)
             {
-                if (!this.gba.cpu.DISPCNT.DisplayBG(BG))
+                if (!this.gba.mem.DISPCNT.DisplayBG(BG))
                     // Background disabled, does not need rendering
                     continue;
 
-                HOFS = this.gba.cpu.BGHOFS[BG].Offset;
-                VOFS = this.gba.cpu.BGVOFS[BG].Offset;
-                BGCNT = this.gba.cpu.BGCNT[BG];
+                HOFS = this.gba.mem.BGHOFS[BG].Offset;
+                VOFS = this.gba.mem.BGVOFS[BG].Offset;
+                BGCNT = this.gba.mem.BGCNT[BG];
 
                 CharBaseBlock = BGCNT.CharBaseBlock;
                 ScreenBaseBlock = BGCNT.ScreenBaseBlock;
@@ -131,25 +132,25 @@ namespace GBAEmulator
 
                 EffectiveY = (short)(scanline + VOFS);
                 if (Mosaic)
-                    EffectiveY -= (short)(EffectiveY % this.gba.cpu.MOSAIC.BGMosaicVSize);
+                    EffectiveY -= (short)(EffectiveY % this.gba.mem.MOSAIC.BGMosaicVSize);
 
                 for (sbyte CourseX = -1; CourseX < 31; CourseX++)
                 {
                     EffectiveX = (short)((CourseX << 3) + HOFS);
 
                     if (Mosaic)
-                        EffectiveX -= (short)(EffectiveX % this.gba.cpu.MOSAIC.BGMosaicHSize);
+                        EffectiveX -= (short)(EffectiveX % this.gba.mem.MOSAIC.BGMosaicHSize);
 
                     // ScreenEntryIndex is the index of the screenentry for the tile we are currently rendering
                     ScreenEntryIndex = PPU.VRAMIndexRegular((int)(EffectiveX >> 3), (int)((EffectiveY) >> 3), BGSize);
                     ScreenEntryIndex += (uint)(ScreenBaseBlock * 0x800);
 
-                    ScreenEntry = (ushort)(this.gba.cpu.VRAM[ScreenEntryIndex + 1] << 8 | this.gba.cpu.VRAM[ScreenEntryIndex]);
+                    ScreenEntry = (ushort)(this.gba.mem.VRAM[ScreenEntryIndex + 1] << 8 | this.gba.mem.VRAM[ScreenEntryIndex]);
                     
                     this.DrawRegularScreenEntry(ref this.BGScanlines[BG], ref this.BGWindows[BG],
                         StartX: (CourseX * 8) - (HOFS & 0x07), dy: (byte)(EffectiveY & 0x07),
                         ScreenEntry: ScreenEntry, CharBaseBlock: CharBaseBlock, ColorMode: ColorMode, Mosaic: Mosaic,
-                        MosaicHSize: this.gba.cpu.MOSAIC.BGMosaicHSize);
+                        MosaicHSize: this.gba.mem.MOSAIC.BGMosaicHSize);
                 }
             }
         }
@@ -167,7 +168,7 @@ namespace GBAEmulator
             // we only use 8bpp mode for affine layers (Tonc)
             
             ushort Address = (ushort)(CharBaseBlock * 0x4000 | (TileID * 0x40) | (dy * 8) | dx);
-            byte VRAMEntry = this.gba.cpu.VRAM[Address];
+            byte VRAMEntry = this.gba.mem.VRAM[Address];
 
             if (VRAMEntry == 0) return 0x8000;  // transparent
 
@@ -175,15 +176,15 @@ namespace GBAEmulator
         }
 
         // based on y = scanline
-        private void RenderAffineBGScanline(byte BG, ARM7TDMI.cReferencePoint BGxX, ARM7TDMI.cReferencePoint BGxY,
-            ARM7TDMI.cRotationScaling PA, ARM7TDMI.cRotationScaling PB, ARM7TDMI.cRotationScaling PC, ARM7TDMI.cRotationScaling PD)
+        private void RenderAffineBGScanline(byte BG, MEM.cReferencePoint BGxX, MEM.cReferencePoint BGxY,
+            MEM.cRotationScaling PA, MEM.cRotationScaling PB, MEM.cRotationScaling PC, MEM.cRotationScaling PD)
         {
             // ! only to be used with BG = 2 or BG = 3
-            if (!this.gba.cpu.DISPCNT.DisplayBG(BG))
+            if (!this.gba.mem.DISPCNT.DisplayBG(BG))
                 // Background disabled, does not need rendering
                 return;
-            
-            ARM7TDMI.cBGControl BGCNT = this.gba.cpu.BGCNT[BG];
+
+            MEM.cBGControl BGCNT = this.gba.mem.BGCNT[BG];
             
             ushort BGSize = PPU.AffineSizes[BGCNT.ScreenSize];
 
@@ -219,7 +220,7 @@ namespace GBAEmulator
                 // similar to regular now
                 ScreenEntryIndex = (ScreenEntryBaseAddress | (uint)((ScreenEntryY >> 3) * (BGSize >> 3))| (uint)(ScreenEntryX >> 3));
                 
-                AffineScreenEntry = this.gba.cpu.VRAM[ScreenEntryIndex];
+                AffineScreenEntry = this.gba.mem.VRAM[ScreenEntryIndex];
 
                 if (this.BGWindows[BG][ScreenX])
                 {

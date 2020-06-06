@@ -13,36 +13,15 @@ namespace GBAEmulator.CPU
         const uint ReservedVector = 0x14;       // unused
         const uint IRQVector = 0x18;
         const uint FIQVector = 0x1c;            // unused
-
-        [Flags]
-        public enum Interrupt : ushort
-        {
-            LCDVBlank = 0x0001,
-            LCDHBlank = 0x0002,
-            LCDVCountMatch = 0x0004,
-            TimerOverflow = 0x0008,
-            // obtained by shifting:
-            //Timer1Overflow = 0x0010,
-            //Timer2Overflow = 0x0020,
-            //Timer3Overflow = 0x0040,
-            SerialCommunication = 0x0080,
-            DMA = 0x0100,
-            // obtained by shifting:
-            //DMA1 = 0x0200,
-            //DMA2 = 0x0400,
-            //DMA3 = 0x0800,
-            Keypad = 0x1000,
-            GamePak = 0x2000
-        }
-
+        
         private bool HandleIRQs()
         {
-            if ((this.IF.raw & this.IE.raw) != 0)  //  & 0b0011_1111_1111_1100  // mask interrupts manually for testing
+            if ((this.mem.IF.raw & this.mem.IE.raw) != 0)  //  & 0b0011_1111_1111_1100  // mask interrupts manually for testing
             {
-                this.HALTCNT.Halt = false;
+                this.mem.HALTCNT.Halt = false;
 
                 // flipping IME makes irq_demo and Endrift's suite work, so this can be (ab)used for testing
-                if (this.IME.Enabled && (this.I == 0))
+                if (this.mem.IME.Enabled && (this.I == 0))
                 {
                     this.DoIRQ();
                     return true;
@@ -54,7 +33,7 @@ namespace GBAEmulator.CPU
         // public to allow for manual IRQ throwing for testing (unstable)
         public void DoIRQ()
         {
-            this.Log("Doing IRQ: " + (this.IF.raw & this.IE.raw).ToString("x8"));
+            this.Log("Doing IRQ: " + (this.mem.IF.raw & this.mem.IE.raw).ToString("x8"));
             this.ChangeMode(Mode.IRQ);
             this.I = 1;
 

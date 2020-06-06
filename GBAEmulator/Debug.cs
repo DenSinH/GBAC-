@@ -61,8 +61,8 @@ namespace GBAEmulator
         {
             // Address within palette memory
             return (ushort)(
-                this.gba.cpu.PaletteRAM[Address] |
-                (this.gba.cpu.PaletteRAM[Address + 1] << 8)
+                this.gba.mem.PaletteRAM[Address] |
+                (this.gba.mem.PaletteRAM[Address + 1] << 8)
                 );
         }
 
@@ -89,30 +89,30 @@ namespace GBAEmulator
 
         private void UpdateDISPCNT()
         {
-            this.BGMode.Text = this.gba.cpu.DISPCNT.BGMode.ToString();
-            this.DPFrameSelect.Text = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? "1" : "0";
-            this.HBlankIntervalFree.Text = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.HBlankIntervalFree) ? "1" : "0";
-            this.OBJVRAMMapping.Text = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping) ? "1" : "0";
-            this.ForcedBlank.Text = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.ForcedBlank) ? "1" : "0";
-            this.Window0Display.Text = this.gba.cpu.DISPCNT.DisplayBGWindow(0) ? "1" : "0";
-            this.Window1Display.Text = this.gba.cpu.DISPCNT.DisplayBGWindow(1) ? "1" : "0";
-            this.OBJWindowDisplay.Text = this.gba.cpu.DISPCNT.DisplayOBJWindow() ? "1" : "0";
+            this.BGMode.Text = this.gba.mem.DISPCNT.BGMode.ToString();
+            this.DPFrameSelect.Text = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? "1" : "0";
+            this.HBlankIntervalFree.Text = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.HBlankIntervalFree) ? "1" : "0";
+            this.OBJVRAMMapping.Text = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping) ? "1" : "0";
+            this.ForcedBlank.Text = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.ForcedBlank) ? "1" : "0";
+            this.Window0Display.Text = this.gba.mem.DISPCNT.DisplayBGWindow(0) ? "1" : "0";
+            this.Window1Display.Text = this.gba.mem.DISPCNT.DisplayBGWindow(1) ? "1" : "0";
+            this.OBJWindowDisplay.Text = this.gba.mem.DISPCNT.DisplayOBJWindow() ? "1" : "0";
         }
 
         private void UpdateDISPSTAT()
         {
-            this.VBlankFlag.Text = this.gba.cpu.DISPSTAT.IsSet(DISPSTATFlags.VBlankFlag) ? "1" : "0";
-            this.HBlankFlag.Text = this.gba.cpu.DISPSTAT.IsSet(DISPSTATFlags.HBlankFlag) ? "1" : "0";
-            this.VCounterFlag.Text = this.gba.cpu.DISPSTAT.IsSet(DISPSTATFlags.VCounterFlag) ? "1" : "0";
-            this.VBlankIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(DISPSTATFlags.VBlankIRQEnable) ? "1" : "0";
-            this.HBlankIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable) ? "1" : "0";
-            this.VCountIRQEnable.Text = this.gba.cpu.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable) ? "1" : "0";
-            this.VCountSetting.Text = this.gba.cpu.DISPSTAT.VCountSetting.ToString("d3");
+            this.VBlankFlag.Text = this.gba.mem.DISPSTAT.IsSet(DISPSTATFlags.VBlankFlag) ? "1" : "0";
+            this.HBlankFlag.Text = this.gba.mem.DISPSTAT.IsSet(DISPSTATFlags.HBlankFlag) ? "1" : "0";
+            this.VCounterFlag.Text = this.gba.mem.DISPSTAT.IsSet(DISPSTATFlags.VCounterFlag) ? "1" : "0";
+            this.VBlankIRQEnable.Text = this.gba.mem.DISPSTAT.IsSet(DISPSTATFlags.VBlankIRQEnable) ? "1" : "0";
+            this.HBlankIRQEnable.Text = this.gba.mem.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable) ? "1" : "0";
+            this.VCountIRQEnable.Text = this.gba.mem.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable) ? "1" : "0";
+            this.VCountSetting.Text = this.gba.mem.DISPSTAT.VCountSetting.ToString("d3");
         }
 
         private void UpdateVCOUNT()
         {
-            this.VCOUNT.Text = this.gba.cpu.VCOUNT.CurrentScanline.ToString("d3");
+            this.VCOUNT.Text = this.gba.mem.VCOUNT.CurrentScanline.ToString("d3");
         }
 
         private void UpdateInterruptControl()
@@ -122,21 +122,21 @@ namespace GBAEmulator
             this.IME.Text = InterruptControlData.IME;
 
             // Nice and hardcoded, I know
-            this.IEVBlank.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDVBlank) > 0) ? "1" : "0";
-            this.IEHBlank.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
-            this.IEVCOUNT.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
+            this.IEVBlank.Text = ((InterruptControlData.IE & (ushort)Interrupt.LCDVBlank) > 0) ? "1" : "0";
+            this.IEHBlank.Text = ((InterruptControlData.IE & (ushort)Interrupt.LCDHBlank) > 0) ? "1" : "0";
+            this.IEVCOUNT.Text = ((InterruptControlData.IE & (ushort)Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
             this.IETimers.Text = ((InterruptControlData.IE & 0x0078) >> 3).ToString("x1");
             this.IEDMA.Text = ((InterruptControlData.IE & 0x0f00) >> 8).ToString("x1"); ;
-            this.IEKeypad.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.Keypad) > 0) ? "1" : "0";
-            this.IEGamePak.Text = ((InterruptControlData.IE & (ushort)ARM7TDMI.Interrupt.GamePak) > 0) ? "1" : "0";
+            this.IEKeypad.Text = ((InterruptControlData.IE & (ushort)Interrupt.Keypad) > 0) ? "1" : "0";
+            this.IEGamePak.Text = ((InterruptControlData.IE & (ushort)Interrupt.GamePak) > 0) ? "1" : "0";
 
-            this.IFVBlank.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDVBlank) > 0) ? "1" : "0";
-            this.IFHBlank.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDHBlank) > 0) ? "1" : "0";
-            this.IFVCOUNT.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
+            this.IFVBlank.Text = ((InterruptControlData.IF & (ushort)Interrupt.LCDVBlank) > 0) ? "1" : "0";
+            this.IFHBlank.Text = ((InterruptControlData.IF & (ushort)Interrupt.LCDHBlank) > 0) ? "1" : "0";
+            this.IFVCOUNT.Text = ((InterruptControlData.IF & (ushort)Interrupt.LCDVCountMatch) > 0) ? "1" : "0";
             this.IFTimers.Text = ((InterruptControlData.IF & 0x0078) >> 3).ToString("x1");
             this.IFDMA.Text = ((InterruptControlData.IF & 0x0f00) >> 8).ToString("x1"); ;
-            this.IFKeypad.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.Keypad) > 0) ? "1" : "0";
-            this.IFGamePak.Text = ((InterruptControlData.IF & (ushort)ARM7TDMI.Interrupt.GamePak) > 0) ? "1" : "0";
+            this.IFKeypad.Text = ((InterruptControlData.IF & (ushort)Interrupt.Keypad) > 0) ? "1" : "0";
+            this.IFGamePak.Text = ((InterruptControlData.IF & (ushort)Interrupt.GamePak) > 0) ? "1" : "0";
 
             this.HALTCNT.Text = InterruptControlData.HALTCNT;
             this.IRQLabel.ForeColor = this.gba.cpu.mode == ARM7TDMI.Mode.IRQ ? Color.Green : Color.Red;
@@ -199,7 +199,7 @@ namespace GBAEmulator
                         {
                             PixelAddress = Address + 8 * y + x;
                             this.RawCharBlock[CharBlockSize * (8 * dTileY + y) + 8 * dTileX + x] = 
-                                this.GetPaletteEntry(2 * (uint)this.gba.cpu.VRAM[PixelAddress]);
+                                this.GetPaletteEntry(2 * (uint)this.gba.mem.VRAM[PixelAddress]);
                         }
                     }
 
@@ -225,7 +225,7 @@ namespace GBAEmulator
                         {
                             PixelAddress = Address + 4 * y + (x >> 1);
 
-                            PaletteNibble = this.gba.cpu.VRAM[PixelAddress];
+                            PaletteNibble = this.gba.mem.VRAM[PixelAddress];
                             if ((x & 1) == 1) PaletteNibble >>= 4;
 
                             PaletteNibble &= 0x0f;

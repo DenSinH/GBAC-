@@ -2,78 +2,49 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace GBAEmulator.CPU
+using GBAEmulator.CPU;
+
+namespace GBAEmulator.Memory
 {
-    partial class ARM7TDMI
+    public partial class MEM
     {
         [Conditional("DEBUG")]
         private void MemoryAccess(uint Address)
         {
             // Console.WriteLine("Memory Access: " + Address.ToString("x8"));
         }
-
-        /* BIOS is defined in CPU.BIOS.cs */
-        private byte[] eWRAM = new byte[0x40000];       // 256kB External Work RAM
-        private byte[] iWRAM = new byte[0x8000];        // 32kB Internal Work RAM
-        // 1kB IO RAM
-        public byte[] PaletteRAM = new byte[0x400];    // 1kB Palette RAM
-        public byte[] VRAM = new byte[0x18000];        // 96kB VRAM
-        public byte[] OAM = new byte[0x400];           // 1kB OAM
-        private byte[] GamePak = new byte[0x200_0000];   // Game Pak (up to) 32MB (0x0800_0000 - 0x0a00_0000, then mirrored)
-        // Backup Region
-
-        private readonly byte[][] __MemoryRegions__;  // Lookup table for memory regions for instant access (instead of switch statement)
-        private readonly uint[] __MemoryMasks__ = new uint[16]  // mirrored twice
-        {
-            0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
-            0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0xffff, 0xffff
-        };
-
-        // todo: waitstates / N & S cycles
-        // Byte access cycles are equal to halfword access cycles
-        private readonly int[] __ByteAccessCycles__ = new int[16]
-        {
-            1, 1, 3, 1, 1, 1, 1, 1,
-            5, 5, 5, 5, 5, 5, 5, 5
-        };
-
-        private readonly int[] __WordAccessCycles__ = new int[16]
-        {
-            1, 1, 6, 1, 1, 2, 2, 1,
-            8, 8, 8, 8, 8, 8, 8, 8
-        };
-
+        
         /*
          todo:
          When accessing OAM (7000000h) or OBJ VRAM (6010000h) by HBlank Timing,
          then the "H-Blank Interval Free" bit in DISPCNT register must be set.
         */
 
-        private uint GetWordAt(uint address)
+        public uint GetWordAt(uint address)
         {
             this.MemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.NCycle = __WordAccessCycles__[Section];
-                this.SCycle = __WordAccessCycles__[Section];
+                this.cpu.NCycle = __WordAccesSCycles__[Section];
+                this.cpu.SCycle = __WordAccesSCycles__[Section];
             }
 
             switch (Section)
             {
                 case 0:
                     if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
-                    return this.Pipeline.Peek();
+                    return this.cpu.Pipeline.Peek();
                 case 1:
-                    return this.Pipeline.Peek();
+                    return this.cpu.Pipeline.Peek();
                 case 2:
                     return __GetWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
                     return __GetWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4:   // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return this.IOGetWordAt(address & 0x3ff);
-                    return this.Pipeline.Peek();
+                    return this.cpu.Pipeline.Peek();
                 case 5:
                     return __GetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -119,19 +90,19 @@ namespace GBAEmulator.CPU
                     byte value = this.BackupRead(address & 0xffff);
                     return (uint)(value | (value << 8) | (value << 16) | (value << 24));
                 default:
-                    return this.Pipeline.Peek();
+                    return this.cpu.Pipeline.Peek();
             }
         }
 
-        private void SetWordAt(uint address, uint value)
+        public void SetWordAt(uint address, uint value)
         {
             this.MemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.NCycle = __WordAccessCycles__[Section];
-                this.SCycle = __WordAccessCycles__[Section];
+                this.cpu.NCycle = __WordAccesSCycles__[Section];
+                this.cpu.SCycle = __WordAccesSCycles__[Section];
             }
 
             switch (Section)
@@ -182,7 +153,7 @@ namespace GBAEmulator.CPU
                         }
                     }
 
-                    this.Error($"ROM Word Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    this.Error($"ROM Word Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM
@@ -190,7 +161,7 @@ namespace GBAEmulator.CPU
                      * Writing changes the 8bit value at the specified address only,
                      * being set to LSB of (source_data ROR (address*8)).
                      */
-                    byte RORValue = (byte)this.ROR(value, (byte)(8 * (address & 3)));
+                    byte RORValue = (byte)ARM7TDMI.ROR(value, (byte)(8 * (address & 3)));
                     this.BackupWrite(address & 0xffff, RORValue);
                     return;
                 default:
@@ -198,31 +169,31 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private ushort GetHalfWordAt(uint address)
+        public ushort GetHalfWordAt(uint address)
         {
             this.MemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.NCycle = __ByteAccessCycles__[Section];
-                this.SCycle = __ByteAccessCycles__[Section];
+                this.cpu.NCycle = __ByteAccesSCycles__[Section];
+                this.cpu.SCycle = __ByteAccesSCycles__[Section];
             }
 
             switch (Section)
             {
                 case 0:
                     if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return __GetHalfWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
-                    return (ushort)this.Pipeline.Peek();
+                    return (ushort)this.cpu.Pipeline.Peek();
                 case 1:
-                    return (ushort)this.Pipeline.Peek();
+                    return (ushort)this.cpu.Pipeline.Peek();
                 case 2:
                     return __GetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
                     return __GetHalfWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4: // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return this.IOGetHalfWordAt(address & 0x3ff);
-                    return (ushort)this.Pipeline.Peek();
+                    return (ushort)this.cpu.Pipeline.Peek();
                 case 5:
                     return __GetHalfWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -264,19 +235,19 @@ namespace GBAEmulator.CPU
                     byte value = this.BackupRead(address & 0xffff);
                     return (ushort)(value | (value << 8));
                 default:
-                    return (ushort)this.Pipeline.Peek();
+                    return (ushort)this.cpu.Pipeline.Peek();
             }
         }
 
-        private void SetHalfWordAt(uint address, ushort value)
+        public void SetHalfWordAt(uint address, ushort value)
         {
             this.MemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.NCycle = __ByteAccessCycles__[Section];
-                this.SCycle = __ByteAccessCycles__[Section];
+                this.cpu.NCycle = __ByteAccesSCycles__[Section];
+                this.cpu.SCycle = __ByteAccesSCycles__[Section];
             }
 
             switch (Section)
@@ -328,7 +299,7 @@ namespace GBAEmulator.CPU
                         }
                     }
 
-                    this.Error($"ROM Halfword Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    this.Error($"ROM Halfword Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM
@@ -336,7 +307,7 @@ namespace GBAEmulator.CPU
                      * Writing changes the 8bit value at the specified address only,
                      * being set to LSB of (source_data ROR (address*8)).
                      */
-                    byte RORValue = (byte)this.ROR(value, (byte)(8 * (address & 3)));
+                    byte RORValue = (byte)ARM7TDMI.ROR(value, (byte)(8 * (address & 3)));
                     this.BackupWrite(address & 0xffff, RORValue);
                     return;
                 default:
@@ -344,31 +315,31 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private byte GetByteAt(uint address)
+        public byte GetByteAt(uint address)
         {
             this.MemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.NCycle = __ByteAccessCycles__[Section];
-                this.SCycle = __ByteAccessCycles__[Section];
+                this.cpu.NCycle = __ByteAccesSCycles__[Section];
+                this.cpu.SCycle = __ByteAccesSCycles__[Section];
             }
 
             switch (Section)
             {
                 case 0:
                     if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return this.BIOS[address & __MemoryMasks__[Section]];
-                    return (byte)this.Pipeline.Peek();
+                    return (byte)this.cpu.Pipeline.Peek();
                 case 1:
-                    return (byte)this.Pipeline.Peek();
+                    return (byte)this.cpu.Pipeline.Peek();
                 case 2:
                     return this.eWRAM[address & __MemoryMasks__[Section]];
                 case 3:
                     return this.iWRAM[address & __MemoryMasks__[Section]];
                 case 4: // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return (byte)this.IOGetByteAt(address & 0x3ff);
-                    return (byte)this.Pipeline.Peek();
+                    return (byte)this.cpu.Pipeline.Peek();
                 case 5:
                     return this.PaletteRAM[address & __MemoryMasks__[Section]];
                 case 6:  // VRAM Mirrors
@@ -408,19 +379,19 @@ namespace GBAEmulator.CPU
                 case 15:  // SRAM
                     return this.BackupRead(address & 0xffff);
                 default:
-                    return (byte)this.Pipeline.Peek();
+                    return (byte)this.cpu.Pipeline.Peek();
             }
         }
 
-        private void SetByteAt(uint address, byte value)
+        public void SetByteAt(uint address, byte value)
         {
             this.MemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.NCycle = __ByteAccessCycles__[Section];
-                this.SCycle = __ByteAccessCycles__[Section];
+                this.cpu.NCycle = __ByteAccesSCycles__[Section];
+                this.cpu.SCycle = __ByteAccesSCycles__[Section];
             }
 
             switch (Section)
@@ -500,7 +471,7 @@ namespace GBAEmulator.CPU
                         }
                     }
 
-                    this.Error($"ROM Byte Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    this.Error($"ROM Byte Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM

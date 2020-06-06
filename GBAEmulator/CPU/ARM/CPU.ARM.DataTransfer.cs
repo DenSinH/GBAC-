@@ -61,21 +61,21 @@ namespace GBAEmulator.CPU
                     if (LoadFromMemory)
                     {
                         if ((Address & 0x01) == 0)  // aligned
-                            this.Registers[Rd] = this.GetHalfWordAt(Address);
+                            this.Registers[Rd] = this.mem.GetHalfWordAt(Address);
                         else
-                            this.Registers[Rd] = (uint)(this.GetByteAt(Address - 1) << 24) | this.GetByteAt(Address);
+                            this.Registers[Rd] = (uint)(this.mem.GetByteAt(Address - 1) << 24) | this.mem.GetByteAt(Address);
                     }
                     else
                     {
                         Address &= 0xffff_fffe;  // force align
-                        this.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
+                        this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
                     }
                     break;
                 case 0b10:  // Signed byte
                     this.Log(string.Format("Halfword Data Transfer: Signed byte Rd = R{0} @{1:x8}", Rd, Address, Rd));
                     if (LoadFromMemory)
                     {
-                        this.Registers[Rd] = (uint)(sbyte)this.GetByteAt(Address);
+                        this.Registers[Rd] = (uint)(sbyte)this.mem.GetByteAt(Address);
                     }
                     else
                     {
@@ -95,11 +95,11 @@ namespace GBAEmulator.CPU
                     {
                         if ((Address & 0x01) == 1)
                         {
-                            this.Registers[Rd] = (uint)(sbyte)this.GetByteAt(Address);
+                            this.Registers[Rd] = (uint)(sbyte)this.mem.GetByteAt(Address);
                         }
                         else
                         {
-                            this.Registers[Rd] = (uint)(short)this.GetHalfWordAt(Address);
+                            this.Registers[Rd] = (uint)(short)this.mem.GetHalfWordAt(Address);
                         }
                     }
                     else

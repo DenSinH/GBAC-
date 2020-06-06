@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 
+using GBAEmulator.Memory;
+
 namespace GBAEmulator.CPU
 {
     public struct InterruptControlInfo
@@ -39,7 +41,7 @@ namespace GBAEmulator.CPU
     {
         public string DAD, SAD, UnitCount, DestAddrControl, SourceAddrControl, Repeat, UnitLength, Timing, IRQ, Enabled;
 
-        public DMAInfo(uint DAD, uint SAD, uint UnitCount, ARM7TDMI.cDMACNT_H dmacnt_h)
+        public DMAInfo(uint DAD, uint SAD, uint UnitCount, MEM.cDMACNT_H dmacnt_h)
         {
             this.DAD = DAD.ToString("x8");
             this.SAD = SAD.ToString("x8");
@@ -60,20 +62,20 @@ namespace GBAEmulator.CPU
         
         private void Error(string message)
         {
-            Console.Error.WriteLine($"Error: {message}");
+            Console.Error.WriteLine($"CPU Error: {message}");
         }
         
         [Conditional("DEBUG")]
         private void Log(string message)
         {
-            // Console.WriteLine(message);
+            Console.WriteLine("CPU: " + message);
         }
 
         public InterruptControlInfo GetInterruptControl()
         {
             return new InterruptControlInfo(
-                this.KEYCNT.Mask.ToString("x4"), this.IME.Enabled ? "1" : "0", this.IE.raw,
-                this.IF.raw, this.HALTCNT.Halt ? "1" : "0"
+                this.mem.KEYCNT.Mask.ToString("x4"), this.mem.IME.Enabled ? "1" : "0", this.mem.IE.raw,
+                this.mem.IF.raw, this.mem.HALTCNT.Halt ? "1" : "0"
             );
         }
 
@@ -88,7 +90,7 @@ namespace GBAEmulator.CPU
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    if (this.DMACNT_H[i].Active) return true;
+                    if (this.mem.DMACNT_H[i].Active) return true;
                 }
                 return false;
             }
@@ -96,7 +98,8 @@ namespace GBAEmulator.CPU
 
         public DMAInfo GetDMAInfo(int index)
         {
-            return new DMAInfo(this.DMADAD[index].Address, this.DMASAD[index].Address, this.DMACNT_L[index].UnitCount, this.DMACNT_H[index]);
+            return new DMAInfo(this.mem.DMADAD[index].Address, this.mem.DMASAD[index].Address,
+                this.mem.DMACNT_L[index].UnitCount, this.mem.DMACNT_H[index]);
         }
 
         public void ShowInfo()
@@ -106,8 +109,8 @@ namespace GBAEmulator.CPU
 
         public void InterruptInfo()
         {
-            Console.WriteLine($"HALTCNT: {this.HALTCNT.Halt}, CPSR-I: {this.I}");
-            Console.WriteLine($"IME enabled: {this.IME.Enabled}, IE: {this.IE.raw.ToString("x8")}, IF: {this.IF.raw.ToString("x8")}");
+            Console.WriteLine($"HALTCNT: {this.mem.HALTCNT.Halt}, CPSR-I: {this.I}");
+            Console.WriteLine($"IME enabled: {this.mem.IME.Enabled}, IE: {this.mem.IE.raw.ToString("x8")}, IF: {this.mem.IF.raw.ToString("x8")}");
         }
 
         public void DumpPAL()
@@ -117,7 +120,7 @@ namespace GBAEmulator.CPU
                 Console.Write(string.Format("{0:x4} :: ", 0x20 * i));
                 for (int j = 0; j < 0xf; j++)
                 {
-                    Console.Write(string.Format("{0:x4} ", this.GetHalfWordAt((uint)(0x0500_0000 | (0x20 * i) | (2 * j)))));
+                    Console.Write(string.Format("{0:x4} ", this.mem.GetHalfWordAt((uint)(0x0500_0000 | (0x20 * i) | (2 * j)))));
                 }
                 Console.WriteLine();
             }
@@ -130,7 +133,7 @@ namespace GBAEmulator.CPU
                 Console.Write(string.Format("{0:x4} :: ", 0x20 * i));
                 for (int j = 0; j < 0x10; j++)
                 {
-                    Console.Write(string.Format("{0:x4} ", this.GetHalfWordAt((uint)(0x0700_0000 | (0x20 * i) | (2 * j)))));
+                    Console.Write(string.Format("{0:x4} ", this.mem.GetHalfWordAt((uint)(0x0700_0000 | (0x20 * i) | (2 * j)))));
                 }
                 Console.WriteLine();
             }
@@ -152,7 +155,7 @@ namespace GBAEmulator.CPU
                         {
                             for (int w = bpp - 1; w < 8; w += 4)  // double writing for 4bpp
                             {
-                                switch ((this.VRAM[Address] >> 4) / 2)
+                                switch ((this.mem.VRAM[Address] >> 4) / 2)
                                 {
                                     case 0:
                                         Console.Write(" ");
@@ -183,43 +186,5 @@ namespace GBAEmulator.CPU
                 }
             }
         }
-
-        public void FindValueInRAM(ushort value)
-        {
-            Console.Write("iWRAM: ");
-            for (uint i = 0; i < this.iWRAM.Length; i += 2)
-            {
-                if (__GetHalfWordAt__(this.iWRAM, i) == value)
-                    Console.Write(i + " ");
-            }
-            Console.WriteLine();
-
-            Console.Write("eWRAM: ");
-            for (uint i = 0; i < this.eWRAM.Length; i += 2)
-            {
-                if (__GetHalfWordAt__(this.eWRAM, i) == value)
-                    Console.Write(i + " ");
-            }
-            Console.WriteLine();
-
-            Console.Write("IORAM: ");
-            for (uint i = 0; i < this.IORAM.Length; i += 2)
-            {
-                if (this.IOGetHalfWordAt(i) == value)
-                    Console.Write(i + " ");
-            }
-            Console.WriteLine();
-        }
-
-        public void ShowIWRAMAt(uint address)
-        {
-            Console.WriteLine(string.Format("iWRAM[${0:x8}] : {1:x8}", address, __GetWordAt__(this.iWRAM, address)));
-        }
-
-        public void ShowEWRAMAt(uint address)
-        {
-            Console.WriteLine(string.Format("eWRAM[${0:x8}] : {1:x8}", address, __GetWordAt__(this.eWRAM, address)));
-        }
-
     }
 }

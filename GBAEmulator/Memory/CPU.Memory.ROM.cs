@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace GBAEmulator.CPU
+namespace GBAEmulator.Memory
 {
-    partial class ARM7TDMI
+    partial class MEM
     {
         const string SAVE_EXTENSION = ".gbac";
 

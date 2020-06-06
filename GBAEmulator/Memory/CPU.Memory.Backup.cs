@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 
-namespace GBAEmulator.CPU
+namespace GBAEmulator.Memory
 {
-    partial class ARM7TDMI
+    partial class MEM
     {
         byte[] BackupStorage = new byte[0x10000];
         private void Erase(byte[] Storage, uint StartAddress, uint EndAddress)

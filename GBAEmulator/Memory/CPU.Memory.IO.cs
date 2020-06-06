@@ -1,23 +1,18 @@
 ﻿using System;
 
-namespace GBAEmulator.CPU
+namespace GBAEmulator.Memory
 {
-    partial class ARM7TDMI
+    partial class MEM
     {
-        private IORegister[] IORAM = new IORegister[0x400];           // 1kB IO RAM
+        public IORegister[] IORAM = new IORegister[0x400];           // 1kB IO RAM
         private UnusedRegister MasterUnusedRegster = new UnusedRegister();
 
-        private void InitRegisters()
+        public void InitRegisters()
         {
             this.DISPSTAT = new cDISPSTAT(this);
             this.VCOUNT = new cVCOUNT(this);
 
             this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(this, 0), new cDMACNT_H(this, 1), new cDMACNT_H(this, 2), new cDMACNT_H(this, 3, true) };
-
-            this.Timers[3] = new cTimer(this, 3);
-            this.Timers[2] = new cTimer(this, 2, this.Timers[3]);
-            this.Timers[1] = new cTimer(this, 1, this.Timers[2]);
-            this.Timers[0] = new cTimer(this, 0, this.Timers[1]);
 
             // LCD I/O Registers
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;
@@ -127,17 +122,17 @@ namespace GBAEmulator.CPU
             }
 
             // Timer Registers
-            this.IORAM[0x100] = this.IORAM[0x101] = this.Timers[0].Data;
-            this.IORAM[0x102] = this.IORAM[0x103] = this.Timers[0].Control;
+            this.IORAM[0x100] = this.IORAM[0x101] = this.cpu.Timers[0].Data;
+            this.IORAM[0x102] = this.IORAM[0x103] = this.cpu.Timers[0].Control;
 
-            this.IORAM[0x104] = this.IORAM[0x105] = this.Timers[1].Data;
-            this.IORAM[0x106] = this.IORAM[0x107] = this.Timers[1].Control;
+            this.IORAM[0x104] = this.IORAM[0x105] = this.cpu.Timers[1].Data;
+            this.IORAM[0x106] = this.IORAM[0x107] = this.cpu.Timers[1].Control;
 
-            this.IORAM[0x108] = this.IORAM[0x109] = this.Timers[2].Data;
-            this.IORAM[0x10a] = this.IORAM[0x10b] = this.Timers[2].Control;
+            this.IORAM[0x108] = this.IORAM[0x109] = this.cpu.Timers[2].Data;
+            this.IORAM[0x10a] = this.IORAM[0x10b] = this.cpu.Timers[2].Control;
 
-            this.IORAM[0x10c] = this.IORAM[0x10d] = this.Timers[3].Data;
-            this.IORAM[0x10e] = this.IORAM[0x10f] = this.Timers[3].Control;
+            this.IORAM[0x10c] = this.IORAM[0x10d] = this.cpu.Timers[3].Data;
+            this.IORAM[0x10e] = this.IORAM[0x10f] = this.cpu.Timers[3].Control;
             
             for (int i = 0x110; i < 0x120; i++)
             {

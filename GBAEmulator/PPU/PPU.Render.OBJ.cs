@@ -55,8 +55,8 @@ namespace GBAEmulator
         {
             this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetWindow<bool>(ref OBJWindow,
-                this.gba.cpu.WININ.WindowOBJEnable(Window.Window0), this.gba.cpu.WININ.WindowOBJEnable(Window.Window1),
-                this.gba.cpu.WINOUT.WindowOBJEnable(Window.OBJ), this.gba.cpu.WINOUT.WindowOBJEnable(Window.Outside), true);
+                this.gba.mem.WININ.WindowOBJEnable(Window.Window0), this.gba.mem.WININ.WindowOBJEnable(Window.Window1),
+                this.gba.mem.WINOUT.WindowOBJEnable(Window.OBJ), this.gba.mem.WINOUT.WindowOBJEnable(Window.Outside), true);
         }
 
         private struct OBJSize
@@ -97,21 +97,21 @@ namespace GBAEmulator
 
             OBJSize OBJsz;
 
-            this.OAM2DMap = this.gba.cpu.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping);
+            this.OAM2DMap = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping);
 
             for (ushort i = 0; i < 0x400; i += 8)  // 128 objects in OAM
             {
                 /* Fetch all data for object */
 
-                OBJ_ATTR0 = (ushort)(this.gba.cpu.OAM[i] | (this.gba.cpu.OAM[i + 1] << 8));
+                OBJ_ATTR0 = (ushort)(this.gba.mem.OAM[i] | (this.gba.mem.OAM[i + 1] << 8));
 
                 OBJMode = (byte)((OBJ_ATTR0 & 0x0300) >> 8);
 
                 if (OBJMode == 0b10)
                     continue;  // sprite hidden
 
-                OBJ_ATTR1 = (ushort)(this.gba.cpu.OAM[i + 2] | (this.gba.cpu.OAM[i + 3] << 8));
-                OBJ_ATTR2 = (ushort)(this.gba.cpu.OAM[i + 4] | (this.gba.cpu.OAM[i + 5] << 8));
+                OBJ_ATTR1 = (ushort)(this.gba.mem.OAM[i + 2] | (this.gba.mem.OAM[i + 3] << 8));
+                OBJ_ATTR2 = (ushort)(this.gba.mem.OAM[i + 4] | (this.gba.mem.OAM[i + 5] << 8));
 
                 // when OBJ is off screen, it can also be at the top
                 OBJy = (short)(OBJ_ATTR0 & 0x00ff);
@@ -196,7 +196,7 @@ namespace GBAEmulator
 
             byte dy = (byte)(scanline - OBJy);   // between 0 and OBJsz.Height (8, 16, 32, 64)
             if (Mosaic)
-                dy -= (byte)(dy % this.gba.cpu.MOSAIC.OBJMosaicVSize);
+                dy -= (byte)(dy % this.gba.mem.MOSAIC.OBJMosaicVSize);
 
             if (VFlip)
                 dy = (byte)(OBJsz.Height - dy);
@@ -233,13 +233,13 @@ namespace GBAEmulator
                     {
                         this.Render4bpp(ref this.OBJWindowMask, null, StartX, XSign,
                         (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
-                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
+                        Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize);
                     }
                     else
                     {
                         this.Render4bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign,
                             (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
-                            Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize);
+                            Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize);
 
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
@@ -268,12 +268,12 @@ namespace GBAEmulator
                     if (UseOBJWindowMask)
                     {
                         this.Render8bpp(ref this.OBJWindowMask, null, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
-                                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
+                                        Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
                     }
                     else
                     {
                         this.Render8bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
-                                        Mosaic, this.gba.cpu.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
+                                        Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
 
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
@@ -304,7 +304,7 @@ namespace GBAEmulator
                 PixelAddress += (uint)(4 * (py & 0x07));
                 PixelAddress += (uint)(0x20 * (px >> 3));
 
-                byte PaletteNibble = this.gba.cpu.VRAM[PixelAddress + ((px & 0x07) >> 1)];
+                byte PaletteNibble = this.gba.mem.VRAM[PixelAddress + ((px & 0x07) >> 1)];
                 if ((px & 1) == 1)
                     PaletteNibble >>= 4;
 
@@ -323,7 +323,7 @@ namespace GBAEmulator
                 PixelAddress += (uint)(8 * (py & 0x07));
                 PixelAddress += (uint)(0x40 * (px >> 3));
 
-                byte VRAMEntry = this.gba.cpu.VRAM[PixelAddress + (px & 0x07)];
+                byte VRAMEntry = this.gba.mem.VRAM[PixelAddress + (px & 0x07)];
                 if (VRAMEntry == 0)
                     return 0x8000;
                 
@@ -349,7 +349,7 @@ namespace GBAEmulator
             short[] RotateScaleParams = new short[4];
             for (int di = 0; di < 4; di++)
             {
-                RotateScaleParams[di] = (short)(this.gba.cpu.OAM[RotScaleIndex] | (this.gba.cpu.OAM[RotScaleIndex + 1] << 8));
+                RotateScaleParams[di] = (short)(this.gba.mem.OAM[RotScaleIndex] | (this.gba.mem.OAM[RotScaleIndex + 1] << 8));
                 RotScaleIndex += 8;
             }
 

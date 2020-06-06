@@ -9,6 +9,28 @@ namespace GBAEmulator
     These enums are used for communication between the CPU and the PPU and I was getting tired of typing
     ARM7TMID.EnumName the whole time, so I just bunched them together
          */
+
+    [Flags]
+    public enum Interrupt : ushort
+    {
+        LCDVBlank = 0x0001,
+        LCDHBlank = 0x0002,
+        LCDVCountMatch = 0x0004,
+        TimerOverflow = 0x0008,
+        // obtained by shifting:
+        //Timer1Overflow = 0x0010,
+        //Timer2Overflow = 0x0020,
+        //Timer3Overflow = 0x0040,
+        SerialCommunication = 0x0080,
+        DMA = 0x0100,
+        // obtained by shifting:
+        //DMA1 = 0x0200,
+        //DMA2 = 0x0400,
+        //DMA3 = 0x0800,
+        Keypad = 0x1000,
+        GamePak = 0x2000
+    }
+
     [Flags]
     public enum DISPCNTFlags : ushort
     {

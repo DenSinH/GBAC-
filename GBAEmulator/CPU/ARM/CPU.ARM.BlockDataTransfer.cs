@@ -61,7 +61,7 @@ namespace GBAEmulator.CPU
             {
                 if (LoadFromMemory)
                 {
-                    this.PC = this.GetWordAt(StartAddress);
+                    this.PC = this.mem.GetWordAt(StartAddress);
                     this.PipelineFlush();
                 }
                 else
@@ -69,16 +69,16 @@ namespace GBAEmulator.CPU
                     if (Up)
                     {
                         if (PreIndex)
-                            this.SetWordAt(StartAddress + 4, this.PC + 4);
+                            this.mem.SetWordAt(StartAddress + 4, this.PC + 4);
                         else
-                            this.SetWordAt(StartAddress, this.PC + 4);
+                            this.mem.SetWordAt(StartAddress, this.PC + 4);
                     }
                     else
                     {
                         if (PreIndex)
-                            this.SetWordAt(StartAddress - 0x40, this.PC + 4);
+                            this.mem.SetWordAt(StartAddress - 0x40, this.PC + 4);
                         else
-                            this.SetWordAt(StartAddress - 0x3c, this.PC + 4);
+                            this.mem.SetWordAt(StartAddress - 0x3c, this.PC + 4);
                     }
                 }
 
@@ -119,9 +119,9 @@ namespace GBAEmulator.CPU
                     if (RegisterQueue.Peek() == Rn)
                     {
                         if (PreIndex)
-                            this.SetWordAt(CurrentAddress + 4, this.Registers[Rn]);
+                            this.mem.SetWordAt(CurrentAddress + 4, this.Registers[Rn]);
                         else
-                            this.SetWordAt(CurrentAddress, this.Registers[Rn]);
+                            this.mem.SetWordAt(CurrentAddress, this.Registers[Rn]);
                         CurrentAddress += 4;
                         OriginalAddress = (uint)(OriginalAddress + (Up? 4 : -4));  // for writeback
                         RegisterQueue.Dequeue();
@@ -148,12 +148,12 @@ namespace GBAEmulator.CPU
 
                     if (LoadFromMemory)
                     {
-                        this.Registers[Register] = this.GetWordAt(CurrentAddress);
+                        this.Registers[Register] = this.mem.GetWordAt(CurrentAddress);
                         this.Log(string.Format("{0:x8} -> R{1} from {2:x8}", this.Registers[Register], Register, CurrentAddress));
                     }
                     else
                     {
-                        this.SetWordAt(CurrentAddress, this.Registers[Register]);
+                        this.mem.SetWordAt(CurrentAddress, this.Registers[Register]);
                         this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[Register], CurrentAddress, Register));
                     }
 
@@ -172,7 +172,7 @@ namespace GBAEmulator.CPU
                     }
                     else
                         // PC is 8 ahead, while it should be 12
-                        this.SetWordAt(CurrentAddress - (uint)((!PreIndex) ? 4 : 0), this.Registers[15] + 4);
+                        this.mem.SetWordAt(CurrentAddress - (uint)((!PreIndex) ? 4 : 0), this.Registers[15] + 4);
                 }
                     
             }

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace GBAEmulator.CPU
+namespace GBAEmulator.Memory
 {
-    partial class ARM7TDMI
+    partial class MEM
     {
         // ========================================================================================================
         //                                                 Flash

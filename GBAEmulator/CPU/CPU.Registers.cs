@@ -136,10 +136,10 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private uint PC  // same for ARM and THUMB
+        public uint PC  // same for ARM and THUMB
         {
             get => Registers[15];
-            set => Registers[15] = value;
+            private set => Registers[15] = value;
         }
 
         /* THUMB state */

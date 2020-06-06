@@ -134,12 +134,11 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.D)
             {
-                Console.WriteLine(this.gba.cpu.DISPSTAT.Get().ToString("x4"));
+                Console.WriteLine(this.gba.mem.DISPSTAT.Get().ToString("x4"));
             }
             else if (e.KeyCode == Keys.F1)
             {
-                ushort ToFind = ushort.Parse(Console.ReadLine());
-                this.gba.cpu.FindValueInRAM(ToFind);
+
             }
             else if (e.KeyCode == Keys.F3)
             {
@@ -232,17 +231,17 @@ namespace GBAEmulator
                 {
                     // freeze GBA for a quick second to prevent the dump from changing while we are dumping it
                     this.gba.Pause = true;
-                    this.gba.cpu.DumpBackup();
-                    this.gba.cpu.BackupChanged = false;
+                    this.gba.mem.DumpBackup();
+                    this.gba.mem.BackupChanged = false;
                     this.gba.Pause = false;
                 }
             }
-            else if (this.gba.cpu.BackupChanged)
+            else if (this.gba.mem.BackupChanged)
             {
                 this.FramesUntilSaveDump = SAVE_DELAY;
             }
             
-            this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.ROMName, (1000 * this.gba.ppu.frame / (ulong)this.FPSTimer.ElapsedMilliseconds));
+            this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.mem.ROMName, (1000 * this.gba.ppu.frame / (ulong)this.FPSTimer.ElapsedMilliseconds));
 
             if (this.FPSTimer.ElapsedMilliseconds > 2000)
             {
