@@ -54,8 +54,9 @@ namespace GBAEmulator
         private void ResetOBJWindow()
         {
             this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
-            this.ResetWindow<bool>(ref OBJWindow, this.gba.cpu.WININ.WindowOBJEnable(0), this.gba.cpu.WININ.WindowOBJEnable(1),
-                this.gba.cpu.WINOUT.WindowOBJEnable(1), this.gba.cpu.WINOUT.WindowOBJEnable(0), true);
+            this.ResetWindow<bool>(ref OBJWindow,
+                this.gba.cpu.WININ.WindowOBJEnable(Window.Window0), this.gba.cpu.WININ.WindowOBJEnable(Window.Window1),
+                this.gba.cpu.WINOUT.WindowOBJEnable(Window.OBJ), this.gba.cpu.WINOUT.WindowOBJEnable(Window.Outside), true);
         }
 
         private struct OBJSize

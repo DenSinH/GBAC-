@@ -47,6 +47,16 @@ namespace GBAEmulator
         HBlank = 2,
         Special = 3
     }
+
+    public enum Window : byte
+    {
+        // WININ:
+        Window0 = 0,
+        Window1 = 1,
+        // WINOUT:
+        Outside = 0,
+        OBJ = 1
+    }
     
     public enum BlendMode : ushort
     {

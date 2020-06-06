@@ -35,8 +35,9 @@ namespace GBAEmulator
         {
             foreach (byte BG in BGs)
             {
-                this.ResetWindow<bool>(ref BGWindows[BG], this.gba.cpu.WININ.WindowBGEnable(0, BG), this.gba.cpu.WININ.WindowBGEnable(1, BG),
-                    this.gba.cpu.WINOUT.WindowBGEnable(1, BG), this.gba.cpu.WINOUT.WindowBGEnable(0, BG), true);
+                this.ResetWindow<bool>(ref BGWindows[BG],
+                    this.gba.cpu.WININ.WindowBGEnable(Window.Window0, BG), this.gba.cpu.WININ.WindowBGEnable(Window.Window1, BG),
+                    this.gba.cpu.WINOUT.WindowBGEnable(Window.OBJ, BG), this.gba.cpu.WINOUT.WindowBGEnable(Window.Outside, BG), true);
             }
         }
 

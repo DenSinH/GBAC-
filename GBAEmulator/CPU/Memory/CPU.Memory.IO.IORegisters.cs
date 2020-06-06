@@ -350,25 +350,25 @@ namespace GBAEmulator.CPU
 
         public class cWindowControl : IORegister2
         {
-            public bool WindowBGEnable(byte Window, byte BG)
+            public bool WindowBGEnable(Window window, byte BG)
             {
-                if (Window == 0)
+                if ((byte)window == 0)
                     return (this._raw & (0x0001 << BG)) > 0;
                 else
                     return (this._raw & (0x0100 << BG)) > 0;
             }
 
-            public bool WindowOBJEnable(byte Window)
+            public bool WindowOBJEnable(Window window)
             {
-                if (Window == 0)
+                if ((byte)window == 0)
                     return (this._raw & 0x0010) > 0;
                 else
                     return (this._raw & 0x1000) > 0;
             }
 
-            public bool WindowSpecialEffects(byte Window)
+            public bool WindowSpecialEffects(Window window)
             {
-                if (Window == 0)
+                if ((byte)window == 0)
                     return (this._raw & 0x0020) > 0;
                 else
                     return (this._raw & 0x2000) > 0;

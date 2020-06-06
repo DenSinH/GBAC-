@@ -12,14 +12,12 @@ namespace GBAEmulator
         public void ResetWindowBlendMode()
         {
             BlendMode AlphaBlending = this.gba.cpu.BLDCNT.BlendMode;
-            FillWindow<BlendMode>(ref WindowBlendMode, AlphaBlending);
-
             BlendMode Win0In, Win1In, OBJWinIn, WinOut;
 
-            Win0In = this.gba.cpu.WININ.WindowSpecialEffects(0) ? AlphaBlending : BlendMode.Off;
-            Win1In = this.gba.cpu.WININ.WindowSpecialEffects(1) ? AlphaBlending : BlendMode.Off;
-            OBJWinIn = this.gba.cpu.WINOUT.WindowSpecialEffects(0) ? AlphaBlending : BlendMode.Off;
-            WinOut = this.gba.cpu.WINOUT.WindowSpecialEffects(1) ? AlphaBlending : BlendMode.Off;
+            Win0In = this.gba.cpu.WININ.WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
+            Win1In = this.gba.cpu.WININ.WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
+            OBJWinIn = this.gba.cpu.WINOUT.WindowSpecialEffects(Window.OBJ)   ? AlphaBlending : BlendMode.Off;
+            WinOut = this.gba.cpu.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
 
             this.ResetWindow<BlendMode>(ref WindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
 
@@ -94,7 +92,7 @@ namespace GBAEmulator
                 return;
             }
 
-            FillWindow(ref Window, WinOut);  // clear to WINOUT
+            FillWindow<T>(ref Window, WinOut);  // clear to WINOUT
 
             byte X1, X2, Y1, Y2;
 
