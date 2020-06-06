@@ -222,7 +222,7 @@ namespace GBAEmulator
         {
             Draw();
             
-            this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.RomName, (1000 * this.gba.ppu.frame / (ulong)this.FPSTimer.ElapsedMilliseconds));
+            this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.ROMName, (1000 * this.gba.ppu.frame / (ulong)this.FPSTimer.ElapsedMilliseconds));
 
             if (this.FPSTimer.ElapsedMilliseconds > 2000)
             {

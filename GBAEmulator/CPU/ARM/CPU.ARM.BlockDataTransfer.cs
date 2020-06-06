@@ -89,7 +89,7 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                Queue<byte> RegisterQueue = new Queue<byte>(16);  // at most 16 registers to store
+                sRegisterList RegisterQueue = new sRegisterList(16);  // at most 16 registers to store
                 for (byte i = 0; i < 16; i++)
                 {
                     if ((RegisterList & (1 << i)) > 0)

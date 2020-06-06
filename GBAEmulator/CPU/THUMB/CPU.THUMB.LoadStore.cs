@@ -352,7 +352,7 @@ namespace GBAEmulator.CPU
             {
                 // Writeback with Rb included in Rlist:
                 // Store OLD base if Rb is FIRST entry in Rlist, otherwise store NEW base (STM/ARMv4)
-                Queue<byte> RegisterQueue = new Queue<byte>(8);
+                sRegisterList RegisterQueue = new sRegisterList(8);
                 for (byte i = 0; i < 8; i++)
                 {
                     if ((RList & (1 << i)) > 0)

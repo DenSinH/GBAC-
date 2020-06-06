@@ -5,6 +5,10 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        /*
+         Contains some useful methods used in different places in the CPU implementation
+        */
+
         public enum State : byte
         {
             ARM = 0,
@@ -22,8 +26,46 @@ namespace GBAEmulator.CPU
             System = 0b11111
         }
 
+        private struct sRegisterList  // used in Block Data Transfer / Push, Pop instructions
+        {
+            // made to be very similar to a Queue<byte>
+            // this is because that is what I initially used to perform this task
+            // however, after implementing my own very short queue for the pipeline,
+            // I realized that this may be faster
+
+            // After all, we only enqueue and dequeue the full thing once, and it is
+            // only a short lived thing
+
+            private byte[] Registers;
+            public int Count { get; private set; }
+            private int Offset;
+
+            public sRegisterList(int MaxRegisters)
+            {
+                this.Registers = new byte[MaxRegisters];
+                this.Count = 0;
+                this.Offset = 0;
+            }
+
+            public void Enqueue(byte value)
+            {
+                this.Registers[Offset + Count++] = value;
+            }
+
+            public byte Dequeue()
+            {
+                Count--;
+                return this.Registers[Offset++];
+            }
+
+            public byte Peek()
+            {
+                return this.Registers[Offset];
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool Condition(byte field)
+        private bool Condition(byte field)  // used in ARM methods (always) and in some THUMB methods
         {
             switch (field)
             {
@@ -62,6 +104,7 @@ namespace GBAEmulator.CPU
             }
         }
 
+        // Used in most arithmetic instructions
         private uint ShiftOperand(uint Op, bool Special0Cases, byte ShiftType, byte ShiftAmount, bool SetConditions)
         {
             // Special cases for 0 shift
@@ -161,6 +204,7 @@ namespace GBAEmulator.CPU
             return Op;
         }
 
+        // used in most arithmetic instructions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetCVAdd(ulong Op1, ulong Op2, uint Result)
         {

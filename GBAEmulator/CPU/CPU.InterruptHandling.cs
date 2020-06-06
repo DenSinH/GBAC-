@@ -4,6 +4,16 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        // Vector pointers for handlers
+        const uint ResetVector = 0x0;
+        const uint UndefVector = 0x4;           // unused
+        const uint SWIVector = 0x8;
+        const uint AbortPrefetchVector = 0xc;   // unused
+        const uint AbortDataVector = 0x10;      // unused
+        const uint ReservedVector = 0x14;       // unused
+        const uint IRQVector = 0x18;
+        const uint FIQVector = 0x1c;            // unused
+
         [Flags]
         public enum Interrupt : ushort
         {

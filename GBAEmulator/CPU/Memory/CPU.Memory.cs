@@ -6,9 +6,10 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        [Conditional("DEBUG")]
+        // [Conditional("DEBUG")]
         private void MemoryAccess(uint Address)
         {
+            if (Address >= 0x0e00_0000) Console.WriteLine("Memory Access: " + Address.ToString("x8"));
             // Console.WriteLine("Memory Access: " + Address.ToString("x8"));
         }
 
@@ -20,7 +21,7 @@ namespace GBAEmulator.CPU
         public byte[] VRAM = new byte[0x18000];        // 96kB VRAM
         public byte[] OAM = new byte[0x400];           // 1kB OAM
         private byte[] GamePak = new byte[0x200_0000];   // Game Pak (up to) 32MB (0x0800_0000 - 0x0a00_0000, then mirrored)
-        private byte[] GamePakSRAM = new byte[0x10000]; // Game Pak Flash ROM (for saving game data)
+        // Backup Region
 
         private readonly byte[][] __MemoryRegions__;  // Lookup table for memory regions for instant access (instead of switch statement)
         private readonly uint[] __MemoryMasks__ = new uint[16]  // mirrored twice
@@ -112,7 +113,8 @@ namespace GBAEmulator.CPU
                     return ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);  // seems to be what mGBA is doing...
                 case 14:
                 case 15:  // SRAM
-                    return (uint)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8) | (this.GamePakSRAM[address & 0xffff] << 16) | (this.GamePakSRAM[address & 0xffff] << 24));
+                    byte value = this.BackupRead(address & 0xffff);
+                    return (uint)(value | (value << 8) | (value << 16) | (value << 24));
                 default:
                     return this.Pipeline.Peek();
             }
@@ -174,7 +176,7 @@ namespace GBAEmulator.CPU
                      * being set to LSB of (source_data ROR (address*8)).
                      */
                     byte RORValue = (byte)this.ROR(value, (byte)(8 * (address & 3)));
-                    this.GamePakSRAM[address & 0xffff] = RORValue;
+                    this.BackupWrite(address & 0xffff, RORValue);
                     return;
                 default:
                     return;
@@ -232,7 +234,8 @@ namespace GBAEmulator.CPU
                     return (ushort)((address >> 1) & 0xffff);
                 case 14:
                 case 15:  // SRAM
-                    return (ushort)(this.GamePakSRAM[address & 0xffff] | (this.GamePakSRAM[address & 0xffff] << 8));
+                    byte value = this.BackupRead(address & 0xffff);
+                    return (ushort)(value | (value << 8));
                 default:
                     return (ushort)this.Pipeline.Peek();
             }
@@ -294,7 +297,7 @@ namespace GBAEmulator.CPU
                      * being set to LSB of (source_data ROR (address*8)).
                      */
                     byte RORValue = (byte)this.ROR(value, (byte)(8 * (address & 3)));
-                    this.GamePakSRAM[address & 0xffff] = RORValue;
+                    this.BackupWrite(address & 0xffff, RORValue);
                     return;
                 default:
                     return;
@@ -311,15 +314,6 @@ namespace GBAEmulator.CPU
             {
                 this.NCycle = __ByteAccessCycles__[Section];
                 this.SCycle = __ByteAccessCycles__[Section];
-            }
-
-            if (address == 0x0E000000)
-            {
-                return 0x62; // Stubbing flash
-            }
-            else if (address == 0x0E000001)
-            {
-                return 0x13; // Stubbing flash
             }
 
             switch (Section)
@@ -361,7 +355,7 @@ namespace GBAEmulator.CPU
                     return (byte)((address >> 1) & 0xff);
                 case 14:
                 case 15:  // SRAM
-                    return this.GamePakSRAM[address & 0xffff];  // SRAM byte reads are just normal
+                    return this.BackupRead(address & 0xffff);
                 default:
                     return (byte)this.Pipeline.Peek();
             }
@@ -446,7 +440,7 @@ namespace GBAEmulator.CPU
                     return;
                 case 14:
                 case 15:  // SRAM
-                    this.GamePakSRAM[address & 0xffff] = value;  // SRAM byte writes are just normal
+                    this.BackupWrite(address & 0xffff, value);
                     return;
                 default:
                     return;

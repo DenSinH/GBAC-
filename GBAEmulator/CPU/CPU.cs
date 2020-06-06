@@ -57,30 +57,7 @@ namespace GBAEmulator.CPU
 
         int SCycle = 1;
         int NCycle = 1;
-        const byte ICycle = 1;
-
-        public string RomName { get; private set; }
-        private uint ROMSize;
-        public void LoadRom(string FileName)
-        {
-            FileStream fs = File.OpenRead(FileName);
-            int current = fs.ReadByte();
-            uint i = 0;
-
-            while (current != -1)
-            {
-                this.GamePak[i++] = (byte)current;
-                current = fs.ReadByte();
-            }
-            ROMSize = i;
-            this.Log(string.Format("{0:x8} Bytes loaded (hex)", i));
-
-            while (i < 0x0200_0000)  // unused bits in ROM
-            {
-                this.GamePak[i] = (byte)(i++ >> 1);
-            }
-            this.RomName = Path.GetFileName(FileName);
-        }
+        const int ICycle = 1;
 
         private void PipelineFlush()
         {
@@ -129,8 +106,7 @@ namespace GBAEmulator.CPU
                     }
                     else
                     {
-                        StepCycles = 0;
-                        // throw new Exception("Pipeline empty!");
+                        StepCycles = 0;  // cycles already accounted for
                     }
                 }
                 else
@@ -144,8 +120,7 @@ namespace GBAEmulator.CPU
                     }
                     else
                     {
-                        StepCycles = 0;
-                        // throw new Exception("Pipeline empty!");
+                        StepCycles = 0;  // cycles already accounted for
                     }
                 }
             }

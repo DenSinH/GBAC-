@@ -53,7 +53,7 @@ namespace GBAEmulator.CPU
                 int Cycles;
 
                 // Reverse pushing, like in ARM block data transfer instruction.
-                Queue<byte> RegisterQueue = new Queue<byte>(9);
+                sRegisterList RegisterQueue = new sRegisterList(9);
                 for (byte i = 0; i < 8; i++)
                 {
                     if ((RList & (1 << i)) > 0)
