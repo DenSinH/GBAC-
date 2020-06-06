@@ -92,6 +92,7 @@
     <Compile Include="CPU\ARM\CPU.ARM.Branch.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.cs" />
     <Compile Include="CPU\Memory\CPU.Memory.cs" />
+    <Compile Include="CPU\Memory\CPU.Memory.EEPROM.cs" />
     <Compile Include="CPU\Memory\CPU.Memory.IO.cs" />
     <Compile Include="CPU\Memory\CPU.Memory.IO.IORegisters.base.cs" />
     <Compile Include="CPU\Memory\CPU.Memory.IO.IORegisters.cs" />

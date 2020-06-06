@@ -92,6 +92,23 @@ namespace GBAEmulator.CPU
                 case 12:
                 case 13:  // GamePak
                     uint _address = address & 0x01ff_ffff;
+
+                    /*
+                     the eeprom can be then addressed at DFFFF00h..DFFFFFFh.
+                    Respectively, with eeprom, ROM is restricted to 8000000h-9FFFeFFh (max. 1FFFF00h bytes = 32MB minus 256 bytes).
+                    On carts with 16MB or smaller ROM, eeprom can be alternately accessed anywhere at D000000h-DFFFFFFh.
+                    (Tonc)
+                     */
+                    if (this.ROMBackupType == Backup.EEPROM)
+                    {
+                        if ((_address > 0x00ff_feff) ||
+                            (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
+                        {
+                            // EEPROM access
+                            return 0;
+                        }
+                    }
+
                     if (_address < ROMSize)
                     {
                         return __GetWordAt__(this.GamePak, _address);
@@ -121,7 +138,7 @@ namespace GBAEmulator.CPU
             {
                 case 0:
                 case 1:
-                    this.Error($"BIOS Word Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    // this.Error($"BIOS Word Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 2:
                     __SetWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
@@ -153,7 +170,19 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    this.Error($"ROM Word Write Attempted at PC = {this.PC.ToString("x8")}");
+                    uint _address = address & 0x00ff_ffff;
+                    // See GetWordAt for info on EEPROM
+                    if (this.ROMBackupType == Backup.EEPROM)
+                    {
+                        if ((_address > 0x00ff_feff) ||
+                            (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
+                        {
+                            // EEPROM access
+                            return;
+                        }
+                    }
+
+                    this.Error($"ROM Word Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM
@@ -211,7 +240,19 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    uint _address = address & 0x01ff_ffff;
+                    uint _address = address & 0x00ff_ffff;
+
+                    // See GetWordAt for info on EEPROM
+                    if (this.ROMBackupType == Backup.EEPROM)
+                    {
+                        if ((_address > 0x00ff_feff) ||
+                            (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
+                        {
+                            // EEPROM access
+                            return 0;
+                        }
+                    }
+
                     if (_address < ROMSize)
                     {
                         return __GetHalfWordAt__(this.GamePak, _address);
@@ -242,7 +283,7 @@ namespace GBAEmulator.CPU
             {
                 case 0:
                 case 1:
-                    this.Error($"BIOS Halfword Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    // this.Error($"BIOS Halfword Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 2:
                     __SetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
@@ -274,7 +315,20 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    this.Error($"ROM Halfword Write Attempted at PC = {this.PC.ToString("x8")}");
+                    uint _address = address & 0x00ff_ffff;
+
+                    // See GetWordAt for info on EEPROM
+                    if (this.ROMBackupType == Backup.EEPROM)
+                    {
+                        if ((_address > 0x00ff_feff) ||
+                            (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
+                        {
+                            // EEPROM access
+                            return;
+                        }
+                    }
+
+                    this.Error($"ROM Halfword Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM
@@ -332,12 +386,24 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    address &= 0x01ff_ffff;
-                    if (address < ROMSize)
+                    uint _address = address & 0x00ff_ffff;
+
+                    // See GetWordAt for info on EEPROM
+                    if (this.ROMBackupType == Backup.EEPROM)
                     {
-                        return this.GamePak[address];
+                        if ((_address > 0x00ff_feff) ||
+                            (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
+                        {
+                            // EEPROM access
+                            return 0;
+                        }
                     }
-                    return (byte)((address >> 1) & 0xff);
+
+                    if (_address < ROMSize)
+                    {
+                        return this.GamePak[_address];
+                    }
+                    return (byte)((_address >> 1) & 0xff);
                 case 14:
                 case 15:  // SRAM
                     return this.BackupRead(address & 0xffff);
@@ -361,7 +427,7 @@ namespace GBAEmulator.CPU
             {
                 case 0:
                 case 1:
-                    this.Error($"BIOS Byte Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    // this.Error($"BIOS Byte Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 2:
                     this.eWRAM[address & __MemoryMasks__[Section]] = value;
@@ -421,7 +487,20 @@ namespace GBAEmulator.CPU
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    this.Error($"ROM Byte Write Attempted at PC = {this.PC.ToString("x8")}");
+                    uint _address = address & 0x00ff_ffff;
+
+                    // See GetWordAt for info on EEPROM
+                    if (this.ROMBackupType == Backup.EEPROM)
+                    {
+                        if ((_address > 0x00ff_feff) ||
+                            (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
+                        {
+                            // EEPROM access
+                            return;
+                        }
+                    }
+
+                    this.Error($"ROM Byte Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
                     return;
                 case 14:
                 case 15:  // SRAM

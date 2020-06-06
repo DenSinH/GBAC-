@@ -103,7 +103,7 @@ namespace GBAEmulator
 
         public void Run()
         {
-            cpu.LoadRom("../../roms/PokemonPinball.gba");
+            cpu.LoadRom("../../roms/ZeldaMinishCap.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
             // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");
@@ -113,7 +113,7 @@ namespace GBAEmulator
             // cpu.LoadRom("../../Tests/EndriftSuite.gba");
             
             // this.cpu.UseNormattsBios();
-            cpu.SkipBios();
+            // cpu.SkipBios();
 
             while (!this.ShutDown)
             {
