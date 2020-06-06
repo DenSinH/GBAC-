@@ -6,10 +6,9 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        // [Conditional("DEBUG")]
+        [Conditional("DEBUG")]
         private void MemoryAccess(uint Address)
         {
-            if (Address >= 0x0e00_0000) Console.WriteLine("Memory Access: " + Address.ToString("x8"));
             // Console.WriteLine("Memory Access: " + Address.ToString("x8"));
         }
 
@@ -43,19 +42,6 @@ namespace GBAEmulator.CPU
             1, 1, 6, 1, 1, 2, 2, 1,
             8, 8, 8, 8, 8, 8, 8, 8
         };
-
-        enum MemorySection : byte
-        {
-            BIOS = 0,
-            // BIOS Mirror
-            eWRAM = 2,
-            iWRAM = 3,
-            IORAM = 4,
-            PaletteRAM = 5,
-            VRAM = 6,
-            OAM = 7
-            // otherwise GamePak
-        }
 
         /*
          todo:
@@ -307,7 +293,6 @@ namespace GBAEmulator.CPU
         private byte GetByteAt(uint address)
         {
             this.MemoryAccess(address);
-            if (address >= 0x0e00_1004) return 0xff;
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)

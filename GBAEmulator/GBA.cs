@@ -13,6 +13,7 @@ namespace GBAEmulator
         public ushort[] display;
 
         public bool ShutDown;
+        public bool Pause;
 
         public GBA(ushort[] display)
         {
@@ -116,7 +117,7 @@ namespace GBAEmulator
 
             while (!this.ShutDown)
             {
-                this.RunLine();
+                if (!this.Pause) this.RunLine();
             }
         }
     }

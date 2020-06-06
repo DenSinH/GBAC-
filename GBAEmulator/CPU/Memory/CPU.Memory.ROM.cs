@@ -5,6 +5,8 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        const string SAVE_EXTENSION = ".gbac";
+
         private enum Backup
         {
             EEPROM, 
@@ -15,6 +17,7 @@ namespace GBAEmulator.CPU
         }
 
         public string ROMName { get; private set; }
+        private string ROMPath;
         private Backup ROMBackupType;
         private uint ROMSize;
 
@@ -37,9 +40,16 @@ namespace GBAEmulator.CPU
 
         public void LoadRom(string FileName)
         {
+            // Initialize save data
             this.ROMBackupType = this.GetBackupType(FileName);
             this.InitBackup();
+            
+            if (File.Exists(Path.ChangeExtension(FileName, SAVE_EXTENSION)))
+            {
+                this.LoadBackup(Path.ChangeExtension(FileName, SAVE_EXTENSION));
+            }
 
+            // Load actual ROM
             FileStream fs = File.OpenRead(FileName);
             int current = fs.ReadByte();
             uint i = 0;
@@ -50,12 +60,9 @@ namespace GBAEmulator.CPU
                 current = fs.ReadByte();
             }
             ROMSize = i;
-            this.Log(string.Format("{0:x8} Bytes loaded (hex)", i));
+            this.Log(string.Format("{0:x8} Bytes loaded (hex)", ROMSize));
 
-            while (i < 0x0200_0000)  // unused bits in ROM
-            {
-                this.GamePak[i] = (byte)(i++ >> 1);
-            }
+            this.ROMPath = FileName;
             this.ROMName = Path.GetFileName(FileName);
         }
     }

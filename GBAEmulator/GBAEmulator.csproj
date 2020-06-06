@@ -86,6 +86,7 @@
     <Compile Include="CPU\CPU.SWI.cs" />
     <Compile Include="CPU\CPU.Aux.cs" />
     <Compile Include="CPU\Memory\CPU.Memory.Backup.cs" />
+    <Compile Include="CPU\Memory\CPU.Memory.Backup.Flash.cs" />
     <Compile Include="CPU\Memory\CPU.Memory.BIOS.cs" />
     <Compile Include="CPU\CPU.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.Branch.cs" />

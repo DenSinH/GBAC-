@@ -21,6 +21,9 @@ namespace GBAEmulator
         private const double scale = 2;
 
         private readonly Stopwatch FPSTimer;
+        private int FramesUntilSaveDump = 0;
+        const int SAVE_DELAY = 10;
+
         public TickDelegate Tick;
         private const byte interval = 17; // ms
 
@@ -38,7 +41,7 @@ namespace GBAEmulator
             this.ClientSize = new Size((int)(scale * width), (int)(scale * height) + MenuStripHeight);
 
             this.gba = gba;
-            this.Tick = new TickDelegate(TickMethod);
+            this.Tick = new TickDelegate(TickDisplay);
             this.DebugScreen = new Debug(gba);
             this._display = new ushort[width * height];
 
@@ -218,9 +221,26 @@ namespace GBAEmulator
 
         public delegate void TickDelegate();
 
-        public void TickMethod()
+        public void TickDisplay()
         {
             Draw();
+
+            if (this.FramesUntilSaveDump > 0)
+            {
+                this.FramesUntilSaveDump--;
+                if (this.FramesUntilSaveDump == 0)
+                {
+                    // freeze GBA for a quick second to prevent the dump from changing while we are dumping it
+                    this.gba.Pause = true;
+                    this.gba.cpu.DumpBackup();
+                    this.gba.cpu.BackupChanged = false;
+                    this.gba.Pause = false;
+                }
+            }
+            else if (this.gba.cpu.BackupChanged)
+            {
+                this.FramesUntilSaveDump = SAVE_DELAY;
+            }
             
             this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>", this.gba.cpu.ROMName, (1000 * this.gba.ppu.frame / (ulong)this.FPSTimer.ElapsedMilliseconds));
 
