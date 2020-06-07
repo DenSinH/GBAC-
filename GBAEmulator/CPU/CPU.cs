@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using GBAEmulator.Memory;
+using GBAEmulator.Bus;
 
 
 namespace GBAEmulator.CPU
@@ -16,8 +17,9 @@ namespace GBAEmulator.CPU
         */
         public State state { get; private set; }
         public readonly cPipeline Pipeline;
-        GBA gba;
+        private GBA gba;
         public MEM mem;
+        public BUS bus;
         
         public int SCycle = 1;
         public int NCycle = 1;
@@ -32,7 +34,8 @@ namespace GBAEmulator.CPU
             this.InitTHUMB();
             this.InitTimers();
 
-            // cpu is required to be initialized before memory is
+            // cpu AND bus are required to be initialized before memory is
+            this.bus = new BUS(this);
             this.mem = new MEM(this);
 
             this.SystemBank = new uint[16];

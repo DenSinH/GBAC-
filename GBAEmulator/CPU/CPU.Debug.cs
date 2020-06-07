@@ -82,18 +82,6 @@ namespace GBAEmulator.CPU
         public TimerInfo GetTimerInfo(int index)
         {
             return new TimerInfo(this.Timers[index]);
-        } 
-
-        public bool DMAActive
-        {
-            get
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    if (this.mem.DMACNT_H[i].Active) return true;
-                }
-                return false;
-            }
         }
 
         public DMAInfo GetDMAInfo(int index)

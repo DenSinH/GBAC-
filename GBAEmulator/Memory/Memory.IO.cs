@@ -15,7 +15,7 @@ namespace GBAEmulator.Memory
 
             this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(this, 0), new cDMACNT_H(this, 1), new cDMACNT_H(this, 2), new cDMACNT_H(this, 3, true) };
 
-            this.MasterUnusedRegister = new UnusedRegister(this.cpu);
+            this.MasterUnusedRegister = new UnusedRegister(this.bus);
 
             // LCD I/O Registers
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;

@@ -2,6 +2,7 @@
 
 using GBAEmulator.CPU;
 using GBAEmulator.Memory;
+using GBAEmulator.Bus;
 
 namespace GBAEmulator
 {
@@ -10,6 +11,7 @@ namespace GBAEmulator
         public ARM7TDMI cpu;
         public PPU ppu;
         public MEM mem;
+        public BUS bus;
 
         public Visual vis;
         public ushort[] display;
@@ -22,6 +24,7 @@ namespace GBAEmulator
             this.cpu = new ARM7TDMI(this);
             this.ppu = new PPU(this, display);
             this.mem = this.cpu.mem;
+            this.bus = this.cpu.bus;
 
             this.display = display;
         }

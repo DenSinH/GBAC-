@@ -73,6 +73,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bus\Bus.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.BlockDataTransfer.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.DataProcessing.cs" />
     <Compile Include="CPU\ARM\CPU.ARM.DataTransfer.cs" />

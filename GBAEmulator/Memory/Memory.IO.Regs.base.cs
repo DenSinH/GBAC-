@@ -1,6 +1,6 @@
 ﻿using System;
 
-using GBAEmulator.CPU;
+using GBAEmulator.Bus;
 
 namespace GBAEmulator.Memory
 {
@@ -61,11 +61,11 @@ namespace GBAEmulator.Memory
 
         public class UnusedRegisterHalf : IORegister2
         {
-            private ARM7TDMI cpu;
+            private BUS bus;
             private bool upper;
-            public UnusedRegisterHalf(ARM7TDMI cpu, bool upper)
+            public UnusedRegisterHalf(BUS bus, bool upper)
             {
-                this.cpu = cpu;
+                this.bus = bus;
                 this.upper = upper;
             }
 
@@ -73,9 +73,9 @@ namespace GBAEmulator.Memory
             {
                 if (upper)
                 {
-                    return (ushort)(this.cpu.Pipeline.OpenBus() >> 16);
+                    return (ushort)(this.bus.OpenBus() >> 16);
                 }
-                return (ushort)this.cpu.Pipeline.OpenBus();
+                return (ushort)this.bus.OpenBus();
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
@@ -86,10 +86,10 @@ namespace GBAEmulator.Memory
 
         private class UnusedRegister : IORegister4<UnusedRegisterHalf>
         {
-            public UnusedRegister(ARM7TDMI cpu)
+            public UnusedRegister(BUS bus)
             {
-                this.lower = new UnusedRegisterHalf(cpu, false);
-                this.upper = new UnusedRegisterHalf(cpu, true);
+                this.lower = new UnusedRegisterHalf(bus, false);
+                this.upper = new UnusedRegisterHalf(bus, true);
             }
         }
     }

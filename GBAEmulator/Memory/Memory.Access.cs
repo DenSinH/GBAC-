@@ -43,16 +43,16 @@ namespace GBAEmulator.Memory
                         }
                         return __GetWordAt__(this.BIOS, (uint)this.CurrentBIOSReadState);
                     }
-                    return this.cpu.Pipeline.OpenBus();
+                    return this.bus.OpenBus();
                 case 1:
-                    return this.cpu.Pipeline.OpenBus();
+                    return this.bus.OpenBus();
                 case 2:
                     return __GetWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
                     return __GetWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4:   // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return this.IOGetWordAt(address & 0x3ff);
-                    return this.cpu.Pipeline.OpenBus();
+                    return this.bus.OpenBus();
                 case 5:
                     return __GetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -98,7 +98,7 @@ namespace GBAEmulator.Memory
                     byte value = this.BackupRead(address & 0xffff);
                     return (uint)(value | (value << 8) | (value << 16) | (value << 24));
                 default:
-                    return this.cpu.Pipeline.OpenBus();
+                    return this.bus.OpenBus();
             }
         }
 
@@ -201,16 +201,16 @@ namespace GBAEmulator.Memory
                         }
                         return __GetHalfWordAt__(this.BIOS, (uint)this.CurrentBIOSReadState);
                     }
-                    return (ushort)this.cpu.Pipeline.OpenBus();
+                    return (ushort)this.bus.OpenBus();
                 case 1:
-                    return (ushort)this.cpu.Pipeline.OpenBus();
+                    return (ushort)this.bus.OpenBus();
                 case 2:
                     return __GetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
                     return __GetHalfWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4: // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return this.IOGetHalfWordAt(address & 0x3ff);
-                    return (ushort)this.cpu.Pipeline.OpenBus();
+                    return (ushort)this.bus.OpenBus();
                 case 5:
                     return __GetHalfWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -252,7 +252,7 @@ namespace GBAEmulator.Memory
                     byte value = this.BackupRead(address & 0xffff);
                     return (ushort)(value | (value << 8));
                 default:
-                    return (ushort)this.cpu.Pipeline.OpenBus();
+                    return (ushort)this.bus.OpenBus();
             }
         }
 
@@ -356,16 +356,16 @@ namespace GBAEmulator.Memory
                         }
                         return this.BIOS[(uint)this.CurrentBIOSReadState];
                     }
-                    return (byte)this.cpu.Pipeline.OpenBus();
+                    return (byte)this.bus.OpenBus();
                 case 1:
-                    return (byte)this.cpu.Pipeline.OpenBus();
+                    return (byte)this.bus.OpenBus();
                 case 2:
                     return this.eWRAM[address & __MemoryMasks__[Section]];
                 case 3:
                     return this.iWRAM[address & __MemoryMasks__[Section]];
                 case 4: // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return (byte)this.IOGetByteAt(address & 0x3ff);
-                    return (byte)this.cpu.Pipeline.OpenBus();
+                    return (byte)this.bus.OpenBus();
                 case 5:
                     return this.PaletteRAM[address & __MemoryMasks__[Section]];
                 case 6:  // VRAM Mirrors
@@ -405,7 +405,7 @@ namespace GBAEmulator.Memory
                 case 15:  // SRAM
                     return this.BackupRead(address & 0xffff);
                 default:
-                    return (byte)this.cpu.Pipeline.OpenBus();
+                    return (byte)this.bus.OpenBus();
             }
         }
 

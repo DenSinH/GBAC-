@@ -1,6 +1,7 @@
 ﻿using System;
 
 using GBAEmulator.CPU;
+using GBAEmulator.Bus;
 
 namespace GBAEmulator.Memory
 {
@@ -40,10 +41,12 @@ namespace GBAEmulator.Memory
 
         public BIOSReadState CurrentBIOSReadState = BIOSReadState.StartUp;
         private ARM7TDMI cpu;
+        private BUS bus;
 
         public MEM(ARM7TDMI cpu)
         {
             this.cpu = cpu;
+            this.bus = cpu.bus;
             
             this.InitBIOS();
             this.InitRegisters();

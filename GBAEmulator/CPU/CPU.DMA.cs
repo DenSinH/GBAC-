@@ -7,6 +7,19 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        public bool DMAActive
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    if (this.mem.DMACNT_H[i].Active) return true;
+                }
+                return false;
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void TriggerDMA(DMAStartTiming timing)
         {
@@ -31,15 +44,19 @@ namespace GBAEmulator.CPU
             this.Log($"DMA: {dmasad.Address.ToString("x8")} -> {dmadad.Address.ToString("x8")}");
 
             uint UnitLength = (uint)(dmacnt_h.DMATransferType ? 4 : 2);  // bytes: 16 / 32 bits
-            
+            uint DMAData;
+
             if (UnitLength == 4)
             {
-                this.mem.SetWordAt(dmadad.Address & 0xffff_fffc, this.mem.GetWordAt(dmasad.Address & 0xffff_fffc));
+                DMAData = this.mem.GetWordAt(dmasad.Address & 0xffff_fffc);
+                this.mem.SetWordAt(dmadad.Address & 0xffff_fffc, DMAData);
             }
             else  // 16 bit
             {
-                this.mem.SetHalfWordAt(dmadad.Address & 0xffff_fffe, this.mem.GetHalfWordAt(dmasad.Address & 0xffff_fffe));
+                DMAData = this.mem.GetHalfWordAt(dmasad.Address & 0xffff_fffe);
+                this.mem.SetHalfWordAt(dmadad.Address & 0xffff_fffe, (ushort)DMAData);
             }
+            this.bus.DMAValue = DMAData;
 
             this.UpdateDMAAddress(dmasad, dmacnt_h.SourceAddrControl, UnitLength);
             this.UpdateDMAAddress(dmadad, dmacnt_h.DestAddrControl, UnitLength);
