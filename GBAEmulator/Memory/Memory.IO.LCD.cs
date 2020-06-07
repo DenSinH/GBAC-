@@ -1,5 +1,7 @@
 ﻿using System;
 
+using GBAEmulator.Bus;
+
 namespace GBAEmulator.Memory
 {
     partial class MEM
@@ -88,7 +90,7 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public cDISPSTAT DISPSTAT;
+        public readonly cDISPSTAT DISPSTAT;
         #endregion
 
         #region VCOUNT
@@ -130,7 +132,7 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public cVCOUNT VCOUNT;
+        public readonly cVCOUNT VCOUNT;
         #endregion
 
         #region BGControl
@@ -193,17 +195,13 @@ namespace GBAEmulator.Memory
         #endregion
 
         #region BGScrolling
-        public class cBGScrolling : IORegister2
+        public class cBGScrolling : WriteOnlyRegister2
         {
+            public cBGScrolling(BUS bus, bool IsLower) : base(bus, IsLower) { }
+
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
                 base.Set((ushort)(value & 0x01ff), setlow, sethigh);
-            }
-
-            public override ushort Get()
-            {
-                // Write only
-                return 0;
             }
 
             public ushort Offset
@@ -212,19 +210,17 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public readonly cBGScrolling[] BGHOFS =
-            new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
-        public readonly cBGScrolling[] BGVOFS =
-            new cBGScrolling[4] { new cBGScrolling(), new cBGScrolling(), new cBGScrolling(), new cBGScrolling() };
+        public readonly cBGScrolling[] BGHOFS;
+        public readonly cBGScrolling[] BGVOFS;
         #endregion
 
         #region BG Rotation/Scaling
-        public class cReferencePointHalf : IORegister2
+        public class cReferencePointHalf : WriteOnlyRegister2
         {
             private cReferencePoint parent;
             private ushort BitMask;
 
-            public cReferencePointHalf(cReferencePoint parent, ushort BitMask)
+            public cReferencePointHalf(cReferencePoint parent, BUS bus, bool IsLower, ushort BitMask) : base(bus, IsLower)
             {
                 this.parent = parent;
                 this.BitMask = BitMask;
@@ -240,21 +236,15 @@ namespace GBAEmulator.Memory
                 base.Set((ushort)(value & this.BitMask), setlow, sethigh);
                 this.parent.ResetInternal();
             }
-
-            public override ushort Get()
-            {
-                // Write only
-                return 0;
-            }
         }
 
         public class cReferencePoint : IORegister4<cReferencePointHalf>
         {
-            public cReferencePoint()
+            public cReferencePoint(BUS bus)
             {
-                this.lower = new cReferencePointHalf(this, 0xffff);
+                this.lower = new cReferencePointHalf(this, bus, true, 0xffff);
                 // top 4 bits unused
-                this.upper = new cReferencePointHalf(this, 0x0fff);
+                this.upper = new cReferencePointHalf(this, bus, false, 0x0fff);
             }
 
             public uint InternalRegister { get; private set; }
@@ -285,8 +275,10 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public class cRotationScaling : IORegister2
+        public class cRotationScaling : WriteOnlyRegister2
         {
+            public cRotationScaling(BUS bus, bool IsLower) : base(bus, IsLower) { }
+
             public short Full
             {
                 get
@@ -295,26 +287,28 @@ namespace GBAEmulator.Memory
                 }
             }
         }
+        
+        public readonly cReferencePoint BG2X;   
+        public readonly cReferencePoint BG2Y;   
+        public readonly cReferencePoint BG3X;
+        public readonly cReferencePoint BG3Y;   
 
-        public readonly cReferencePoint BG2X = new cReferencePoint();
-        public readonly cReferencePoint BG2Y = new cReferencePoint();
-        public readonly cReferencePoint BG3X = new cReferencePoint();
-        public readonly cReferencePoint BG3Y = new cReferencePoint();
+        public readonly cRotationScaling BG2PA;
+        public readonly cRotationScaling BG2PB;
+        public readonly cRotationScaling BG2PC;
+        public readonly cRotationScaling BG2PD;
 
-        public readonly cRotationScaling BG2PA = new cRotationScaling();
-        public readonly cRotationScaling BG2PB = new cRotationScaling();
-        public readonly cRotationScaling BG2PC = new cRotationScaling();
-        public readonly cRotationScaling BG2PD = new cRotationScaling();
-
-        public readonly cRotationScaling BG3PA = new cRotationScaling();
-        public readonly cRotationScaling BG3PB = new cRotationScaling();
-        public readonly cRotationScaling BG3PC = new cRotationScaling();
-        public readonly cRotationScaling BG3PD = new cRotationScaling();
+        public readonly cRotationScaling BG3PA;
+        public readonly cRotationScaling BG3PB;
+        public readonly cRotationScaling BG3PC;
+        public readonly cRotationScaling BG3PD;
         #endregion
 
         #region Window Feature
-        public class cWindowDimensions : IORegister2
+        public class cWindowDimensions : WriteOnlyRegister2
         {
+            public cWindowDimensions(BUS bus, bool IsLower) : base(bus, IsLower) { }
+
             public byte HighCoord
             {
                 get => (byte)(this._raw & 0x00ff);
@@ -324,16 +318,10 @@ namespace GBAEmulator.Memory
             {
                 get => (byte)(this._raw >> 8);
             }
-
-            public override ushort Get()
-            {
-                // Write only
-                return 0;
-            }
         }
 
-        public cWindowDimensions[] WINH = new cWindowDimensions[2] { new cWindowDimensions(), new cWindowDimensions() };
-        public cWindowDimensions[] WINV = new cWindowDimensions[2] { new cWindowDimensions(), new cWindowDimensions() };
+        public cWindowDimensions[] WINH;
+        public cWindowDimensions[] WINV;
 
         public class cWindowControl : IORegister2
         {

@@ -1,23 +1,20 @@
 ﻿using System;
+
+using GBAEmulator.Bus;
+
 namespace GBAEmulator.Memory
 {
     partial class MEM
     {
         #region DMA Transfers
-        public class cDMAAddressHalf : IORegister2
+        public class cDMAAddressHalf : WriteOnlyRegister2
         {
             private ushort BitMask;
             public ushort InternalRegister;
 
-            public cDMAAddressHalf(ushort BitMask) : base()
+            public cDMAAddressHalf(BUS bus, bool IsLower, ushort BitMask) : base(bus, IsLower)
             {
                 this.BitMask = BitMask;
-            }
-
-            public override ushort Get()
-            {
-                // Write only
-                return 0;
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
@@ -35,7 +32,9 @@ namespace GBAEmulator.Memory
         {
             private bool InternalMemory;
 
-            public cDMAAddress(bool InternalMemory) : base(new cDMAAddressHalf(0xffff), new cDMAAddressHalf((ushort)(InternalMemory ? 0x07ff : 0xffff)))
+            public cDMAAddress(BUS bus, bool InternalMemory) : base(
+                new cDMAAddressHalf(bus, true, 0xffff),
+                new cDMAAddressHalf(bus, false, (ushort)(InternalMemory ? 0x07ff : 0xffff)))
             {
                 this.InternalMemory = InternalMemory;
             }
@@ -59,17 +58,15 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public readonly cDMAAddress[] DMASAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(false),
-            new cDMAAddress(false), new cDMAAddress(false) };
-        public readonly cDMAAddress[] DMADAD = new cDMAAddress[4] { new cDMAAddress(true), new cDMAAddress(true),
-            new cDMAAddress(true), new cDMAAddress(false) };
+        public readonly cDMAAddress[] DMASAD;
+        public readonly cDMAAddress[] DMADAD;
 
-        public class cDMACNT_L : IORegister2
+        public class cDMACNT_L : WriteOnlyRegister2
         {
             private ushort BitMask;
             private ushort InternalRegister;
 
-            public cDMACNT_L(ushort BitMask) : base()
+            public cDMACNT_L(BUS bus, ushort BitMask) : base(bus, true)
             {
                 this.BitMask = BitMask;
             }
@@ -96,16 +93,9 @@ namespace GBAEmulator.Memory
             {
                 base.Set((ushort)(value & this.BitMask), setlow, sethigh);
             }
-
-            public override ushort Get()
-            {
-                // Write only
-                return 0;
-            }
         }
 
-        public readonly cDMACNT_L[] DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(0x3fff), new cDMACNT_L(0x3fff),
-            new cDMACNT_L(0x3fff), new cDMACNT_L(0xffff) };
+        public readonly cDMACNT_L[] DMACNT_L;
 
         public class cDMACNT_H : IORegister2
         {
@@ -188,7 +178,8 @@ namespace GBAEmulator.Memory
             {
                 bool DoReload = !this.DMAEnable;
 
-                base.Set(value, setlow, sethigh);
+                // bottom 5 bits unused
+                base.Set((ushort)(value & 0xfff8), setlow, sethigh);
                 if (DoReload && this.DMAEnable)
                 {
                     this.mem.DMADAD[this.index].Reload();

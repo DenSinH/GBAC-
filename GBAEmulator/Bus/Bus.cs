@@ -18,7 +18,7 @@ namespace GBAEmulator.Bus
         {
             if (!this.cpu.DMAActive)
                 return this.DMAValue;
-            return this.cpu.Pipeline.OpenBus();
+            return this.cpu.Pipeline.PreFetch();
         }
     }
 }

@@ -47,13 +47,13 @@ namespace GBAEmulator.CPU
             offset = 0;
         }
 
-        public uint OpenBus()
+        public uint PreFetch()
         {
             // recently fetched opcode
             if (this.cpu.state == ARM7TDMI.State.ARM)
-                return storage[(offset + Count) & 3];
+                return storage[(offset + Count - 1) & 3];
 
-            uint prefetch = storage[(offset + Count) & 3];
+            uint prefetch = storage[(offset + Count - 1) & 3];
             return (uint)(prefetch << 16) | prefetch;
         }
     }

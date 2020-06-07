@@ -30,20 +30,23 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public abstract class IORegister4<T> where T : IORegister2
+        public abstract class WriteOnlyRegister2 : IORegister2
         {
-            public T lower;
-            public T upper;
+            private readonly BUS bus;
+            private readonly bool IsLower;
 
-            protected IORegister4() { }
-
-            protected IORegister4(T lower, T upper)
+            public WriteOnlyRegister2(BUS bus, bool IsLower)
             {
-                this.lower = lower;
-                this.upper = upper;
+                this.bus = bus;
+                this.IsLower = IsLower;
+            }
+
+            public override ushort Get()
+            {
+                return (ushort)this.bus.OpenBus();
             }
         }
-        
+
         private class DefaultRegister : IORegister2 { }  // basically default register (name might be a bit misleading)
 
         private class ZeroRegister : IORegister
@@ -55,7 +58,21 @@ namespace GBAEmulator.Memory
 
             public void Set(ushort value, bool setlow, bool sethigh)
             {
-                
+
+            }
+        }
+
+        public abstract class IORegister4<T> where T : IORegister2
+        {
+            public T lower;
+            public T upper;
+
+            protected IORegister4() { }
+
+            protected IORegister4(T lower, T upper)
+            {
+                this.lower = lower;
+                this.upper = upper;
             }
         }
 

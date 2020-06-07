@@ -10,13 +10,6 @@ namespace GBAEmulator.Memory
 
         public void InitRegisters()
         {
-            this.DISPSTAT = new cDISPSTAT(this);
-            this.VCOUNT = new cVCOUNT(this);
-
-            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(this, 0), new cDMACNT_H(this, 1), new cDMACNT_H(this, 2), new cDMACNT_H(this, 3, true) };
-
-            this.MasterUnusedRegister = new UnusedRegister(this.bus);
-
             // LCD I/O Registers
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;
             this.IORAM[0x02] = this.IORAM[0x03] = new DefaultRegister();  // green swap

@@ -199,7 +199,7 @@ namespace GBAEmulator
                 dy -= (byte)(dy % this.gba.mem.MOSAIC.OBJMosaicVSize);
 
             if (VFlip)
-                dy = (byte)(OBJsz.Height - dy);
+                dy = (byte)(OBJsz.Height - dy - 1);
             
             uint SliverBaseAddress;  // base address for horizontal sprite sliver
             if (HFlip)
@@ -358,12 +358,13 @@ namespace GBAEmulator
             uint px0 = (uint)(OBJsz.Width >> 1);
             uint py0 = (uint)(OBJsz.Height >> 1);
 
+            // distance with the midpoint of the sprite
             short dy;
             if (!DoubleRendering)
                 dy = (short)(scanline - OBJy - (OBJsz.Height >> 1));
             else
                 dy = (short)(scanline - OBJy - OBJsz.Height);
-
+            
             // subtract one because we increment at the start of the loop
             short dx = (short)((DoubleRendering ? -OBJsz.Width : -(OBJsz.Width >> 1)) - 1);
 

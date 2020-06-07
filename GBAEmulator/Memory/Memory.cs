@@ -48,6 +48,45 @@ namespace GBAEmulator.Memory
             this.cpu = cpu;
             this.bus = cpu.bus;
             
+            this.DISPSTAT = new cDISPSTAT(this);
+            this.VCOUNT = new cVCOUNT(this);
+            this.BGHOFS = new cBGScrolling[4] { new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false),
+                new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false) };
+
+            this.BGVOFS = new cBGScrolling[4] { new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false),
+                new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false) };
+
+            this.BG2X = new cReferencePoint(this.bus);
+            this.BG2Y = new cReferencePoint(this.bus);
+            this.BG3X = new cReferencePoint(this.bus);
+            this.BG3Y = new cReferencePoint(this.bus);
+
+            this.BG2PA = new cRotationScaling(this.bus, true);
+            this.BG2PB = new cRotationScaling(this.bus, false);
+            this.BG2PC = new cRotationScaling(this.bus, true);
+            this.BG2PD = new cRotationScaling(this.bus, false);
+
+            this.BG3PA = new cRotationScaling(this.bus, true);
+            this.BG3PB = new cRotationScaling(this.bus, false);
+            this.BG3PC = new cRotationScaling(this.bus, true);
+            this.BG3PD = new cRotationScaling(this.bus, false);
+
+            this.WINH = new cWindowDimensions[2] { new cWindowDimensions(this.bus, true), new cWindowDimensions(this.bus, false) };
+            this.WINV = new cWindowDimensions[2] { new cWindowDimensions(this.bus, true), new cWindowDimensions(this.bus, false) };
+
+            this.DMASAD = new cDMAAddress[4] { new cDMAAddress(this.bus, true), new cDMAAddress(this.bus, false),
+                new cDMAAddress(this.bus, false), new cDMAAddress(this.bus, false) };
+            this.DMADAD = new cDMAAddress[4] { new cDMAAddress(this.bus, true), new cDMAAddress(this.bus, true),
+                new cDMAAddress(this.bus, true), new cDMAAddress(this.bus, false) };
+            
+            this.DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(this.bus, 0x3fff), new cDMACNT_L(this.bus, 0x3fff),
+                new cDMACNT_L(this.bus, 0x3fff), new cDMACNT_L(this.bus, 0xffff) };
+
+            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(this, 0), new cDMACNT_H(this, 1),
+                new cDMACNT_H(this, 2), new cDMACNT_H(this, 3, true) };
+
+            this.MasterUnusedRegister = new UnusedRegister(this.bus);
+
             this.InitBIOS();
             this.InitRegisters();
 
