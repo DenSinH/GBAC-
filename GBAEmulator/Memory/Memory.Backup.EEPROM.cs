@@ -137,11 +137,11 @@ namespace GBAEmulator.Memory
                  */
                 if (EEPROMAccess == EEPROMAccessType.Read)
                 {
-                    EEPROMReadAddress = (uint)(EEPROMBuffer & (EEPROMSize - 1)) << 3;
+                    EEPROMReadAddress = (uint)(EEPROMBuffer << 3) & (EEPROMSize - 1);
                 }
                 else
                 {
-                    EEPROMWriteAddress = (uint)(EEPROMBuffer & (EEPROMSize - 1)) << 3;
+                    EEPROMWriteAddress = (uint)(EEPROMBuffer << 3) & (EEPROMSize - 1);
                 }
             }
             else if (EEPROMWriteBitCounter > 2 + EEPROMBusSize)

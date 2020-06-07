@@ -117,7 +117,7 @@ namespace GBAEmulator.Memory
             {
                 case 0:
                 case 1:
-                    // this.Error($"BIOS Word Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    this.Error($"BIOS Word Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
                     return;
                 case 2:
                     __SetWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
@@ -271,7 +271,7 @@ namespace GBAEmulator.Memory
             {
                 case 0:
                 case 1:
-                    // this.Error($"BIOS Halfword Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    this.Error($"BIOS Halfword Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
                     return;
                 case 2:
                     __SetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
@@ -424,7 +424,7 @@ namespace GBAEmulator.Memory
             {
                 case 0:
                 case 1:
-                    // this.Error($"BIOS Byte Write Attempted at {address.ToString("x8")} with PC = {this.PC.ToString("x8")}");
+                    this.Error($"BIOS Byte Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
                     return;
                 case 2:
                     this.eWRAM[address & __MemoryMasks__[Section]] = value;
