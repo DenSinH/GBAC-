@@ -196,8 +196,7 @@ namespace GBAEmulator.Memory
             {
                 if (this.IORAM[i] is null)
                 {
-                    Console.WriteLine(i.ToString("x4") + " in IORAM not initialized");
-                    Console.ReadKey();
+                    this.Error(i.ToString("x4") + " in IORAM not initialized");
                 }
             }
         }

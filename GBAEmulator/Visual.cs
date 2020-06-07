@@ -112,13 +112,25 @@ namespace GBAEmulator
                 this.gba.cpu.ShowInfo();
                 this.gba.cpu.InterruptInfo();
             }
+            else if (e.KeyCode == Keys.F1)
+            {
+
+            }
+            else if (e.KeyCode == Keys.F2)
+            {
+
+            }
+            else if (e.KeyCode == Keys.F3)
+            {
+
+            }
             else if (e.KeyCode == Keys.F4)
             {
-                this.gba.cpu.DoIRQ();
+                this.gba.cpu.pause ^= true;
             }
             else if (e.KeyCode == Keys.F5)
             {
-                this.gba.cpu.pause = true;
+                
             }
             else if (e.KeyCode == Keys.O)
             {
@@ -135,14 +147,6 @@ namespace GBAEmulator
             else if (e.KeyCode == Keys.D)
             {
                 Console.WriteLine(this.gba.mem.DISPSTAT.Get().ToString("x4"));
-            }
-            else if (e.KeyCode == Keys.F1)
-            {
-
-            }
-            else if (e.KeyCode == Keys.F3)
-            {
-                this.gba.cpu.pause = true;
             }
         }
 

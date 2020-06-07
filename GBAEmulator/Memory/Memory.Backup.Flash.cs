@@ -68,7 +68,6 @@ namespace GBAEmulator.Memory
                     else this.Error($"Flash: Expected 0x55 to 0x2aaa, got {value.ToString("x2")} to {address.ToString("x4")}");
                     return;
                 case 2:  // command
-                    // Console.ReadKey();
                     FlashState = 0;  // reset flash state
                     switch (value)
                     {

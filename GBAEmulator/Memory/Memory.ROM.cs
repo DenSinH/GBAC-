@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace GBAEmulator.Memory
 {
@@ -20,7 +21,7 @@ namespace GBAEmulator.Memory
             {
                 foreach (Backup BackupType in Enum.GetValues(typeof(Backup)))
                 {
-                    if (line.Contains($"{BackupType}_"))
+                    if (Regex.Match(line, $"{BackupType}_V\\d\\d\\d").Success)
                     {
                         return BackupType;
                     }
