@@ -6,6 +6,15 @@ namespace GBAEmulator.Memory
 {
     partial class MEM
     {
+        private enum Backup
+        {
+            EEPROM,
+            SRAM,
+            FLASH,
+            FLASH512,
+            FLASH1M
+        }
+
         byte[] BackupStorage = new byte[0x10000];
         private void Erase(byte[] Storage, uint StartAddress, uint EndAddress)
         {
@@ -99,6 +108,7 @@ namespace GBAEmulator.Memory
                     this.InitFlash();
                     break;
                 case Backup.EEPROM:
+                    this.InitEEPROM();
                     break;
                 default:
                     throw new Exception($"Invalid rom backup type: {this.ROMBackupType}");
@@ -121,7 +131,7 @@ namespace GBAEmulator.Memory
                     this.FlashWrite(address, value);
                     return;
                 case Backup.EEPROM:
-                    this.BackupStorage[address] = value;
+                    this.EEPROMWrite(value);
                     this.BackupChanged = true;
                     return;
                 default:
@@ -153,7 +163,7 @@ namespace GBAEmulator.Memory
                         return SanyoDeviceID;
                     }
                 case Backup.EEPROM:
-                    return this.BackupStorage[address];  // "stub"
+                    return this.EEPROMRead();
                 default:
                     throw new Exception($"Invalid rom backup type: {this.ROMBackupType}");
             }

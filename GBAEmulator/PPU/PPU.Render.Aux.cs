@@ -20,7 +20,7 @@ namespace GBAEmulator
             WinOut = this.gba.mem.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
 
             this.ResetWindow<BlendMode>(ref WindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
-
+            
             // override for alpha blending objects (?)
             BlendMode OBJBlendMode = AlphaBlending != BlendMode.Off ? AlphaBlending : BlendMode.Normal;
 

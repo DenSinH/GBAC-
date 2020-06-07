@@ -106,7 +106,7 @@ namespace GBAEmulator
 
         public void Run()
         {
-            cpu.mem.LoadRom("../../roms/PokemonEmerald.gba");
+            cpu.mem.LoadRom("../../roms/ZeldaMinishCap.gba");
             // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
             // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");

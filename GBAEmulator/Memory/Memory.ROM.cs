@@ -7,15 +7,6 @@ namespace GBAEmulator.Memory
     {
         const string SAVE_EXTENSION = ".gbac";
 
-        private enum Backup
-        {
-            EEPROM, 
-            SRAM,
-            FLASH,
-            FLASH512,
-            FLASH1M
-        }
-
         public string ROMName { get; private set; }
         private string ROMPath;
         private Backup ROMBackupType;
@@ -23,6 +14,7 @@ namespace GBAEmulator.Memory
 
         private Backup GetBackupType(string FileName)
         {
+            // search for the type of backup used in ROM file
             string[] RomContent = File.ReadAllLines(FileName);
             foreach (string line in RomContent)
             {

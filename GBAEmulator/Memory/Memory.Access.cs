@@ -75,8 +75,8 @@ namespace GBAEmulator.Memory
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
-                            // EEPROM access
-                            return 0;
+                            // EEPROM access, might as well call a read directly
+                            return this.EEPROMRead();
                         }
                     }
 
@@ -148,7 +148,8 @@ namespace GBAEmulator.Memory
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
-                            // EEPROM access
+                            // EEPROM access, might as well call a write directly
+                            this.EEPROMWrite((byte)value);
                             return;
                         }
                     }
@@ -219,8 +220,8 @@ namespace GBAEmulator.Memory
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
-                            // EEPROM access
-                            return 0;
+                            // EEPROM access, might as well call a read directly
+                            return this.EEPROMRead();
                         }
                     }
 
@@ -294,7 +295,8 @@ namespace GBAEmulator.Memory
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
-                            // EEPROM access
+                            // EEPROM access, might as well call a write directly
+                            this.EEPROMWrite((byte)value);
                             return;
                         }
                     }
@@ -365,8 +367,8 @@ namespace GBAEmulator.Memory
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
-                            // EEPROM access
-                            return 0;
+                            // EEPROM access, might as well call a read directly
+                            return this.EEPROMRead();
                         }
                     }
 
@@ -466,7 +468,8 @@ namespace GBAEmulator.Memory
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
-                            // EEPROM access
+                            // EEPROM access, might as well call a write directly
+                            this.EEPROMWrite(value);
                             return;
                         }
                     }

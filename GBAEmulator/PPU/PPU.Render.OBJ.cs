@@ -174,7 +174,7 @@ namespace GBAEmulator
                     if (!(Priority >= OBJMaxPriority[StartX + dx]) && this.OBJLayers[Priority][StartX + dx] != 0x8000)
                     {
                         this.OBJMaxPriority[StartX + dx] = Priority;
-                        this.OBJBlendingMask[StartX + dx] = EnableBlending;
+                        this.OBJBlendingMask[StartX + dx] |= EnableBlending;
                     }
                 }
             }
@@ -206,7 +206,7 @@ namespace GBAEmulator
             {
                 XSign = -1;
                 // tiles are also in a different order when we flip horizontally
-                StartX += OBJsz.Width;
+                StartX += OBJsz.Width - 1;
             }
 
             if (!ColorMode)     // ========================= 4bpp =============================
