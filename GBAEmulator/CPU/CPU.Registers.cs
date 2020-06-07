@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using GBAEmulator.Memory;
+
 namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
@@ -32,6 +34,18 @@ namespace GBAEmulator.CPU
             {
                 this.BankedRegisters[this.mode][i] = this.Registers[i];
                 this.Registers[i] = this.BankedRegisters[NewMode][i];
+            }
+
+            switch (this.mode)
+            {
+                case Mode.IRQ:
+                    // return from IRQ
+                    this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterIRQ;
+                    break;
+                case Mode.Supervisor:
+                    // return from SWI
+                    this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterSWI;
+                    break;
             }
 
             switch (NewMode)

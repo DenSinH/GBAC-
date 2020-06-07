@@ -106,17 +106,18 @@ namespace GBAEmulator
 
         public void Run()
         {
-            cpu.mem.LoadRom("../../roms/ZeldaMinishCap.gba");
-            // cpu.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
-            // cpu.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
-            // cpu.LoadRom("../../Tests/Organharvester/joypad.gba");
-            // cpu.LoadRom("../../Tests/GBASuiteNew/mem.gba");
-            // cpu.LoadRom("../../Tests/Tonc/bld_demo.gba");
-            // cpu.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
-            // cpu.LoadRom("../../Tests/EndriftSuite.gba");
-            
+            // this.mem.LoadRom("../../roms/ZeldaMinishCap.gba");
+            // this.mem.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
+            // this.mem.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
+            // this.mem.LoadRom("../../Tests/Organharvester/joypad.gba");
+            // this.mem.LoadRom("../../Tests/flero/openbuster.gba");
+            // this.mem.LoadRom("../../Tests/GBASuiteNew/mem.gba");
+            // this.mem.LoadRom("../../Tests/Tonc/bld_demo.gba");
+            // this.mem.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
+            this.mem.LoadRom("../../Tests/EndriftSuite.gba");
+
             // this.cpu.UseNormattsBios();
-            // cpu.SkipBios();
+            cpu.SkipBios();
 
             while (!this.ShutDown)
             {

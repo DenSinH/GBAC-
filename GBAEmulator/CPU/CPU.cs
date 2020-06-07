@@ -15,7 +15,7 @@ namespace GBAEmulator.CPU
          Emulation of the ARM7TDMI CPU
         */
         public State state { get; private set; }
-        public readonly cPipeline Pipeline = new cPipeline();
+        public readonly cPipeline Pipeline;
         GBA gba;
         public MEM mem;
         
@@ -26,7 +26,8 @@ namespace GBAEmulator.CPU
         public ARM7TDMI(GBA gba)
         {
             this.gba = gba;
-            
+            this.Pipeline = new cPipeline(this);
+
             this.InitARM();
             this.InitTHUMB();
             this.InitTimers();

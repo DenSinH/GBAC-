@@ -34,17 +34,25 @@ namespace GBAEmulator.Memory
             switch (Section)
             {
                 case 0:
-                    if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
-                    return this.cpu.Pipeline.Peek();
+                    if (address <= __MemoryMasks__[Section])  // address is already < 0x0100_0000
+                    {
+                        if (this.cpu.PC < 0x0100_0000)
+                        {
+                            // normal BIOS fetch
+                            return __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                        }
+                        return __GetWordAt__(this.BIOS, (uint)this.CurrentBIOSReadState);
+                    }
+                    return this.cpu.Pipeline.OpenBus();
                 case 1:
-                    return this.cpu.Pipeline.Peek();
+                    return this.cpu.Pipeline.OpenBus();
                 case 2:
                     return __GetWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
                     return __GetWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4:   // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return this.IOGetWordAt(address & 0x3ff);
-                    return this.cpu.Pipeline.Peek();
+                    return this.cpu.Pipeline.OpenBus();
                 case 5:
                     return __GetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -90,7 +98,7 @@ namespace GBAEmulator.Memory
                     byte value = this.BackupRead(address & 0xffff);
                     return (uint)(value | (value << 8) | (value << 16) | (value << 24));
                 default:
-                    return this.cpu.Pipeline.Peek();
+                    return this.cpu.Pipeline.OpenBus();
             }
         }
 
@@ -184,17 +192,25 @@ namespace GBAEmulator.Memory
             switch (Section)
             {
                 case 0:
-                    if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return __GetHalfWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
-                    return (ushort)this.cpu.Pipeline.Peek();
+                    if (address <= __MemoryMasks__[Section])
+                    {
+                        if (this.cpu.PC < 0x0100_0000)
+                        {
+                            // normal BIOS fetch
+                            return __GetHalfWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                        }
+                        return __GetHalfWordAt__(this.BIOS, (uint)this.CurrentBIOSReadState);
+                    }
+                    return (ushort)this.cpu.Pipeline.OpenBus();
                 case 1:
-                    return (ushort)this.cpu.Pipeline.Peek();
+                    return (ushort)this.cpu.Pipeline.OpenBus();
                 case 2:
                     return __GetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
                     return __GetHalfWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4: // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return this.IOGetHalfWordAt(address & 0x3ff);
-                    return (ushort)this.cpu.Pipeline.Peek();
+                    return (ushort)this.cpu.Pipeline.OpenBus();
                 case 5:
                     return __GetHalfWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
@@ -236,7 +252,7 @@ namespace GBAEmulator.Memory
                     byte value = this.BackupRead(address & 0xffff);
                     return (ushort)(value | (value << 8));
                 default:
-                    return (ushort)this.cpu.Pipeline.Peek();
+                    return (ushort)this.cpu.Pipeline.OpenBus();
             }
         }
 
@@ -331,17 +347,25 @@ namespace GBAEmulator.Memory
             switch (Section)
             {
                 case 0:
-                    if ((address & 0x00ff_ffff) <= __MemoryMasks__[Section]) return this.BIOS[address & __MemoryMasks__[Section]];
-                    return (byte)this.cpu.Pipeline.Peek();
+                    if (address <= __MemoryMasks__[Section])
+                    {
+                        if (this.cpu.PC < 0x0100_0000)
+                        {
+                            // normal BIOS fetch
+                            return this.BIOS[address & __MemoryMasks__[Section]];
+                        }
+                        return this.BIOS[(uint)this.CurrentBIOSReadState];
+                    }
+                    return (byte)this.cpu.Pipeline.OpenBus();
                 case 1:
-                    return (byte)this.cpu.Pipeline.Peek();
+                    return (byte)this.cpu.Pipeline.OpenBus();
                 case 2:
                     return this.eWRAM[address & __MemoryMasks__[Section]];
                 case 3:
                     return this.iWRAM[address & __MemoryMasks__[Section]];
                 case 4: // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return (byte)this.IOGetByteAt(address & 0x3ff);
-                    return (byte)this.cpu.Pipeline.Peek();
+                    return (byte)this.cpu.Pipeline.OpenBus();
                 case 5:
                     return this.PaletteRAM[address & __MemoryMasks__[Section]];
                 case 6:  // VRAM Mirrors
@@ -381,7 +405,7 @@ namespace GBAEmulator.Memory
                 case 15:  // SRAM
                     return this.BackupRead(address & 0xffff);
                 default:
-                    return (byte)this.cpu.Pipeline.Peek();
+                    return (byte)this.cpu.Pipeline.OpenBus();
             }
         }
 

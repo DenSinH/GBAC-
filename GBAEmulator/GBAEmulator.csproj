@@ -86,6 +86,7 @@
     <Compile Include="CPU\CPU.SWI.cs" />
     <Compile Include="CPU\CPU.Aux.cs" />
     <Compile Include="CPU\CPU.Timers.cs" />
+    <Compile Include="Memory\Memory.Aux.cs" />
     <Compile Include="Memory\Memory.Backup.cs" />
     <Compile Include="Memory\Memory.Backup.EEPROM.cs" />
     <Compile Include="Memory\Memory.Backup.Flash.cs" />

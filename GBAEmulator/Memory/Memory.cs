@@ -38,6 +38,7 @@ namespace GBAEmulator.Memory
             8, 8, 8, 8, 8, 8, 8, 8
         };
 
+        public BIOSReadState CurrentBIOSReadState = BIOSReadState.StartUp;
         private ARM7TDMI cpu;
 
         public MEM(ARM7TDMI cpu)

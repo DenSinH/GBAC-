@@ -1,5 +1,7 @@
 ﻿using System;
 
+using GBAEmulator.Memory;
+
 namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
@@ -36,6 +38,8 @@ namespace GBAEmulator.CPU
             this.Log("Doing IRQ: " + (this.mem.IF.raw & this.mem.IE.raw).ToString("x8"));
             this.ChangeMode(Mode.IRQ);
             this.I = 1;
+
+            this.mem.CurrentBIOSReadState = MEM.BIOSReadState.DuringIRQ;
 
             if (this.Pipeline.Count == 0) this.PC += (uint)((this.state == State.ARM) ? 4 : 2);
 

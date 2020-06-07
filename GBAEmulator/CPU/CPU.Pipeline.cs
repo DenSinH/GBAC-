@@ -18,6 +18,13 @@ namespace GBAEmulator.CPU
         private uint offset = 0;
         public int Count { get; private set; }
 
+        private ARM7TDMI cpu;
+
+        public cPipeline(ARM7TDMI cpu)
+        {
+            this.cpu = cpu;
+        }
+
         public uint Peek()
         {
             return storage[offset & 3];
@@ -38,6 +45,16 @@ namespace GBAEmulator.CPU
         {
             Count = 0;
             offset = 0;
+        }
+
+        public uint OpenBus()
+        {
+            // recently fetched opcode
+            if (this.cpu.state == ARM7TDMI.State.ARM)
+                return storage[(offset + Count) & 3];
+
+            uint prefetch = storage[(offset + Count) & 3];
+            return (uint)(prefetch << 16) | prefetch;
         }
     }
 

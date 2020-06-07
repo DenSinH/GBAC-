@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using GBAEmulator.CPU;
 
 namespace GBAEmulator.Memory
 {
@@ -46,18 +44,53 @@ namespace GBAEmulator.Memory
             }
         }
         
-        private class EmptyRegister : IORegister2 { }  // basically default register (name might be a bit misleading)
+        private class DefaultRegister : IORegister2 { }  // basically default register (name might be a bit misleading)
 
-        private class UnusedRegister : IORegister
+        private class ZeroRegister : IORegister
         {
-            // Register full of unused bits (always returns 0)
             public ushort Get()
             {
-                // todo: open bus?
                 return 0;
             }
 
-            public void Set(ushort value, bool setlow, bool sethigh) { }
+            public void Set(ushort value, bool setlow, bool sethigh)
+            {
+                
+            }
+        }
+
+        public class UnusedRegisterHalf : IORegister2
+        {
+            private ARM7TDMI cpu;
+            private bool upper;
+            public UnusedRegisterHalf(ARM7TDMI cpu, bool upper)
+            {
+                this.cpu = cpu;
+                this.upper = upper;
+            }
+
+            public override ushort Get()
+            {
+                if (upper)
+                {
+                    return (ushort)(this.cpu.Pipeline.OpenBus() >> 16);
+                }
+                return (ushort)this.cpu.Pipeline.OpenBus();
+            }
+
+            public override void Set(ushort value, bool setlow, bool sethigh)
+            {
+                
+            }
+        }
+
+        private class UnusedRegister : IORegister4<UnusedRegisterHalf>
+        {
+            public UnusedRegister(ARM7TDMI cpu)
+            {
+                this.lower = new UnusedRegisterHalf(cpu, false);
+                this.upper = new UnusedRegisterHalf(cpu, true);
+            }
         }
     }
 }

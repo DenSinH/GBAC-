@@ -34,11 +34,11 @@ namespace GBAEmulator.CPU
             
             if (UnitLength == 4)
             {
-                this.mem.SetWordAt(dmadad.Address, this.mem.GetWordAt(dmasad.Address));
+                this.mem.SetWordAt(dmadad.Address & 0xffff_fffc, this.mem.GetWordAt(dmasad.Address & 0xffff_fffc));
             }
             else  // 16 bit
             {
-                this.mem.SetHalfWordAt(dmadad.Address, this.mem.GetHalfWordAt(dmasad.Address));
+                this.mem.SetHalfWordAt(dmadad.Address & 0xffff_fffe, this.mem.GetHalfWordAt(dmasad.Address & 0xffff_fffe));
             }
 
             this.UpdateDMAAddress(dmasad, dmacnt_h.SourceAddrControl, UnitLength);

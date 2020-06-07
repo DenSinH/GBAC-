@@ -63,7 +63,7 @@ namespace GBAEmulator.CPU
                         if ((Address & 0x01) == 0)  // aligned
                             this.Registers[Rd] = this.mem.GetHalfWordAt(Address);
                         else
-                            this.Registers[Rd] = (uint)(this.mem.GetByteAt(Address - 1) << 24) | this.mem.GetByteAt(Address);
+                            this.Registers[Rd] = ROR(this.mem.GetHalfWordAt(Address - 1), 8);
                     }
                     else
                     {
@@ -93,9 +93,10 @@ namespace GBAEmulator.CPU
                     this.Log(string.Format("Halfword Data Transfer: Signed Halfword Rd = R{0} @{1:x8}", Rd, Address, Rd));
                     if (LoadFromMemory)
                     {
-                        if ((Address & 0x01) == 1)
+                        if ((Address & 0x01) == 1)  // misaligned
                         {
-                            this.Registers[Rd] = (uint)(sbyte)this.mem.GetByteAt(Address);
+                            // equivalent to this.mem.GetByteAt(Address) for normal addresses
+                            this.Registers[Rd] = (uint)(sbyte)(this.mem.GetHalfWordAt(Address - 1) >> 8);
                         }
                         else
                         {
