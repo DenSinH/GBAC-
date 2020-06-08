@@ -151,7 +151,7 @@ namespace GBAEmulator.Memory
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    uint _address = address & 0x00ff_ffff;
+                    uint _address = address & 0x01ff_ffff;
                     // See GetWordAt for info on EEPROM
                     if (this.ROMBackupType == Backup.EEPROM)
                     {
@@ -230,7 +230,7 @@ namespace GBAEmulator.Memory
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    uint _address = address & 0x00ff_ffff;
+                    uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
                     if (this.ROMBackupType == Backup.EEPROM)
@@ -309,7 +309,7 @@ namespace GBAEmulator.Memory
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    uint _address = address & 0x00ff_ffff;
+                    uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
                     if (this.ROMBackupType == Backup.EEPROM)
@@ -389,7 +389,7 @@ namespace GBAEmulator.Memory
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    uint _address = address & 0x00ff_ffff;
+                    uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
                     if (this.ROMBackupType == Backup.EEPROM)
@@ -491,7 +491,7 @@ namespace GBAEmulator.Memory
                 case 11:
                 case 12:
                 case 13:  // GamePak
-                    uint _address = address & 0x00ff_ffff;
+                    uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
                     if (this.ROMBackupType == Backup.EEPROM)
