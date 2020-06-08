@@ -32,8 +32,8 @@ namespace GBAEmulator.CPU
                         this.mem.SetByteAt(Address, (byte)this.Registers[Rd]);
                     else
                     {
-                        Address &= 0xffff_fffc;  // Forced align for STR
-                        this.mem.SetWordAt(Address, this.Registers[Rd]);
+                        // Forced align for STR
+                        this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rd], offset: Address & 3);
                     }
 
                     // STR instructions take 2N incremental cycles to execute.
@@ -73,8 +73,8 @@ namespace GBAEmulator.CPU
                 {
                     if (!HFlag)
                     {
-                        Address &= 0xffff_fffe;  // force align STRH
-                        this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
+                        // force align STRH
+                        this.mem.SetHalfWordAt(Address & 0xffff_fffe, (ushort)this.Registers[Rd], offset: Address & 1);
 
                         // STR instructions take 2N incremental cycles to execute.
                         return NCycle << 1;
@@ -162,8 +162,8 @@ namespace GBAEmulator.CPU
                     this.mem.SetByteAt(Address, (byte)this.Registers[Rd]);
                 else
                 {
-                    Address &= 0xffff_fffe;  // force align
-                    this.mem.SetWordAt(Address, this.Registers[Rd]);
+                    // force align
+                    this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rd], offset: Address & 3);
                 }
 
                 // STR instructions take 2N incremental cycles to execute.
@@ -206,8 +206,8 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                Address &= 0xffff_fffe;  // force align
-                this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
+                // force align
+                this.mem.SetHalfWordAt(Address & 0xffff_fffe, (ushort)this.Registers[Rd], offset: Address & 1);
 
                 // STR instructions take 2N incremental cycles to execute.
                 return NCycle << 1;
@@ -248,8 +248,8 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                Address &= 0xffff_fffc;  // force align
-                this.mem.SetWordAt(SP + Word8, this.Registers[Rd]);
+                // force align
+                this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rd], offset: Address & 3);
 
                 // STR instructions take 2N incremental cycles to execute.
                 return NCycle << 1;
@@ -306,8 +306,9 @@ namespace GBAEmulator.CPU
 
             uint Address = this.Registers[Rb];
             byte Misalignment = (byte)(Address & 0x03);  // store misalignment for writeback
-            Address = Address & 0xffff_fffc;  // force align
-
+            uint offset = Address & 3;
+            Address &= 0xffff_fffc;  // force align
+            
             if (RList == 0)
             {
                 /*
@@ -321,8 +322,10 @@ namespace GBAEmulator.CPU
                     this.PipelineFlush();
                 }
                 else
-                    this.mem.SetWordAt(Address, PC + 2);  // My PC is 4 ahead, but it should be 6 in this case
-
+                {
+                    this.mem.SetWordAt(Address, PC + 2, offset: offset);  // My PC is 4 ahead, but it should be 6 in this case
+                }
+                    
                 // Writeback
                 this.Registers[Rb] += 0x40;
 
@@ -366,7 +369,7 @@ namespace GBAEmulator.CPU
                 if (RegisterQueue.Peek() == Rb)
                 {
                     this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[Rb], Address, Rb));
-                    this.mem.SetWordAt(Address, this.Registers[Rb]);
+                    this.mem.SetWordAt(Address, this.Registers[Rb], offset: offset);
                     Address += 4;
                     RegisterQueue.Dequeue();
                 }
@@ -377,7 +380,7 @@ namespace GBAEmulator.CPU
                 while (RegisterQueue.Count > 0)
                 {
                     this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[RegisterQueue.Peek()], Address, RegisterQueue.Peek()));
-                    this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
+                    this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()], offset: offset);
                     Address += 4;
                 }
 

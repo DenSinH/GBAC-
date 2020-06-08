@@ -32,7 +32,7 @@ namespace GBAEmulator.CPU
                 if (RotateAmount != 0)
                     MemoryContent = ROR(MemoryContent, RotateAmount);
 
-                this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rm]);  // force align
+                this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rm], offset: Address & 3);  // force align
                 this.Registers[Rd] = MemoryContent;
             }
 

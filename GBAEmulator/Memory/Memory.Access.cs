@@ -9,14 +9,10 @@ namespace GBAEmulator.Memory
 {
     public partial class MEM
     {
-        // [Conditional("DEBUG")]
+        [Conditional("DEBUG")]
         private void MemoryAccess(uint Address)
         {
-            if (Address >= 0x0203_9ed0 && Address < 0x0203_9ed4)
-            {
-                Console.WriteLine("Memory Access: " + Address.ToString("x8"));
-                // Console.ReadKey();
-            }
+            Console.WriteLine("Memory Access: " + Address.ToString("x8"));
         }
         
         /*
@@ -107,7 +103,7 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public void SetWordAt(uint address, uint value)
+        public void SetWordAt(uint address, uint value, uint offset = 0)
         {
             this.MemoryAccess(address);
             this.bus.BusValue = value;
@@ -176,8 +172,8 @@ namespace GBAEmulator.Memory
                      * Writing changes the 8bit value at the specified address only,
                      * being set to LSB of (source_data ROR (address*8)).
                      */
-                    byte RORValue = (byte)ARM7TDMI.ROR(value, (byte)(8 * (address & 3)));
-                    this.BackupWrite(address & 0xffff, RORValue);
+                    byte RORValue = (byte)(value >> (8 * (int)offset));
+                    this.BackupWrite((address & 0xffff) + offset, RORValue);
                     return;
                 default:
                     return;
@@ -265,7 +261,7 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public void SetHalfWordAt(uint address, ushort value)
+        public void SetHalfWordAt(uint address, ushort value, uint offset = 0)
         {
             this.MemoryAccess(address);
             this.bus.BusValue = (this.bus.BusValue & 0xffff_0000) | value;
@@ -335,8 +331,8 @@ namespace GBAEmulator.Memory
                      * Writing changes the 8bit value at the specified address only,
                      * being set to LSB of (source_data ROR (address*8)).
                      */
-                    byte RORValue = (byte)ARM7TDMI.ROR(value, (byte)(8 * (address & 3)));
-                    this.BackupWrite(address & 0xffff, RORValue);
+                    byte RORValue = (byte)(value >> (8 * (int)offset));
+                    this.BackupWrite((address & 0xffff) + offset, RORValue);
                     return;
                 default:
                     return;

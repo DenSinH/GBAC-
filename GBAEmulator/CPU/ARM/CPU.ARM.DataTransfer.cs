@@ -66,9 +66,9 @@ namespace GBAEmulator.CPU
                             this.Registers[Rd] = ROR(this.mem.GetHalfWordAt(Address - 1), 8);
                     }
                     else
-                    {
-                        Address &= 0xffff_fffe;  // force align
-                        this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
+                    {   
+                        // force align
+                        this.mem.SetHalfWordAt(Address & 0xffff_fffe, (ushort)this.Registers[Rd], offset: Address & 1);
                     }
                     break;
                 case 0b10:  // Signed byte
