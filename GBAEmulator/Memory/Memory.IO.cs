@@ -69,7 +69,7 @@ namespace GBAEmulator.Memory
 
             for (int i = 0x58; i < 0x60; i += 4)
             {
-                this.IORAM[i] = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
+                this.IORAM[i]     = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
                 this.IORAM[i + 2] = this.IORAM[i + 3] = this.MasterUnusedRegister.upper;
             }
 
@@ -82,7 +82,7 @@ namespace GBAEmulator.Memory
 
             for (int i = 0xa8; i < 0xb0; i += 4)
             {
-                this.IORAM[i] = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
+                this.IORAM[i]     = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
                 this.IORAM[i + 2] = this.IORAM[i + 3] = this.MasterUnusedRegister.upper;
             }
 
@@ -117,7 +117,7 @@ namespace GBAEmulator.Memory
 
             for (int i = 0xe0; i < 0x100; i += 4)
             {
-                this.IORAM[i] = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
+                this.IORAM[i]     = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
                 this.IORAM[i + 2] = this.IORAM[i + 3] = this.MasterUnusedRegister.upper;
             }
 
@@ -136,7 +136,7 @@ namespace GBAEmulator.Memory
             
             for (int i = 0x110; i < 0x120; i += 4)
             {
-                this.IORAM[i] = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
+                this.IORAM[i]     = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
                 this.IORAM[i + 2] = this.IORAM[i + 3] = this.MasterUnusedRegister.upper;
             }
 
@@ -164,7 +164,7 @@ namespace GBAEmulator.Memory
             this.IORAM[0x15a] = this.IORAM[0x15b] = this.MasterZeroRegister;
             for (int i = 0x015c; i < 0x200; i += 4)
             {
-                this.IORAM[i] = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
+                this.IORAM[i]     = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
                 this.IORAM[i + 2] = this.IORAM[i + 3] = this.MasterUnusedRegister.upper;
             }
 
@@ -188,7 +188,7 @@ namespace GBAEmulator.Memory
 
             for (int i = 0x304; i < 0x400; i += 4)
             {
-                this.IORAM[i] = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
+                this.IORAM[i]     = this.IORAM[i + 1] = this.MasterUnusedRegister.lower;
                 this.IORAM[i + 2] = this.IORAM[i + 3] = this.MasterUnusedRegister.upper;
             }
 
@@ -263,8 +263,8 @@ namespace GBAEmulator.Memory
                 return (uint)(reg.Get() | (this.IORAM[address + 2].Get() << 16));
             }
             uint result = (uint)(reg.Get() >> 8);
-            result |= ((uint)this.IORAM[address + 1].Get() << 8);
-            result |= ((uint)this.IORAM[address + 3].Get() << 24);
+            result |= ((uint)this.IORAM[address + 2].Get() << 8);
+            result |= ((uint)this.IORAM[address + 4].Get() << 24);
             return result;
 
         }
@@ -283,8 +283,8 @@ namespace GBAEmulator.Memory
             else
             {
                 reg.Set((ushort)(value << 8), false, true);
-                this.IORAM[address + 1].Set((ushort)(value >> 8), true, true);
-                this.IORAM[address + 3].Set((ushort)(value >> 24), true, false);
+                this.IORAM[address + 2].Set((ushort)(value >> 8), true, true);
+                this.IORAM[address + 4].Set((ushort)(value >> 24), true, false);
             }
         }
     }

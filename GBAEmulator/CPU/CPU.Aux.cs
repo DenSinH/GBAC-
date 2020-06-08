@@ -11,19 +11,19 @@ namespace GBAEmulator.CPU
 
         public enum State : byte
         {
-            ARM = 0,
+            ARM   = 0,
             THUMB = 1
         }
 
         public enum Mode : byte
         {
-            User = 0b10000,
-            FIQ = 0b10001,
-            IRQ = 0b10010,
-            Supervisor = 0b10011,
-            Abort = 0b10111,
-            Undefined = 0b11011,
-            System = 0b11111
+            User        = 0b10000,
+            FIQ         = 0b10001,
+            IRQ         = 0b10010,
+            Supervisor  = 0b10011,
+            Abort       = 0b10111,
+            Undefined   = 0b11011,
+            System      = 0b11111
         }
 
         private struct sRegisterList  // used in Block Data Transfer / Push, Pop instructions
@@ -192,7 +192,7 @@ namespace GBAEmulator.CPU
                     case 0b11:  // Rotate Right
                         ShiftAmount &= 0x1f;  // mod 32 gives same result
                         newC = (byte)((Op >> (ShiftAmount - 1)) & 0x01);  // Bit (ShiftAmount - 1) of contents of Rm, similar to LSR
-                        Op = (uint)((Op >> ShiftAmount) | ((Op & ((1 << ShiftAmount) - 1)) << (32 - ShiftAmount)));
+                        Op = ROR(Op, ShiftAmount);
                         break;
                 }
 

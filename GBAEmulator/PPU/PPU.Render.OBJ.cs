@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-using GBAEmulator.CPU;
-
 namespace GBAEmulator
 {
     partial class PPU
@@ -70,11 +68,11 @@ namespace GBAEmulator
         }
 
         // [Shape][Size], see table on Tonc
-        private static readonly OBJSize[][] GetOBJSize = new OBJSize[3][]
+        private static readonly OBJSize[][] OBJSizeTable = new OBJSize[3][]
         {
-            new OBJSize[4] {new OBJSize(8, 8), new OBJSize(16, 16), new OBJSize(32, 32), new OBJSize(64, 64) },
-            new OBJSize[4] {new OBJSize(16, 8), new OBJSize(32, 8), new OBJSize(32, 16), new OBJSize(64, 32) },
-            new OBJSize[4] {new OBJSize(8, 16), new OBJSize(8, 32), new OBJSize(16, 32), new OBJSize(32, 64) }
+            new OBJSize[4] {new OBJSize(8, 8),  new OBJSize(16, 16), new OBJSize(32, 32), new OBJSize(64, 64) },
+            new OBJSize[4] {new OBJSize(16, 8), new OBJSize(32, 8),  new OBJSize(32, 16), new OBJSize(64, 32) },
+            new OBJSize[4] {new OBJSize(8, 16), new OBJSize(8, 32),  new OBJSize(16, 32), new OBJSize(32, 64) }
         };
 
         bool OAM2DMap;  // false for 1D mapping, true for 2D
@@ -123,10 +121,10 @@ namespace GBAEmulator
 
                 GFXMode = (byte)((OBJ_ATTR0 & 0x0c00) >> 10);
 
-                Mosaic = (OBJ_ATTR0 & 0x1000) > 0;
+                Mosaic    = (OBJ_ATTR0 & 0x1000) > 0;
                 ColorMode = (OBJ_ATTR0 & 0x2000) > 0;
 
-                OBJsz = PPU.GetOBJSize[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
+                OBJsz = OBJSizeTable[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
 
                 /* Draw object */
                 if ((!UseOBJWindowMask) ^ GFXMode == 0b10)
@@ -166,6 +164,7 @@ namespace GBAEmulator
 
         private void UpdateOBJMask(int StartX, byte Priority, bool EnableBlending)
         {
+            // Change blending mask values for a 8 pixel tile sliver
             for (int dx = 0; dx < 8; dx++)
             {
                 if (0 <= StartX + dx && StartX + dx < width)
@@ -232,15 +231,27 @@ namespace GBAEmulator
                     // we can use our same rendering method as for background, as we simply render a tile
                     if (UseOBJWindowMask)
                     {
-                        this.Render4bpp(ref this.OBJWindowMask, null, StartX, XSign,
-                        (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
-                        Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize);
+                        this.Render4bpp(
+                            ref this.OBJWindowMask,
+                            null,
+                            StartX,
+                            XSign,
+                            (uint)(SliverBaseAddress + (0x20 * dTileX)),
+                            (uint)(0x200 + PaletteBank * 0x20),
+                            Mosaic,
+                            this.gba.mem.MOSAIC.OBJMosaicHSize);
                     }
                     else
                     {
-                        this.Render4bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign,
-                            (uint)(SliverBaseAddress + (0x20 * dTileX)), (uint)(0x200 + PaletteBank * 0x20),
-                            Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize);
+                        this.Render4bpp(
+                            ref this.OBJLayers[Priority],
+                            this.OBJWindow,
+                            StartX,
+                            XSign,
+                            (uint)(SliverBaseAddress + (0x20 * dTileX)),
+                            (uint)(0x200 + PaletteBank * 0x20),
+                            Mosaic,
+                            this.gba.mem.MOSAIC.OBJMosaicHSize);
 
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
@@ -268,13 +279,29 @@ namespace GBAEmulator
                     // we can use our same rendering method as for background, as we simply render a tile
                     if (UseOBJWindowMask)
                     {
-                        this.Render8bpp(ref this.OBJWindowMask, null, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
-                                        Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
+                        this.Render8bpp(
+                            ref this.OBJWindowMask,
+                            null,
+                            StartX,
+                            XSign,
+                            (uint)(SliverBaseAddress + (0x40 * dTileX)),
+                            Mosaic,
+                            this.gba.mem.MOSAIC.OBJMosaicHSize,
+                            PaletteOffset: 0x200
+                            );
                     }
                     else
                     {
-                        this.Render8bpp(ref this.OBJLayers[Priority], this.OBJWindow, StartX, XSign, (uint)(SliverBaseAddress + (0x40 * dTileX)),
-                                        Mosaic, this.gba.mem.MOSAIC.OBJMosaicHSize, PaletteOffset: 0x200);
+                        this.Render8bpp(
+                            ref this.OBJLayers[Priority],
+                            this.OBJWindow,
+                            StartX,
+                            XSign,
+                            (uint)(SliverBaseAddress + (0x40 * dTileX)),
+                            Mosaic,
+                            this.gba.mem.MOSAIC.OBJMosaicHSize,
+                            PaletteOffset: 0x200
+                            );
 
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
@@ -297,11 +324,16 @@ namespace GBAEmulator
              over and over. For regular sprites / backgrounds it is faster to just do it all in a row
              */
             uint PixelAddress = 0x10000;   // OBJ vram starts at 0x10000 within VRAM
+
+            // base address is the same for 4bpp and 8bpp sprites
+            // Tonc about Sprite tile memory offsets: Always per 4bpp tile size: start = base + id * 32
+            PixelAddress += (uint)(TileID * 0x20);
+            // removed shifting for less arithmetic, like in regular objects
+            PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 4) : (32 * 0x20 * (py >> 3)));
+
+
             if (!ColorMode)     // 4bpp
             {
-                PixelAddress += (uint)(TileID * 0x20);
-                // removed shifting for less arithmetic, like in regular objects
-                PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 4) : (32 * 0x20 * (py >> 3)));
                 PixelAddress += (uint)(4 * (py & 0x07));
                 PixelAddress += (uint)(0x20 * (px >> 3));
 
@@ -317,10 +349,6 @@ namespace GBAEmulator
             }
             else                // 8bpp
             {
-                // Tonc about Sprite tile memory offsets: Always per 4bpp tile size: start = base + id * 32
-                PixelAddress += (uint)(TileID * 0x20);
-                // removed shifting for less arithmetic:
-                PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 4) : (32 * 0x20 * (py >> 3)));
                 PixelAddress += (uint)(8 * (py & 0x07));
                 PixelAddress += (uint)(0x40 * (px >> 3));
 
@@ -338,12 +366,11 @@ namespace GBAEmulator
             int StartX = OBJ_ATTR1 & 0x01ff;
             if ((OBJ_ATTR1 & 0x0100) > 0) StartX = (int)(StartX | 0xffff_ff00);  // sign extend
 
-            byte AffineIndex = (byte)((OBJ_ATTR1 & 0x3e00) >> 9);
-
-            ushort TileID = (ushort)(OBJ_ATTR2 & 0x03ff);
-            byte Priority = (byte)((OBJ_ATTR2 & 0x0c00) >> 10);
+            ushort TileID   = (ushort)(OBJ_ATTR2 & 0x03ff);
+            byte Priority    = (byte)((OBJ_ATTR2 & 0x0c00) >> 10);
             byte PaletteBank = (byte)((OBJ_ATTR2 & 0xf000) >> 12);
 
+            byte AffineIndex = (byte)((OBJ_ATTR1 & 0x3e00) >> 9);
             ushort RotScaleIndex = (ushort)(32 * AffineIndex + 6);
 
             // PA, PB, PC, PD:
@@ -356,18 +383,21 @@ namespace GBAEmulator
 
             // todo: SIMD?
             uint px, py;
-            uint px0 = (uint)(OBJsz.Width >> 1);
+            uint px0 = (uint)(OBJsz.Width  >> 1);
             uint py0 = (uint)(OBJsz.Height >> 1);
 
             // distance with the midpoint of the sprite
-            short dy;
-            if (!DoubleRendering)
-                dy = (short)(scanline - OBJy - (OBJsz.Height >> 1));
-            else
+            short dy, dx;
+            if (DoubleRendering)
+            {
                 dy = (short)(scanline - OBJy - OBJsz.Height);
-            
-            // subtract one because we increment at the start of the loop
-            short dx = (short)((DoubleRendering ? -OBJsz.Width : -(OBJsz.Width >> 1)) - 1);
+                dx = (short)(-OBJsz.Width - 1);             // subtract one because we increment at the start of the loop
+            }
+            else
+            {
+                dy = (short)(scanline - OBJy - (OBJsz.Height >> 1));
+                dx = (short)(-(OBJsz.Width >> 1) - 1);      // subtract one because we increment at the start of the loop
+            }
 
             // What the object width is to be interpreted as for looping over x coordinates
             byte FictionalOBJWidth = (byte)(DoubleRendering ? 2 * OBJsz.Width : OBJsz.Width);
@@ -397,7 +427,7 @@ namespace GBAEmulator
 
                 if (UseOBJWindowMask)
                 {
-                    this.OBJWindowMask[StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, (byte)px, (byte)py, ColorMode, PaletteBank);
+                    this.OBJWindowMask      [StartX + ix] = this.GetAffineOBJPixel(TileID, OBJsz, (byte)px, (byte)py, ColorMode, PaletteBank);
                 }
                 else
                 {
@@ -409,7 +439,7 @@ namespace GBAEmulator
                     {
                         if (this.OBJLayers[Priority][StartX + ix] != 0x8000)
                         {
-                            this.OBJMaxPriority[StartX + ix] = Priority;
+                            this.OBJMaxPriority [StartX + ix] = Priority;
                             this.OBJBlendingMask[StartX + ix] = EnableBlending;
                         }
                     }

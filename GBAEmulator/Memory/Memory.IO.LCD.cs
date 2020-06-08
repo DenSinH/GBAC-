@@ -34,7 +34,7 @@ namespace GBAEmulator.Memory
             }
         }
 
-        public readonly cDISPCNT DISPCNT = new cDISPCNT();  // 0x0400_0004
+        public readonly cDISPCNT DISPCNT = new cDISPCNT();
         #endregion
 
         #region DISPSTAT

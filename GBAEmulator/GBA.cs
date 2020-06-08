@@ -109,13 +109,13 @@ namespace GBAEmulator
 
         public void Run()
         {
-            this.mem.LoadRom("../../roms/ZeldaLTTP.gba");
+            this.mem.LoadRom("../../roms/ZeldaMinishCap.gba");
             // this.mem.LoadRom("../../Tests/Krom/BIOSARCTAN.gba");
             // this.mem.LoadRom("../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../Tests/Organharvester/joypad.gba");
             // this.mem.LoadRom("../../Tests/flero/openbuster.gba");
             // this.mem.LoadRom("../../Tests/GBASuiteNew/nes.gba");
-            // this.mem.LoadRom("../../Tests/Tonc/bm_modes.gba");
+            // this.mem.LoadRom("../../Tests/Tonc/obj_aff.gba");
             // this.mem.LoadRom("../../Tests/Armwrestler/armwrestler.gba");
             // this.mem.LoadRom("../../Tests/EndriftSuite.gba");
 

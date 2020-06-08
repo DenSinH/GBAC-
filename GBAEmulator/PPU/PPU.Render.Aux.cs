@@ -12,10 +12,10 @@ namespace GBAEmulator
             BlendMode AlphaBlending = this.gba.mem.BLDCNT.BlendMode;
             BlendMode Win0In, Win1In, OBJWinIn, WinOut;
 
-            Win0In = this.gba.mem.WININ.WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
-            Win1In = this.gba.mem.WININ.WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
-            OBJWinIn = this.gba.mem.WINOUT.WindowSpecialEffects(Window.OBJ)   ? AlphaBlending : BlendMode.Off;
-            WinOut = this.gba.mem.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
+            Win0In   = this.gba.mem.WININ .WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
+            Win1In   = this.gba.mem.WININ .WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
+            OBJWinIn = this.gba.mem.WINOUT.WindowSpecialEffects(Window.OBJ)     ? AlphaBlending : BlendMode.Off;
+            WinOut   = this.gba.mem.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
 
             this.ResetWindow<BlendMode>(ref WindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
             
@@ -41,41 +41,29 @@ namespace GBAEmulator
         {
             if (Y1 <= Y2)
             {
-                // no vert wrap
+                // no vert wrap and out of bounds: return
                 if (scanline < Y1 || scanline > Y2) return;
-
-                if (X1 <= X2)
-                {
-                    // no hor wrap
-                    // slice in WININ
-                    for (int x = X1; x < X2; x++)
-                    {
-                        Window[x] = WindowInEnable;
-                    } 
-                }
-                else
-                {
-                    // slices in WININ
-                    for (int x = 0; x < X2; x++) Window[x] = WindowInEnable;
-                    for (int x = X1; x < width; x++) Window[x] = WindowInEnable;
-                }
             }
             else
             {
+                // vert wrap and "in bounds": return
                 if ((scanline < Y1) && (scanline > Y2)) return;
+            }
 
-                if (X1 <= X2)
+            if (X1 <= X2)
+            {
+                // no hor wrap
+                // slice in WININ
+                for (int x = X1; x < X2; x++)
                 {
-                    // no hor wrap
-                    // slice in WININ
-                    for (int x = X1; x < X2; x++) Window[x] = WindowInEnable;
-                }
-                else
-                {
-                    // slices in WININ
-                    for (int x = 0; x < X2; x++) Window[x] = WindowInEnable;
-                    for (int x = X1; x < width; x++) Window[x] = WindowInEnable;
-                }
+                    Window[x] = WindowInEnable;
+                } 
+            }
+            else
+            {
+                // slices in WININ
+                for (int x = 0; x < X2; x++)     Window[x] = WindowInEnable;
+                for (int x = X1; x < width; x++) Window[x] = WindowInEnable;
             }
         }
 
@@ -96,8 +84,6 @@ namespace GBAEmulator
             // OBJ layer lowest priority
             if (this.gba.mem.DISPCNT.DisplayOBJWindow())
             {
-                // assume OBJ layer 0 is the mask!
-                // has to be filled BEFORE calling this method
                 for (int x = 0; x < width; x++)
                 {
                     // we draw the mask sprites all to priority 0
@@ -108,7 +94,7 @@ namespace GBAEmulator
                 }
             }
 
-            for (byte window = 1; window <= 1; window--)
+            for (byte window = 1; window <= 1; window--)  // abuse overflow to loop over window = 1, 0
             {
                 if (!this.gba.mem.DISPCNT.DisplayBGWindow(window))
                 {
@@ -121,10 +107,9 @@ namespace GBAEmulator
 
                 Y1 = this.gba.mem.WINV[window].LowCoord;
                 Y2 = this.gba.mem.WINV[window].HighCoord;
-                // if (Y2 > height) Y2 = height;
+                // if (Y2 > height) Y2 = height;  // GBATek says this, but it seems to create wrong behavior
 
-                this.MaskWindow<T>(ref Window, (window == 0) ? Win0In : Win1In,
-                    X1, X2, Y1, Y2);
+                this.MaskWindow<T>(ref Window, (window == 0) ? Win0In : Win1In, X1, X2, Y1, Y2);
             }
         }
         
@@ -137,11 +122,11 @@ namespace GBAEmulator
             ushort BGR;
 
             // Blend red
-            BGR = (ushort)(((ColorA & 0x001f) * EVA + (ColorB & 0x001f) * EVB) >> 4);  // 1.4 fixed point
+            BGR = (ushort)(((ColorA & 0x001f) * EVA + (ColorB & 0x001f) * EVB) >> 4);                 // 1.4 fixed point
             Blend |= (ushort)(BGR >= 0x1f ? 0x001f : BGR);
 
             // Blend green
-            BGR = (ushort)((((ColorA & 0x03e0) >> 5) * EVA + ((ColorB & 0x03e0) >> 5) * EVB) >> 4);  // 1.4 fixed point
+            BGR = (ushort)((((ColorA & 0x03e0) >> 5) * EVA + ((ColorB & 0x03e0) >> 5) * EVB) >> 4);   // 1.4 fixed point
             Blend |= (ushort)(BGR >= 0x1f ? 0x03e0 : (BGR << 5));
 
             // Blend blue
@@ -243,15 +228,15 @@ namespace GBAEmulator
             bool[] BGTop = new bool[4], BGBottom = new bool[4];
             foreach (byte BG in BGs)
             {
-                BGTop[BG] = this.gba.mem.BLDCNT.BGIsTop(BG);
+                BGTop[BG]    = this.gba.mem.BLDCNT.BGIsTop(BG);
                 BGBottom[BG] = this.gba.mem.BLDCNT.BGIsBottom(BG);
             }
 
             bool OBJTop, OBJBottom, BDTop, BDBottom;
-            OBJTop = this.gba.mem.BLDCNT.OBJIsTop();
-            OBJBottom = this.gba.mem.BLDCNT.OBJIsBottom();
-            BDTop = this.gba.mem.BLDCNT.BDIsTop();
-            BDBottom = this.gba.mem.BLDCNT.BDIsBottom();
+            OBJTop      = this.gba.mem.BLDCNT.OBJIsTop();
+            OBJBottom   = this.gba.mem.BLDCNT.OBJIsBottom();
+            BDTop       = this.gba.mem.BLDCNT.BDIsTop();
+            BDBottom    = this.gba.mem.BLDCNT.BDIsBottom();
 
             // only to be called after drawing into the BGScanlines and OBJLayers
             byte priority;
@@ -265,17 +250,14 @@ namespace GBAEmulator
 
                 for (priority = 0; priority < 4; priority++)
                 {
-                    if (RenderOBJ)
+                    if (RenderOBJ && this.OBJLayers[priority][x] != 0x8000)
                     {
-                        if (this.OBJLayers[priority][x] != 0x8000)
+                        if (this.SetPixel(ScreenX, this.OBJLayers[priority][x], WindowBlendMode[x], OBJTop, OBJBottom, WasOBJ, IsOBJ: true))
                         {
-                            if (this.SetPixel(ScreenX, this.OBJLayers[priority][x], WindowBlendMode[x], OBJTop, OBJBottom, WasOBJ, IsOBJ: true))
-                            {
-                                priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
-                                break;
-                            }
-                            WasOBJ = true;
+                            priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                            break;
                         }
+                        WasOBJ = true;
                     }
 
                     foreach (byte BG in BGs)
@@ -286,13 +268,13 @@ namespace GBAEmulator
                         if (Priorities[BG] != priority)
                             continue;
 
-                        if (this.BGScanlines[BG][x] != 0x8000)
+                        if (this.BGScanlines[BG][x] == 0x8000)
+                            continue;
+
+                        if (this.SetPixel(ScreenX, this.BGScanlines[BG][x], WindowBlendMode[x], BGTop[BG], BGBottom[BG], WasOBJ))
                         {
-                            if (this.SetPixel(ScreenX, this.BGScanlines[BG][x], WindowBlendMode[x], BGTop[BG], BGBottom[BG], WasOBJ))
-                            {
-                                priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
-                                break;
-                            }
+                            priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
+                            break;
                         }
                     }
                 }
@@ -320,42 +302,32 @@ namespace GBAEmulator
             for (int dx = 0; dx < 4; dx++)  // we need to look at nibbles here
             {
                 MosaicCorrectedAddress = (uint)(TileLineBaseAddress + dx);
-                if (Mosaic && MosaicHSize != 1)
+                for (int ddx = 0; ddx < 2; ddx++)
                 {
-                    // todo: fix horizontal mosaic
-                    UpperNibble = (((dx << 1) % MosaicHSize) & 1) == 1;
-                    MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize) >> 1;
-                }
-                else
-                {
-                    UpperNibble = false;
-                }
-
-                VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
-
-                if (0 <= ScreenX && ScreenX < width)  // ScreenX is a byte, so always greater than 0
-                {
-                    if (Line[ScreenX] == 0x8000)
+                    if (Mosaic && MosaicHSize != 1)
                     {
-                        PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
-                        if (PaletteNibble > 0 && (Window?[ScreenX] ?? true))  // non-transparent
-                            Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
+                        // todo: fix horizontal mosaic
+                        UpperNibble = (((dx << 1) % MosaicHSize) & 1) == 1;
+                        MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize) >> 1;
                     }
-                }
-                ScreenX += XSign;
-
-                UpperNibble = !Mosaic || MosaicHSize == 1 || ((((dx << 1) + 1) % MosaicHSize) & 1) == 1;
-
-                if (0 <= ScreenX && ScreenX < width)
-                {
-                    if (Line[ScreenX] == 0x8000)
+                    else
                     {
-                        PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
-                        if (PaletteNibble > 0 && (Window?[ScreenX] ?? true))  // non-transparent
-                            Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
+                        UpperNibble = ddx == 1;
                     }
+
+                    VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
+
+                    if (0 <= ScreenX && ScreenX < width)  // ScreenX is a byte, so always greater than 0
+                    {
+                        if (Line[ScreenX] == 0x8000)
+                        {
+                            PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
+                            if (PaletteNibble > 0 && (Window?[ScreenX] ?? true))  // non-transparent
+                                Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
+                        }
+                    }
+                    ScreenX += XSign;
                 }
-                ScreenX += XSign;
             }
         }
 
@@ -373,7 +345,7 @@ namespace GBAEmulator
                 if (Mosaic)
                     MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize);
 
-                if (0 <= ScreenX && ScreenX < width)  // ScreenX is a byte, so always >= 0
+                if (0 <= ScreenX && ScreenX < width)
                 {
                     if (Line[ScreenX] == 0x8000)
                     {

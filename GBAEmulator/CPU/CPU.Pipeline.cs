@@ -14,6 +14,7 @@ namespace GBAEmulator.CPU
          */
     public class cPipeline
     {
+        const int STORAGE_MASK = 3;
         private uint[] storage = new uint[4];
         private uint offset = 0;
         public int Count { get; private set; }
@@ -27,18 +28,18 @@ namespace GBAEmulator.CPU
 
         public uint Peek()
         {
-            return storage[offset & 3];
+            return storage[offset & STORAGE_MASK];
         }
 
         public uint Dequeue()
         {
             Count--;
-            return storage[offset++ & 3];
+            return storage[offset++ & STORAGE_MASK];
         }
 
         public void Enqueue(uint value)
         {
-            storage[(offset + Count++) & 3] = value;
+            storage[(offset + Count++) & STORAGE_MASK] = value;
         }
 
         public void Clear()
@@ -53,9 +54,9 @@ namespace GBAEmulator.CPU
             {
                 // recently fetched opcode
                 if (this.cpu.state == ARM7TDMI.State.ARM)
-                    return storage[(offset + Count - 1) & 3];
+                    return storage[(offset + Count - 1) & STORAGE_MASK];
 
-                uint prefetch = storage[(offset + Count - 1) & 3];
+                uint prefetch = storage[(offset + Count - 1) & STORAGE_MASK];
                 return (uint)(prefetch << 16) | prefetch;
             }
         }
@@ -65,7 +66,7 @@ namespace GBAEmulator.CPU
             string result = "";
             for (int i = 0; i < 4; i++)
             {
-                result += storage[(offset + i) & 3].ToString("x8") + " ";
+                result += storage[(offset + i) & STORAGE_MASK].ToString("x8") + " ";
             }
             return result;
         }

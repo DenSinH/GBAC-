@@ -7,22 +7,21 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
         // Vector pointers for handlers
-        const uint ResetVector = 0x0;
-        const uint UndefVector = 0x4;           // unused
-        const uint SWIVector = 0x8;
-        const uint AbortPrefetchVector = 0xc;   // unused
-        const uint AbortDataVector = 0x10;      // unused
-        const uint ReservedVector = 0x14;       // unused
-        const uint IRQVector = 0x18;
-        const uint FIQVector = 0x1c;            // unused
+        const uint ResetVector          = 0x00;
+        const uint UndefVector          = 0x04;  // unused
+        const uint SWIVector            = 0x08;
+        const uint AbortPrefetchVector  = 0x0c;  // unused
+        const uint AbortDataVector      = 0x10;  // unused
+        const uint ReservedVector       = 0x14;  // unused
+        const uint IRQVector            = 0x18;
+        const uint FIQVector            = 0x1c;  // unused
         
         private bool HandleIRQs()
         {
-            if ((this.mem.IF.raw & this.mem.IE.raw) != 0)  //  & 0b0011_1111_1111_1100  // mask interrupts manually for testing
+            if ((this.mem.IF.raw & this.mem.IE.raw) != 0)
             {
                 this.mem.HALTCNT.Halt = false;
-
-                // flipping IME makes irq_demo and Endrift's suite work, so this can be (ab)used for testing
+                
                 if (this.mem.IME.Enabled && (this.I == 0))
                 {
                     this.DoIRQ();

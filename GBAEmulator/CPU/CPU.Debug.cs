@@ -52,7 +52,7 @@ namespace GBAEmulator.CPU
             this.UnitLength = dmacnt_h.DMATransferType ? "32" : "16";
             this.Timing = dmacnt_h.StartTiming.ToString();
             this.IRQ = dmacnt_h.IRQOnEnd ? "1" : "0";
-            this.Enabled = dmacnt_h.DMAEnable ? "1" : "0";
+            this.Enabled = dmacnt_h.DMAEnabled ? "1" : "0";
         }
     }
 

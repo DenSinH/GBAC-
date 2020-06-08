@@ -153,7 +153,7 @@ namespace GBAEmulator.Memory
                 get => (this._raw & 0x4000) > 0;
             }
 
-            public bool DMAEnable
+            public bool DMAEnabled
             {
                 get => (this._raw & 0x8000) > 0;
             }
@@ -176,11 +176,11 @@ namespace GBAEmulator.Memory
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
-                bool DoReload = !this.DMAEnable;
+                bool DoReload = !this.DMAEnabled;
 
                 // bottom 5 bits unused
                 base.Set((ushort)(value & 0xfff8), setlow, sethigh);
-                if (DoReload && this.DMAEnable)
+                if (DoReload && this.DMAEnabled)
                 {
                     this.mem.DMADAD[this.index].Reload();
                     this.mem.DMASAD[this.index].Reload();

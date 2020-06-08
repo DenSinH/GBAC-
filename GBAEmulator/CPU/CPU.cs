@@ -49,13 +49,13 @@ namespace GBAEmulator.CPU
             // Initialize Register banks
             this.BankedRegisters = new Dictionary<Mode, uint[]>
             {
-                { Mode.System, this.SystemBank },
-                { Mode.User, this.SystemBank },
-                { Mode.FIQ, this.FIQBank },
-                { Mode.Supervisor, this.SupervisorBank },
-                { Mode.Abort, this.AbortBank },
-                { Mode.IRQ, this.IRQBank },
-                { Mode.Undefined, this.UndefinedBank }
+                { Mode.System,          this.SystemBank },
+                { Mode.User,            this.SystemBank },
+                { Mode.FIQ,             this.FIQBank },
+                { Mode.Supervisor,      this.SupervisorBank },
+                { Mode.Abort,           this.AbortBank },
+                { Mode.IRQ,             this.IRQBank },
+                { Mode.Undefined,       this.UndefinedBank }
             };
 
             // need banked registers for CPSR initialization
@@ -80,12 +80,12 @@ namespace GBAEmulator.CPU
                   SP_usr=03007F00h
             (GBATek)
              */
-            this.SP = 0x03007F00;
-            this.FIQBank[13] = 0x03007F00;          // mode does not exist
+            this.SP                 = 0x03007F00;
+            this.FIQBank[13]        = 0x03007F00;  // mode does not exist
             this.SupervisorBank[13] = 0x03007FE0;
-            this.AbortBank[13] = 0x03007F00;        // mode does not exist
-            this.IRQBank[13] = 0x03007FA0;
-            this.UndefinedBank[13] = 0x03007F00;    // mode does not exist
+            this.AbortBank[13]      = 0x03007F00;  // mode does not exist
+            this.IRQBank[13]        = 0x03007FA0;
+            this.UndefinedBank[13]  = 0x03007F00;  // mode does not exist
 
             this.PC = 0x08000000;
             this.CPSR = 0x6000001F;
@@ -183,7 +183,7 @@ namespace GBAEmulator.CPU
             //    }
             //}
 
-            return StepCycles;
+            return (StepCycles >> 1) + 1;
         }
     }
 }

@@ -119,16 +119,15 @@ namespace GBAEmulator
                     // Background disabled, does not need rendering
                     continue;
 
-                HOFS = this.gba.mem.BGHOFS[BG].Offset;
-                VOFS = this.gba.mem.BGVOFS[BG].Offset;
+                HOFS  = this.gba.mem.BGHOFS[BG].Offset;
+                VOFS  = this.gba.mem.BGVOFS[BG].Offset;
                 BGCNT = this.gba.mem.BGCNT[BG];
 
-                CharBaseBlock = BGCNT.CharBaseBlock;
+                CharBaseBlock   = BGCNT.CharBaseBlock;
                 ScreenBaseBlock = BGCNT.ScreenBaseBlock;
-                ColorMode = BGCNT.ColorMode;
-                Mosaic = BGCNT.Mosaic;
-
-                BGSize = BGCNT.ScreenSize;
+                ColorMode       = BGCNT.ColorMode;
+                Mosaic          = BGCNT.Mosaic;
+                BGSize          = BGCNT.ScreenSize;
 
                 // correct address for mosaic
                 EffectiveY = (short)(scanline + VOFS);
@@ -148,10 +147,17 @@ namespace GBAEmulator
 
                     ScreenEntry = (ushort)(this.gba.mem.VRAM[ScreenEntryIndex + 1] << 8 | this.gba.mem.VRAM[ScreenEntryIndex]);
                     
-                    this.DrawRegularScreenEntry(ref this.BGScanlines[BG], ref this.BGWindows[BG],
-                        StartX: (CourseX * 8) - (HOFS & 0x07), dy: (byte)(EffectiveY & 0x07),
-                        ScreenEntry: ScreenEntry, CharBaseBlock: CharBaseBlock, ColorMode: ColorMode, Mosaic: Mosaic,
-                        MosaicHSize: this.gba.mem.MOSAIC.BGMosaicHSize);
+                    this.DrawRegularScreenEntry(
+                        ref this.BGScanlines[BG],
+                        ref this.BGWindows[BG],
+                        StartX: (CourseX * 8) - (HOFS & 0x07),
+                        dy: (byte)(EffectiveY & 0x07),
+                        ScreenEntry: ScreenEntry,
+                        CharBaseBlock: CharBaseBlock,
+                        ColorMode: ColorMode,
+                        Mosaic: Mosaic,
+                        MosaicHSize: this.gba.mem.MOSAIC.BGMosaicHSize
+                        );
                 }
             }
         }
@@ -160,7 +166,7 @@ namespace GBAEmulator
         //                                      Affine layers
         // ===================================================================================================
 
-        private static readonly ushort[] AffineSizes = new ushort[4] { 128, 256, 512, 1024 };
+        private static readonly ushort[] AffineSizeTable = new ushort[4] { 128, 256, 512, 1024 };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ushort GetAffinePixel(byte TileID, uint ScreenX, byte CharBaseBlock, byte dx, byte dy)
@@ -180,20 +186,18 @@ namespace GBAEmulator
         private void RenderAffineBGScanline(byte BG, MEM.cReferencePoint BGxX, MEM.cReferencePoint BGxY,
             MEM.cRotationScaling PA, MEM.cRotationScaling PB, MEM.cRotationScaling PC, MEM.cRotationScaling PD)
         {
-            // ! only to be used with BG = 2 or BG = 3
-            if (!this.gba.mem.DISPCNT.DisplayBG(BG))
-                // Background disabled, does not need rendering
+            // ! only to be used with BG = 2 or BG = 3 !
+            if (!this.gba.mem.DISPCNT.DisplayBG(BG))  // Background disabled, does not need rendering
                 return;
 
             MEM.cBGControl BGCNT = this.gba.mem.BGCNT[BG];
             
-            ushort BGSize = PPU.AffineSizes[BGCNT.ScreenSize];
+            ushort BGSize = AffineSizeTable[BGCNT.ScreenSize];
 
             byte CharBaseBlock = BGCNT.CharBaseBlock;
             uint ScreenEntryBaseAddress = (uint)BGCNT.ScreenBaseBlock * 0x800;
-            byte Priority = BGCNT.BGPriority;
-
-            bool Mosaic = BGCNT.Mosaic;
+            byte Priority      = BGCNT.BGPriority;
+            bool Mosaic        = BGCNT.Mosaic;
 
             uint ScreenEntryIndex;
             byte AffineScreenEntry;

@@ -528,7 +528,6 @@ namespace GBAEmulator.Memory
             this.bus.BusValue = value;
 
             return (byte)value;
-            return memory[address];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -539,7 +538,6 @@ namespace GBAEmulator.Memory
             this.bus.BusValue = value;
 
             return (ushort)value;
-            return (ushort)((memory[address + 1] << 8) | memory[address]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
