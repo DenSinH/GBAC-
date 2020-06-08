@@ -47,14 +47,27 @@ namespace GBAEmulator.CPU
             offset = 0;
         }
 
-        public uint PreFetch()
+        public uint PreFetch
         {
-            // recently fetched opcode
-            if (this.cpu.state == ARM7TDMI.State.ARM)
-                return storage[(offset + Count - 1) & 3];
+            get
+            {
+                // recently fetched opcode
+                if (this.cpu.state == ARM7TDMI.State.ARM)
+                    return storage[(offset + Count - 1) & 3];
 
-            uint prefetch = storage[(offset + Count - 1) & 3];
-            return (uint)(prefetch << 16) | prefetch;
+                uint prefetch = storage[(offset + Count - 1) & 3];
+                return (uint)(prefetch << 16) | prefetch;
+            }
+        }
+
+        public string Dumps()
+        {
+            string result = "";
+            for (int i = 0; i < 4; i++)
+            {
+                result += storage[(offset + i) & 3].ToString("x8") + " ";
+            }
+            return result;
         }
     }
 

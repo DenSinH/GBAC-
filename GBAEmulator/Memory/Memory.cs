@@ -27,13 +27,13 @@ namespace GBAEmulator.Memory
         // todo: waitstates / N & S cycles
         // Byte access cycles are equal to halfword access cycles
 
-        private readonly int[] __ByteAccesSCycles__ = new int[16]
+        private readonly int[] __ByteAccessSCycles__ = new int[16]
         {
             1, 1, 3, 1, 1, 1, 1, 1,
             5, 5, 5, 5, 5, 5, 5, 5
         };
 
-        private readonly int[] __WordAccesSCycles__ = new int[16]
+        private readonly int[] __WordAccessSCycles__ = new int[16]
         {
             1, 1, 6, 1, 1, 2, 2, 1,
             8, 8, 8, 8, 8, 8, 8, 8

@@ -43,7 +43,7 @@ namespace GBAEmulator.CPU
 
             this.Log($"DMA: {dmasad.Address.ToString("x8")} -> {dmadad.Address.ToString("x8")}");
 
-            uint UnitLength = (uint)(dmacnt_h.DMATransferType ? 4 : 2);  // bytes: 16 / 32 bits
+            uint UnitLength = (uint)(dmacnt_h.DMATransferType ? 4 : 2);  // bytes: 32 / 16 bits
             uint DMAData;
 
             if (UnitLength == 4)
@@ -56,7 +56,6 @@ namespace GBAEmulator.CPU
                 DMAData = this.mem.GetHalfWordAt(dmasad.Address & 0xffff_fffe);
                 this.mem.SetHalfWordAt(dmadad.Address & 0xffff_fffe, (ushort)DMAData);
             }
-            this.bus.DMAValue = DMAData;
 
             this.UpdateDMAAddress(dmasad, dmacnt_h.SourceAddrControl, UnitLength);
             this.UpdateDMAAddress(dmadad, dmacnt_h.DestAddrControl, UnitLength);
@@ -85,7 +84,7 @@ namespace GBAEmulator.CPU
 
         private void EndDMA(MEM.cDMACNT_H dmacnt_h, MEM.cDMACNT_L dmacnt_l, MEM.cDMAAddress dmasad, MEM.cDMAAddress dmadad)
         {
-            // Immediate DMA transfers should ignore the Repeat bit  - Fleroviux
+            // Immediate DMA transfers should ignore the Repeat bit - Fleroviux
             if (dmacnt_h.DMARepeat && dmacnt_h.StartTiming != DMAStartTiming.Immediately)
             {
                 dmacnt_l.Reload();

@@ -94,16 +94,17 @@ namespace GBAEmulator.CPU
         }
 
         //bool COMPLOG;
-        //StreamReader LOGFILE = new StreamReader("../../Tests/ags_IO.log");
+        //StreamReader LOGFILE = new StreamReader("../../Tests/ClearDMA0firsttime.log");
         public int Step()
         {
             int DMACycles = 0;
             int StepCycles;
 
-            //if (pause && this.PC == 0x080030CE)
+            //if (this.PC == 0x0800_ce54)
             //{
+            //    Console.WriteLine("Start DMA0 func");
             //    Console.WriteLine("BREAKPOINT!");
-            //    COMPLOG = COMPLOG || Console.ReadKey().KeyChar == 'c';
+            //    COMPLOG = true;
             //}
 
             if (pause)
@@ -158,26 +159,26 @@ namespace GBAEmulator.CPU
 
             //if (COMPLOG)
             //{
-            //    if (!this.HALTCNT.Halt && (DMACycles == 0))
+            //    if (!this.mem.HALTCNT.Halt && (DMACycles == 0))
             //    {
             //        if (this.Pipeline.Count == 1)
             //        {
             //            string Line = LOGFILE.ReadLine();
             //            Console.WriteLine("LOG " + Line);
-            //            Console.Write("ACT ");
+            //            Console.Write(" ACT ");
             //            this.ShowInfo();
 
             //            //// all registers
-            //            if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
-            //            {
-            //                Console.ReadKey();
-            //            }
-
-            //            // wrong branch
-            //            //if (!Line.Contains(this.Registers[15].ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            //if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
             //            //{
             //            //    Console.ReadKey();
             //            //}
+
+            //            // wrong branch
+            //            if (!Line.Contains(this.Registers[15].ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            {
+            //                Console.ReadKey();
+            //            }
             //        }
             //    }
             //}

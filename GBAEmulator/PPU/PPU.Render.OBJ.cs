@@ -110,6 +110,9 @@ namespace GBAEmulator
                 if (OBJMode == 0b10)
                     continue;  // sprite hidden
 
+                if ((OBJ_ATTR0 & 0xc000) == 0xc000)
+                    continue;  // forbidden sprite size
+
                 OBJ_ATTR1 = (ushort)(this.gba.mem.OAM[i + 2] | (this.gba.mem.OAM[i + 3] << 8));
                 OBJ_ATTR2 = (ushort)(this.gba.mem.OAM[i + 4] | (this.gba.mem.OAM[i + 5] << 8));
 
@@ -122,8 +125,6 @@ namespace GBAEmulator
 
                 Mosaic = (OBJ_ATTR0 & 0x1000) > 0;
                 ColorMode = (OBJ_ATTR0 & 0x2000) > 0;
-
-                if ((OBJ_ATTR0 & 0xc000) == 0xc000) continue;  // forbidden
 
                 OBJsz = PPU.GetOBJSize[(OBJ_ATTR0 & 0xc000) >> 14][(OBJ_ATTR1 & 0xc000) >> 14];
 

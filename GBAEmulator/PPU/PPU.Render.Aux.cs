@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-using GBAEmulator.CPU;
-
 namespace GBAEmulator
 {
     partial class PPU
@@ -38,8 +36,7 @@ namespace GBAEmulator
         {
             for (int x = 0; x < width; x++) Window[x] = value;
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
         private void MaskWindow<T>(ref T[] Window, T WindowInEnable, byte X1, byte X2, byte Y1, byte Y2)
         {
             if (Y1 <= Y2)
@@ -153,8 +150,7 @@ namespace GBAEmulator
 
             return Blend;
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
         private bool SetPixel(int ScreenX, ushort Color, BlendMode AlphaBlending, bool IsTop, bool IsBottom, bool WasOBJ, bool IsOBJ = false)
         {
             // returns if the pixel has final value

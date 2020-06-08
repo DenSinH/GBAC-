@@ -130,6 +130,7 @@ namespace GBAEmulator
 
                 BGSize = BGCNT.ScreenSize;
 
+                // correct address for mosaic
                 EffectiveY = (short)(scanline + VOFS);
                 if (Mosaic)
                     EffectiveY -= (short)(EffectiveY % this.gba.mem.MOSAIC.BGMosaicVSize);

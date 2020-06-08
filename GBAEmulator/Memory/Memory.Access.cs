@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 using GBAEmulator.CPU;
 
@@ -8,10 +9,14 @@ namespace GBAEmulator.Memory
 {
     public partial class MEM
     {
-        [Conditional("DEBUG")]
+        // [Conditional("DEBUG")]
         private void MemoryAccess(uint Address)
         {
-            // Console.WriteLine("Memory Access: " + Address.ToString("x8"));
+            if (Address >= 0x0203_9ed0 && Address < 0x0203_9ed4)
+            {
+                Console.WriteLine("Memory Access: " + Address.ToString("x8"));
+                // Console.ReadKey();
+            }
         }
         
         /*
@@ -27,8 +32,8 @@ namespace GBAEmulator.Memory
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.cpu.NCycle = __WordAccesSCycles__[Section];
-                this.cpu.SCycle = __WordAccesSCycles__[Section];
+                this.cpu.NCycle = __WordAccessSCycles__[Section];
+                this.cpu.SCycle = __WordAccessSCycles__[Section];
             }
 
             switch (Section)
@@ -39,31 +44,31 @@ namespace GBAEmulator.Memory
                         if (this.cpu.PC < 0x0100_0000)
                         {
                             // normal BIOS fetch
-                            return __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
+                            return this.bus.BusValue = __GetWordAt__(this.BIOS, address & __MemoryMasks__[Section]);
                         }
-                        return __GetWordAt__(this.BIOS, (uint)this.CurrentBIOSReadState);
+                        return this.bus.BusValue = __GetWordAt__(this.BIOS, (uint)this.CurrentBIOSReadState);
                     }
                     return this.bus.OpenBus();
                 case 1:
                     return this.bus.OpenBus();
                 case 2:
-                    return __GetWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
+                    return this.bus.BusValue = __GetWordAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
-                    return __GetWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
+                    return this.bus.BusValue = __GetWordAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4:   // IORAM
                     if ((address & 0x00ff_ffff) < 0x400) return this.IOGetWordAt(address & 0x3ff);
                     return this.bus.OpenBus();
                 case 5:
-                    return __GetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
+                    return this.bus.BusValue = __GetWordAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
                     if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        return __GetWordAt__(this.VRAM, address & 0xffff);
+                        return this.bus.BusValue = __GetWordAt__(this.VRAM, address & 0xffff);
                     }
-                    return __GetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
+                    return this.bus.BusValue = __GetWordAt__(this.VRAM, 0x10000 | (address & 0x7fff));
                 case 7:
-                    return __GetWordAt__(this.OAM, address & __MemoryMasks__[Section]);
+                    return this.bus.BusValue = __GetWordAt__(this.OAM, address & __MemoryMasks__[Section]);
                 case 8:
                 case 9:
                 case 10:
@@ -84,15 +89,15 @@ namespace GBAEmulator.Memory
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
                             // EEPROM access, might as well call a read directly
-                            return this.EEPROMRead();
+                            return this.bus.BusValue = this.EEPROMRead();
                         }
                     }
 
                     if (_address < ROMSize)
                     {
-                        return __GetWordAt__(this.GamePak, _address);
+                        return this.bus.BusValue = __GetWordAt__(this.GamePak, _address);
                     }
-                    return ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);  // seems to be what mGBA is doing...
+                    return this.bus.BusValue = ((address >> 1) & 0xffff) | ((((address >> 1) + 1) & 0xffff) << 16);  // seems to be what mGBA is doing...
                 case 14:
                 case 15:  // SRAM
                     byte value = this.BackupRead(address & 0xffff);
@@ -105,12 +110,13 @@ namespace GBAEmulator.Memory
         public void SetWordAt(uint address, uint value)
         {
             this.MemoryAccess(address);
+            this.bus.BusValue = value;
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.cpu.NCycle = __WordAccesSCycles__[Section];
-                this.cpu.SCycle = __WordAccesSCycles__[Section];
+                this.cpu.NCycle = __WordAccessSCycles__[Section];
+                this.cpu.SCycle = __WordAccessSCycles__[Section];
             }
 
             switch (Section)
@@ -185,8 +191,8 @@ namespace GBAEmulator.Memory
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.cpu.NCycle = __ByteAccesSCycles__[Section];
-                this.cpu.SCycle = __ByteAccesSCycles__[Section];
+                this.cpu.NCycle = __ByteAccessSCycles__[Section];
+                this.cpu.SCycle = __ByteAccessSCycles__[Section];
             }
 
             switch (Section)
@@ -245,12 +251,15 @@ namespace GBAEmulator.Memory
                     {
                         return __GetHalfWordAt__(this.GamePak, _address);
                     }
-                    else if (address >= 0x0d00_0000) return 1;  // this is what mGBA seems to do...
-                    return (ushort)((address >> 1) & 0xffff);
+                    else if (address >= 0x0d00_0000)
+                    {
+                        return (ushort)(this.bus.BusValue = 1);  // this is what mGBA seems to do...
+                    }
+                    return (ushort)(this.bus.BusValue = (address >> 1) & 0xffff);
                 case 14:
                 case 15:  // SRAM
                     byte value = this.BackupRead(address & 0xffff);
-                    return (ushort)(value | (value << 8));
+                    return (ushort)(this.bus.BusValue = (this.bus.BusValue & 0xffff_0000) | (uint)(value | (value << 8)));
                 default:
                     return (ushort)this.bus.OpenBus();
             }
@@ -259,19 +268,20 @@ namespace GBAEmulator.Memory
         public void SetHalfWordAt(uint address, ushort value)
         {
             this.MemoryAccess(address);
+            this.bus.BusValue = (this.bus.BusValue & 0xffff_0000) | value;
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.cpu.NCycle = __ByteAccesSCycles__[Section];
-                this.cpu.SCycle = __ByteAccesSCycles__[Section];
+                this.cpu.NCycle = __ByteAccessSCycles__[Section];
+                this.cpu.SCycle = __ByteAccessSCycles__[Section];
             }
 
             switch (Section)
             {
                 case 0:
                 case 1:
-                    this.Error($"BIOS Halfword Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
+                    // this.Error($"BIOS Halfword Write Attempted at {address.ToString("x8")} with PC = {this.cpu.PC.ToString("x8")}");
                     return;
                 case 2:
                     __SetHalfWordAt__(this.eWRAM, address & __MemoryMasks__[Section], value);
@@ -340,8 +350,8 @@ namespace GBAEmulator.Memory
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.cpu.NCycle = __ByteAccesSCycles__[Section];
-                this.cpu.SCycle = __ByteAccesSCycles__[Section];
+                this.cpu.NCycle = __ByteAccessSCycles__[Section];
+                this.cpu.SCycle = __ByteAccessSCycles__[Section];
             }
 
             switch (Section)
@@ -352,31 +362,31 @@ namespace GBAEmulator.Memory
                         if (this.cpu.PC < 0x0100_0000)
                         {
                             // normal BIOS fetch
-                            return this.BIOS[address & __MemoryMasks__[Section]];
+                            return __GetByteAt__(this.BIOS, address & __MemoryMasks__[Section]);
                         }
-                        return this.BIOS[(uint)this.CurrentBIOSReadState];
+                        return __GetByteAt__(this.BIOS, (uint)this.CurrentBIOSReadState);
                     }
                     return (byte)this.bus.OpenBus();
                 case 1:
                     return (byte)this.bus.OpenBus();
                 case 2:
-                    return this.eWRAM[address & __MemoryMasks__[Section]];
+                    return __GetByteAt__(this.eWRAM, address & __MemoryMasks__[Section]);
                 case 3:
-                    return this.iWRAM[address & __MemoryMasks__[Section]];
+                    return __GetByteAt__(this.iWRAM, address & __MemoryMasks__[Section]);
                 case 4: // IORAM
-                    if ((address & 0x00ff_ffff) < 0x400) return (byte)this.IOGetByteAt(address & 0x3ff);
+                    if ((address & 0x00ff_ffff) < 0x400) return this.IOGetByteAt(address & 0x3ff);
                     return (byte)this.bus.OpenBus();
                 case 5:
-                    return this.PaletteRAM[address & __MemoryMasks__[Section]];
+                    return __GetByteAt__(this.PaletteRAM, address & __MemoryMasks__[Section]);
                 case 6:  // VRAM Mirrors
                     if ((address & 0x1ffff) < 0x10000)
                     {
                         // first bit is already 0
-                        return this.VRAM[address & 0xffff];
+                        return __GetByteAt__(this.VRAM, address & 0xffff);
                     }
-                    return this.VRAM[0x10000 | (address & 0x7fff)];
+                    return __GetByteAt__(this.VRAM, 0x10000 | (address & 0x7fff));
                 case 7:
-                    return this.OAM[address & __MemoryMasks__[Section]];
+                    return __GetByteAt__(this.OAM, address & __MemoryMasks__[Section]);
                 case 8:
                 case 9:
                 case 10:
@@ -398,9 +408,9 @@ namespace GBAEmulator.Memory
 
                     if (_address < ROMSize)
                     {
-                        return this.GamePak[_address];
+                        return __GetByteAt__(this.GamePak, _address);
                     }
-                    return (byte)((_address >> 1) & 0xff);
+                    return (byte)(this.bus.BusValue = (_address >> 1) & 0xff);
                 case 14:
                 case 15:  // SRAM
                     return this.BackupRead(address & 0xffff);
@@ -412,12 +422,13 @@ namespace GBAEmulator.Memory
         public void SetByteAt(uint address, byte value)
         {
             this.MemoryAccess(address);
+            this.bus.BusValue = (this.bus.BusValue & 0xffff_ff00) | value;
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
             {
-                this.cpu.NCycle = __ByteAccesSCycles__[Section];
-                this.cpu.SCycle = __ByteAccesSCycles__[Section];
+                this.cpu.NCycle = __ByteAccessSCycles__[Section];
+                this.cpu.SCycle = __ByteAccessSCycles__[Section];
             }
 
             switch (Section)
@@ -447,11 +458,11 @@ namespace GBAEmulator.Memory
                         and to Palette (5000000h-50003FFh) are writing the new 8bit value to BOTH upper and
                         lower 8bits of the addressed halfword, ie. "[addr AND NOT 1]=data*101h".
                     */
-                case 5:  // ignore PaletteRAM byte stores
+                case 5:
                     this.PaletteRAM[address & 0x3fe] = value;
                     this.PaletteRAM[(address & 0x3fe) | 1] = value;
                     return;
-                case 6:   // ignore OAM byte stores
+                case 6:
                     if (this.DISPCNT.BGMode >= 3)
                     {
                         if (address >= 0x0601_4000)
@@ -514,12 +525,28 @@ namespace GBAEmulator.Memory
          * =====================================================================================================
          */
 
-        private static ushort __GetHalfWordAt__(byte[] memory, uint address)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private byte __GetByteAt__(byte[] memory, uint address)
+        {
+            uint value = ARM7TDMI.ROR(__GetWordAt__(memory, address & 0xffff_fffc), (int)(address & 3) * 8);
+            this.bus.BusValue = value;
+
+            return (byte)value;
+            return memory[address];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private ushort __GetHalfWordAt__(byte[] memory, uint address)
         {
             // assumes memory address does not wrap!
+            uint value = ARM7TDMI.ROR(__GetWordAt__(memory, address & 0xffff_fffc), (int)(address & 3) * 8);
+            this.bus.BusValue = value;
+
+            return (ushort)value;
             return (ushort)((memory[address + 1] << 8) | memory[address]);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void __SetHalfWordAt__(byte[] memory, uint address, ushort value)
         {
             // assumes memory address does not wrap!

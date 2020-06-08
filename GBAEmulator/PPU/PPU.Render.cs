@@ -128,10 +128,10 @@ namespace GBAEmulator
 
             if (this.gba.mem.DISPCNT.DisplayBG(2))
             {
-                int priority = 0;
-
                 for (int x = 0; x < width; x++)
                 {
+                    int priority = 4;
+
                     if (OBJWindow[x])
                     {
                         for (priority = 0; priority < 4; priority++)
@@ -179,10 +179,10 @@ namespace GBAEmulator
 
             if (this.gba.mem.DISPCNT.DisplayBG(2))
             {
-                int priority = 0;
-
                 for (int x = 0; x < width; x++)
                 {
+                    int priority = 4;
+
                     if (OBJWindow[x])
                     {
                         for (priority = 0; priority < 4; priority++)

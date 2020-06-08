@@ -38,11 +38,13 @@ namespace GBAEmulator.Memory
                 bool Overflow = false;
 
                 this.PrescalerCounter += cycles;
-                while (this.PrescalerCounter > this.PrescalerLimit)
-                {
-                    Overflow |= this.TickDirect(1);
 
-                    this.PrescalerCounter -= this.PrescalerLimit;
+                if (this.PrescalerCounter > this.PrescalerLimit)
+                {
+                    // assume cycles < 64 (pretty valid assumption)
+                    Overflow |= this.TickDirect((ushort)(this.PrescalerLimit == 1 ? this.PrescalerCounter : 1));
+
+                    this.PrescalerCounter &= (ushort)(this.PrescalerLimit - 1);  // power of 2
                 }
 
                 return Overflow;

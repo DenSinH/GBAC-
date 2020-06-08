@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 using GBAEmulator.CPU;
 
@@ -7,18 +8,17 @@ namespace GBAEmulator.Bus
     public class BUS
     {
         private ARM7TDMI cpu;
-        public uint DMAValue;
+        public uint BusValue;
         
         public BUS(ARM7TDMI cpu)
         {
             this.cpu = cpu;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint OpenBus()
         {
-            if (!this.cpu.DMAActive)
-                return this.DMAValue;
-            return this.cpu.Pipeline.PreFetch();
+            return this.BusValue;
         }
     }
 }
