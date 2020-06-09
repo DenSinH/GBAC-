@@ -5,16 +5,19 @@ namespace GBAEmulator.Memory
     partial class MEM
     {
         #region KEYINPUT
-        private class cKeyInput : IORegister2
+        public class cKeyInput : IORegister2
         {
             Controller controller = new XInputController();
+            public KeyboardController keyboard = new KeyboardController();
             cKeyInterruptControl KEYCNT;
             MEM mem;
 
-            public cKeyInput(cKeyInterruptControl KEYCNT, MEM cpu)
+            public bool UsingKeyboard { get; private set; }
+
+            public cKeyInput(cKeyInterruptControl KEYCNT, MEM mem)
             {
                 this.KEYCNT = KEYCNT;
-                this.mem = cpu;
+                this.mem = mem;
 
                 try
                 {
@@ -22,7 +25,8 @@ namespace GBAEmulator.Memory
                 }
                 catch (SharpDX.SharpDXException)
                 {
-                    this.controller = new KeyboardController();
+                    this.controller = keyboard;
+                    this.UsingKeyboard = true;
                 }
             }
 
@@ -48,6 +52,8 @@ namespace GBAEmulator.Memory
 
             public override void Set(ushort value, bool setlow, bool sethigh) { }
         }
+
+        public cKeyInput KEYINPUT;
 
         public class cKeyInterruptControl : IORegister2
         {

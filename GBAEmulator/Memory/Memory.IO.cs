@@ -151,7 +151,7 @@ namespace GBAEmulator.Memory
             this.IORAM[0x012e] = this.IORAM[0x012f] = this.MasterUnusedRegister.upper;
 
             // Keypad Input
-            this.IORAM[0x0130] = this.IORAM[0x0131] = new cKeyInput(this.KEYCNT, this);
+            this.IORAM[0x0130] = this.IORAM[0x0131] = this.KEYINPUT;
             this.IORAM[0x0132] = this.IORAM[0x0133] = this.KEYCNT;
 
             // Serial Communication (2)

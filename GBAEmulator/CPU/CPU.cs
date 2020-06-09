@@ -38,24 +38,24 @@ namespace GBAEmulator.CPU
             this.bus = new BUS(this);
             this.mem = new MEM(this);
 
-            this.SystemBank = new uint[16];
-            this.FIQBank = new uint[16];
+            this.SystemBank     = new uint[16];
+            this.FIQBank        = new uint[16];
             this.SupervisorBank = new uint[16];
-            this.AbortBank = new uint[16];
-            this.IRQBank = new uint[16];
-            this.UndefinedBank = new uint[16];
-            this.state = State.ARM;
+            this.AbortBank      = new uint[16];
+            this.IRQBank        = new uint[16];
+            this.UndefinedBank  = new uint[16];
+            this.state          = State.ARM;
 
             // Initialize Register banks
             this.BankedRegisters = new Dictionary<Mode, uint[]>
             {
-                { Mode.System,          this.SystemBank },
-                { Mode.User,            this.SystemBank },
-                { Mode.FIQ,             this.FIQBank },
-                { Mode.Supervisor,      this.SupervisorBank },
-                { Mode.Abort,           this.AbortBank },
-                { Mode.IRQ,             this.IRQBank },
-                { Mode.Undefined,       this.UndefinedBank }
+                { Mode.System,     this.SystemBank },
+                { Mode.User,       this.SystemBank },
+                { Mode.FIQ,        this.FIQBank },
+                { Mode.Supervisor, this.SupervisorBank },
+                { Mode.Abort,      this.AbortBank },
+                { Mode.IRQ,        this.IRQBank },
+                { Mode.Undefined,  this.UndefinedBank }
             };
 
             // need banked registers for CPSR initialization

@@ -596,7 +596,7 @@ namespace GBAEmulator.Memory
             FileStream fs;
             try
             {
-                fs = File.OpenRead("../../Memory/bios/gba_bios.bin");
+                fs = File.OpenRead("../../../Memory/bios/gba_bios.bin");
             }
             catch
             {

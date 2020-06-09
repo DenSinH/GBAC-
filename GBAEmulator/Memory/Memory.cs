@@ -74,6 +74,8 @@ namespace GBAEmulator.Memory
             this.WINH = new cWindowDimensions[2] { new cWindowDimensions(this.bus, true), new cWindowDimensions(this.bus, false) };
             this.WINV = new cWindowDimensions[2] { new cWindowDimensions(this.bus, true), new cWindowDimensions(this.bus, false) };
 
+            this.KEYINPUT = new cKeyInput(this.KEYCNT, this);
+
             this.DMASAD = new cDMAAddress[4] { new cDMAAddress(this.bus, true),  new cDMAAddress(this.bus, false),
                                                new cDMAAddress(this.bus, false), new cDMAAddress(this.bus, false) };
             this.DMADAD = new cDMAAddress[4] { new cDMAAddress(this.bus, true), new cDMAAddress(this.bus, true),

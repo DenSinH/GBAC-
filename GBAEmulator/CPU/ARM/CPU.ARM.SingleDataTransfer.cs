@@ -13,10 +13,10 @@ namespace GBAEmulator.CPU
             int Cycles;
 
             RegisterOffset = (Instruction & 0x0200_0000) > 0;
-            PreIndex = (Instruction & 0x0100_0000) > 0;
-            Up = (Instruction & 0x0080_0000) > 0;
-            ByteQuantity = (Instruction & 0x0040_0000) > 0;
-            WriteBack = (Instruction & 0x0020_0000) > 0;
+            PreIndex       = (Instruction & 0x0100_0000) > 0;
+            Up             = (Instruction & 0x0080_0000) > 0;
+            ByteQuantity   = (Instruction & 0x0040_0000) > 0;
+            WriteBack      = (Instruction & 0x0020_0000) > 0;
             LoadFromMemory = (Instruction & 0x0010_0000) > 0;
 
             Rn = (byte)((Instruction & 0x000f_0000) >> 16);

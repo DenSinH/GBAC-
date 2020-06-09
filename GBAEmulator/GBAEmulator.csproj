@@ -1,187 +1,35 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B2646DC8-EA04-4A08-8A98-1C5662163882}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>GBAEmulator</RootNamespace>
-    <AssemblyName>GBAEmulator</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>GBAEmulator.Program</StartupObject>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
+    <Compile Remove="docs\**" />
+    <Compile Remove="Memory\bios\**" />
+    <Compile Remove="roms\**" />
+    <Compile Remove="Tests\**" />
+    <EmbeddedResource Remove="docs\**" />
+    <EmbeddedResource Remove="Memory\bios\**" />
+    <EmbeddedResource Remove="roms\**" />
+    <EmbeddedResource Remove="Tests\**" />
+    <None Remove="docs\**" />
+    <None Remove="Memory\bios\**" />
+    <None Remove="roms\**" />
+    <None Remove="Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpDX" Version="4.2.0" />
+    <PackageReference Include="SharpDX.XInput" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore">
+      <HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.0\PresentationCore.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.XInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.XInput.4.2.0\lib\net45\SharpDX.XInput.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Bus\BUS.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.BlockDataTransfer.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.DataProcessing.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.DataTransfer.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.Multiply.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.PSRTransfer.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.SingleDataTransfer.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.SWP.cs" />
-    <Compile Include="CPU\CPU.Debug.cs" />
-    <Compile Include="CPU\CPU.DMA.cs" />
-    <Compile Include="CPU\CPU.Pipeline.cs" />
-    <Compile Include="CPU\CPU.SWI.cs" />
-    <Compile Include="CPU\CPU.Aux.cs" />
-    <Compile Include="CPU\CPU.Timers.cs" />
-    <Compile Include="Memory\Memory.Aux.cs" />
-    <Compile Include="Memory\Memory.Backup.cs" />
-    <Compile Include="Memory\Memory.Backup.EEPROM.cs" />
-    <Compile Include="Memory\Memory.Backup.Flash.cs" />
-    <Compile Include="Memory\Memory.BIOS.cs" />
-    <Compile Include="CPU\CPU.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.Branch.cs" />
-    <Compile Include="CPU\ARM\CPU.ARM.cs" />
-    <Compile Include="Memory\Memory.Access.cs" />
-    <Compile Include="Memory\Memory.IO.cs" />
-    <Compile Include="Memory\Memory.IO.DMA.cs" />
-    <Compile Include="Memory\Memory.IO.InterruptControl.cs" />
-    <Compile Include="Memory\Memory.IO.Keypad.cs" />
-    <Compile Include="Memory\Memory.IO.LCD.cs" />
-    <Compile Include="Memory\Memory.IO.Regs.base.cs" />
-    <Compile Include="CPU\CPU.InterruptHandling.cs" />
-    <Compile Include="Memory\Memory.IO.Timers.cs" />
-    <Compile Include="Memory\Memory.ROM.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.AddOffsetToSP.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.AddSubtract.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.ALUOperations.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.Branch.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.HiReg_BX.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.LoadStore.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.MovCmpAddSubImmediate.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.MoveShiftedRegister.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.PCRelativeLoad.cs" />
-    <Compile Include="CPU\THUMB\CPU.THUMB.PushPop.cs" />
-    <Compile Include="Debug.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Debug.Designer.cs">
-      <DependentUpon>Debug.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Enums.cs" />
-    <Compile Include="GBA.cs" />
-    <Compile Include="Input.cs" />
-    <Compile Include="Memory\Memory.cs" />
-    <Compile Include="Memory\Memory.Debug.cs" />
-    <Compile Include="PPU\PPU.Aux.cs" />
-    <Compile Include="PPU\PPU.cs" />
-    <Compile Include="PPU\PPU.Render.Aux.cs" />
-    <Compile Include="PPU\PPU.Render.cs" />
-    <Compile Include="PPU\PPU.Render.BG.cs" />
-    <Compile Include="PPU\PPU.Render.OBJ.cs" />
-    <Compile Include="Visual.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Visual.Designer.cs">
-      <DependentUpon>Visual.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Debug.resx">
-      <DependentUpon>Debug.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Visual.resx">
-      <DependentUpon>Visual.cs</DependentUpon>
-    </EmbeddedResource>
-    <Compile Include="CPU\CPU.Registers.cs" />
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

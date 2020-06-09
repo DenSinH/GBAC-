@@ -95,6 +95,13 @@ namespace GBAEmulator
             this.Paint += new PaintEventHandler(Visual_Paint);
 
             this.KeyDown += new KeyEventHandler(Visual_KeyDown);
+
+            if (this.gba.mem.KEYINPUT.UsingKeyboard)
+            {
+                Console.WriteLine("No XInput device detected, using keyboard");
+                this.KeyDown += this.gba.mem.KEYINPUT.keyboard.KeyDown;
+                this.KeyUp += this.gba.mem.KEYINPUT.keyboard.KeyUp;
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -183,8 +190,6 @@ namespace GBAEmulator
 
         private void Draw()
         {
-
-            // ref: https://github.com/Xyene/Emulator.NES/blob/master/dotNES/Renderers/SoftwareRenderer.cs
             if (Backbuffer != null)
             {
                 this.Backbuffer?.Dispose();
