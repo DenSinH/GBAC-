@@ -79,13 +79,14 @@ namespace GBAEmulator.Memory
                     On carts with 16MB or smaller ROM, eeprom can be alternately accessed anywhere at D000000h-DFFFFFFh.
                     (Tonc)
                      */
-                    if (this.ROMBackupType == Backup.EEPROM)
+                    if (this.ROMBackupType == BackupType.EEPROM)
                     {
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
                             // EEPROM access, might as well call a read directly
-                            return this.bus.BusValue = this.EEPROMRead();
+                            // the interface we are using wants an argument, so we just pass it 0xffff_ffff to signify that it does not matter
+                            return this.bus.BusValue = this.BackupRead(0xffff_ffff);
                         }
                     }
 
@@ -153,13 +154,13 @@ namespace GBAEmulator.Memory
                 case 13:  // GamePak
                     uint _address = address & 0x01ff_ffff;
                     // See GetWordAt for info on EEPROM
-                    if (this.ROMBackupType == Backup.EEPROM)
+                    if (this.ROMBackupType == BackupType.EEPROM)
                     {
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
                             // EEPROM access, might as well call a write directly
-                            this.EEPROMWrite((byte)value);
+                            this.BackupWrite(0xffff_ffff, (byte)value);
                             return;
                         }
                     }
@@ -233,13 +234,13 @@ namespace GBAEmulator.Memory
                     uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
-                    if (this.ROMBackupType == Backup.EEPROM)
+                    if (this.ROMBackupType == BackupType.EEPROM)
                     {
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
                             // EEPROM access, might as well call a read directly
-                            return this.EEPROMRead();
+                            return this.BackupRead(0xffff_ffff);
                         }
                     }
 
@@ -312,13 +313,13 @@ namespace GBAEmulator.Memory
                     uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
-                    if (this.ROMBackupType == Backup.EEPROM)
+                    if (this.ROMBackupType == BackupType.EEPROM)
                     {
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
-                            // EEPROM access, might as well call a write directly
-                            this.EEPROMWrite((byte)value);
+                            // EEPROM access
+                            this.BackupWrite(0xffff_ffff, (byte)value);
                             return;
                         }
                     }
@@ -392,13 +393,13 @@ namespace GBAEmulator.Memory
                     uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
-                    if (this.ROMBackupType == Backup.EEPROM)
+                    if (this.ROMBackupType == BackupType.EEPROM)
                     {
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
                             // EEPROM access, might as well call a read directly
-                            return this.EEPROMRead();
+                            return this.BackupRead(0xffff_ffff);
                         }
                     }
 
@@ -494,13 +495,13 @@ namespace GBAEmulator.Memory
                     uint _address = address & 0x01ff_ffff;
 
                     // See GetWordAt for info on EEPROM
-                    if (this.ROMBackupType == Backup.EEPROM)
+                    if (this.ROMBackupType == BackupType.EEPROM)
                     {
                         if ((_address > 0x00ff_feff) ||
                             (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                         {
                             // EEPROM access, might as well call a write directly
-                            this.EEPROMWrite(value);
+                            this.BackupWrite(0xffff_ffff, (byte)value);
                             return;
                         }
                     }

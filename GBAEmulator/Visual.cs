@@ -243,6 +243,7 @@ namespace GBAEmulator
                     this.gba.mem.DumpBackup();
                     this.gba.mem.BackupChanged = false;
                     this.gba.Pause = false;
+                    Console.WriteLine("Dumped save file");
                 }
             }
             else if (this.gba.mem.BackupChanged)
