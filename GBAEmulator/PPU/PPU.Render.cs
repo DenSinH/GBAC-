@@ -7,7 +7,7 @@ namespace GBAEmulator
     partial class PPU
     {
         public byte scanline = 0;
-        public ulong frame = 0;
+        public volatile uint frame = 0;  // reset in different thread as well
 
         public void DrawScanline()
         {

@@ -60,7 +60,7 @@ namespace GBAEmulator
                 {
                     this.vis?.Invoke(this.vis.Tick);
                 }
-                    catch (ObjectDisposedException)
+                catch (ObjectDisposedException)
                 {
                     // disgusting I know... 
                 }
@@ -109,13 +109,13 @@ namespace GBAEmulator
 
         public void Run()
         {
-            // this.mem.LoadRom("../../../roms/ZeldaMinishCap.gba");
+            this.mem.LoadRom("../../../roms/KirbyNightmare.gba");
             // this.mem.LoadRom("../../../Tests/Krom/BIOSARCTAN.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
-            this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
+            // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
             // this.mem.LoadRom("../../../Tests/GBASuiteNew/nes.gba");
-            // this.mem.LoadRom("../../../Tests/Tonc/obj_aff.gba");
+            // this.mem.LoadRom("../../../Tests/Tonc/sbb_aff.gba");
             // this.mem.LoadRom("../../../Tests/Armwrestler/armwrestler.gba");
             // this.mem.LoadRom("../../../Tests/EndriftSuite.gba");
 

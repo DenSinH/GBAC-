@@ -7,12 +7,10 @@ namespace GBAEmulator.Memory
         #region KEYINPUT
         public class cKeyInput : IORegister2
         {
-            Controller controller = new XInputController();
+            public XInputController xinput = new XInputController();
             public KeyboardController keyboard = new KeyboardController();
             cKeyInterruptControl KEYCNT;
             MEM mem;
-
-            public bool UsingKeyboard { get; private set; }
 
             public cKeyInput(cKeyInterruptControl KEYCNT, MEM mem)
             {
@@ -21,18 +19,17 @@ namespace GBAEmulator.Memory
 
                 try
                 {
-                    this.controller.PollKeysPressed();
+                    this.xinput.PollKeysPressed();
                 }
                 catch (SharpDX.SharpDXException)
                 {
-                    this.controller = keyboard;
-                    this.UsingKeyboard = true;
+                    this.xinput = new NoXInputController();
                 }
             }
 
             public override ushort Get()
             {
-                ushort state = this.controller.PollKeysPressed();
+                ushort state = (ushort)(this.keyboard.PollKeysPressed() | this.xinput.PollKeysPressed());
                 if (this.KEYCNT.IRQEnable)
                 {
                     if (this.KEYCNT.IRQCondition)   // AND

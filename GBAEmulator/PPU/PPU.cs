@@ -15,7 +15,7 @@ namespace GBAEmulator
 
          (Tonc)
         */
-        ushort[] Display;
+        readonly ushort[] Display;
 
         const int width = 240;
         const int height = 160;

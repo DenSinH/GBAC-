@@ -96,12 +96,9 @@ namespace GBAEmulator
 
             this.KeyDown += new KeyEventHandler(Visual_KeyDown);
 
-            if (this.gba.mem.KEYINPUT.UsingKeyboard)
-            {
-                Console.WriteLine("No XInput device detected, using keyboard");
-                this.KeyDown += this.gba.mem.KEYINPUT.keyboard.KeyDown;
-                this.KeyUp += this.gba.mem.KEYINPUT.keyboard.KeyUp;
-            }
+            // Keyboard input handling
+            this.KeyDown += this.gba.mem.KEYINPUT.keyboard.KeyDown;
+            this.KeyUp += this.gba.mem.KEYINPUT.keyboard.KeyUp;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -232,6 +229,9 @@ namespace GBAEmulator
         public void TickDisplay()
         {
             Draw();
+
+            // refresh xinput in this thread to save processing power
+            this.gba.mem.KEYINPUT.xinput.UpdateState();
 
             if (this.FramesUntilSaveDump > 0)
             {

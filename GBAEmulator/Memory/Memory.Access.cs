@@ -551,6 +551,11 @@ namespace GBAEmulator.Memory
         private static uint __GetWordAt__(byte[] memory, uint address)
         {
             // assumes memory address does not wrap!
+            //fixed (byte* wordptr = &memory[address])
+            //{
+            //    return *((uint*)wordptr);
+            //}
+
             return (uint)(
                     (memory[address + 3] << 24) |
                     (memory[address + 2] << 16) |

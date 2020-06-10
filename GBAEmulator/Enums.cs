@@ -81,7 +81,7 @@ namespace GBAEmulator
         Window1 = 1,
         // WINOUT:
         Outside = 0,
-        OBJ = 1
+        OBJ =     1
     }
     
     public enum BlendMode : ushort
