@@ -22,7 +22,7 @@ namespace GBAEmulator
 
         private readonly Stopwatch FPSTimer;
         private int FramesUntilSaveDump = 0;
-        const int SAVE_DELAY = 10;
+        const int SaveDumpFrameDelay = 10;
 
         public TickDelegate Tick;
         private const byte interval = 17; // ms
@@ -248,11 +248,16 @@ namespace GBAEmulator
             }
             else if (this.gba.mem.BackupChanged)
             {
-                this.FramesUntilSaveDump = SAVE_DELAY;
+                this.FramesUntilSaveDump = SaveDumpFrameDelay;
             }
             
             this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>",
                 this.gba.mem.ROMName, (1000 * this.gba.ppu.frame / (double)this.FPSTimer.ElapsedMilliseconds));
+
+            if (this.gba.mem.BackupChanged)
+            {
+                this.Text += " Saving, do not remove GamePak;)";
+            }
 
             if (this.FPSTimer.ElapsedMilliseconds > 2000)
             {

@@ -10,7 +10,7 @@ namespace GBAEmulator.Memory
     public partial class MEM
     {
         [Conditional("DEBUG")]
-        private void MemoryAccess(uint Address)
+        private void LogMemoryAccess(uint Address)
         {
             Console.WriteLine("Memory Access: " + Address.ToString("x8"));
         }
@@ -23,7 +23,7 @@ namespace GBAEmulator.Memory
 
         public uint GetWordAt(uint address)
         {
-            this.MemoryAccess(address);
+            this.LogMemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
@@ -106,7 +106,7 @@ namespace GBAEmulator.Memory
 
         public void SetWordAt(uint address, uint value, uint offset = 0)
         {
-            this.MemoryAccess(address);
+            this.LogMemoryAccess(address);
             this.bus.BusValue = value;
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
@@ -183,7 +183,7 @@ namespace GBAEmulator.Memory
 
         public ushort GetHalfWordAt(uint address)
         {
-            this.MemoryAccess(address);
+            this.LogMemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
@@ -264,7 +264,7 @@ namespace GBAEmulator.Memory
 
         public void SetHalfWordAt(uint address, ushort value, uint offset = 0)
         {
-            this.MemoryAccess(address);
+            this.LogMemoryAccess(address);
             this.bus.BusValue = (this.bus.BusValue & 0xffff_0000) | value;
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
@@ -342,7 +342,7 @@ namespace GBAEmulator.Memory
 
         public byte GetByteAt(uint address)
         {
-            this.MemoryAccess(address);
+            this.LogMemoryAccess(address);
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
             if (Section < 0x10)
@@ -418,7 +418,7 @@ namespace GBAEmulator.Memory
 
         public void SetByteAt(uint address, byte value)
         {
-            this.MemoryAccess(address);
+            this.LogMemoryAccess(address);
             this.bus.BusValue = (this.bus.BusValue & 0xffff_ff00) | value;
 
             byte Section = (byte)((address & 0xff00_0000) >> 24);
@@ -552,6 +552,8 @@ namespace GBAEmulator.Memory
         private static uint __GetWordAt__(byte[] memory, uint address)
         {
             // assumes memory address does not wrap!
+
+            // testing with dirty pointers:
             //fixed (byte* wordptr = &memory[address])
             //{
             //    return *((uint*)wordptr);

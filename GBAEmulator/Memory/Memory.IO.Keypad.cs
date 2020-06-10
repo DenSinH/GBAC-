@@ -19,10 +19,13 @@ namespace GBAEmulator.Memory
 
                 try
                 {
-                    this.xinput.PollKeysPressed();
+                    // attempt to read controller state
+                    this.xinput.UpdateState();
                 }
                 catch (SharpDX.SharpDXException)
                 {
+                    // if there is no controller connected, an exception will be thrown and we can instead
+                    // initialize the register with only the keyboardcontroller
                     this.xinput = new NoXInputController();
                 }
             }
