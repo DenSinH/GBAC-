@@ -1,14 +1,72 @@
 ﻿using System;
 using System.IO;
 
-namespace GBAEmulator.Memory
+using GBAEmulator.CPU;
+
+namespace GBAEmulator.Memory.Sections
 {
-    partial class MEM
+    public class cBIOSSection : ReadOnlyMemorySection
     {
-        /* Normatt's GBA BIOS */
-        private const int BIOS_SIZE = 0x4000;
-        private byte[] BIOS;
-        private readonly byte[] NormattsBIOS = {
+        private ARM7TDMI cpu;
+
+        public cBIOSSection(ARM7TDMI cpu) : base(0x4000)
+        {
+            this.cpu = cpu;
+            this.Init();
+        }
+
+        public bool Init()
+        {
+            FileStream fs;
+            try
+            {
+                fs = File.OpenRead("../../../Memory/bios/gba_bios.bin");
+            }
+            catch
+            {
+                for (int j = 0; j < BIOSDefaults.NormattsBIOS.Length; j++)
+                    this.Storage[j] = BIOSDefaults.NormattsBIOS[j];
+                Console.WriteLine("BIOS dump load failed, using Normatt's BIOS...");
+                return false;
+            }
+
+            int current = fs.ReadByte();
+            uint i = 0;
+
+            while (current != -1)
+            {
+                this.Storage[i] = (byte)current;
+                current = fs.ReadByte();
+                i++;
+            }
+            return true;
+        }
+
+        public override byte? GetByteAt(uint address)
+        {
+            if (this.cpu.PC < 0x0100_0000)
+                return base.GetByteAt(address);
+            return Storage[(uint)this.cpu.mem.CurrentBIOSReadState];
+        }
+
+        public override ushort? GetHalfWordAt(uint address)
+        {
+            if (this.cpu.PC < 0x0100_0000)
+                return base.GetHalfWordAt(address);
+            return Storage[(uint)this.cpu.mem.CurrentBIOSReadState];
+        }
+
+        public override uint? GetWordAt(uint address)
+        {
+            if (this.cpu.PC < 0x0100_0000)
+                return base.GetWordAt(address);
+            return Storage[(uint)this.cpu.mem.CurrentBIOSReadState];
+        }
+    }
+
+    public static class BIOSDefaults
+    {
+        public static readonly byte[] NormattsBIOS = {
             0x0C, 0x00, 0x00, 0xEA, 0x15, 0x00, 0x00, 0xEA, 0x15, 0x00, 0x00, 0xEA, 0x13, 0x00, 0x00, 0xEA,
             0x12, 0x00, 0x00, 0xEA, 0x11, 0x00, 0x00, 0xEA, 0x00, 0x00, 0x00, 0xEA, 0xFF, 0xFF, 0xFF, 0xEA,
             0x0F, 0x50, 0x2D, 0xE9, 0x01, 0x03, 0xA0, 0xE3, 0x0F, 0xE0, 0xA0, 0xE1, 0x04, 0xF0, 0x10, 0xE5,
@@ -590,41 +648,5 @@ namespace GBAEmulator.Memory
             0xBB, 0x86, 0xC8, 0xBF, 0x2A, 0xF5, 0x2F, 0xCB, 0xCB, 0xFC, 0x44, 0xD7, 0x3A, 0xF0, 0x11, 0xE4,
             0x39, 0xBF, 0xA1, 0xF1, 0x64, 0x6B, 0x41, 0x52, 0x4D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
-
-        public bool InitBIOS()
-        {
-            this.BIOSSection = new cBIOSSection(this.cpu);
-
-            FileStream fs;
-            try
-            {
-                fs = File.OpenRead("../../../Memory/bios/gba_bios.bin");
-            }
-            catch
-            {
-                this.BIOS = this.NormattsBIOS;
-                this.BIOSSection.Load(this.NormattsBIOS);
-                Console.WriteLine("BIOS dump load failed, using Normatt's BIOS...");
-                return false;
-            }
-
-            this.BIOS = new byte[BIOS_SIZE];
-            int current = fs.ReadByte();
-            uint i = 0;
-
-            while (current != -1)
-            {
-                this.BIOS[i] = (byte)current;
-                current = fs.ReadByte();
-                i++;
-            }
-            this.BIOSSection.Load(this.BIOS);
-            return true;
-        }
-
-        public void UseNormattsBios()
-        {
-            this.BIOS = this.NormattsBIOS;
-        }
     }
 }

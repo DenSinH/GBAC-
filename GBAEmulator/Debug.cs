@@ -61,7 +61,7 @@ namespace GBAEmulator
         {
             // Address within palette memory
             return (ushort)(
-                this.gba.mem.PaletteRAM[Address] |
+                 this.gba.mem.PaletteRAM[Address] |
                 (this.gba.mem.PaletteRAM[Address + 1] << 8)
                 );
         }

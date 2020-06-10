@@ -97,8 +97,8 @@ namespace GBAEmulator
             this.KeyDown += new KeyEventHandler(Visual_KeyDown);
 
             // Keyboard input handling
-            this.KeyDown += this.gba.mem.IORAMSection.KEYINPUT.keyboard.KeyDown;
-            this.KeyUp += this.gba.mem.IORAMSection.KEYINPUT.keyboard.KeyUp;
+            this.KeyDown += this.gba.mem.IORAM.KEYINPUT.keyboard.KeyDown;
+            this.KeyUp += this.gba.mem.IORAM.KEYINPUT.keyboard.KeyUp;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -231,7 +231,7 @@ namespace GBAEmulator
             Draw();
 
             // refresh xinput in this thread to save processing power
-            this.gba.mem.IORAMSection.KEYINPUT.xinput.UpdateState();
+            this.gba.mem.IORAM.KEYINPUT.xinput.UpdateState();
 
             if (this.FramesUntilSaveDump > 0)
             {
@@ -240,13 +240,13 @@ namespace GBAEmulator
                 {
                     // freeze GBA for a quick second to prevent the dump from changing while we are dumping it
                     this.gba.Pause = true;
-                    this.gba.mem.DumpBackup();
-                    this.gba.mem.BackupChanged = false;
+                    this.gba.mem.Backup.DumpBackup();
+                    this.gba.mem.Backup.BackupChanged = false;
                     this.gba.Pause = false;
                     Console.WriteLine("Dumped save file");
                 }
             }
-            else if (this.gba.mem.BackupChanged)
+            else if (this.gba.mem.Backup.BackupChanged)
             {
                 this.FramesUntilSaveDump = SaveDumpFrameDelay;
             }
@@ -254,7 +254,7 @@ namespace GBAEmulator
             this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>",
                 this.gba.mem.ROMName, (1000 * this.gba.ppu.frame / (double)this.FPSTimer.ElapsedMilliseconds));
 
-            if (this.gba.mem.BackupChanged)
+            if (this.gba.mem.Backup.BackupChanged)
             {
                 this.Text += " Saving, do not remove GamePak;)";
             }

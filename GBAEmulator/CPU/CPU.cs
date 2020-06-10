@@ -90,14 +90,13 @@ namespace GBAEmulator.CPU
             this.PC = 0x08000000;
             this.CPSR = 0x6000001F;
 
-            this.mem.IORAMSection.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
+            this.mem.IORAM.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
         }
 
-        //bool COMPLOG;
-        //StreamReader LOGFILE = new StreamReader("../../Tests/ClearDMA0firsttime.log");
+        //bool COMPLOG = true;
+        //StreamReader LOGFILE = new StreamReader("../../../Tests/arm.log");
         public int Step()
         {
-            int DMACycles = 0;
             int StepCycles;
 
             //if (this.PC == 0x0800_ce54)
@@ -112,18 +111,16 @@ namespace GBAEmulator.CPU
 
             this.HandleIRQs();
 
-            if (this.mem.IORAMSection.HALTCNT.Halt)
+            if (this.mem.IORAM.HALTCNT.Halt)
             {
                 this.Log("Halted");
                 StepCycles = 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
             }
             else
             {
-                DMACycles = this.HandleDMAs();
-                if (DMACycles > 0)
+                if ((StepCycles = this.HandleDMAs()) > 0)
                 {
                     this.Log("DMAing");
-                    StepCycles = DMACycles;
                 }
                 else if (this.state == State.ARM)
                 {
@@ -159,7 +156,7 @@ namespace GBAEmulator.CPU
 
             //if (COMPLOG)
             //{
-            //    if (!this.mem.HALTCNT.Halt && (DMACycles == 0))
+            //    if (!this.mem.IORAM.HALTCNT.Halt)
             //    {
             //        if (this.Pipeline.Count == 1)
             //        {

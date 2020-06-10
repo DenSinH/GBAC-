@@ -52,7 +52,7 @@ namespace GBAEmulator
             // set VBlank
             if (this.ppu.scanline == 160)
             {
-                this.mem.IORAMSection.DISPSTAT.SetVBlank(true);
+                this.mem.IORAM.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(DMAStartTiming.VBlank);
 
                 // refresh screen, vis might have been destroyed because we ended the thread
@@ -68,20 +68,20 @@ namespace GBAEmulator
             // no VBlank in 227
             else if (this.ppu.scanline == 227)
             {
-                this.mem.IORAMSection.DISPSTAT.SetVBlank(false);
+                this.mem.IORAM.DISPSTAT.SetVBlank(false);
             }
 
             if (this.ppu.IsVBlank)
             {
-                this.mem.IORAMSection.BG2X.ResetInternal();
-                this.mem.IORAMSection.BG2Y.ResetInternal();
-                this.mem.IORAMSection.BG3X.ResetInternal();
-                this.mem.IORAMSection.BG3Y.ResetInternal();
+                this.mem.IORAM.BG2X.ResetInternal();
+                this.mem.IORAM.BG2Y.ResetInternal();
+                this.mem.IORAM.BG3X.ResetInternal();
+                this.mem.IORAM.BG3Y.ResetInternal();
             }
 
             /* NON-HBLANK */
-            this.mem.IORAMSection.DISPSTAT.SetHBlank(false);
-            this.mem.IORAMSection.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
+            this.mem.IORAM.DISPSTAT.SetHBlank(false);
+            this.mem.IORAM.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
             if (this.ppu.scanline >= 2 && this.ppu.scanline < 162)
             {
                 // DMA 3 video capture mode (special DMA trigger)
@@ -93,7 +93,7 @@ namespace GBAEmulator
                 this.cycle -= this.cpu.Step();
 
             /* HBLANK */
-            this.mem.IORAMSection.DISPSTAT.SetHBlank(true);
+            this.mem.IORAM.DISPSTAT.SetHBlank(true);
             if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
             this.ppu.DrawScanline();
 
@@ -101,20 +101,20 @@ namespace GBAEmulator
             while (this.cycle > 0)
                 this.cycle -= this.cpu.Step();
 
-            this.mem.IORAMSection.BG2X.UpdateInternal((uint)this.mem.IORAMSection.BG2PB.Full);
-            this.mem.IORAMSection.BG2Y.UpdateInternal((uint)this.mem.IORAMSection.BG2PD.Full);
-            this.mem.IORAMSection.BG3X.UpdateInternal((uint)this.mem.IORAMSection.BG3PB.Full);
-            this.mem.IORAMSection.BG3Y.UpdateInternal((uint)this.mem.IORAMSection.BG3PD.Full);
+            this.mem.IORAM.BG2X.UpdateInternal((uint)this.mem.IORAM.BG2PB.Full);
+            this.mem.IORAM.BG2Y.UpdateInternal((uint)this.mem.IORAM.BG2PD.Full);
+            this.mem.IORAM.BG3X.UpdateInternal((uint)this.mem.IORAM.BG3PB.Full);
+            this.mem.IORAM.BG3Y.UpdateInternal((uint)this.mem.IORAM.BG3PD.Full);
         }
 
         public void Run()
         {
             // this.mem.LoadRom("../../../roms/KirbyNightmare.gba");
-            // this.mem.LoadRom("../../../Tests/Krom/BIOSARCTAN.gba");
+            this.mem.LoadRom("../../../Tests/Krom/BIOSARCTAN.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
             // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
-            this.mem.LoadRom("../../../Tests/GBASuiteNew/arm.gba");
+            // this.mem.LoadRom("../../../Tests/GBASuiteNew/arm.gba");
             // this.mem.LoadRom("../../../Tests/Tonc/sbb_aff.gba");
             // this.mem.LoadRom("../../../Tests/EndriftSuite.gba");
 

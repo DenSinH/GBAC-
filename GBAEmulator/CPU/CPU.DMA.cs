@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-using GBAEmulator.Memory;
+using GBAEmulator.Memory.IO;
 
 namespace GBAEmulator.CPU
 {
@@ -14,7 +14,7 @@ namespace GBAEmulator.CPU
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    if (this.mem.IORAMSection.DMACNT_H[i].Active) return true;
+                    if (this.mem.IORAM.DMACNT_H[i].Active) return true;
                 }
                 return false;
             }
@@ -24,22 +24,22 @@ namespace GBAEmulator.CPU
         public void TriggerDMA(DMAStartTiming timing)
         {
             for (int i = 0; i < 4; i++)
-                if (!this.mem.IORAMSection.DMACNT_H[i].Active) this.mem.IORAMSection.DMACNT_H[i].Trigger(timing);
+                if (!this.mem.IORAM.DMACNT_H[i].Active) this.mem.IORAM.DMACNT_H[i].Trigger(timing);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void TriggerDMASpecial(int i)
         {
             // todo: Sound FIFO
-            this.mem.IORAMSection.DMACNT_H[i].Trigger(DMAStartTiming.Special);
+            this.mem.IORAM.DMACNT_H[i].Trigger(DMAStartTiming.Special);
         }
 
         private void DoDMA(int i)
         {
-            cIORAM.cDMACNT_H dmacnt_h = this.mem.IORAMSection.DMACNT_H[i];
-            cIORAM.cDMACNT_L dmacnt_l = this.mem.IORAMSection.DMACNT_L[i];
-            cIORAM.cDMAAddress dmasad = this.mem.IORAMSection.DMASAD[i];
-            cIORAM.cDMAAddress dmadad = this.mem.IORAMSection.DMADAD[i];
+            cDMACNT_H dmacnt_h = this.mem.IORAM.DMACNT_H[i];
+            cDMACNT_L dmacnt_l = this.mem.IORAM.DMACNT_L[i];
+            cDMAAddress dmasad = this.mem.IORAM.DMASAD[i];
+            cDMAAddress dmadad = this.mem.IORAM.DMADAD[i];
 
             this.Log($"DMA: {dmasad.Address.ToString("x8")} -> {dmadad.Address.ToString("x8")}");
 
@@ -66,7 +66,7 @@ namespace GBAEmulator.CPU
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateDMAAddress(cIORAM.cDMAAddress dmaxad, AddrControl control, uint amount)
+        private void UpdateDMAAddress(cDMAAddress dmaxad, AddrControl control, uint amount)
         {
             switch (control)
             {
@@ -82,7 +82,7 @@ namespace GBAEmulator.CPU
             }
         }
 
-        private void EndDMA(cIORAM.cDMACNT_H dmacnt_h, cIORAM.cDMACNT_L dmacnt_l, cIORAM.cDMAAddress dmasad, cIORAM.cDMAAddress dmadad)
+        private void EndDMA(cDMACNT_H dmacnt_h, cDMACNT_L dmacnt_l, cDMAAddress dmasad, cDMAAddress dmadad)
         {
             // Immediate DMA transfers should ignore the Repeat bit - Fleroviux
             if (dmacnt_h.DMARepeat && dmacnt_h.StartTiming != DMAStartTiming.Immediately)
@@ -98,7 +98,7 @@ namespace GBAEmulator.CPU
                 // end of the transfer
                 if (dmacnt_h.IRQOnEnd)
                 {
-                    this.mem.IORAMSection.IF.Request((ushort)((ushort)Interrupt.DMA << dmacnt_h.index));
+                    this.mem.IORAM.IF.Request((ushort)((ushort)Interrupt.DMA << dmacnt_h.index));
                 }
                 dmacnt_h.Disable();  // clear enabled bit
             }
@@ -110,7 +110,7 @@ namespace GBAEmulator.CPU
             for (int i = 0; i < 4; i++)
             {
                 // DMA channel 0 has highest priority, 3 the lowest
-                if (this.mem.IORAMSection.DMACNT_H[i].Active)
+                if (this.mem.IORAM.DMACNT_H[i].Active)
                 {
                     this.DoDMA(i);
                     // 2N cycles for first, then 2S every cycle after

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 
-using GBAEmulator.Memory;
+using GBAEmulator.Memory.IO;
 
 namespace GBAEmulator.CPU
 {
@@ -41,7 +41,7 @@ namespace GBAEmulator.CPU
     {
         public string DAD, SAD, UnitCount, DestAddrControl, SourceAddrControl, Repeat, UnitLength, Timing, IRQ, Enabled;
 
-        public DMAInfo(uint DAD, uint SAD, uint UnitCount, cIORAM.cDMACNT_H dmacnt_h)
+        public DMAInfo(uint DAD, uint SAD, uint UnitCount, cDMACNT_H dmacnt_h)
         {
             this.DAD = DAD.ToString("x8");
             this.SAD = SAD.ToString("x8");
@@ -74,8 +74,8 @@ namespace GBAEmulator.CPU
         public InterruptControlInfo GetInterruptControl()
         {
             return new InterruptControlInfo(
-                this.mem.IORAMSection.KEYCNT.Mask.ToString("x4"), this.mem.IORAMSection.IME.Enabled ? "1" : "0", this.mem.IORAMSection.IE.raw,
-                this.mem.IORAMSection.IF.raw, this.mem.IORAMSection.HALTCNT.Halt ? "1" : "0"
+                this.mem.IORAM.KEYCNT.Mask.ToString("x4"), this.mem.IORAM.IME.Enabled ? "1" : "0", this.mem.IORAM.IE.raw,
+                this.mem.IORAM.IF.raw, this.mem.IORAM.HALTCNT.Halt ? "1" : "0"
             );
         }
 
@@ -86,8 +86,8 @@ namespace GBAEmulator.CPU
 
         public DMAInfo GetDMAInfo(int index)
         {
-            return new DMAInfo(this.mem.IORAMSection.DMADAD[index].Address, this.mem.IORAMSection.DMASAD[index].Address,
-                this.mem.IORAMSection.DMACNT_L[index].UnitCount, this.mem.IORAMSection.DMACNT_H[index]);
+            return new DMAInfo(this.mem.IORAM.DMADAD[index].Address, this.mem.IORAM.DMASAD[index].Address,
+                this.mem.IORAM.DMACNT_L[index].UnitCount, this.mem.IORAM.DMACNT_H[index]);
         }
 
         public void ShowInfo()
@@ -97,8 +97,8 @@ namespace GBAEmulator.CPU
 
         public void InterruptInfo()
         {
-            Console.WriteLine($"HALTCNT: {this.mem.IORAMSection.HALTCNT.Halt}, CPSR-I: {this.I}");
-            Console.WriteLine($"IME enabled: {this.mem.IORAMSection.IME.Enabled}, IE: {this.mem.IORAMSection.IE.raw.ToString("x8")}, IF: {this.mem.IORAMSection.IF.raw.ToString("x8")}");
+            Console.WriteLine($"HALTCNT: {this.mem.IORAM.HALTCNT.Halt}, CPSR-I: {this.I}");
+            Console.WriteLine($"IME enabled: {this.mem.IORAM.IME.Enabled}, IE: {this.mem.IORAM.IE.raw.ToString("x8")}, IF: {this.mem.IORAM.IF.raw.ToString("x8")}");
         }
 
         public void DumpPAL()

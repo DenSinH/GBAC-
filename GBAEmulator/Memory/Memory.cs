@@ -1,5 +1,6 @@
 ﻿using System;
 
+using GBAEmulator.Memory.Sections;
 using GBAEmulator.CPU;
 using GBAEmulator.Bus;
 
@@ -7,22 +8,19 @@ namespace GBAEmulator.Memory
 {
     public partial class MEM
     {
-        ///* BIOS is defined in CPU.BIOS.cs */
-        public byte[] eWRAM = new byte[0x40000];       // 256kB External Work RAM
-        public byte[] iWRAM = new byte[0x8000];        // 32kB Internal Work RAM
-        // 1kB IO RAM
-        public byte[] PaletteRAM = new byte[0x400];    // 1kB Palette RAM
-        public byte[] VRAM = new byte[0x18000];        // 96kB VRAM
-        public byte[] OAM = new byte[0x400];           // 1kB OAM
-        public byte[] GamePak = new byte[0x200_0000];   // Game Pak (up to) 32MB (0x0800_0000 - 0x0a00_0000, then mirrored)
-        //// Backup Region
+        private cBIOSSection             BIOS;
+        private NonMirroredMemorySection UnusedSection = new NonMirroredMemorySection(0);
+        private MirroredMemorySection    eWRAM         = new MirroredMemorySection(0x40000);
+        private MirroredMemorySection    iWRAM         = new MirroredMemorySection(0x8000);
+        public  cIORAM                   IORAM;
+        public  MirroredMemorySection    PaletteRAM    = new MirroredMemorySection(0x8000);
+        public  cVRAMSection             VRAM          = new cVRAMSection();
+        public  MirroredMemorySection    OAM           = new MirroredMemorySection(0x400);
+        private cROMSection              GamePak_L;
+        private cROMSection              GamePak_H;
+        public  BackupSection            Backup;
 
-        //private readonly byte[][] __MemoryRegions__;  // Lookup table for memory regions for instant access (instead of switch statement)
-        //private readonly uint[] __MemoryMasks__ = new uint[16]  // mirrored twice
-        //{
-        //    0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
-        //    0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0xffff, 0xffff
-        //};
+        private IMemorySection[] MemorySections;
 
         // todo: waitstates / N & S cycles
         // Byte access cycles are equal to halfword access cycles
@@ -47,38 +45,32 @@ namespace GBAEmulator.Memory
         {
             this.cpu = cpu;
             this.bus = cpu.bus;
-            
-            this.InitBIOS();
-            this.IORAMSection = new cIORAM(cpu, this, cpu.bus);
-            this.BackupSection = new cBackupSection(this);
-            this.GamePakSection_L = new cROMSection(this, false);
-            this.GamePakSection_H = new cROMSection(this, true);
 
-            //this.__MemoryRegions__ = new byte[16][]
-            //{
-            //    this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
-            //    this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, null, null
-            //};
+            this.BIOS       = new cBIOSSection(cpu);
+            this.IORAM      = new cIORAM(cpu, this, cpu.bus);
+            this.Backup     = new BackupSection(this);
+            this.GamePak_L  = new cROMSection(this, false);
+            this.GamePak_H  = new cROMSection(this, true);
 
             this.MemorySections = new IMemorySection[16]
             {
-                this.BIOSSection,
+                this.BIOS,
                 this.UnusedSection,
-                this.eWRAMSection,
-                this.iWRAMSection,
-                this.IORAMSection,
-                this.PaletteRAMSection,
-                this.VRAMSection,
-                this.OAMSection,
+                this.eWRAM,
+                this.iWRAM,
+                this.IORAM,
+                this.PaletteRAM,
+                this.VRAM,
+                this.OAM,
 
-                this.GamePakSection_L,
-                this.GamePakSection_H,
-                this.GamePakSection_L,
-                this.GamePakSection_H,
-                this.GamePakSection_L,
-                this.GamePakSection_H,
-                this.BackupSection,
-                this.BackupSection
+                this.GamePak_L,
+                this.GamePak_H,
+                this.GamePak_L,
+                this.GamePak_H,
+                this.GamePak_L,
+                this.GamePak_H,
+                this.Backup,
+                this.Backup
             };
         }
 

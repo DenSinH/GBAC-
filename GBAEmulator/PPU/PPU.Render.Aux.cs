@@ -9,13 +9,13 @@ namespace GBAEmulator
 
         public void ResetWindowBlendMode()
         {
-            BlendMode AlphaBlending = this.gba.mem.IORAMSection.BLDCNT.BlendMode;
+            BlendMode AlphaBlending = this.gba.mem.IORAM.BLDCNT.BlendMode;
             BlendMode Win0In, Win1In, OBJWinIn, WinOut;
 
-            Win0In   = this.gba.mem.IORAMSection.WININ .WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
-            Win1In   = this.gba.mem.IORAMSection.WININ .WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
-            OBJWinIn = this.gba.mem.IORAMSection.WINOUT.WindowSpecialEffects(Window.OBJ)     ? AlphaBlending : BlendMode.Off;
-            WinOut   = this.gba.mem.IORAMSection.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
+            Win0In   = this.gba.mem.IORAM.WININ .WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
+            Win1In   = this.gba.mem.IORAM.WININ .WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
+            OBJWinIn = this.gba.mem.IORAM.WINOUT.WindowSpecialEffects(Window.OBJ)     ? AlphaBlending : BlendMode.Off;
+            WinOut   = this.gba.mem.IORAM.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
 
             this.ResetWindow<BlendMode>(ref WindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
             
@@ -69,9 +69,9 @@ namespace GBAEmulator
 
         private void ResetWindow<T>(ref T[] Window, T Win0In, T Win1In, T OBJWinIn, T WinOut, T Default)
         {
-            if (!this.gba.mem.IORAMSection.DISPCNT.DisplayOBJWindow() && 
-                !this.gba.mem.IORAMSection.DISPCNT.DisplayBGWindow(0) &&
-                !this.gba.mem.IORAMSection.DISPCNT.DisplayBGWindow(1))
+            if (!this.gba.mem.IORAM.DISPCNT.DisplayOBJWindow() && 
+                !this.gba.mem.IORAM.DISPCNT.DisplayBGWindow(0) &&
+                !this.gba.mem.IORAM.DISPCNT.DisplayBGWindow(1))
             {
                 FillWindow<T>(ref Window, Default);
                 return;
@@ -82,7 +82,7 @@ namespace GBAEmulator
             byte X1, X2, Y1, Y2;
 
             // OBJ layer lowest priority
-            if (this.gba.mem.IORAMSection.DISPCNT.DisplayOBJWindow())
+            if (this.gba.mem.IORAM.DISPCNT.DisplayOBJWindow())
             {
                 for (int x = 0; x < width; x++)
                 {
@@ -96,17 +96,17 @@ namespace GBAEmulator
 
             for (byte window = 1; window <= 1; window--)  // abuse overflow to loop over window = 1, 0
             {
-                if (!this.gba.mem.IORAMSection.DISPCNT.DisplayBGWindow(window))
+                if (!this.gba.mem.IORAM.DISPCNT.DisplayBGWindow(window))
                 {
                     continue;
                 }
                 
-                X1 = this.gba.mem.IORAMSection.WINH[window].LowCoord;
-                X2 = this.gba.mem.IORAMSection.WINH[window].HighCoord;
+                X1 = this.gba.mem.IORAM.WINH[window].LowCoord;
+                X2 = this.gba.mem.IORAM.WINH[window].HighCoord;
                 if (X2 > width) X2 = width;
 
-                Y1 = this.gba.mem.IORAMSection.WINV[window].LowCoord;
-                Y2 = this.gba.mem.IORAMSection.WINV[window].HighCoord;
+                Y1 = this.gba.mem.IORAM.WINV[window].LowCoord;
+                Y2 = this.gba.mem.IORAM.WINV[window].HighCoord;
                 // if (Y2 > height) Y2 = height;  // GBATek says this, but it seems to create wrong behavior
 
                 this.MaskWindow<T>(ref Window, (window == 0) ? Win0In : Win1In, X1, X2, Y1, Y2);
@@ -158,7 +158,7 @@ namespace GBAEmulator
                     {
                         if (IsBottom)
                         {
-                            this.Display[ScreenX] = Blend(this.Display[ScreenX], Color, this.gba.mem.IORAMSection.BLDALPHA.EVA, this.gba.mem.IORAMSection.BLDALPHA.EVB);
+                            this.Display[ScreenX] = Blend(this.Display[ScreenX], Color, this.gba.mem.IORAM.BLDALPHA.EVA, this.gba.mem.IORAM.BLDALPHA.EVB);
                             return true;
                         }
 
@@ -176,7 +176,7 @@ namespace GBAEmulator
                     if (WasOBJ)
                     {
                         this.Display[ScreenX] = Blend(this.Display[ScreenX], (ushort)(AlphaBlending == BlendMode.White ? 0x7fff : 0),
-                            (byte)(0x10 - this.gba.mem.IORAMSection.BLDY.EY), this.gba.mem.IORAMSection.BLDY.EY);
+                            (byte)(0x10 - this.gba.mem.IORAM.BLDY.EY), this.gba.mem.IORAM.BLDY.EY);
                         return true;
                     }
 
@@ -185,7 +185,7 @@ namespace GBAEmulator
                         // blend with white and color is final
                         // EY <= 0x10 so 0x10 - EY >= 0
                         this.Display[ScreenX] = Blend(Color, (ushort)(AlphaBlending == BlendMode.White ? 0x7fff : 0),
-                            (byte)(0x10 - this.gba.mem.IORAMSection.BLDY.EY), this.gba.mem.IORAMSection.BLDY.EY);
+                            (byte)(0x10 - this.gba.mem.IORAM.BLDY.EY), this.gba.mem.IORAM.BLDY.EY);
                     }
                     else
                     {
@@ -220,23 +220,23 @@ namespace GBAEmulator
 
             foreach (byte BG in BGs)
             {
-                Priorities[BG] = this.gba.mem.IORAMSection.BGCNT[BG].BGPriority;
-                Enabled[BG] = this.gba.mem.IORAMSection.DISPCNT.DisplayBG(BG);
+                Priorities[BG] = this.gba.mem.IORAM.BGCNT[BG].BGPriority;
+                Enabled[BG] = this.gba.mem.IORAM.DISPCNT.DisplayBG(BG);
             }
 
             // blending parameters
             bool[] BGTop = new bool[4], BGBottom = new bool[4];
             foreach (byte BG in BGs)
             {
-                BGTop[BG]    = this.gba.mem.IORAMSection.BLDCNT.BGIsTop(BG);
-                BGBottom[BG] = this.gba.mem.IORAMSection.BLDCNT.BGIsBottom(BG);
+                BGTop[BG]    = this.gba.mem.IORAM.BLDCNT.BGIsTop(BG);
+                BGBottom[BG] = this.gba.mem.IORAM.BLDCNT.BGIsBottom(BG);
             }
 
             bool OBJTop, OBJBottom, BDTop, BDBottom;
-            OBJTop      = this.gba.mem.IORAMSection.BLDCNT.OBJIsTop();
-            OBJBottom   = this.gba.mem.IORAMSection.BLDCNT.OBJIsBottom();
-            BDTop       = this.gba.mem.IORAMSection.BLDCNT.BDIsTop();
-            BDBottom    = this.gba.mem.IORAMSection.BLDCNT.BDIsBottom();
+            OBJTop      = this.gba.mem.IORAM.BLDCNT.OBJIsTop();
+            OBJBottom   = this.gba.mem.IORAM.BLDCNT.OBJIsBottom();
+            BDTop       = this.gba.mem.IORAM.BLDCNT.BDIsTop();
+            BDBottom    = this.gba.mem.IORAM.BLDCNT.BDIsBottom();
 
             // only to be called after drawing into the BGScanlines and OBJLayers
             byte priority;
