@@ -10,8 +10,8 @@ namespace GBAEmulator.Memory
 
         public string ROMName { get; private set; }
         private string ROMPath;
-        private BackupType ROMBackupType;
-        private uint ROMSize;
+        public BackupType ROMBackupType { get; private set; }
+        public uint ROMSize { get; private set; }
 
         private BackupType GetBackupType(string FileName)
         {
@@ -57,6 +57,9 @@ namespace GBAEmulator.Memory
 
             this.ROMPath = FileName;
             this.ROMName = Path.GetFileName(FileName);
+
+            this.GamePakSection_L.Load(this.GamePak, 0);
+            this.GamePakSection_H.Load(this.GamePak, 0x0100_0000);
         }
     }
 }

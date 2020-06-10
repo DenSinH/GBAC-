@@ -1,15 +1,57 @@
-﻿using System;
+﻿using GBAEmulator.CPU;
+using GBAEmulator.Bus;
+using System;
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    public partial class cIORAM : IMemorySection
     {
         public IORegister[] IORAM = new IORegister[0x400];           // 1kB IO RAM
         private UnusedRegister MasterUnusedRegister;
         private ZeroRegister MasterZeroRegister = new ZeroRegister();
 
-        public void InitRegisters()
+        public cIORAM(ARM7TDMI cpu, MEM mem, BUS bus)
         {
+            this.DISPSTAT = new cDISPSTAT(mem);
+            this.VCOUNT = new cVCOUNT(mem);
+            this.BGHOFS = new cBGScrolling[4] { new cBGScrolling(bus, true), new cBGScrolling(bus, false),
+                                                new cBGScrolling(bus, true), new cBGScrolling(bus, false) };
+
+            this.BGVOFS = new cBGScrolling[4] { new cBGScrolling(bus, true), new cBGScrolling(bus, false),
+                                                new cBGScrolling(bus, true), new cBGScrolling(bus, false) };
+
+            this.BG2X = new cReferencePoint(bus);
+            this.BG2Y = new cReferencePoint(bus);
+            this.BG3X = new cReferencePoint(bus);
+            this.BG3Y = new cReferencePoint(bus);
+
+            this.BG2PA = new cRotationScaling(bus, true);
+            this.BG2PB = new cRotationScaling(bus, false);
+            this.BG2PC = new cRotationScaling(bus, true);
+            this.BG2PD = new cRotationScaling(bus, false);
+
+            this.BG3PA = new cRotationScaling(bus, true);
+            this.BG3PB = new cRotationScaling(bus, false);
+            this.BG3PC = new cRotationScaling(bus, true);
+            this.BG3PD = new cRotationScaling(bus, false);
+
+            this.WINH = new cWindowDimensions[2] { new cWindowDimensions(bus, true), new cWindowDimensions(bus, false) };
+            this.WINV = new cWindowDimensions[2] { new cWindowDimensions(bus, true), new cWindowDimensions(bus, false) };
+
+            this.KEYINPUT = new cKeyInput(this.KEYCNT, mem);
+
+            this.DMASAD = new cDMAAddress[4] { new cDMAAddress(bus, true),  new cDMAAddress(bus, false),
+                                               new cDMAAddress(bus, false), new cDMAAddress(bus, false) };
+            this.DMADAD = new cDMAAddress[4] { new cDMAAddress(bus, true), new cDMAAddress(bus, true),
+                                               new cDMAAddress(bus, true), new cDMAAddress(bus, false) };
+
+            this.DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0x3fff),
+                                               new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0xffff) };
+            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(mem, 0), new cDMACNT_H(mem, 1),
+                                               new cDMACNT_H(mem, 2), new cDMACNT_H(mem, 3, true) };
+
+            this.MasterUnusedRegister = new UnusedRegister(bus);
+
             // LCD I/O Registers
             this.IORAM[0x00] = this.IORAM[0x01] = this.DISPCNT;
             this.IORAM[0x02] = this.IORAM[0x03] = new DefaultRegister();  // green swap
@@ -122,17 +164,17 @@ namespace GBAEmulator.Memory
             }
 
             // Timer Registers
-            this.IORAM[0x100] = this.IORAM[0x101] = this.cpu.Timers[0].Data;
-            this.IORAM[0x102] = this.IORAM[0x103] = this.cpu.Timers[0].Control;
+            this.IORAM[0x100] = this.IORAM[0x101] = cpu.Timers[0].Data;
+            this.IORAM[0x102] = this.IORAM[0x103] = cpu.Timers[0].Control;
 
-            this.IORAM[0x104] = this.IORAM[0x105] = this.cpu.Timers[1].Data;
-            this.IORAM[0x106] = this.IORAM[0x107] = this.cpu.Timers[1].Control;
+            this.IORAM[0x104] = this.IORAM[0x105] = cpu.Timers[1].Data;
+            this.IORAM[0x106] = this.IORAM[0x107] = cpu.Timers[1].Control;
 
-            this.IORAM[0x108] = this.IORAM[0x109] = this.cpu.Timers[2].Data;
-            this.IORAM[0x10a] = this.IORAM[0x10b] = this.cpu.Timers[2].Control;
+            this.IORAM[0x108] = this.IORAM[0x109] = cpu.Timers[2].Data;
+            this.IORAM[0x10a] = this.IORAM[0x10b] = cpu.Timers[2].Control;
 
-            this.IORAM[0x10c] = this.IORAM[0x10d] = this.cpu.Timers[3].Data;
-            this.IORAM[0x10e] = this.IORAM[0x10f] = this.cpu.Timers[3].Control;
+            this.IORAM[0x10c] = this.IORAM[0x10d] = cpu.Timers[3].Data;
+            this.IORAM[0x10e] = this.IORAM[0x10f] = cpu.Timers[3].Control;
             
             for (int i = 0x110; i < 0x120; i += 4)
             {
@@ -201,7 +243,17 @@ namespace GBAEmulator.Memory
             }
         }
 
-        private byte IOGetByteAt(uint address)
+        private void Error(string message)
+        {
+
+        }
+
+        private void Log(string message)
+        {
+
+        }
+
+        public byte? GetByteAt(uint address)
         {
             this.Log("Get register byte at address " + address.ToString("x3"));
             IORegister reg = this.IORAM[address];
@@ -213,7 +265,7 @@ namespace GBAEmulator.Memory
             return (byte)((reg.Get() & 0xff00) >> 8);
         }
 
-        private void IOSetByteAt(uint address, byte value)
+        public void SetByteAt(uint address, byte value)
         {
             this.Log("Set register byte at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.IORAM[address];
@@ -224,7 +276,7 @@ namespace GBAEmulator.Memory
                 reg.Set((ushort)(value << 8), false, true);
         }
         
-        private ushort IOGetHalfWordAt(uint address)
+        public ushort? GetHalfWordAt(uint address)
         {
             this.Log("Get register halfword at address " + address.ToString("x"));
             IORegister reg = this.IORAM[address];
@@ -236,7 +288,7 @@ namespace GBAEmulator.Memory
             return (ushort)(((reg.Get() & 0xff00) >> 8) | ((this.IORAM[address + 2].Get() & 0x00ff) << 8));
         }
 
-        private void IOSetHalfWordAt(uint address, ushort value)
+        public void SetHalfWordAt(uint address, ushort value)
         {
             this.Log("Set register halfword at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.IORAM[address];
@@ -252,7 +304,7 @@ namespace GBAEmulator.Memory
             this.IORAM[address + 2].Set((ushort)(value & 0x00ff), true, false);
         }
 
-        private uint IOGetWordAt(uint address)
+        public uint? GetWordAt(uint address)
         {
             this.Log("Get register word at address " + address.ToString("x"));
             IORegister reg = this.IORAM[address];
@@ -269,7 +321,7 @@ namespace GBAEmulator.Memory
 
         }
 
-        private void IOSetWordAt(uint address, uint value)
+        public void SetWordAt(uint address, uint value)
         {
             this.Log("Set register word at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.IORAM[address];

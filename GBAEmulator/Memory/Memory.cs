@@ -5,9 +5,9 @@ using GBAEmulator.Bus;
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    public partial class MEM
     {
-        /* BIOS is defined in CPU.BIOS.cs */
+        ///* BIOS is defined in CPU.BIOS.cs */
         public byte[] eWRAM = new byte[0x40000];       // 256kB External Work RAM
         public byte[] iWRAM = new byte[0x8000];        // 32kB Internal Work RAM
         // 1kB IO RAM
@@ -15,14 +15,14 @@ namespace GBAEmulator.Memory
         public byte[] VRAM = new byte[0x18000];        // 96kB VRAM
         public byte[] OAM = new byte[0x400];           // 1kB OAM
         public byte[] GamePak = new byte[0x200_0000];   // Game Pak (up to) 32MB (0x0800_0000 - 0x0a00_0000, then mirrored)
-        // Backup Region
+        //// Backup Region
 
-        private readonly byte[][] __MemoryRegions__;  // Lookup table for memory regions for instant access (instead of switch statement)
-        private readonly uint[] __MemoryMasks__ = new uint[16]  // mirrored twice
-        {
-            0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
-            0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0xffff, 0xffff
-        };
+        //private readonly byte[][] __MemoryRegions__;  // Lookup table for memory regions for instant access (instead of switch statement)
+        //private readonly uint[] __MemoryMasks__ = new uint[16]  // mirrored twice
+        //{
+        //    0x3fff, 0x3fff, 0x3ffff, 0x7fff, 0, 0x3ff, 0, 0x3ff, // 0 because VRAM mirrors are different, and IORAM contains registers
+        //    0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0x01ff_ffff, 0xffff, 0xffff
+        //};
 
         // todo: waitstates / N & S cycles
         // Byte access cycles are equal to halfword access cycles
@@ -48,53 +48,37 @@ namespace GBAEmulator.Memory
             this.cpu = cpu;
             this.bus = cpu.bus;
             
-            this.DISPSTAT = new cDISPSTAT(this);
-            this.VCOUNT = new cVCOUNT(this);
-            this.BGHOFS = new cBGScrolling[4] { new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false),
-                                                new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false) };
-
-            this.BGVOFS = new cBGScrolling[4] { new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false),
-                                                new cBGScrolling(this.bus, true), new cBGScrolling(this.bus, false) };
-
-            this.BG2X = new cReferencePoint(this.bus);
-            this.BG2Y = new cReferencePoint(this.bus);
-            this.BG3X = new cReferencePoint(this.bus);
-            this.BG3Y = new cReferencePoint(this.bus);
-
-            this.BG2PA = new cRotationScaling(this.bus, true);
-            this.BG2PB = new cRotationScaling(this.bus, false);
-            this.BG2PC = new cRotationScaling(this.bus, true);
-            this.BG2PD = new cRotationScaling(this.bus, false);
-
-            this.BG3PA = new cRotationScaling(this.bus, true);
-            this.BG3PB = new cRotationScaling(this.bus, false);
-            this.BG3PC = new cRotationScaling(this.bus, true);
-            this.BG3PD = new cRotationScaling(this.bus, false);
-
-            this.WINH = new cWindowDimensions[2] { new cWindowDimensions(this.bus, true), new cWindowDimensions(this.bus, false) };
-            this.WINV = new cWindowDimensions[2] { new cWindowDimensions(this.bus, true), new cWindowDimensions(this.bus, false) };
-
-            this.KEYINPUT = new cKeyInput(this.KEYCNT, this);
-
-            this.DMASAD = new cDMAAddress[4] { new cDMAAddress(this.bus, true),  new cDMAAddress(this.bus, false),
-                                               new cDMAAddress(this.bus, false), new cDMAAddress(this.bus, false) };
-            this.DMADAD = new cDMAAddress[4] { new cDMAAddress(this.bus, true), new cDMAAddress(this.bus, true),
-                                               new cDMAAddress(this.bus, true), new cDMAAddress(this.bus, false) };
-            
-            this.DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(this.bus, 0x3fff), new cDMACNT_L(this.bus, 0x3fff),
-                                               new cDMACNT_L(this.bus, 0x3fff), new cDMACNT_L(this.bus, 0xffff) };
-            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(this, 0), new cDMACNT_H(this, 1),
-                                               new cDMACNT_H(this, 2), new cDMACNT_H(this, 3, true) };
-
-            this.MasterUnusedRegister = new UnusedRegister(this.bus);
-
             this.InitBIOS();
-            this.InitRegisters();
+            this.IORAMSection = new cIORAM(cpu, this, cpu.bus);
+            this.BackupSection = new cBackupSection(this);
+            this.GamePakSection_L = new cROMSection(this, false);
+            this.GamePakSection_H = new cROMSection(this, true);
 
-            this.__MemoryRegions__ = new byte[16][]
+            //this.__MemoryRegions__ = new byte[16][]
+            //{
+            //    this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
+            //    this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, null, null
+            //};
+
+            this.MemorySections = new IMemorySection[16]
             {
-                this.BIOS, this.BIOS, this.eWRAM, this.iWRAM, null, this.PaletteRAM, null, this.OAM,
-                this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, this.GamePak, null, null
+                this.BIOSSection,
+                this.UnusedSection,
+                this.eWRAMSection,
+                this.iWRAMSection,
+                this.IORAMSection,
+                this.PaletteRAMSection,
+                this.VRAMSection,
+                this.OAMSection,
+
+                this.GamePakSection_L,
+                this.GamePakSection_H,
+                this.GamePakSection_L,
+                this.GamePakSection_H,
+                this.GamePakSection_L,
+                this.GamePakSection_H,
+                this.BackupSection,
+                this.BackupSection
             };
         }
 

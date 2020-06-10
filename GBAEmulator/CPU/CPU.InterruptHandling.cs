@@ -18,11 +18,11 @@ namespace GBAEmulator.CPU
         
         private bool HandleIRQs()
         {
-            if ((this.mem.IF.raw & this.mem.IE.raw) != 0)
+            if ((this.mem.IORAMSection.IF.raw & this.mem.IORAMSection.IE.raw) != 0)
             {
-                this.mem.HALTCNT.Halt = false;
+                this.mem.IORAMSection.HALTCNT.Halt = false;
                 
-                if (this.mem.IME.Enabled && (this.I == 0))
+                if (this.mem.IORAMSection.IME.Enabled && (this.I == 0))
                 {
                     this.DoIRQ();
                     return true;
@@ -34,7 +34,7 @@ namespace GBAEmulator.CPU
         // public to allow for manual IRQ throwing for testing (unstable)
         public void DoIRQ()
         {
-            this.Log("Doing IRQ: " + (this.mem.IF.raw & this.mem.IE.raw).ToString("x8"));
+            // this.Log("Doing IRQ: " + (this.mem.IF.raw & this.mem.IE.raw).ToString("x8"));
             this.ChangeMode(Mode.IRQ);
             this.I = 1;
 

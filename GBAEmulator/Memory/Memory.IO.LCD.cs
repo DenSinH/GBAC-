@@ -4,7 +4,7 @@ using GBAEmulator.Bus;
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    partial class cIORAM
     {
 
         #region DISPCNT
@@ -70,7 +70,7 @@ namespace GBAEmulator.Memory
                     this._raw |= 1;
                     if (this.IsSet(DISPSTATFlags.VBlankIRQEnable))
                     {
-                        this.mem.IF.Request(Interrupt.LCDVBlank);
+                        this.mem.IORAMSection.IF.Request(Interrupt.LCDVBlank);
                     }
                 }
                 else
@@ -83,7 +83,7 @@ namespace GBAEmulator.Memory
                 {
                     this._raw |= 2;
                     if (this.IsSet(DISPSTATFlags.HBlankIRQEnable))
-                        this.mem.IF.Request(Interrupt.LCDHBlank);
+                        this.mem.IORAMSection.IF.Request(Interrupt.LCDHBlank);
                 }
                 else
                     this._raw &= 0xfffd;
@@ -111,24 +111,24 @@ namespace GBAEmulator.Memory
                 set
                 {
                     this._raw = (ushort)((this._raw & 0xff00) | value);
-                    if (value == this.mem.DISPSTAT.VCountSetting)
+                    if (value == this.mem.IORAMSection.DISPSTAT.VCountSetting)
                     {
-                        this.mem.DISPSTAT.VCountMatch(true);
-                        if (this.mem.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable))
+                        this.mem.IORAMSection.DISPSTAT.VCountMatch(true);
+                        if (this.mem.IORAMSection.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable))
                         {
-                            this.mem.IF.Request(Interrupt.LCDVCountMatch);
+                            this.mem.IORAMSection.IF.Request(Interrupt.LCDVCountMatch);
                         }
                     }
                     else
                     {
-                        this.mem.DISPSTAT.VCountMatch(false);
+                        this.mem.IORAMSection.DISPSTAT.VCountMatch(false);
                     }
                 }
             }
 
             public override void Set(ushort value, bool setlow, bool sethigh)
             {
-                this.mem.Error("Cannot write to VCOUNT register");
+                // this.mem.Error("Cannot write to VCOUNT register");
             }
         }
 

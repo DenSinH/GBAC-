@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    partial class cIORAM
     {
         #region Interrupt Control
         public class cIME : IORegister2  // Interrupt Master Enable

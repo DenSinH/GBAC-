@@ -593,6 +593,8 @@ namespace GBAEmulator.Memory
 
         public bool InitBIOS()
         {
+            this.BIOSSection = new cBIOSSection(this.cpu);
+
             FileStream fs;
             try
             {
@@ -601,6 +603,7 @@ namespace GBAEmulator.Memory
             catch
             {
                 this.BIOS = this.NormattsBIOS;
+                this.BIOSSection.Load(this.NormattsBIOS);
                 Console.WriteLine("BIOS dump load failed, using Normatt's BIOS...");
                 return false;
             }
@@ -615,6 +618,7 @@ namespace GBAEmulator.Memory
                 current = fs.ReadByte();
                 i++;
             }
+            this.BIOSSection.Load(this.BIOS);
             return true;
         }
 

@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    partial class cIORAM
     {
         #region Timer Registers
         public class cTMCNT_L : IORegister2

@@ -21,15 +21,15 @@ namespace GBAEmulator.CPU
             private ARM7TDMI cpu;
             private int index;
 
-            public MEM.cTMCNT_L Data;
-            public MEM.cTMCNT_H Control;
+            public cIORAM.cTMCNT_L Data;
+            public cIORAM.cTMCNT_H Control;
 
             public cTimer(ARM7TDMI cpu, int index)
             {
                 this.cpu = cpu;
                 this.index = index;
-                this.Data = new MEM.cTMCNT_L();
-                this.Control = new MEM.cTMCNT_H(this.Data);
+                this.Data = new cIORAM.cTMCNT_L();
+                this.Control = new cIORAM.cTMCNT_H(this.Data);
             }
 
             public cTimer(ARM7TDMI cpu, int index, cTimer Next) : this(cpu, index)
@@ -51,7 +51,7 @@ namespace GBAEmulator.CPU
                     {
                         if (this.Next?.Control.CountUpTiming ?? false) this.Next?.TickDirect(1);
 
-                        if (this.Control.TimerIRQEnable) this.cpu.mem.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
+                        if (this.Control.TimerIRQEnable) this.cpu.mem.IORAMSection.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
                     }
                 }
             }

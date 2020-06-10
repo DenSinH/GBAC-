@@ -4,7 +4,7 @@ using GBAEmulator.Bus;
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    partial class cIORAM
     {
         public interface IORegister
         {

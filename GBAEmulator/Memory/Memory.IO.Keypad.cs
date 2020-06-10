@@ -2,7 +2,7 @@
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    partial class cIORAM
     {
         #region KEYINPUT
         public class cKeyInput : IORegister2
@@ -38,12 +38,12 @@ namespace GBAEmulator.Memory
                     if (this.KEYCNT.IRQCondition)   // AND
                     {
                         if ((state & this.KEYCNT.Mask) == this.KEYCNT.Mask)
-                            this.mem.IF.Request(Interrupt.Keypad);
+                            this.mem.IORAMSection.IF.Request(Interrupt.Keypad);
                     }
                     else                            // OR
                     {
                         if ((state & this.KEYCNT.Mask) > 0)
-                            this.mem.IF.Request(Interrupt.Keypad);
+                            this.mem.IORAMSection.IF.Request(Interrupt.Keypad);
                     }
                 }
 

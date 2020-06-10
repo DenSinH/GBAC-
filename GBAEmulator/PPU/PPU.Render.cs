@@ -24,7 +24,7 @@ namespace GBAEmulator
             if (!IsVBlank)
             {
                 // Console.WriteLine(this.gba.mem.DISPCNT.BGMode);
-                switch (this.gba.mem.DISPCNT.BGMode)
+                switch (this.gba.mem.IORAMSection.DISPCNT.BGMode)
                 {
                     case 0:
                         this.Mode0Scanline();
@@ -59,7 +59,7 @@ namespace GBAEmulator
 
         private void Mode0Scanline()
         {
-            bool DoRenderOBJs = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.mem.IORAMSection.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(0, 1, 2, 3);
             this.ResetBGWindows(0, 1, 2, 3);
@@ -76,7 +76,7 @@ namespace GBAEmulator
 
         private void Mode1Scanline()
         {
-            bool DoRenderOBJs = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.mem.IORAMSection.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(0, 1, 2);
             this.ResetBGWindows(0, 1, 2);
@@ -88,14 +88,14 @@ namespace GBAEmulator
             }
 
             this.RenderRegularBGScanlines(0, 1);
-            this.RenderAffineBGScanline(2, this.gba.mem.BG2X, this.gba.mem.BG2Y,
-                this.gba.mem.BG2PA, this.gba.mem.BG2PB, this.gba.mem.BG2PC, this.gba.mem.BG2PD);
+            this.RenderAffineBGScanline(2, this.gba.mem.IORAMSection.BG2X, this.gba.mem.IORAMSection.BG2Y,
+                this.gba.mem.IORAMSection.BG2PA, this.gba.mem.IORAMSection.BG2PB, this.gba.mem.IORAMSection.BG2PC, this.gba.mem.IORAMSection.BG2PD);
             this.MergeBGs(DoRenderOBJs, 0, 1, 2);
         }
 
         private void Mode2Scanline()
         {
-            bool DoRenderOBJs = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.mem.IORAMSection.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(2, 3);
             this.ResetBGWindows(2, 3);
@@ -106,17 +106,17 @@ namespace GBAEmulator
                 this.RenderOBJs();
             }
 
-            this.RenderAffineBGScanline(2, this.gba.mem.BG2X, this.gba.mem.BG2Y,
-                this.gba.mem.BG2PA, this.gba.mem.BG2PB, this.gba.mem.BG2PC, this.gba.mem.BG2PD);
-            this.RenderAffineBGScanline(3, this.gba.mem.BG3X, this.gba.mem.BG3Y,
-                this.gba.mem.BG3PA, this.gba.mem.BG3PB, this.gba.mem.BG3PC, this.gba.mem.BG3PD);
+            this.RenderAffineBGScanline(2, this.gba.mem.IORAMSection.BG2X, this.gba.mem.IORAMSection.BG2Y,
+                this.gba.mem.IORAMSection.BG2PA, this.gba.mem.IORAMSection.BG2PB, this.gba.mem.IORAMSection.BG2PC, this.gba.mem.IORAMSection.BG2PD);
+            this.RenderAffineBGScanline(3, this.gba.mem.IORAMSection.BG3X, this.gba.mem.IORAMSection.BG3Y,
+                this.gba.mem.IORAMSection.BG3PA, this.gba.mem.IORAMSection.BG3PB, this.gba.mem.IORAMSection.BG3PC, this.gba.mem.IORAMSection.BG3PD);
             this.MergeBGs(DoRenderOBJs, 2, 3);
         }
 
         private void Mode3Scanline()
         {
             // we render on BG2
-            bool DoRenderOBJs = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.gba.mem.IORAMSection.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
@@ -126,7 +126,7 @@ namespace GBAEmulator
                 this.RenderOBJs();
             }
 
-            if (this.gba.mem.DISPCNT.DisplayBG(2))
+            if (this.gba.mem.IORAMSection.DISPCNT.DisplayBG(2))
             {
                 for (int x = 0; x < width; x++)
                 {
@@ -166,8 +166,8 @@ namespace GBAEmulator
         private void Mode4Scanline()
         {
             // we render on BG2
-            ushort offset = (ushort)(this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
-            bool DoRenderOBJs = this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            ushort offset = (ushort)(this.gba.mem.IORAMSection.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
+            bool DoRenderOBJs = this.gba.mem.IORAMSection.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
 
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
@@ -177,7 +177,7 @@ namespace GBAEmulator
                 this.RenderOBJs();
             }
 
-            if (this.gba.mem.DISPCNT.DisplayBG(2))
+            if (this.gba.mem.IORAMSection.DISPCNT.DisplayBG(2))
             {
                 for (int x = 0; x < width; x++)
                 {
@@ -217,9 +217,9 @@ namespace GBAEmulator
         {
             // I don't think this is working properly
             // I can't find much on mode 5 rendering though, so I'll just leave it
-            if (scanline < 128 && this.gba.mem.DISPCNT.DisplayBG(2))
+            if (scanline < 128 && this.gba.mem.IORAMSection.DISPCNT.DisplayBG(2))
             {
-                ushort offset = (ushort)(this.gba.mem.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
+                ushort offset = (ushort)(this.gba.mem.IORAMSection.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
 
                 // smaller format
                 for (int x = 0; x < 160; x++)

@@ -37,8 +37,8 @@ namespace GBAEmulator
             foreach (byte BG in BGs)
             {
                 this.ResetWindow<bool>(ref BGWindows[BG],
-                    this.gba.mem.WININ.WindowBGEnable(Window.Window0, BG), this.gba.mem.WININ.WindowBGEnable(Window.Window1, BG),
-                    this.gba.mem.WINOUT.WindowBGEnable(Window.OBJ, BG), this.gba.mem.WINOUT.WindowBGEnable(Window.Outside, BG), true);
+                    this.gba.mem.IORAMSection.WININ.WindowBGEnable(Window.Window0, BG), this.gba.mem.IORAMSection.WININ.WindowBGEnable(Window.Window1, BG),
+                    this.gba.mem.IORAMSection.WINOUT.WindowBGEnable(Window.OBJ, BG), this.gba.mem.IORAMSection.WINOUT.WindowBGEnable(Window.Outside, BG), true);
             }
         }
 
@@ -111,17 +111,17 @@ namespace GBAEmulator
             uint ScreenEntryIndex;
             ushort ScreenEntry;
 
-            MEM.cBGControl BGCNT;
+            cIORAM.cBGControl BGCNT;
 
             foreach (byte BG in BGs)
             {
-                if (!this.gba.mem.DISPCNT.DisplayBG(BG))
+                if (!this.gba.mem.IORAMSection.DISPCNT.DisplayBG(BG))
                     // Background disabled, does not need rendering
                     continue;
 
-                HOFS  = this.gba.mem.BGHOFS[BG].Offset;
-                VOFS  = this.gba.mem.BGVOFS[BG].Offset;
-                BGCNT = this.gba.mem.BGCNT[BG];
+                HOFS  = this.gba.mem.IORAMSection.BGHOFS[BG].Offset;
+                VOFS  = this.gba.mem.IORAMSection.BGVOFS[BG].Offset;
+                BGCNT = this.gba.mem.IORAMSection.BGCNT[BG];
 
                 CharBaseBlock   = BGCNT.CharBaseBlock;
                 ScreenBaseBlock = BGCNT.ScreenBaseBlock;
@@ -132,14 +132,14 @@ namespace GBAEmulator
                 // correct address for mosaic
                 EffectiveY = (short)(scanline + VOFS);
                 if (Mosaic)
-                    EffectiveY -= (short)(EffectiveY % this.gba.mem.MOSAIC.BGMosaicVSize);
+                    EffectiveY -= (short)(EffectiveY % this.gba.mem.IORAMSection.MOSAIC.BGMosaicVSize);
 
                 for (sbyte CourseX = -1; CourseX < 31; CourseX++)
                 {
                     EffectiveX = (short)((CourseX << 3) + HOFS);
 
                     if (Mosaic)
-                        EffectiveX -= (short)(EffectiveX % this.gba.mem.MOSAIC.BGMosaicHSize);
+                        EffectiveX -= (short)(EffectiveX % this.gba.mem.IORAMSection.MOSAIC.BGMosaicHSize);
 
                     // ScreenEntryIndex is the index of the screenentry for the tile we are currently rendering
                     ScreenEntryIndex = PPU.VRAMIndexRegular((int)(EffectiveX >> 3), (int)((EffectiveY) >> 3), BGSize);
@@ -156,7 +156,7 @@ namespace GBAEmulator
                         CharBaseBlock: CharBaseBlock,
                         ColorMode: ColorMode,
                         Mosaic: Mosaic,
-                        MosaicHSize: this.gba.mem.MOSAIC.BGMosaicHSize
+                        MosaicHSize: this.gba.mem.IORAMSection.MOSAIC.BGMosaicHSize
                         );
                 }
             }
@@ -183,14 +183,14 @@ namespace GBAEmulator
         }
 
         // based on y = scanline
-        private void RenderAffineBGScanline(byte BG, MEM.cReferencePoint BGxX, MEM.cReferencePoint BGxY,
-            MEM.cRotationScaling PA, MEM.cRotationScaling PB, MEM.cRotationScaling PC, MEM.cRotationScaling PD)
+        private void RenderAffineBGScanline(byte BG, cIORAM.cReferencePoint BGxX, cIORAM.cReferencePoint BGxY,
+            cIORAM.cRotationScaling PA, cIORAM.cRotationScaling PB, cIORAM.cRotationScaling PC, cIORAM.cRotationScaling PD)
         {
             // ! only to be used with BG = 2 or BG = 3 !
-            if (!this.gba.mem.DISPCNT.DisplayBG(BG))  // Background disabled, does not need rendering
+            if (!this.gba.mem.IORAMSection.DISPCNT.DisplayBG(BG))  // Background disabled, does not need rendering
                 return;
 
-            MEM.cBGControl BGCNT = this.gba.mem.BGCNT[BG];
+            cIORAM.cBGControl BGCNT = this.gba.mem.IORAMSection.BGCNT[BG];
             
             ushort BGSize = AffineSizeTable[BGCNT.ScreenSize];
 

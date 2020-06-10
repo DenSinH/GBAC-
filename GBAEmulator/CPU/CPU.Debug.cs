@@ -41,7 +41,7 @@ namespace GBAEmulator.CPU
     {
         public string DAD, SAD, UnitCount, DestAddrControl, SourceAddrControl, Repeat, UnitLength, Timing, IRQ, Enabled;
 
-        public DMAInfo(uint DAD, uint SAD, uint UnitCount, MEM.cDMACNT_H dmacnt_h)
+        public DMAInfo(uint DAD, uint SAD, uint UnitCount, cIORAM.cDMACNT_H dmacnt_h)
         {
             this.DAD = DAD.ToString("x8");
             this.SAD = SAD.ToString("x8");
@@ -74,8 +74,8 @@ namespace GBAEmulator.CPU
         public InterruptControlInfo GetInterruptControl()
         {
             return new InterruptControlInfo(
-                this.mem.KEYCNT.Mask.ToString("x4"), this.mem.IME.Enabled ? "1" : "0", this.mem.IE.raw,
-                this.mem.IF.raw, this.mem.HALTCNT.Halt ? "1" : "0"
+                this.mem.IORAMSection.KEYCNT.Mask.ToString("x4"), this.mem.IORAMSection.IME.Enabled ? "1" : "0", this.mem.IORAMSection.IE.raw,
+                this.mem.IORAMSection.IF.raw, this.mem.IORAMSection.HALTCNT.Halt ? "1" : "0"
             );
         }
 
@@ -86,8 +86,8 @@ namespace GBAEmulator.CPU
 
         public DMAInfo GetDMAInfo(int index)
         {
-            return new DMAInfo(this.mem.DMADAD[index].Address, this.mem.DMASAD[index].Address,
-                this.mem.DMACNT_L[index].UnitCount, this.mem.DMACNT_H[index]);
+            return new DMAInfo(this.mem.IORAMSection.DMADAD[index].Address, this.mem.IORAMSection.DMASAD[index].Address,
+                this.mem.IORAMSection.DMACNT_L[index].UnitCount, this.mem.IORAMSection.DMACNT_H[index]);
         }
 
         public void ShowInfo()
@@ -97,8 +97,8 @@ namespace GBAEmulator.CPU
 
         public void InterruptInfo()
         {
-            Console.WriteLine($"HALTCNT: {this.mem.HALTCNT.Halt}, CPSR-I: {this.I}");
-            Console.WriteLine($"IME enabled: {this.mem.IME.Enabled}, IE: {this.mem.IE.raw.ToString("x8")}, IF: {this.mem.IF.raw.ToString("x8")}");
+            Console.WriteLine($"HALTCNT: {this.mem.IORAMSection.HALTCNT.Halt}, CPSR-I: {this.I}");
+            Console.WriteLine($"IME enabled: {this.mem.IORAMSection.IME.Enabled}, IE: {this.mem.IORAMSection.IE.raw.ToString("x8")}, IF: {this.mem.IORAMSection.IF.raw.ToString("x8")}");
         }
 
         public void DumpPAL()
@@ -127,52 +127,52 @@ namespace GBAEmulator.CPU
             }
         }
 
-        public void DumpVRAM(byte CharBlock, byte bpp)
-        {
-            uint StartAddress = (uint)(CharBlock * 0x4000);
-            uint Address = 0;
-            for (int row = 0; row < 0x10; row++)
-            {
-                Console.WriteLine(Address.ToString("x4"));
-                for (int dy = 0; dy < 8; dy++)  // overall y
-                {
-                    for (int t = 0; t < 0x10; t++)
-                    {
-                        Address = StartAddress + (uint)(8 * bpp * 0x10 * row) + (uint)(8 * bpp * t) + (uint)(bpp * dy);  // 0x10 is row length
-                        for (int j = 0; j < bpp; j++)
-                        {
-                            for (int w = bpp - 1; w < 8; w += 4)  // double writing for 4bpp
-                            {
-                                switch ((this.mem.VRAM[Address] >> 4) / 2)
-                                {
-                                    case 0:
-                                        Console.Write(" ");
-                                        break;
-                                    case 1:
-                                        Console.Write("/");
-                                        break;
-                                    case 2:
-                                        Console.Write("?");
-                                        break;
-                                    case 3:
-                                        Console.Write("#");
-                                        break;
-                                    default:
-                                        Console.Write(" ");
-                                        break;
-                                }
-                            }
-                            Address++;
-                        }
-                        Console.Write("|");
-                    }
-                    if ((dy + 1) % 8 == 0)
-                    {
-                        Console.WriteLine();
-                    }
-                    Console.WriteLine();
-                }
-            }
-        }
+        //public void DumpVRAM(byte CharBlock, byte bpp)
+        //{
+        //    uint StartAddress = (uint)(CharBlock * 0x4000);
+        //    uint Address = 0;
+        //    for (int row = 0; row < 0x10; row++)
+        //    {
+        //        Console.WriteLine(Address.ToString("x4"));
+        //        for (int dy = 0; dy < 8; dy++)  // overall y
+        //        {
+        //            for (int t = 0; t < 0x10; t++)
+        //            {
+        //                Address = StartAddress + (uint)(8 * bpp * 0x10 * row) + (uint)(8 * bpp * t) + (uint)(bpp * dy);  // 0x10 is row length
+        //                for (int j = 0; j < bpp; j++)
+        //                {
+        //                    for (int w = bpp - 1; w < 8; w += 4)  // double writing for 4bpp
+        //                    {
+        //                        switch ((this.mem.VRAM[Address] >> 4) / 2)
+        //                        {
+        //                            case 0:
+        //                                Console.Write(" ");
+        //                                break;
+        //                            case 1:
+        //                                Console.Write("/");
+        //                                break;
+        //                            case 2:
+        //                                Console.Write("?");
+        //                                break;
+        //                            case 3:
+        //                                Console.Write("#");
+        //                                break;
+        //                            default:
+        //                                Console.Write(" ");
+        //                                break;
+        //                        }
+        //                    }
+        //                    Address++;
+        //                }
+        //                Console.Write("|");
+        //            }
+        //            if ((dy + 1) % 8 == 0)
+        //            {
+        //                Console.WriteLine();
+        //            }
+        //            Console.WriteLine();
+        //        }
+        //    }
+        //}
     }
 }

@@ -4,7 +4,7 @@ using GBAEmulator.Bus;
 
 namespace GBAEmulator.Memory
 {
-    partial class MEM
+    partial class cIORAM
     {
         #region DMA Transfers
         public class cDMAAddressHalf : WriteOnlyRegister2
@@ -182,9 +182,9 @@ namespace GBAEmulator.Memory
                 base.Set((ushort)(value & 0xfff8), setlow, sethigh);
                 if (DoReload && this.DMAEnabled)
                 {
-                    this.mem.DMADAD[this.index].Reload();
-                    this.mem.DMASAD[this.index].Reload();
-                    this.mem.DMACNT_L[this.index].Reload();
+                    this.mem.IORAMSection.DMADAD[this.index].Reload();
+                    this.mem.IORAMSection.DMASAD[this.index].Reload();
+                    this.mem.IORAMSection.DMACNT_L[this.index].Reload();
                 }
 
                 if ((this._raw & 0xb000) == 0x8000)  // DMA Enable set AND DMA start timing immediate
