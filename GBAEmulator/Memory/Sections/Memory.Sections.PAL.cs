@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GBAEmulator.Memory.Sections.Templates
+namespace GBAEmulator.Memory.Sections
 {
     public class PALSection : MirroredMemorySection
     {

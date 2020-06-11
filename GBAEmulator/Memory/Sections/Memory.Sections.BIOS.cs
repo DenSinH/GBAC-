@@ -60,6 +60,7 @@ namespace GBAEmulator.Memory.Sections
         {
             if (this.cpu.PC < 0x0100_0000)
                 return base.GetWordAt(address);
+
             return base.GetWordAt((uint)this.cpu.mem.CurrentBIOSReadState);
         }
 

@@ -18,6 +18,7 @@
         {
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return this.bus.OpenBus();
+
             this.Update32bitAccessCPUCycles(Section);
             return this.bus.BusValue = (this.MemorySections[Section].GetWordAt(address) ?? this.bus.OpenBus());
         }
@@ -26,6 +27,7 @@
         {
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return (ushort)this.bus.OpenBus();
+
             this.Update32bitAccessCPUCycles(Section);
             ushort value = this.MemorySections[Section].GetHalfWordAt(address) ?? (ushort)this.bus.OpenBus();
             this.bus.BusValue = value;
@@ -37,6 +39,7 @@
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return (byte)this.bus.OpenBus();
             this.Update8bitAccessCPUCycles(Section);
+
             byte value = this.MemorySections[Section].GetByteAt(address) ?? (byte)this.bus.OpenBus();
             this.bus.BusValue = value;
             return value;
@@ -47,6 +50,7 @@
             this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;
+
             this.Update8bitAccessCPUCycles(Section);
             this.MemorySections[Section].SetWordAt(address, value);
         }
@@ -56,6 +60,7 @@
             this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;
+
             this.Update8bitAccessCPUCycles(Section);
             this.MemorySections[Section].SetHalfWordAt(address, value);
         }
@@ -65,6 +70,7 @@
             this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;
+
             this.Update8bitAccessCPUCycles(Section);
             this.MemorySections[Section].SetByteAt(address, value);
         }

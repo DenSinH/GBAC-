@@ -3,7 +3,6 @@
 using GBAEmulator.Memory.Sections;
 using GBAEmulator.CPU;
 using GBAEmulator.Bus;
-using GBAEmulator.Memory.Sections.Templates;
 
 namespace GBAEmulator.Memory
 {

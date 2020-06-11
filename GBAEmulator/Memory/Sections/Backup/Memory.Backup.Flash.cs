@@ -11,7 +11,8 @@ namespace GBAEmulator.Memory.Backup
 
     class BackupFLASH : IBackup
     {
-        byte[][] Banks = new byte[2][] { new byte[0x10000], new byte[0x10000] }; const byte SanyoManufacturerID = 0x62;
+        byte[][] Banks = new byte[2][] { new byte[0x8000], new byte[0x8000] };
+        const byte SanyoManufacturerID = 0x62;
         const byte SanyoDeviceID = 0x13;
 
         private int State;
@@ -23,7 +24,7 @@ namespace GBAEmulator.Memory.Backup
 
         public void Init()
         {
-            for (int i = 0; i < 0x10000; i++)
+            for (int i = 0; i < 0x8000; i++)
             {
                 Banks[0][i] = 0xff;
                 Banks[1][i] = 0xff;
@@ -56,9 +57,9 @@ namespace GBAEmulator.Memory.Backup
                 byte[] FlashDump = File.ReadAllBytes(FileName);
                 for (int b = 0; b < 2; b++)
                 {
-                    for (int i = 0; i < 0x10000; i++)
+                    for (int i = 0; i < 0x8000; i++)
                     {
-                        this.Banks[b][i] = FlashDump[0x10000 * b + i];
+                        this.Banks[b][i] = FlashDump[0x8000 * b + i];
                     }
                 }
             }

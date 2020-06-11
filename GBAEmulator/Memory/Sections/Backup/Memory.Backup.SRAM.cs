@@ -1,15 +1,16 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace GBAEmulator.Memory.Backup
 {
     class BackupSRAM : IBackup
     {
-        byte[] Storage = new byte[0x10000];
+        byte[] Storage = new byte[0x8000];
 
         public void Init()
         {
-            for (int i = 0; i < 0x10000; i++)
+            for (int i = 0; i < 0x8000; i++)
             {
                 Storage[i] = 0xff;
             }

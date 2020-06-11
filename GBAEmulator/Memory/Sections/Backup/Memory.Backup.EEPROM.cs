@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-
+using System.Linq;
 using GBAEmulator.Memory.IO;
 
 namespace GBAEmulator.Memory.Backup
@@ -49,7 +49,7 @@ namespace GBAEmulator.Memory.Backup
         private byte BusSize;  // either *6* bit bus (512B/0x200) or *14* bit bus (8kB/0x2000)
         private uint Size;     // either 0x200 or 0x2000
 
-        byte[] Storage = new byte[0x10000];
+        byte[] Storage = new byte[0x8000];
 
         public void Init()
         {
@@ -61,7 +61,7 @@ namespace GBAEmulator.Memory.Backup
             this.BusSize = 0;
             this.Size = 0;
 
-            for (int i = 0; i < 0x10000; i++)
+            for (int i = 0; i < 0x8000; i++)
             {
                 Storage[i] = 0xff;
             }
