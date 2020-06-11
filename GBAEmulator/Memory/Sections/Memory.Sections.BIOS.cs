@@ -5,11 +5,11 @@ using GBAEmulator.CPU;
 
 namespace GBAEmulator.Memory.Sections
 {
-    public class cBIOSSection : ReadOnlyMemorySection
+    public class BIOSSection : NonMirroredMemorySection
     {
         private ARM7TDMI cpu;
 
-        public cBIOSSection(ARM7TDMI cpu) : base(0x4000)
+        public BIOSSection(ARM7TDMI cpu) : base(0x4000)
         {
             this.cpu = cpu;
             this.Init();
@@ -53,15 +53,21 @@ namespace GBAEmulator.Memory.Sections
         {
             if (this.cpu.PC < 0x0100_0000)
                 return base.GetHalfWordAt(address);
-            return Storage[(uint)this.cpu.mem.CurrentBIOSReadState];
+            return base.GetHalfWordAt((uint)this.cpu.mem.CurrentBIOSReadState);
         }
 
         public override uint? GetWordAt(uint address)
         {
             if (this.cpu.PC < 0x0100_0000)
                 return base.GetWordAt(address);
-            return Storage[(uint)this.cpu.mem.CurrentBIOSReadState];
+            return base.GetWordAt((uint)this.cpu.mem.CurrentBIOSReadState);
         }
+
+        public override void SetByteAt(uint address, byte value) { }
+
+        public override void SetHalfWordAt(uint address, ushort value) { }
+
+        public override void SetWordAt(uint address, uint value) { }
     }
 
     public static class BIOSDefaults

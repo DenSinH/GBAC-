@@ -9,6 +9,7 @@ namespace GBAEmulator.Memory.Sections
         // Base class for a non-register memory section
         // assumes all accesses are in bounds
         protected readonly byte[] Storage;
+        const uint AddressMask = 0x00ff_ffff;
 
         public MemorySection(uint Size)
         {
@@ -24,16 +25,18 @@ namespace GBAEmulator.Memory.Sections
 
         public virtual byte? GetByteAt(uint address)
         {
-            return Storage[address];
+            return Storage[address & AddressMask];
         }
 
         public virtual ushort? GetHalfWordAt(uint address)
         {
+            address &= AddressMask;
             return (ushort)((Storage[address + 1] << 8) | Storage[address]);
         }
 
         public virtual uint? GetWordAt(uint address)
         {
+            address &= AddressMask;
             return (uint)(
                     (Storage[address + 3] << 24) |
                     (Storage[address + 2] << 16) |
@@ -44,17 +47,20 @@ namespace GBAEmulator.Memory.Sections
 
         public virtual void SetByteAt(uint address, byte value)
         {
+            address &= AddressMask;
             Storage[address] = value;
         }
 
         public virtual void SetHalfWordAt(uint address, ushort value)
         {
+            address &= AddressMask;
             Storage[address + 1] = (byte)((value & 0xff00) >> 8);
             Storage[address] = (byte)(value & 0x00ff);
         }
 
         public virtual void SetWordAt(uint address, uint value)
         {
+            address &= AddressMask;
             Storage[address + 3] = (byte)((value & 0xff00_0000) >> 24);
             Storage[address + 2] = (byte)((value & 0x00ff_0000) >> 16);
             Storage[address + 1] = (byte)((value & 0x0000_ff00) >> 8);

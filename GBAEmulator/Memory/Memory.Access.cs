@@ -19,7 +19,7 @@
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return this.bus.OpenBus();
             this.Update32bitAccessCPUCycles(Section);
-            return this.MemorySections[Section].GetWordAt(address) ?? this.bus.OpenBus();
+            return this.bus.BusValue = (this.MemorySections[Section].GetWordAt(address) ?? this.bus.OpenBus());
         }
 
         public ushort GetHalfWordAt(uint address, uint offset=0)
@@ -27,7 +27,9 @@
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return (ushort)this.bus.OpenBus();
             this.Update32bitAccessCPUCycles(Section);
-            return this.MemorySections[Section].GetHalfWordAt(address) ?? (ushort)this.bus.OpenBus();
+            ushort value = this.MemorySections[Section].GetHalfWordAt(address) ?? (ushort)this.bus.OpenBus();
+            this.bus.BusValue = value;
+            return value;
         }
 
         public byte GetByteAt(uint address)
@@ -35,11 +37,14 @@
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return (byte)this.bus.OpenBus();
             this.Update8bitAccessCPUCycles(Section);
-            return this.MemorySections[Section].GetByteAt(address) ?? (byte)this.bus.OpenBus();
+            byte value = this.MemorySections[Section].GetByteAt(address) ?? (byte)this.bus.OpenBus();
+            this.bus.BusValue = value;
+            return value;
         }
 
         public void SetWordAt(uint address, uint value, uint offset=0)
         {
+            this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;
             this.Update8bitAccessCPUCycles(Section);
@@ -48,6 +53,7 @@
 
         public void SetHalfWordAt(uint address, ushort value, uint offset=0)
         {
+            this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;
             this.Update8bitAccessCPUCycles(Section);
@@ -56,6 +62,7 @@
 
         public void SetByteAt(uint address, byte value)
         {
+            this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;
             this.Update8bitAccessCPUCycles(Section);

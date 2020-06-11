@@ -6,11 +6,12 @@ using GBAEmulator.Memory.IO;
 
 namespace GBAEmulator.Memory.Sections
 {
-    public partial class cIORAM : IMemorySection
+    public partial class IORAMSection : IMemorySection
     {
-        public IORegister[] Storage = new IORegister[0x400];           // 1kB IO RAM
+        private readonly IORegister[] Storage = new IORegister[0x400];  // 1kB IO RAM
         private UnusedRegister MasterUnusedRegister;
         private ZeroRegister MasterZeroRegister = new ZeroRegister();
+        const int AddressMask = 0x00ff_ffff;
 
         public readonly cDISPCNT DISPCNT = new cDISPCNT();
         public readonly cDISPSTAT DISPSTAT;
@@ -64,7 +65,7 @@ namespace GBAEmulator.Memory.Sections
 
         public readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
 
-        public cIORAM(ARM7TDMI cpu, MEM mem, BUS bus)
+        public IORAMSection(ARM7TDMI cpu, MEM mem, BUS bus)
         {
             this.DISPSTAT = new cDISPSTAT(mem);
             this.VCOUNT = new cVCOUNT(mem);
@@ -314,6 +315,8 @@ namespace GBAEmulator.Memory.Sections
 
         public byte? GetByteAt(uint address)
         {
+            if ((address &= AddressMask) > this.Storage.Length) return null;
+
             this.Log("Get register byte at address " + address.ToString("x3"));
             IORegister reg = this.Storage[address];
             bool offset = (address & 1) > 0;
@@ -326,6 +329,8 @@ namespace GBAEmulator.Memory.Sections
 
         public void SetByteAt(uint address, byte value)
         {
+            if ((address &= AddressMask) > this.Storage.Length) return;
+
             this.Log("Set register byte at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.Storage[address];
             bool offset = (address & 1) > 0;
@@ -337,6 +342,8 @@ namespace GBAEmulator.Memory.Sections
         
         public ushort? GetHalfWordAt(uint address)
         {
+            if ((address &= AddressMask) > this.Storage.Length) return null;
+
             this.Log("Get register halfword at address " + address.ToString("x"));
             IORegister reg = this.Storage[address];
             bool offset = (address & 1) > 0;
@@ -349,6 +356,8 @@ namespace GBAEmulator.Memory.Sections
 
         public void SetHalfWordAt(uint address, ushort value)
         {
+            if ((address &= AddressMask) > this.Storage.Length) return;
+
             this.Log("Set register halfword at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.Storage[address];
             bool offset = (address & 1) > 0;
@@ -365,6 +374,8 @@ namespace GBAEmulator.Memory.Sections
 
         public uint? GetWordAt(uint address)
         {
+            if ((address &= AddressMask) > this.Storage.Length) return null;
+
             this.Log("Get register word at address " + address.ToString("x"));
             IORegister reg = this.Storage[address];
             bool offset = (address & 1) > 0;
@@ -382,6 +393,8 @@ namespace GBAEmulator.Memory.Sections
 
         public void SetWordAt(uint address, uint value)
         {
+            if ((address &= AddressMask) > this.Storage.Length) return;
+
             this.Log("Set register word at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.Storage[address];
             bool offset = (address & 1) > 0;

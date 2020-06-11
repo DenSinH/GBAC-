@@ -3,19 +3,20 @@
 using GBAEmulator.Memory.Sections;
 using GBAEmulator.CPU;
 using GBAEmulator.Bus;
+using GBAEmulator.Memory.Sections.Templates;
 
 namespace GBAEmulator.Memory
 {
     public partial class MEM
     {
-        private cBIOSSection             BIOS;
+        private BIOSSection              BIOS;
         private NonMirroredMemorySection UnusedSection = new NonMirroredMemorySection(0);
         private MirroredMemorySection    eWRAM         = new MirroredMemorySection(0x40000);
         private MirroredMemorySection    iWRAM         = new MirroredMemorySection(0x8000);
-        public  cIORAM                   IORAM;
-        public  MirroredMemorySection    PaletteRAM    = new MirroredMemorySection(0x8000);
-        public  cVRAMSection             VRAM          = new cVRAMSection();
-        public  MirroredMemorySection    OAM           = new MirroredMemorySection(0x400);
+        public  IORAMSection             IORAM;
+        public  PALSection               PAL           = new PALSection();
+        public  VRAMSection              VRAM;
+        public  OAMSection               OAM           = new OAMSection();
         private cROMSection              GamePak_L;
         private cROMSection              GamePak_H;
         public  BackupSection            Backup;
@@ -46,11 +47,12 @@ namespace GBAEmulator.Memory
             this.cpu = cpu;
             this.bus = cpu.bus;
 
-            this.BIOS       = new cBIOSSection(cpu);
-            this.IORAM      = new cIORAM(cpu, this, cpu.bus);
-            this.Backup     = new BackupSection(this);
+            this.BIOS       = new BIOSSection(cpu);
+            this.IORAM      = new IORAMSection(cpu, this, cpu.bus);
+            this.VRAM       = new VRAMSection(this.IORAM.DISPCNT);
             this.GamePak_L  = new cROMSection(this, false);
             this.GamePak_H  = new cROMSection(this, true);
+            this.Backup = new BackupSection(this);
 
             this.MemorySections = new IMemorySection[16]
             {
@@ -59,7 +61,7 @@ namespace GBAEmulator.Memory
                 this.eWRAM,
                 this.iWRAM,
                 this.IORAM,
-                this.PaletteRAM,
+                this.PAL,
                 this.VRAM,
                 this.OAM,
 

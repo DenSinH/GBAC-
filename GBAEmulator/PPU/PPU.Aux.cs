@@ -15,14 +15,14 @@ namespace GBAEmulator
         {
             // Address within palette memory
             return (ushort)(
-                this.gba.mem.PaletteRAM[Address] |
-                (this.gba.mem.PaletteRAM[Address + 1] << 8)
+                this.gba.mem.PAL[Address] |
+                (this.gba.mem.PAL[Address + 1] << 8)
                 );
         }
 
         private ushort Backdrop
         {
-            get => (ushort)(this.gba.mem.PaletteRAM[0] | (this.gba.mem.PaletteRAM[1] << 8));
+            get => (ushort)(this.gba.mem.PAL[0] | (this.gba.mem.PAL[1] << 8));
         }
     }
 }

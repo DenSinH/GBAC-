@@ -19,6 +19,8 @@ namespace GBAEmulator.Memory.Sections
         public const string SaveExtension = ".gbac";
         public string ROMPath;
 
+        const uint AddressMask = 0xffff;
+
         private IBackup Backup;
         public BackupType ROMBackupType;
         private MEM mem;
@@ -66,33 +68,33 @@ namespace GBAEmulator.Memory.Sections
 
         public byte? GetByteAt(uint address)
         {
-            return this.Backup.Read(address & 0xffff);
+            return this.Backup.Read(address & AddressMask);
         }
 
         public ushort? GetHalfWordAt(uint address)
         {
-            return this.Backup.Read(address & 0xffff);
+            return (ushort)(0x0101 * this.Backup.Read(address & AddressMask));
         }
 
         public uint? GetWordAt(uint address)
         {
-            return this.Backup.Read(address & 0xffff);
+            return (uint)0x0101_0101 * this.Backup.Read(address & AddressMask);
         }
 
         public void SetByteAt(uint address, byte value)
         {
             // detect changes in actual backup storage
-            this.BackupChanged |= this.Backup.Write(address & 0xffff, value);
+            this.BackupChanged |= this.Backup.Write(address & AddressMask, value);
         }
 
         public void SetHalfWordAt(uint address, ushort value)
         {
-            this.BackupChanged |= this.Backup.Write(address & 0xffff, (byte)value);
+            this.BackupChanged |= this.Backup.Write(address & AddressMask, (byte)value);
         }
 
         public void SetWordAt(uint address, uint value)
         {
-            this.BackupChanged |= this.Backup.Write(address & 0xffff, (byte)value);
+            this.BackupChanged |= this.Backup.Write(address & AddressMask, (byte)value);
         }
     }
 
