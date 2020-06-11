@@ -4,7 +4,7 @@ using GBAEmulator.Bus;
 
 namespace GBAEmulator.Memory.IO
 {
-    #region DMA Transfers
+    #region DMAxAD
     public class cDMAAddressHalf : WriteOnlyRegister2
     {
         private ushort BitMask;
@@ -55,7 +55,9 @@ namespace GBAEmulator.Memory.IO
             this.upper.Reload();
         }
     }
+    #endregion
 
+    #region DMACNT_L
     public class cDMACNT_L : WriteOnlyRegister2
     {
         private ushort BitMask;
@@ -89,7 +91,9 @@ namespace GBAEmulator.Memory.IO
             base.Set((ushort)(value & this.BitMask), setlow, sethigh);
         }
     }
+    #endregion
 
+    #region DMACNT_H
     public class cDMACNT_H : IORegister2
     {
         private bool AllowGamePakDRQ;
