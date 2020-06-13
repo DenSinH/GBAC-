@@ -13,8 +13,9 @@ namespace GBAEmulator.Memory
         private BackupType GetBackupType(string FileName)
         {
             // search for the type of backup used in ROM file
-            string[] RomContent = File.ReadAllLines(FileName);
-            foreach (string line in RomContent)
+            string line;
+            StreamReader file = new StreamReader(FileName);
+            while ((line = file.ReadLine()) != null)
             {
                 foreach (BackupType BackupType in Enum.GetValues(typeof(BackupType)))
                 {
@@ -24,6 +25,7 @@ namespace GBAEmulator.Memory
                     }
                 }
             }
+            file.Close();
             this.Error($"Could not find ROM backup type for ROM {FileName}");
             return BackupType.SRAM;
         }

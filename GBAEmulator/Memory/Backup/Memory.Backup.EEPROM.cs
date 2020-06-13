@@ -33,7 +33,7 @@ namespace GBAEmulator.Memory.Backup
 
         private enum AccessType : byte
         {
-            Read = 0b11,
+            Read =  0b11,
             Write = 0b10
         }
 

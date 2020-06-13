@@ -66,7 +66,8 @@ namespace GBAEmulator.CPU
                 else
                 {
                     // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
-                    uint Result = this.mem.GetWordAt(Address & 0xffff_fffc);
+                    // force align happens in memory handler
+                    uint Result = this.mem.GetWordAt(Address);
                     byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                     // ROR result for misaligned adresses

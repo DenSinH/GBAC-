@@ -56,9 +56,13 @@ namespace GBAEmulator.CPU
                 {
                     if (this.Data.Tick((ushort)cycles))  // overflow
                     {
-                        if (this.Next?.Control.CountUpTiming ?? false) this.Next?.TickDirect(1);
+                        if (this.Next?.Control.CountUpTiming ?? false)
+                            this.Next?.TickDirect(1);
 
-                        if (this.Control.TimerIRQEnable) this.cpu.mem.IORAM.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
+                        if (this.Control.TimerIRQEnable)
+                        {
+                            this.cpu.mem.IORAM.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
+                        }
                     }
                 }
             }

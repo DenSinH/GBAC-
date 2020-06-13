@@ -11,7 +11,7 @@ namespace GBAEmulator.Memory.Backup
 
     class BackupFLASH : IBackup
     {
-        byte[][] Banks = new byte[2][] { new byte[0x8000], new byte[0x8000] };
+        byte[][] Banks = new byte[2][] { new byte[0x10000], new byte[0x10000] };
         const byte SanyoManufacturerID = 0x62;
         const byte SanyoDeviceID = 0x13;
 
@@ -24,7 +24,7 @@ namespace GBAEmulator.Memory.Backup
 
         public void Init()
         {
-            for (int i = 0; i < 0x8000; i++)
+            for (int i = 0; i < 0x10000; i++)
             {
                 Banks[0][i] = 0xff;
                 Banks[1][i] = 0xff;
@@ -57,9 +57,9 @@ namespace GBAEmulator.Memory.Backup
                 byte[] FlashDump = File.ReadAllBytes(FileName);
                 for (int b = 0; b < 2; b++)
                 {
-                    for (int i = 0; i < 0x8000; i++)
+                    for (int i = 0; i < 0x10000; i++)
                     {
-                        this.Banks[b][i] = FlashDump[0x8000 * b + i];
+                        this.Banks[b][i] = FlashDump[0x10000 * b + i];
                     }
                 }
             }
@@ -81,6 +81,7 @@ namespace GBAEmulator.Memory.Backup
 
         public byte Read(uint address)
         {
+            // Console.WriteLine($"Read from {address:x4}");
             if (!ChipIDMode || (address > 1))
             {
                 return this.Banks[ActiveBank][address];
@@ -102,7 +103,7 @@ namespace GBAEmulator.Memory.Backup
                 ExpectSingleByte = false;
                 this.Banks[ActiveBank][address] = value;
 
-                // this.Log($"Flash single byte write {value.ToString("x2")} to {address.ToString("x4")}");
+                // Console.WriteLine($"Flash single byte write {value.ToString("x2")} to {address.ToString("x4")}");
                 return true;
             }
             else if (ExpectBankSwitch)  // only enabled if bank switching is actually possible
@@ -111,7 +112,7 @@ namespace GBAEmulator.Memory.Backup
                 if (address == 0)
                 {
                     ActiveBank = value;
-                    // this.Log("Bank switched to " + value);
+                    // Console.WriteLine("Bank switched to " + value);
                 }
                 else
                 {
@@ -124,6 +125,7 @@ namespace GBAEmulator.Memory.Backup
             {
                 case 0:  // expect 0xAA to 0x5555 to signify command start
                     if (address == 0x5555 && value == 0xaa) State++;
+                    else if (address == 0x5555 && value == 0xf0) { }  // cancel command
                     else Console.Error.WriteLine($"Flash: Expected 0xAA to 0x5555, got {value.ToString("x2")} to {address.ToString("x4")}");
                     return false;
                 case 1:  // expect 0x55 to 0x2aaa to signify command start
@@ -158,7 +160,7 @@ namespace GBAEmulator.Memory.Backup
                         case 0x30:  // Erase 4kB sector
                             if (ExpectErase)
                             {
-                                // this.Log($"Erase 4kB flash at {address.ToString("x4")}");
+                                // Console.WriteLine($"Erase 4kB flash at {address:x4}");
                                 this.Erase(this.Banks[ActiveBank], address, address + 0x1000);
                                 ExpectErase = false;
                                 return true;

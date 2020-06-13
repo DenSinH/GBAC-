@@ -43,12 +43,12 @@ namespace GBAEmulator.Memory.Backup
 
         public byte Read(uint address)
         {
-            return this.Storage[address];
+            return this.Storage[address & 0x7fff];
         }
 
         public bool Write(uint address, byte value)
         {
-            this.Storage[address] = value;
+            this.Storage[address & 0x7fff] = value;
             return true;
         }
     }

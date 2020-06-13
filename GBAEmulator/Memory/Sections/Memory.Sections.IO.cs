@@ -317,7 +317,8 @@ namespace GBAEmulator.Memory.Sections
 
         public byte? GetByteAt(uint address)
         {
-            if ((address &= AddressMask) > this.Storage.Length) return null;
+            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return null; }
+            else if ((address &= AddressMask) >= this.Storage.Length) return null;
 
             this.Log("Get register byte at address " + address.ToString("x3"));
             IORegister reg = this.Storage[address];
@@ -331,7 +332,8 @@ namespace GBAEmulator.Memory.Sections
 
         public void SetByteAt(uint address, byte value)
         {
-            if ((address &= AddressMask) > this.Storage.Length) return;
+            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return; }
+            else if ((address &= AddressMask) >= this.Storage.Length) return;
 
             this.Log("Set register byte at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.Storage[address];
@@ -345,7 +347,8 @@ namespace GBAEmulator.Memory.Sections
         
         public ushort? GetHalfWordAt(uint address)
         {
-            if ((address &= AddressMask) > this.Storage.Length) return null;
+            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return null; }
+            else if((address &= AddressMask) >= this.Storage.Length) return null;
             address &= 0x00ff_fffe;  // force align
 
             this.Log("Get register halfword at address " + address.ToString("x"));
@@ -357,7 +360,8 @@ namespace GBAEmulator.Memory.Sections
 
         public void SetHalfWordAt(uint address, ushort value)
         {
-            if ((address &= AddressMask) > this.Storage.Length) return;
+            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return; }
+            else if((address &= AddressMask) >= this.Storage.Length) return;
             address &= 0x00ff_fffe;  // force align
 
             this.Log("Set register halfword at address " + address.ToString("x3") + " " + value.ToString("x"));
@@ -369,7 +373,8 @@ namespace GBAEmulator.Memory.Sections
 
         public uint? GetWordAt(uint address)
         {
-            if ((address &= AddressMask) > this.Storage.Length) return null;
+            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return null; }
+            else if((address &= AddressMask) >= this.Storage.Length) return null;
             address &= 0x00ff_fffc;  // force align
 
             this.Log("Get register word at address " + address.ToString("x"));
@@ -382,7 +387,8 @@ namespace GBAEmulator.Memory.Sections
 
         public void SetWordAt(uint address, uint value)
         {
-            if ((address &= AddressMask) > this.Storage.Length) return;
+            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return; }
+            else if((address &= AddressMask) >= this.Storage.Length) return;
             address &= 0x00ff_fffc;  // force align
 
             this.Log("Set register word at address " + address.ToString("x3") + " " + value.ToString("x"));

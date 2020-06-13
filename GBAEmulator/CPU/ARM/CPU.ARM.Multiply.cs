@@ -8,7 +8,6 @@ namespace GBAEmulator.CPU
         {
             bool Accumulate, SetCondition;
             byte Rd, Rn, Rs, Rm;
-            int mCycles = 4;
 
             Accumulate = (Instruction & 0x0020_0000) > 0;
             SetCondition = (Instruction & 0x0010_0000) > 0;
@@ -37,6 +36,7 @@ namespace GBAEmulator.CPU
              Whereas 'm' depends on whether/how many most significant bits of Rs are all zero or all one.
              That is m=1 for Bit 31-8, m=2 for Bit 31-16, m=3 for Bit 31-24, and m=4 otherwise.
             */
+            int mCycles = Accumulate ? 5 : 4;
             uint OperandBitComparison = this.Registers[Rs] ^ (this.Registers[Rs] << 1);
             if ((OperandBitComparison & 0xfe00_0000) == 0)
             {
@@ -63,7 +63,6 @@ namespace GBAEmulator.CPU
             */
             bool Signed, Accumulate, SetCondition;
             byte RdHi, RdLo, Rs, Rm;
-            int mCycles = 4;
 
             Signed = (Instruction & 0x0040_0000) > 0;
             Accumulate = (Instruction & 0x0020_0000) > 0;
@@ -78,14 +77,14 @@ namespace GBAEmulator.CPU
                 if (Signed)
                 {
                     long Result = (long)(int)this.Registers[Rs] * (long)(int)this.Registers[Rm];
-                    this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
-                    this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
+                    this.Registers[RdHi] = (uint)(Result >> 32);
+                    this.Registers[RdLo] = (uint)Result;
                 }
                 else
                 {
                     ulong Result = (ulong)this.Registers[Rs] * (ulong)this.Registers[Rm];
-                    this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
-                    this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
+                    this.Registers[RdHi] = (uint)(Result >> 32);
+                    this.Registers[RdLo] = (uint)Result;
                 }
             }
             else
@@ -94,15 +93,15 @@ namespace GBAEmulator.CPU
                 {
                     long RdHiRdLo = ((long)this.Registers[RdHi] << 32) | (this.Registers[RdLo]);
                     long Result = (long)(int)this.Registers[Rs] * (long)(int)this.Registers[Rm] + RdHiRdLo;
-                    this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
-                    this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
+                    this.Registers[RdHi] = (uint)(Result >> 32);
+                    this.Registers[RdLo] = (uint)Result;
                 }
                 else
                 {
                     ulong RdHiRdLo = ((ulong)this.Registers[RdHi] << 32) | (ulong)(this.Registers[RdLo]);
                     ulong Result = (ulong)this.Registers[Rs] * (ulong)this.Registers[Rm] + RdHiRdLo;
-                    this.Registers[RdHi] = (uint)((Result >> 32) & 0xffff_ffff);
-                    this.Registers[RdLo] = (uint)(Result & 0xffff_ffff);
+                    this.Registers[RdHi] = (uint)(Result >> 32);
+                    this.Registers[RdLo] = (uint)Result;
                 }
             }
 
@@ -123,9 +122,10 @@ namespace GBAEmulator.CPU
             */
 
             uint OperandBitComparison = Accumulate ? this.Registers[Rs] : this.Registers[Rs] ^ (this.Registers[Rs] << 1);
+            int mCycles = Accumulate ? 6 : 5;
             if ((OperandBitComparison & 0xfe00_0000) == 0)
             {
-                // we falsely get here if the first 7 bits are 0 in Accumulate mode
+                // we falsely get here if the first 7 bits are 1 in unsigned mode
                 mCycles--;
                 if ((OperandBitComparison & 0xfffe_0000) == 0)
                 {

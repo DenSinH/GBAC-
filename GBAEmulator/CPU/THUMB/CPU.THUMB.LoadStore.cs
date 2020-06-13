@@ -85,7 +85,11 @@ namespace GBAEmulator.CPU
                         if ((Address & 0x01) == 0)  // aligned
                             this.Registers[Rd] = this.mem.GetHalfWordAt(Address);
                         else
-                            this.Registers[Rd] = (uint)(this.mem.GetByteAt(Address - 1) << 24) | this.mem.GetByteAt(Address);
+                        {
+                            ushort value = this.mem.GetHalfWordAt(Address);
+                            this.Registers[Rd] = (uint)(value << 24) | (uint)(value >> 8);
+                        }
+                            
 
                         // Normal LDR instructions take 1S + 1N + 1I (incremental)
                         return ICycle;
@@ -200,7 +204,8 @@ namespace GBAEmulator.CPU
                 }
                 else
                 {
-                    this.Registers[Rd] = (uint)(this.mem.GetByteAt(Address - 1) << 24) | this.mem.GetByteAt(Address);
+                    ushort value = this.mem.GetHalfWordAt(Address);
+                    this.Registers[Rd] = (uint)(value << 24) | (uint)(value >> 8);
                 }
 
                 // Normal LDR instructions take 1S + 1N + 1I (incremental)

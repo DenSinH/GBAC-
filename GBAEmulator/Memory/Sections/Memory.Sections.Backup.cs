@@ -19,7 +19,7 @@ namespace GBAEmulator.Memory.Sections
         public const string SaveExtension = ".gbac";
         public string ROMPath;
 
-        const uint AddressMask = 0x7fff;
+        const uint AddressMask = 0xffff;
 
         private IBackup Backup;
         public BackupType ROMBackupType;

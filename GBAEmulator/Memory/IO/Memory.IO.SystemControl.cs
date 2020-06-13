@@ -65,6 +65,11 @@ namespace GBAEmulator.Memory.IO
                     throw new IndexOutOfRangeException($"Waitstate {section} is invalid");
             }
         }
+
+        public override void Set(ushort value, bool setlow, bool sethigh)
+        {
+            base.Set((ushort)(value & 0xdfff), setlow, sethigh);
+        }
     }
     #endregion
 

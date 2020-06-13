@@ -233,7 +233,12 @@ namespace GBAEmulator
             // refresh xinput in this thread to save processing power
             this.gba.mem.IORAM.KEYINPUT.xinput.UpdateState();
 
-            if (this.FramesUntilSaveDump > 0)
+            if (this.gba.mem.Backup.BackupChanged)
+            {
+                this.FramesUntilSaveDump = SaveDumpFrameDelay;
+                this.gba.mem.Backup.BackupChanged = false;
+            }
+            else if (this.FramesUntilSaveDump > 0)
             {
                 this.FramesUntilSaveDump--;
                 if (this.FramesUntilSaveDump == 0)
@@ -241,14 +246,9 @@ namespace GBAEmulator
                     // freeze GBA for a quick second to prevent the dump from changing while we are dumping it
                     this.gba.Pause = true;
                     this.gba.mem.Backup.DumpBackup();
-                    this.gba.mem.Backup.BackupChanged = false;
                     this.gba.Pause = false;
                     Console.WriteLine("Dumped save file");
                 }
-            }
-            else if (this.gba.mem.Backup.BackupChanged)
-            {
-                this.FramesUntilSaveDump = SaveDumpFrameDelay;
             }
             
             this.Text = string.Format("GBAC-  : {0} <{1:0.0} fps>",
