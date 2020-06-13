@@ -78,8 +78,6 @@ namespace GBAEmulator.Memory.IO
             if (on)
             {
                 this._raw |= 2;
-                if (this.IsSet(DISPSTATFlags.HBlankIRQEnable))
-                    this.mem.IORAM.IF.Request(Interrupt.LCDHBlank);
             }
             else
                 this._raw &= 0xfffd;

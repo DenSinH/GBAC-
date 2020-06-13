@@ -1,0 +1,7 @@
+﻿{
+    .enabled = 1,
+    .executed = 0,
+    .result = 0,
+    .funcPtr = sub_800A9F0,
+    .name = "DMA PRIORITY",
+},

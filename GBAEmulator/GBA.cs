@@ -30,7 +30,8 @@ namespace GBAEmulator
         }
 
         const int NonHBlankCycles = 960;
-        const int HBlankCycles = 272;
+        const int HBlankNoFlagCycles = 46;
+        const int HBlankWithFlagCycles = 226;
 
         long cycle;
 
@@ -89,7 +90,7 @@ namespace GBAEmulator
             }
             else if (this.cpu.mem.IORAM.DMACNT_H[3].StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
             {
-                this.cpu.mem.IORAM.DMACNT_H[3].Active = false;
+                // this.cpu.mem.IORAM.DMACNT_H[3].Active = false;
                 this.cpu.mem.IORAM.DMACNT_H[3].Disable();
             }
 
@@ -98,11 +99,23 @@ namespace GBAEmulator
                 this.cycle -= this.cpu.Step();
 
             /* HBLANK */
-            this.mem.IORAM.DISPSTAT.SetHBlank(true);
+            if (this.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable))
+                this.mem.IORAM.IF.Request(Interrupt.LCDHBlank);
+
             if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
             this.ppu.DrawScanline();
 
-            this.cycle += HBlankCycles;
+            // Although the drawing time is only 960 cycles (240*4), the H-Blank flag is "0" for a total of 1006 cycles.
+            // we split up the HBlank period into 2 smaller periods:
+            //   - one where the HBlank flag is not set, but an HBlank IRQ has been requested
+            //   - one where the HBlank flag is set
+            this.cycle += HBlankNoFlagCycles;
+            while (this.cycle > 0)
+                this.cycle -= this.cpu.Step();
+
+            this.mem.IORAM.DISPSTAT.SetHBlank(true);
+
+            this.cycle += HBlankWithFlagCycles;
             while (this.cycle > 0)
                 this.cycle -= this.cpu.Step();
 

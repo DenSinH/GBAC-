@@ -95,8 +95,10 @@ namespace GBAEmulator.CPU
 
         //bool COMPLOG = true;
         //StreamReader LOGFILE = new StreamReader("../../../Tests/arm.log");
+        public int InstructionCycles;
         public int Step()
         {
+            InstructionCycles = 0;
             int StepCycles;
 
             //if (this.PC == 0x0800_ce54)
@@ -180,7 +182,7 @@ namespace GBAEmulator.CPU
             //    }
             //}
 
-            return (StepCycles >> 1) + 1;
+            return InstructionCycles;
         }
     }
 }

@@ -52,22 +52,4 @@ namespace GBAEmulator.Memory.IO
         }
     }
     #endregion
-
-    #region HALTCNT
-    public class cPOSTFLG_HALTCNT : IORegister2
-    {
-        // 2 1 byte registers combined
-        public bool Halt;
-
-        public override void Set(ushort value, bool setlow, bool sethigh)
-        {
-            base.Set(value, setlow, sethigh);
-            if (sethigh)
-            {
-                // "games never enable stop mode" - EmuDev Discord
-                Halt = true;
-            }
-        }
-    }
-    #endregion
 }

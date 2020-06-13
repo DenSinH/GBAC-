@@ -63,6 +63,8 @@ namespace GBAEmulator.Memory.Sections
         public readonly cIE IE = new cIE();
         public readonly cIF IF = new cIF();
 
+        public readonly cWAITCNT WAITCNT = new cWAITCNT();
+
         public readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
 
         public IORAMSection(ARM7TDMI cpu, MEM mem, BUS bus)
@@ -273,7 +275,7 @@ namespace GBAEmulator.Memory.Sections
             // Interrupt, Waitstate and Power-Down Control
             this.Storage[0x0200] = this.Storage[0x0201] = this.IE;
             this.Storage[0x0202] = this.Storage[0x0203] = this.IF;
-            this.Storage[0x0204] = this.Storage[0x0205] = new DefaultRegister(); // WAITCNT
+            this.Storage[0x0204] = this.Storage[0x0205] = this.WAITCNT;
 
             this.Storage[0x0206] = this.Storage[0x0207] = this.MasterZeroRegister;
             this.Storage[0x0208] = this.Storage[0x0209] = this.IME;
