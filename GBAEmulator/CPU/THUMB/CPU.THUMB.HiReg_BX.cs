@@ -72,8 +72,7 @@ namespace GBAEmulator.CPU
             }
 
             // equivalent instruction is a Dataprocessing instruction if it was not BX
-            // we CAN use Rd = PC here because we are doing Hi Register operations
-            return this.DataProcessingTimings(false, Rd == 15 && this.Registers[Rd] == 15);
+            return this.DataProcessingTimings(false);
         }
     }
 }

@@ -42,7 +42,7 @@ namespace GBAEmulator.CPU
             this.SetNZ(Result);
 
             // equivalent instruction is ADD/SUB #/Rs. Rd cannot be PC as we are in THUMB mode
-            return this.DataProcessingTimings(ImmediateOperand, false);
+            return this.DataProcessingTimings(ImmediateOperand);
         }
     }
 }

@@ -73,8 +73,8 @@ namespace GBAEmulator.CPU
                 this.Registers[Rd] = CPSR;
             }
 
-            // PSR Transfers take 1S incremental cycles
-            return SCycle;
+            // PSR Transfers take 1S incremental cycles, no I cycles
+            return 0;
         }
 
         private int MSR(uint Instruction)
@@ -122,8 +122,8 @@ namespace GBAEmulator.CPU
                 CPSR = (CPSR & (~BitMask)) | (Operand & BitMask);
             }
 
-            // PSR Transfers take 1S incremental cycles
-            return SCycle;
+            // PSR Transfers take 1S incremental cycles, no I cycles
+            return 0;
         }
     }
 }

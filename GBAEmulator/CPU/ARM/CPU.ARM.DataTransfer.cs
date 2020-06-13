@@ -62,8 +62,8 @@ namespace GBAEmulator.CPU
                     {
                         if ((Address & 0x01) == 0)  // aligned
                             this.Registers[Rd] = this.mem.GetHalfWordAt(Address);
-                        else
-                            this.Registers[Rd] = ROR(this.mem.GetHalfWordAt(Address - 1), 8);
+                        else  // alignment happens in the memory handler
+                            this.Registers[Rd] = ROR(this.mem.GetHalfWordAt(Address), 8);
                     }
                     else
                     {   
@@ -96,7 +96,8 @@ namespace GBAEmulator.CPU
                         if ((Address & 0x01) == 1)  // misaligned
                         {
                             // equivalent to this.mem.GetByteAt(Address) for normal addresses
-                            this.Registers[Rd] = (uint)(sbyte)(this.mem.GetHalfWordAt(Address - 1) >> 8);
+                            // memory alignment happens in memory handler
+                            this.Registers[Rd] = (uint)(sbyte)(this.mem.GetHalfWordAt(Address) >> 8);
                         }
                         else
                         {
@@ -128,19 +129,7 @@ namespace GBAEmulator.CPU
                 this.Registers[Rn] = Address;
             }
 
-            if (LoadFromMemory)
-            {
-                if (Rd == 15)
-                    // LDR(H,SH,SB) PC take 2S + 2N + 1I incremental cycles.
-                    return (SCycle << 1) + (NCycle << 1) + ICycle;
-                else
-                    // Normal LDR(H,SH,SB) instructions take 1S + 1N + 1I
-                    return SCycle + NCycle + ICycle;
-            }
-            else
-                // STRH instructions take 2N incremental cycles to execute.
-                return NCycle << 1;
-
+            return LoadFromMemory ? ICycle : 0;
         }
     }
 }

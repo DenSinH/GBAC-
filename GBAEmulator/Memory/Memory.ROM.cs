@@ -9,7 +9,6 @@ namespace GBAEmulator.Memory
     partial class MEM
     {
         public string ROMName { get; private set; }
-        public uint ROMSize   { get; private set; }
 
         private BackupType GetBackupType(string FileName)
         {
@@ -42,13 +41,14 @@ namespace GBAEmulator.Memory
 
             // Load actual ROM
             byte[] GamePak = File.ReadAllBytes(FileName);
-            ROMSize = (uint)GamePak.Length;
-            this.Log(string.Format("{0:x8} Bytes loaded (hex)", ROMSize));
+            this.Log(string.Format("{0:x8} Bytes loaded (hex)", GamePak.Length));
 
             this.Backup.ROMPath = FileName;
             this.ROMName = Path.GetFileName(FileName);
 
+            this.GamePak_L.ROMSize = (uint)GamePak.Length;
             this.GamePak_L.Load(GamePak, 0);
+            this.GamePak_H.ROMSize = (uint)GamePak.Length;
             this.GamePak_H.Load(GamePak, 0x0100_0000);
         }
     }

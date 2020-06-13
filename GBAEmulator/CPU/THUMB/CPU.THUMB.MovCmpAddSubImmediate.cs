@@ -44,7 +44,7 @@ namespace GBAEmulator.CPU
             this.SetNZ(Result);
 
             // equivalent instruction is MOV/CMP/SUB/ADD #imm. Rd cannot be PC as we are in THUMB mode
-            return this.DataProcessingTimings(true, false);
+            return this.DataProcessingTimings(true);
         }
     }
 }

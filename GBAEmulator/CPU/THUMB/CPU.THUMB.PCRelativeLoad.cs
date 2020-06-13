@@ -34,7 +34,7 @@ namespace GBAEmulator.CPU
             this.Registers[Rd] = Result;
 
             // Normal LDR instructions take 1S + 1N + 1I (incremental)
-            return SCycle + NCycle + ICycle;
+            return ICycle;
         }
     }
 }

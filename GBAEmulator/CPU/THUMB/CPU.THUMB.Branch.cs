@@ -57,7 +57,7 @@ namespace GBAEmulator.CPU
             }
 
             // 2S + 1N cycles
-            return (SCycle << 1) + NCycle;
+            return 0;
         }
 
         private int UnconditionalBranch(ushort Instruction)
@@ -76,7 +76,7 @@ namespace GBAEmulator.CPU
             this.Log(string.Format("Unconditional Branch, Offset {0}", TrueOffset));
 
             // 2S + 1N cycles
-            return (SCycle << 1) + NCycle;
+            return 0;
         }
 
         private int LongBranchWithLink(ushort Instruction)
@@ -105,8 +105,8 @@ namespace GBAEmulator.CPU
                 this.PipelineFlush();
             }
 
-            // see 10.3 in Instruction cycle operations in the manual
-            return 3 * SCycle + NCycle;
+            // see 10.3 in Instruction cycle operations in the manual: no I cycles
+            return 0;
         }
     }
 }

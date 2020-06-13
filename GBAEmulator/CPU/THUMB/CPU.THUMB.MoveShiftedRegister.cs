@@ -20,7 +20,7 @@ namespace GBAEmulator.CPU
             this.Registers[Rd] = Result;
             
             // equivalent instruction is MOVS #imm, Rd cannot be PC
-            return this.DataProcessingTimings(true, false);
+            return this.DataProcessingTimings(true);
         }
     }
 }

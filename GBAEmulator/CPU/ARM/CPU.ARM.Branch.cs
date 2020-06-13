@@ -19,8 +19,8 @@ namespace GBAEmulator.CPU
 
             this.Log(string.Format("BX: R{0} -> PC", Rn));
 
-            // 2S + 1N cycles
-            return (SCycle << 1) + NCycle;
+            // no I cycles
+            return 0;
         }
 
         private int Branch(uint Instruction)
@@ -42,8 +42,8 @@ namespace GBAEmulator.CPU
 
             this.Log(string.Format("ARM branch (with link?) Offset {0:x8}", TrueOffset));
 
-            // 2S + 1N cycles
-            return (SCycle << 1) + NCycle;
+            // no I cycles
+            return 0;
         }
     }
 }

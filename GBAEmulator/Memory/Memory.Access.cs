@@ -5,18 +5,6 @@ namespace GBAEmulator.Memory
     partial class MEM
     {
         private uint PreviousAddress;
-
-        private void Update32bitAccessCPUCycles(uint section)
-        {
-            this.cpu.NCycle = WordAccessCycles[section];
-            this.cpu.SCycle = WordAccessCycles[section];
-        }
-        private void Update8bitAccessCPUCycles(uint section)
-        {
-            this.cpu.NCycle = NonWordAccessCycles[section];
-            this.cpu.SCycle = NonWordAccessCycles[section];
-        }
-
         private int GetWordAccessCycles(uint section, uint address)
         {
             int cycles = 1;
@@ -86,7 +74,6 @@ namespace GBAEmulator.Memory
             this.cpu.InstructionCycles += this.GetWordAccessCycles(Section, address);
             if (Section > 15) return this.bus.OpenBus();
 
-            this.Update32bitAccessCPUCycles(Section);
             return this.bus.BusValue = (this.MemorySections[Section].GetWordAt(address) ?? this.bus.OpenBus());
         }
 
@@ -97,7 +84,6 @@ namespace GBAEmulator.Memory
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
             if (Section > 15) return (ushort)this.bus.OpenBus();
 
-            this.Update32bitAccessCPUCycles(Section);
             ushort value = this.MemorySections[Section].GetHalfWordAt(address) ?? (ushort)this.bus.OpenBus();
             this.bus.BusValue = value;
             return value;
@@ -108,7 +94,6 @@ namespace GBAEmulator.Memory
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
             if (Section > 15) return (byte)this.bus.OpenBus();
-            this.Update8bitAccessCPUCycles(Section);
 
             byte value = this.MemorySections[Section].GetByteAt(address) ?? (byte)this.bus.OpenBus();
             this.bus.BusValue = value;
@@ -123,7 +108,6 @@ namespace GBAEmulator.Memory
             this.cpu.InstructionCycles += this.GetWordAccessCycles(Section, address);
             if (Section > 15) return;
 
-            this.Update8bitAccessCPUCycles(Section);
             this.MemorySections[Section].SetWordAt(address, value);
         }
 
@@ -135,7 +119,6 @@ namespace GBAEmulator.Memory
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
             if (Section > 15) return;
 
-            this.Update8bitAccessCPUCycles(Section);
             this.MemorySections[Section].SetHalfWordAt(address, value);
         }
 
@@ -146,7 +129,6 @@ namespace GBAEmulator.Memory
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
             if (Section > 15) return;
 
-            this.Update8bitAccessCPUCycles(Section);
             this.MemorySections[Section].SetByteAt(address, value);
         }
     }

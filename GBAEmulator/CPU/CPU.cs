@@ -21,8 +21,6 @@ namespace GBAEmulator.CPU
         public MEM mem;
         public BUS bus;
         
-        public int SCycle = 1;
-        public int NCycle = 1;
         public const int ICycle = 1;
 
         public ARM7TDMI(GBA gba)
@@ -99,7 +97,6 @@ namespace GBAEmulator.CPU
         public int Step()
         {
             InstructionCycles = 0;
-            int StepCycles;
 
             //if (this.PC == 0x0800_ce54)
             //{
@@ -116,11 +113,13 @@ namespace GBAEmulator.CPU
             if (this.mem.IORAM.HALTCNT.Halt)
             {
                 this.Log("Halted");
-                StepCycles = 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
+                InstructionCycles = 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
             }
             else
             {
-                if ((StepCycles = this.HandleDMAs()) > 0)
+                this.HandleDMAs();
+                // Handling DMAs automatically causes InstructionCycles to no longer be 0 because of the memory accesses
+                if (InstructionCycles > 0)
                 {
                     this.Log("DMAing");
                 }
@@ -131,11 +130,11 @@ namespace GBAEmulator.CPU
 
                     if (this.Pipeline.Count == 2)
                     {
-                        StepCycles = this.ExecuteARM(this.Pipeline.Dequeue());
+                        InstructionCycles += this.ExecuteARM(this.Pipeline.Dequeue());
                     }
                     else
                     {
-                        StepCycles = 0;  // cycles already accounted for
+                        // cycles already accounted for
                     }
                 }
                 else
@@ -145,16 +144,16 @@ namespace GBAEmulator.CPU
 
                     if (this.Pipeline.Count == 2)
                     {
-                        StepCycles = this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
+                        InstructionCycles += this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
                     }
                     else
                     {
-                        StepCycles = 0;  // cycles already accounted for
+                        // cycles already accounted for
                     }
                 }
             }
 
-            for (int i = 0; i < 4; i++) this.Timers[i].Tick(StepCycles);
+            this.TickTimers(InstructionCycles);
 
             //if (COMPLOG)
             //{

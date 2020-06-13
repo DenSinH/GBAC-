@@ -36,8 +36,8 @@ namespace GBAEmulator.CPU
                         this.mem.SetWordAt(Address, this.Registers[Rd]);
                     }
 
-                    // STR instructions take 2N incremental cycles to execute.
-                    return NCycle << 1;
+                    // STR instructions take 2N incremental cycles to execute. (no I cycles)
+                    return 0;
                 }
                 else
                 {
@@ -45,7 +45,8 @@ namespace GBAEmulator.CPU
                         this.Registers[Rd] = this.mem.GetByteAt(Address);
                     else
                     {
-                        uint Result = this.mem.GetWordAt(Address & 0xffff_fffc);
+                        // memory alignment happens in memory access handler
+                        uint Result = this.mem.GetWordAt(Address);
                         byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                         // ROR result for misaligned addresses
@@ -55,7 +56,7 @@ namespace GBAEmulator.CPU
                         this.Registers[Rd] = Result;
                     }
                     // Normal LDR instructions take 1S + 1N + 1I (incremental)
-                    return SCycle + NCycle + ICycle;
+                    return ICycle;
                 }
             }
             else
@@ -76,8 +77,8 @@ namespace GBAEmulator.CPU
                         // force align STRH is handled in memory read handler
                         this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
 
-                        // STR instructions take 2N incremental cycles to execute.
-                        return NCycle << 1;
+                        // STR instructions take 2N incremental cycles to execute. (No I cycles)
+                        return 0;
                     }
                     else
                     {
@@ -87,7 +88,7 @@ namespace GBAEmulator.CPU
                             this.Registers[Rd] = (uint)(this.mem.GetByteAt(Address - 1) << 24) | this.mem.GetByteAt(Address);
 
                         // Normal LDR instructions take 1S + 1N + 1I (incremental)
-                        return SCycle + NCycle + ICycle;
+                        return ICycle;
                     }
                 }
                 else
@@ -107,7 +108,7 @@ namespace GBAEmulator.CPU
                     }
 
                     // Normal LDR instructions take 1S + 1N + 1I (incremental)
-                    return SCycle + NCycle + ICycle;
+                    return ICycle;
                 }
 
             }
@@ -143,7 +144,8 @@ namespace GBAEmulator.CPU
                     this.Registers[Rd] = this.mem.GetByteAt(Address);
                 else
                 {
-                    uint Result = this.mem.GetWordAt(Address & 0xffff_fffc);
+                    // alignment happens in memory handler
+                    uint Result = this.mem.GetWordAt(Address);
                     byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                     // ROR result for misaligned adresses
@@ -154,7 +156,7 @@ namespace GBAEmulator.CPU
                 }
 
                 // Normal LDR instructions take 1S + 1N + 1I (incremental)
-                return SCycle + NCycle + ICycle;
+                return ICycle;
             }
             else
             {
@@ -166,8 +168,8 @@ namespace GBAEmulator.CPU
                     this.mem.SetWordAt(Address, this.Registers[Rd]);
                 }
 
-                // STR instructions take 2N incremental cycles to execute.
-                return NCycle << 1;
+                // STR instructions take 2N incremental cycles to execute. (No I cycles)
+                return 0;
             }
         }
 
@@ -202,7 +204,7 @@ namespace GBAEmulator.CPU
                 }
 
                 // Normal LDR instructions take 1S + 1N + 1I (incremental)
-                return SCycle + NCycle + ICycle;
+                return ICycle;
             }
             else
             {
@@ -210,7 +212,7 @@ namespace GBAEmulator.CPU
                 this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
 
                 // STR instructions take 2N incremental cycles to execute.
-                return NCycle << 1;
+                return 0;
             }
         }
 
@@ -245,7 +247,7 @@ namespace GBAEmulator.CPU
                 this.Registers[Rd] = Result;
 
                 // Normal LDR instructions take 1S + 1N + 1I (incremental)
-                return SCycle + NCycle + ICycle;
+                return ICycle;
             }
             else
             {
@@ -253,7 +255,7 @@ namespace GBAEmulator.CPU
                 this.mem.SetWordAt(Address, this.Registers[Rd]);
 
                 // STR instructions take 2N incremental cycles to execute.
-                return NCycle << 1;
+                return 0;
             }
         }
 
@@ -291,7 +293,7 @@ namespace GBAEmulator.CPU
             }
 
             // Normal LDR instructions take 1S + 1N + 1I (incremental)
-            return SCycle + NCycle + ICycle;
+            return ICycle;
         }
 
         private int MultipleLoadStore(ushort Instruction)
@@ -326,8 +328,6 @@ namespace GBAEmulator.CPU
                     
                 // Writeback
                 this.Registers[Rb] += 0x40;
-
-                return SCycle;  // todo: figure out actual timings
             }
             else if (LoadFromMemory)
             {
@@ -345,9 +345,6 @@ namespace GBAEmulator.CPU
                     }
                 }
                 this.Registers[Rb] = Address;  // return misaligned
-
-                // Normal LDM instructions take nS + 1N + 1I
-                return RegisterCount * SCycle + NCycle + ICycle;
             }
             else
             {
@@ -359,9 +356,6 @@ namespace GBAEmulator.CPU
                     if ((RList & (1 << i)) > 0)
                         RegisterQueue.Enqueue(i);
                 }
-
-                // STM instructions take (n-1)S + 2N incremental cycles to execute
-                int Cycles =(RegisterQueue.Count - 1) * SCycle + (NCycle << 1);
 
                 // we know that the queue is not empty, because RList != 0
                 if (RegisterQueue.Peek() == Rb)
@@ -381,9 +375,9 @@ namespace GBAEmulator.CPU
                     this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
-
-                return Cycles;
             }
+
+            return LoadFromMemory ? ICycle : 0;
         }
     }
 }

@@ -117,7 +117,7 @@ namespace GBAEmulator.CPU
                     this.DoDMA(i);
                     // 2N cycles for first, then 2S every cycle after
                     // Internal time for DMA processing is 2I (normally), or 4I (if both source and destination are in gamepak memory area)
-                    return SCycle << 1;
+                    return 0;
                 }
             }
             return 0;

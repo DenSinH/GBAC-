@@ -20,7 +20,7 @@ namespace GBAEmulator.CPU
             this.Log(string.Format("Add offset to SP: Negative: {0} Offset: {1:x4}", Sign, SWord7));
 
             // equivalent instructions are ADD/SUB #imm
-            return this.DataProcessingTimings(true, false);
+            return this.DataProcessingTimings(true);
         }
     }
 }

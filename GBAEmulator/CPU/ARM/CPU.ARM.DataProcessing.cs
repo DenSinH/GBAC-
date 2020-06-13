@@ -6,24 +6,10 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int DataProcessingTimings(bool ImmediateOperand, bool PCUsed)
+        private int DataProcessingTimings(bool ImmediateOperand)
         {
-            if (ImmediateOperand)
-            {
-                if (PCUsed)
-                    // it could happen that we read from PC and the operation result had the same value,
-                    // but our emulator is not that accurate that it matters
-                    return (SCycle << 1) + NCycle;
-                else
-                    return SCycle;
-            }
-            else
-            {
-                if (PCUsed)
-                    return (SCycle << 1) + NCycle + ICycle;
-                else
-                    return SCycle + ICycle;
-            }
+            // + 1I for SHIFT(Rs)
+            return ImmediateOperand ? 0 : ICycle;
         }
         
         private int DataProcessing(uint Instruction)
@@ -229,7 +215,7 @@ namespace GBAEmulator.CPU
              Data Processing with PC written                                2S + 1N
              Data Processing with register specified shift and PC written   2S + 1N + 1I
              */
-            return this.DataProcessingTimings(ImmediateOperand, Rd == 15 && this.Registers[Rd] == Result);
+            return this.DataProcessingTimings(ImmediateOperand);
         }
 
     }

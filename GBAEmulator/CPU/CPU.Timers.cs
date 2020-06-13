@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 using GBAEmulator.Memory.IO;
 
@@ -12,6 +13,12 @@ namespace GBAEmulator.CPU
             this.Timers[2] = new cTimer(this, 2, this.Timers[3]);
             this.Timers[1] = new cTimer(this, 1, this.Timers[2]);
             this.Timers[0] = new cTimer(this, 0, this.Timers[1]);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void TickTimers(int cycles)
+        {
+            for (int i = 0; i < 4; i++) this.Timers[i].Tick(cycles);
         }
 
         public class cTimer

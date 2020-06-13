@@ -17,7 +17,7 @@ namespace GBAEmulator.CPU
             this.PipelineFlush();
 
             // Software interrupt instructions take 2S + 1N incremental cycles to execute
-            return (SCycle << 1) + NCycle;
+            return 0;
         }
 
         private int SWIInstruction(ushort Instruction)

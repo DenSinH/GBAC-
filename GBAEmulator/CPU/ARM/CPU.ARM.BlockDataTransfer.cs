@@ -12,7 +12,6 @@ namespace GBAEmulator.CPU
             bool PreIndex, Up, PSR_ForceUser, WriteBack, LoadFromMemory;
             byte Rn;  // Base register
             ushort RegisterList;
-            int Cycles;
 
             PreIndex       = (Instruction & 0x0100_0000) > 0;
             Up             = (Instruction & 0x0080_0000) > 0;
@@ -83,8 +82,6 @@ namespace GBAEmulator.CPU
 
                 if (WriteBack)
                     this.Registers[Rn] = Up ? OriginalAddress + 0x40 : OriginalAddress - 0x40;
-
-                Cycles = SCycle;  // todo: find out
             }
             else
             {
@@ -108,9 +105,6 @@ namespace GBAEmulator.CPU
 
                 if (!LoadFromMemory)
                 {
-                    // Normal LDM instructions take nS + 1N + 1I
-                    Cycles = (byte)(RegisterQueue.Count * SCycle + NCycle + ICycle);
-
                     // Writeback with Rb included in Rlist: Store OLD base if Rb is FIRST entry in Rlist, otherwise store NEW base (STM/ARMv4)
                     // (GBATek)
 
@@ -125,11 +119,6 @@ namespace GBAEmulator.CPU
                         OriginalAddress = (uint)(OriginalAddress + (Up? 4 : -4));  // for writeback
                         RegisterQueue.Dequeue();
                     }
-                }
-                else
-                {
-                    // STM instructions take (n-1)S + 2N incremental cycles to execute
-                    Cycles = (byte)((RegisterQueue.Count - 1) * SCycle + (NCycle << 1));
                 }
 
                 // so we must set Rn on the case of writeback in case we store it later
@@ -164,9 +153,6 @@ namespace GBAEmulator.CPU
                 {
                     if (LoadFromMemory)
                     {
-                        //  LDM PC takes (n+1)S + 2N + 1I incremental cycles
-                        Cycles += SCycle + NCycle;
-
                         this.PipelineFlush();  // Flush pipeline when changing PC
                     }
                     else
@@ -181,7 +167,7 @@ namespace GBAEmulator.CPU
                 this.ChangeMode(OldMode);
             }
 
-            return Cycles;
+            return LoadFromMemory ? ICycle : 0;
         }
     }
 }

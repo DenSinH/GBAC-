@@ -117,7 +117,7 @@ namespace GBAEmulator.CPU
             this.SetNZ(Result);
 
             // We always use a register as operand, Rd cannot be PC as we are in THUMB mode
-            return this.DataProcessingTimings(false, false);
+            return this.DataProcessingTimings(false);
         }
     }
 }

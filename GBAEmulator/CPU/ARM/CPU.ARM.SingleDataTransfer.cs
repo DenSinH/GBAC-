@@ -10,7 +10,6 @@ namespace GBAEmulator.CPU
             byte Rn, Rd;
             uint Offset;
             uint Address;
-            int Cycles;
 
             RegisterOffset = (Instruction & 0x0200_0000) > 0;
             PreIndex       = (Instruction & 0x0100_0000) > 0;
@@ -79,14 +78,7 @@ namespace GBAEmulator.CPU
 
                 if (Rd == 15)
                 {
-                    // LDR PC take 2S + 2N +1I incremental cycles
-                    Cycles = (SCycle << 1) + (NCycle << 1) + ICycle;
                     this.PipelineFlush();
-                }
-                else
-                {
-                    // Normal LDR instructions take 1S + 1N + 1I (incremental)
-                    Cycles = SCycle + NCycle + ICycle;
                 }
             }
             else
@@ -111,9 +103,6 @@ namespace GBAEmulator.CPU
                     // forced align for STR happens in memory handler
                     this.mem.SetWordAt(Address, Value);
                 }
-
-                // STR instructions take 2N incremental cycles to execute.
-                Cycles = NCycle << 1;
             }
 
             if ((WriteBack || !PreIndex) && !(Rn == Rd && LoadFromMemory))
@@ -133,7 +122,7 @@ namespace GBAEmulator.CPU
                 // Write-back must not be specified if R15 is specified as the base register (Rn). (Manual)
                 this.Registers[Rn] = Address;
             }
-            return Cycles;
+            return LoadFromMemory ? ICycle : 0;
         }
     }
 }

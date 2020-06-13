@@ -51,7 +51,7 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            return SCycle + mCycles * ICycle;
+            return mCycles * ICycle;
         }
 
         private int MultiplyLong(uint Instruction)
@@ -137,7 +137,7 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            return SCycle + mCycles * ICycle;
+            return mCycles * ICycle;
         }
     }
 }
