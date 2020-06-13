@@ -15,6 +15,12 @@ namespace GBAEmulator.Memory.Sections
             this.Init();
         }
 
+        public void UseNormattsBIOS()
+        {
+            for (int j = 0; j < BIOSDefaults.NormattsBIOS.Length; j++)
+                this.Storage[j] = BIOSDefaults.NormattsBIOS[j];
+        }
+
         public bool Init()
         {
             FileStream fs;
@@ -24,9 +30,8 @@ namespace GBAEmulator.Memory.Sections
             }
             catch
             {
-                for (int j = 0; j < BIOSDefaults.NormattsBIOS.Length; j++)
-                    this.Storage[j] = BIOSDefaults.NormattsBIOS[j];
-                Console.WriteLine("BIOS dump load failed, using Normatt's BIOS...");
+                this.UseNormattsBIOS();
+                Console.Error.WriteLine("BIOS dump load failed, using Normatt's BIOS...");
                 return false;
             }
 

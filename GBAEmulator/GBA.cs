@@ -87,6 +87,11 @@ namespace GBAEmulator
                 // DMA 3 video capture mode (special DMA trigger)
                 this.cpu.TriggerDMASpecial(3);
             }
+            else if (this.cpu.mem.IORAM.DMACNT_H[3].StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
+            {
+                this.cpu.mem.IORAM.DMACNT_H[3].Active = false;
+                this.cpu.mem.IORAM.DMACNT_H[3].Disable();
+            }
 
             this.cycle += NonHBlankCycles;
             while (this.cycle > 0)
@@ -116,9 +121,9 @@ namespace GBAEmulator
             // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
             // this.mem.LoadRom("../../../Tests/GBASuiteNew/bios.gba");
             // this.mem.LoadRom("../../../Tests/Tonc/obj_aff.gba");
-            this.mem.LoadRom("../../../Tests/AgingCard.gba");
+            this.mem.LoadRom("../../../Tests/agingcard.gba");
 
-            // this.cpu.mem.BIOS.UseNormattsBios();
+            // this.cpu.mem.UseNormattsBios();
             cpu.SkipBios();
 
             while (!this.ShutDown)

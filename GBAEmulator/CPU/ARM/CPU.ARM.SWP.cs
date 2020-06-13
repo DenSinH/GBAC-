@@ -25,14 +25,14 @@ namespace GBAEmulator.CPU
             else
             {
                 uint Address = this.Registers[Rn];
-                MemoryContent = this.mem.GetWordAt(Address & 0xffff_fffc);
+                MemoryContent = this.mem.GetWordAt(Address );
                 byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                 // ROR result for misaligned addresses
                 if (RotateAmount != 0)
                     MemoryContent = ROR(MemoryContent, RotateAmount);
 
-                this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rm], offset: Address & 3);  // force align
+                this.mem.SetWordAt(Address, this.Registers[Rm]);  // force align happens in memory handler
                 this.Registers[Rd] = MemoryContent;
             }
 

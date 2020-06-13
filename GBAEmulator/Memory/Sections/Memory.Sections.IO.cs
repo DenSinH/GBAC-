@@ -323,8 +323,8 @@ namespace GBAEmulator.Memory.Sections
 
             if (!offset)
                 return (byte)reg.Get();
-
-            return (byte)((reg.Get() & 0xff00) >> 8);
+            else
+                return (byte)((reg.Get() & 0xff00) >> 8);
         }
 
         public void SetByteAt(uint address, byte value)
@@ -333,6 +333,7 @@ namespace GBAEmulator.Memory.Sections
 
             this.Log("Set register byte at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.Storage[address];
+
             bool offset = (address & 1) > 0;
             if (!offset)
                 reg.Set(value, true, false);
@@ -343,73 +344,51 @@ namespace GBAEmulator.Memory.Sections
         public ushort? GetHalfWordAt(uint address)
         {
             if ((address &= AddressMask) > this.Storage.Length) return null;
+            address &= 0x00ff_fffe;  // force align
 
             this.Log("Get register halfword at address " + address.ToString("x"));
             IORegister reg = this.Storage[address];
-            bool offset = (address & 1) > 0;
 
-            if (!offset)
-                return (ushort)reg.Get();
-
-            return (ushort)(((reg.Get() & 0xff00) >> 8) | ((this.Storage[address + 2].Get() & 0x00ff) << 8));
+            // force alignment makes these accesses a lot simpler!
+            return reg.Get();
         }
 
         public void SetHalfWordAt(uint address, ushort value)
         {
             if ((address &= AddressMask) > this.Storage.Length) return;
+            address &= 0x00ff_fffe;  // force align
 
             this.Log("Set register halfword at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.Storage[address];
-            bool offset = (address & 1) > 0;
 
-            if (!offset)
-            {
-                reg.Set(value, true, true);
-                return;
-            }
-
-            reg.Set((ushort)(value << 8), false, true);
-            this.Storage[address + 2].Set((ushort)(value & 0x00ff), true, false);
+            // force alignment makes these accesses a lot simpler!
+            reg.Set(value, true, true);
         }
 
         public uint? GetWordAt(uint address)
         {
             if ((address &= AddressMask) > this.Storage.Length) return null;
+            address &= 0x00ff_fffc;  // force align
 
             this.Log("Get register word at address " + address.ToString("x"));
             IORegister reg = this.Storage[address];
-            bool offset = (address & 1) > 0;
 
-            if (!offset)
-            {
-                return (uint)(reg.Get() | (this.Storage[address + 2].Get() << 16));
-            }
-            uint result = (uint)(reg.Get() >> 8);
-            result |= ((uint)this.Storage[address + 2].Get() << 8);
-            result |= ((uint)this.Storage[address + 4].Get() << 24);
-            return result;
+            // force alignment makes these accesses a lot simpler!
+            return (uint)(reg.Get() | (this.Storage[address + 2].Get() << 16));
 
         }
 
         public void SetWordAt(uint address, uint value)
         {
             if ((address &= AddressMask) > this.Storage.Length) return;
+            address &= 0x00ff_fffc;  // force align
 
             this.Log("Set register word at address " + address.ToString("x3") + " " + value.ToString("x"));
             IORegister reg = this.Storage[address];
-            bool offset = (address & 1) > 0;
 
-            if (!offset)
-            {
-                reg.Set((ushort)value, true, true);
-                this.Storage[address + 2].Set((ushort)(value >> 16), true, true);
-            }
-            else
-            {
-                reg.Set((ushort)(value << 8), false, true);
-                this.Storage[address + 2].Set((ushort)(value >> 8), true, true);
-                this.Storage[address + 4].Set((ushort)(value >> 24), true, false);
-            }
+            // force alignment makes these accesses a lot simpler!
+            reg.Set((ushort)value, true, true);
+            this.Storage[address + 2].Set((ushort)(value >> 16), true, true);
         }
     }
 }

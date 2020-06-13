@@ -32,8 +32,8 @@ namespace GBAEmulator.CPU
                         this.mem.SetByteAt(Address, (byte)this.Registers[Rd]);
                     else
                     {
-                        // Forced align for STR
-                        this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rd], offset: Address & 3);
+                        // Forced align for STR is handled i memory read handler
+                        this.mem.SetWordAt(Address, this.Registers[Rd]);
                     }
 
                     // STR instructions take 2N incremental cycles to execute.
@@ -73,8 +73,8 @@ namespace GBAEmulator.CPU
                 {
                     if (!HFlag)
                     {
-                        // force align STRH
-                        this.mem.SetHalfWordAt(Address & 0xffff_fffe, (ushort)this.Registers[Rd], offset: Address & 1);
+                        // force align STRH is handled in memory read handler
+                        this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
 
                         // STR instructions take 2N incremental cycles to execute.
                         return NCycle << 1;
@@ -162,8 +162,8 @@ namespace GBAEmulator.CPU
                     this.mem.SetByteAt(Address, (byte)this.Registers[Rd]);
                 else
                 {
-                    // force align
-                    this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rd], offset: Address & 3);
+                    // force align is handled in memory read handler
+                    this.mem.SetWordAt(Address, this.Registers[Rd]);
                 }
 
                 // STR instructions take 2N incremental cycles to execute.
@@ -206,8 +206,8 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                // force align
-                this.mem.SetHalfWordAt(Address & 0xffff_fffe, (ushort)this.Registers[Rd], offset: Address & 1);
+                // force align is handled in memory read handler
+                this.mem.SetHalfWordAt(Address, (ushort)this.Registers[Rd]);
 
                 // STR instructions take 2N incremental cycles to execute.
                 return NCycle << 1;
@@ -234,7 +234,8 @@ namespace GBAEmulator.CPU
             if (LoadFromMemory)
             {
                 // If address is misaligned by a half-word amount, garbage is fetched into the upper 2 bits. (GBATek)
-                uint Result = this.mem.GetWordAt(Address & 0xffff_fffc);
+                // force align is handled in memory read handler
+                uint Result = this.mem.GetWordAt(Address);
                 byte RotateAmount = (byte)((Address & 0x03) << 3);
 
                 // ROR result for misaligned adresses
@@ -248,8 +249,8 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                // force align
-                this.mem.SetWordAt(Address & 0xffff_fffc, this.Registers[Rd], offset: Address & 3);
+                // force align happens in read handler
+                this.mem.SetWordAt(Address, this.Registers[Rd]);
 
                 // STR instructions take 2N incremental cycles to execute.
                 return NCycle << 1;
@@ -305,9 +306,6 @@ namespace GBAEmulator.CPU
             RList = (byte)(Instruction & 0x00ff);
 
             uint Address = this.Registers[Rb];
-            byte Misalignment = (byte)(Address & 0x03);  // store misalignment for writeback
-            uint offset = Address & 3;
-            Address &= 0xffff_fffc;  // force align
             
             if (RList == 0)
             {
@@ -323,7 +321,7 @@ namespace GBAEmulator.CPU
                 }
                 else
                 {
-                    this.mem.SetWordAt(Address, PC + 2, offset: offset);  // My PC is 4 ahead, but it should be 6 in this case
+                    this.mem.SetWordAt(Address, PC + 2);  // My PC is 4 ahead, but it should be 6 in this case
                 }
                     
                 // Writeback
@@ -346,7 +344,7 @@ namespace GBAEmulator.CPU
                         RegisterCount++;
                     }
                 }
-                this.Registers[Rb] = Address | Misalignment;  // return misalignment
+                this.Registers[Rb] = Address;  // return misaligned
 
                 // Normal LDM instructions take nS + 1N + 1I
                 return RegisterCount * SCycle + NCycle + ICycle;
@@ -369,18 +367,18 @@ namespace GBAEmulator.CPU
                 if (RegisterQueue.Peek() == Rb)
                 {
                     this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[Rb], Address, Rb));
-                    this.mem.SetWordAt(Address, this.Registers[Rb], offset: offset);
+                    this.mem.SetWordAt(Address, this.Registers[Rb]);
                     Address += 4;
                     RegisterQueue.Dequeue();
                 }
 
                 // Writeback, we want to write Rb as the new value if it is not the first to be written
-                this.Registers[Rb] = (Address + 4 * (uint)RegisterQueue.Count) | Misalignment;
+                this.Registers[Rb] = (Address + 4 * (uint)RegisterQueue.Count);
 
                 while (RegisterQueue.Count > 0)
                 {
                     this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[RegisterQueue.Peek()], Address, RegisterQueue.Peek()));
-                    this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()], offset: offset);
+                    this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
 

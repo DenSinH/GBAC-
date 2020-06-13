@@ -108,8 +108,8 @@ namespace GBAEmulator.CPU
                 }
                 else
                 {
-                    // forced align for STR
-                    this.mem.SetWordAt(Address & 0xffff_fffc, Value, Address & 3);
+                    // forced align for STR happens in memory handler
+                    this.mem.SetWordAt(Address, Value);
                 }
 
                 // STR instructions take 2N incremental cycles to execute.

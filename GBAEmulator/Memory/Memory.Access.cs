@@ -14,8 +14,9 @@
             this.cpu.SCycle = WordAccessSCycles[Section];
         }
 
-        public uint GetWordAt(uint address, uint offset=0)
+        public uint GetWordAt(uint address)
         {
+            // offset is handled in individual sections (always force align, except SRAM
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return this.bus.OpenBus();
 
@@ -23,8 +24,9 @@
             return this.bus.BusValue = (this.MemorySections[Section].GetWordAt(address) ?? this.bus.OpenBus());
         }
 
-        public ushort GetHalfWordAt(uint address, uint offset=0)
+        public ushort GetHalfWordAt(uint address)
         {
+            // offset is handled in individual sections (always force align, except SRAM
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return (ushort)this.bus.OpenBus();
 
@@ -45,8 +47,9 @@
             return value;
         }
 
-        public void SetWordAt(uint address, uint value, uint offset=0)
+        public void SetWordAt(uint address, uint value)
         {
+            // offset is handled in individual sections (always force align, except SRAM
             this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;
@@ -55,8 +58,9 @@
             this.MemorySections[Section].SetWordAt(address, value);
         }
 
-        public void SetHalfWordAt(uint address, ushort value, uint offset=0)
+        public void SetHalfWordAt(uint address, ushort value)
         {
+            // offset is handled in individual sections (always force align, except SRAM
             this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
             if (Section > 15) return;

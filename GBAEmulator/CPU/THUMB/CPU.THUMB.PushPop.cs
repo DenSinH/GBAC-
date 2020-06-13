@@ -74,7 +74,7 @@ namespace GBAEmulator.CPU
                 while (RegisterQueue.Count > 0)
                 {
                     this.Log(string.Format("PUSH R{1} -> Mem[{0:x8}]", Address, RegisterQueue.Peek()));
-                    this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()], Address & 3);
+                    this.mem.SetWordAt(Address, this.Registers[RegisterQueue.Dequeue()]);
                     Address += 4;
                 }
 

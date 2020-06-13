@@ -48,13 +48,15 @@ namespace GBAEmulator.CPU
 
             if (UnitLength == 4)
             {
-                DMAData = this.mem.GetWordAt(dmasad.Address & 0xffff_fffc);
-                this.mem.SetWordAt(dmadad.Address & 0xffff_fffc, DMAData, offset: dmadad.Address & 3);
+                // force alignment happens in memory handler
+                DMAData = this.mem.GetWordAt(dmasad.Address);
+                this.mem.SetWordAt(dmadad.Address, DMAData);
             }
             else  // 16 bit
             {
-                DMAData = this.mem.GetHalfWordAt(dmasad.Address & 0xffff_fffe);
-                this.mem.SetHalfWordAt(dmadad.Address & 0xffff_fffe, (ushort)DMAData, offset: dmadad.Address & 1);
+                // force alignment happens in memory handler
+                DMAData = this.mem.GetHalfWordAt(dmasad.Address);
+                this.mem.SetHalfWordAt(dmadad.Address, (ushort)DMAData);
             }
 
             this.UpdateDMAAddress(dmasad, dmacnt_h.SourceAddrControl, UnitLength);

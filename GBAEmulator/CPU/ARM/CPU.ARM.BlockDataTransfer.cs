@@ -54,8 +54,6 @@ namespace GBAEmulator.CPU
             
             uint StartAddress = this.Registers[Rn];
             uint OriginalAddress = StartAddress;
-            uint offset = StartAddress & 3;
-            StartAddress &= 0xffff_fffc;  // force align
             // R15 should not be used as the base register in any LDM or STM instruction
 
             if (RegisterList == 0)  // Invalid Register lists (see https://problemkaputt.de/gbatek.htm#armopcodesmemoryblockdatatransferldmstm)
@@ -70,16 +68,16 @@ namespace GBAEmulator.CPU
                     if (Up)
                     {
                         if (PreIndex)
-                            this.mem.SetWordAt(StartAddress + 4, this.PC + 4, offset: offset);
+                            this.mem.SetWordAt(StartAddress + 4, this.PC + 4);
                         else
-                            this.mem.SetWordAt(StartAddress, this.PC + 4, offset: offset);
+                            this.mem.SetWordAt(StartAddress, this.PC + 4);
                     }
                     else
                     {
                         if (PreIndex)
-                            this.mem.SetWordAt(StartAddress - 0x40, this.PC + 4, offset: offset);
+                            this.mem.SetWordAt(StartAddress - 0x40, this.PC + 4);
                         else
-                            this.mem.SetWordAt(StartAddress - 0x3c, this.PC + 4, offset: offset);
+                            this.mem.SetWordAt(StartAddress - 0x3c, this.PC + 4);
                     }
                 }
 
@@ -120,9 +118,9 @@ namespace GBAEmulator.CPU
                     if (RegisterQueue.Peek() == Rn)
                     {
                         if (PreIndex)
-                            this.mem.SetWordAt(CurrentAddress + 4, this.Registers[Rn], offset: offset);
+                            this.mem.SetWordAt(CurrentAddress + 4, this.Registers[Rn]);
                         else
-                            this.mem.SetWordAt(CurrentAddress, this.Registers[Rn], offset: offset);
+                            this.mem.SetWordAt(CurrentAddress, this.Registers[Rn]);
                         CurrentAddress += 4;
                         OriginalAddress = (uint)(OriginalAddress + (Up? 4 : -4));  // for writeback
                         RegisterQueue.Dequeue();
@@ -154,7 +152,7 @@ namespace GBAEmulator.CPU
                     }
                     else
                     {
-                        this.mem.SetWordAt(CurrentAddress, this.Registers[Register], offset: offset);
+                        this.mem.SetWordAt(CurrentAddress, this.Registers[Register]);
                         this.Log(string.Format("{0:x8} -> MEM${1:x8} from R{2}", this.Registers[Register], CurrentAddress, Register));
                     }
 
@@ -173,7 +171,7 @@ namespace GBAEmulator.CPU
                     }
                     else
                         // PC is 8 ahead, while it should be 12
-                        this.mem.SetWordAt(CurrentAddress - (uint)((!PreIndex) ? 4 : 0), this.Registers[15] + 4, offset: offset);
+                        this.mem.SetWordAt(CurrentAddress - (uint)((!PreIndex) ? 4 : 0), this.Registers[15] + 4);
                 }
                     
             }
