@@ -165,15 +165,17 @@ namespace GBAEmulator.IO
             this._raw &= 0x7fff;
         }
 
-        public void Trigger(DMAStartTiming timing)
+        public bool Trigger(DMAStartTiming timing)
         {
-            if ((this._raw & 0x8000) > 0)  // enabled
+            if (!this.Active && (this._raw & 0x8000) > 0)  // enabled
             {
                 if (timing == this.StartTiming)
                 {
                     this.Active = true;
+                    return true;
                 }
             }
+            return false;
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)

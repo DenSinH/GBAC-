@@ -136,22 +136,6 @@ namespace GBAEmulator
             {
                 
             }
-            else if (e.KeyCode == Keys.O)
-            {
-                this.gba.cpu.DumpOAM();
-            }
-            else if (e.KeyCode == Keys.P)
-            {
-                this.gba.cpu.DumpPAL();
-            }
-            else if (e.KeyCode == Keys.V)
-            {
-                // this.gba.cpu.DumpVRAM(2, 4);
-            }
-            else if (e.KeyCode == Keys.D)
-            {
-                // Console.WriteLine(this.gba.mem.DISPSTAT.Get().ToString("x4"));
-            }
         }
 
         private void Visual_Paint(object sender, PaintEventArgs e)

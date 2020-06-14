@@ -11,7 +11,7 @@ namespace GBAEmulator
     {
         public ARM7TDMI cpu;
         public PPU ppu;
-        private IORAMSection IO;
+        public IORAMSection IO;
         public MEM mem;
         public BUS bus;
 
@@ -137,7 +137,7 @@ namespace GBAEmulator
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
             // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
             // this.mem.LoadRom("../../../Tests/GBASuiteNew/bios.gba");
-            // this.mem.LoadRom("../../../Tests/Tonc/prio_demo.gba");
+            // this.mem.LoadRom("../../../Tests/Tonc/obj_aff.gba");
             // this.mem.LoadRom("../../../Tests/AgingCard.gba");
 
             // this.cpu.mem.UseNormattsBios();

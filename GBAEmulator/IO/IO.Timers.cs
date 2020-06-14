@@ -16,13 +16,12 @@ namespace GBAEmulator.IO
             this.Counter = Reload;
         }
 
-        public bool TickDirect(ushort cycles)
+        public bool TickUnscaled(ushort cycles)
         {
             // don't account for the prescaler
             bool Overflow = false;
             if (this.Counter + cycles > 0xffff)  // overflow
             {
-                this.Counter += cycles;
                 this.Counter += this.Reload;
                 Overflow = true;
             }
@@ -40,7 +39,7 @@ namespace GBAEmulator.IO
             if (this.PrescalerCounter > this.PrescalerLimit)
             {
                 // assume cycles < 64 (pretty valid assumption)
-                Overflow |= this.TickDirect((ushort)(this.PrescalerLimit == 1 ? this.PrescalerCounter : 1));
+                Overflow |= this.TickUnscaled((ushort)(this.PrescalerLimit == 1 ? this.PrescalerCounter : 1));
 
                 this.PrescalerCounter &= (ushort)(this.PrescalerLimit - 1);  // power of 2
             }

@@ -19,7 +19,7 @@ namespace GBAEmulator
                 // reset only the relevant layers
                 for (int x = 0; x < width; x++)
                 {
-                    BGScanlines[BG][x] = 0x8000;
+                    BGScanlines[BG][x] = Transparent;
                 }
             }
         }
@@ -176,7 +176,7 @@ namespace GBAEmulator
             ushort Address = (ushort)(CharBaseBlock * 0x4000 | (TileID * 0x40) | (dy * 8) | dx);
             byte VRAMEntry = this.gba.mem.VRAM[Address];
 
-            if (VRAMEntry == 0) return 0x8000;  // transparent
+            if (VRAMEntry == 0) return Transparent;  // transparent
 
             return this.GetPaletteEntry((uint)2 * VRAMEntry);
         }
@@ -210,11 +210,8 @@ namespace GBAEmulator
 
                 if (ScreenEntryX < 0 || ScreenEntryX >= BGSize || ScreenEntryY < 0 || ScreenEntryY >= BGSize)
                 {
-                    if (!BGCNT.DisplayAreaOverflow)
-                    {
-                        this.BGScanlines[BG][ScreenX] = 0x8000;  // transparent
-                        continue;
-                    }
+                    if (!BGCNT.DisplayAreaOverflow)  // don't render: out of bounds
+                        continue;                    // value in scanline is already transparent
                     
                     // wraparound: modulo BGSize (power of 2)
                     ScreenEntryX &= (BGSize - 1);

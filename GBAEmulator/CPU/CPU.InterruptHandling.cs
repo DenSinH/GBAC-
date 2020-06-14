@@ -18,7 +18,7 @@ namespace GBAEmulator.CPU
         
         private bool HandleIRQs()
         {
-            if ((this.IO.IF.raw & this.IO.IE.raw) != 0)
+            if ((this.IO.IF.raw & this.IO.IE.raw) > 0)
             {
                 this.IO.HALTCNT.Halt = false;
                 
@@ -40,7 +40,8 @@ namespace GBAEmulator.CPU
 
             this.mem.CurrentBIOSReadState = MEM.BIOSReadState.DuringIRQ;
 
-            if (this.Pipeline.Count == 0) this.PC += (uint)((this.state == State.ARM) ? 4 : 2);
+            if (this.Pipeline.Count == 0)
+                this.PC += (uint)((this.state == State.ARM) ? 4 : 2);
 
             // store address of instruction that did not get executed + 4
             // we check for IRQ before filling the pipeline, so we are 2 (in THUMB) or 4 (ARM) ahead

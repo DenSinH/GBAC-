@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Runtime.CompilerServices;
 
 namespace GBAEmulator
@@ -15,7 +16,7 @@ namespace GBAEmulator
         {
             // Address within palette memory
             return (ushort)(
-                this.gba.mem.PAL[Address] |
+                 this.gba.mem.PAL[Address] |
                 (this.gba.mem.PAL[Address + 1] << 8)
                 );
         }

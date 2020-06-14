@@ -137,7 +137,7 @@ namespace GBAEmulator
                     {
                         for (priority = 0; priority < 4; priority++)
                         {
-                            if (this.OBJLayers[priority][x] != 0x8000)
+                            if (this.OBJLayers[priority][x] != Transparent)
                             {
                                 this.Display[width * scanline + x] = this.OBJLayers[priority][x];
                                 priority = 0xff;  // break out of both loops

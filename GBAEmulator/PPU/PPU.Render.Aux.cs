@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace GBAEmulator
 {
     partial class PPU
     {
-        BlendMode[] WindowBlendMode = new BlendMode[width];
+        BlendMode[]  BGWindowBlendMode = new BlendMode[width];
+        BlendMode[] OBJWindowBlendMode = new BlendMode[width];
 
         public void ResetWindowBlendMode()
         {
@@ -17,16 +19,17 @@ namespace GBAEmulator
             OBJWinIn = this.IO.WINOUT.WindowSpecialEffects(Window.OBJ)     ? AlphaBlending : BlendMode.Off;
             WinOut   = this.IO.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
 
-            this.ResetWindow<BlendMode>(ref WindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
+            this.ResetWindow<BlendMode>(ref BGWindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
+            // we don't need to reset OBJWindowBlendMode because we only update the values where a sprite is present anyway
             
-            // override for alpha blending objects (?)
+            // override for alpha blending objects
             BlendMode OBJBlendMode = AlphaBlending != BlendMode.Off ? AlphaBlending : BlendMode.Normal;
 
             for (int x = 0; x < width; x++)
             {
                 if (this.OBJBlendingMask[x] != null)  // null means no sprite present, so don't enable the blendmode
                 {
-                    WindowBlendMode[x] = this.OBJBlendingMask[x] ?? false ? OBJBlendMode : BlendMode.Off;
+                    OBJWindowBlendMode[x] = this.OBJBlendingMask[x] ?? false ? OBJBlendMode : BlendMode.Off;
                 }
             }
         }
@@ -87,7 +90,7 @@ namespace GBAEmulator
                 for (int x = 0; x < width; x++)
                 {
                     // we draw the mask sprites all to priority 0
-                    if (this.OBJWindowMask[x] != 0x8000)
+                    if (this.OBJWindowMask[x] != Transparent)
                     {
                         Window[x] = OBJWinIn;
                     }
@@ -122,11 +125,11 @@ namespace GBAEmulator
             ushort BGR;
 
             // Blend red
-            BGR = (ushort)(((ColorA & 0x001f) * EVA + (ColorB & 0x001f) * EVB) >> 4);                 // 1.4 fixed point
+            BGR = (ushort)(((ColorA & 0x001f) * EVA + (ColorB & 0x001f) * EVB) >> 4);                  // 1.4 fixed point
             Blend |= (ushort)(BGR >= 0x1f ? 0x001f : BGR);
 
             // Blend green
-            BGR = (ushort)((((ColorA & 0x03e0) >> 5) * EVA + ((ColorB & 0x03e0) >> 5) * EVB) >> 4);   // 1.4 fixed point
+            BGR = (ushort)((((ColorA & 0x03e0) >> 5) * EVA + ((ColorB & 0x03e0) >> 5) * EVB) >> 4);    // 1.4 fixed point
             Blend |= (ushort)(BGR >= 0x1f ? 0x03e0 : (BGR << 5));
 
             // Blend blue
@@ -136,7 +139,8 @@ namespace GBAEmulator
             return Blend;
         }
         
-        private bool SetPixel(int ScreenX, ushort Color, BlendMode AlphaBlending, bool IsTop, bool IsBottom, bool WasOBJ, bool IsOBJ = false)
+        private bool SetPixel(int ScreenX, ushort Color, BlendMode AlphaBlending,
+            bool IsTop, bool IsBottom, bool WasOBJ, bool IsOBJ = false)
         {
             // returns if the pixel has final value
 
@@ -146,15 +150,15 @@ namespace GBAEmulator
             // as otherwise the color was final
             if (WasOBJ && IsBottom) AlphaBlending = BlendMode.Normal;
 
-            // assumes Color != 0x8000
-            // assumes that if Blendmode is off, Display[ScreenX] = 0x8000
+            // assumes Color != Transparent
+            // assumes that if Blendmode is off, Display[ScreenX] = Transparent
             switch (AlphaBlending)
             {
                 case BlendMode.Off:
                     this.Display[ScreenX] = Color;
                     return true;
                 case BlendMode.Normal:
-                    if (this.Display[ScreenX] != 0x8000)
+                    if (this.Display[ScreenX] != Transparent)
                     {
                         if (IsBottom)
                         {
@@ -172,7 +176,7 @@ namespace GBAEmulator
                     }
                 case BlendMode.White:
                 case BlendMode.Black:
-                    // Display[ScreenX] should always be 0x8000 in this case, as we always return true (color is always final)
+                    // Display[ScreenX] should always be Transparent in this case, as we always return true (color is always final)
                     if (WasOBJ)
                     {
                         this.Display[ScreenX] = Blend(this.Display[ScreenX], (ushort)(AlphaBlending == BlendMode.White ? 0x7fff : 0),
@@ -213,15 +217,17 @@ namespace GBAEmulator
             // determine what blend mode to use per pixel
             this.ResetWindowBlendMode();
 
-            // default parameters
             ushort Backdrop = this.Backdrop;
+
+            // figure out which backgrounds we actually need to draw
+
             byte[] Priorities = new byte[4];
             bool[] Enabled = new bool[4];
 
             foreach (byte BG in BGs)
             {
-                Priorities[BG] = this.IO.BGCNT[BG].BGPriority;
-                Enabled[BG] = this.IO.DISPCNT.DisplayBG(BG);
+                if (Enabled[BG] = this.IO.DISPCNT.DisplayBG(BG))
+                    Priorities[BG] = this.IO.BGCNT[BG].BGPriority;
             }
 
             // blending parameters
@@ -245,14 +251,14 @@ namespace GBAEmulator
             
             for (int x = 0; x < width; x++)
             {
-                this.Display[ScreenX] = 0x8000;  // reset 1 pixel at a time to prevent artifacts
+                this.Display[ScreenX] = Transparent;  // reset 1 pixel at a time to prevent artifacts
                 WasOBJ = false;
 
                 for (priority = 0; priority < 4; priority++)
                 {
-                    if (RenderOBJ && this.OBJLayers[priority][x] != 0x8000)
+                    if (RenderOBJ && this.OBJLayers[priority][x] != Transparent)
                     {
-                        if (this.SetPixel(ScreenX, this.OBJLayers[priority][x], WindowBlendMode[x], OBJTop, OBJBottom, WasOBJ, IsOBJ: true))
+                        if (this.SetPixel(ScreenX, this.OBJLayers[priority][x], OBJWindowBlendMode[x], OBJTop, OBJBottom, WasOBJ, IsOBJ: true))
                         {
                             priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
                             break;
@@ -260,7 +266,7 @@ namespace GBAEmulator
                         WasOBJ = true;
                     }
 
-                    foreach (byte BG in BGs)
+                    for (byte BG = 0; BG < 4; BG++)
                     {
                         if (!Enabled[BG])
                             continue;
@@ -268,10 +274,10 @@ namespace GBAEmulator
                         if (Priorities[BG] != priority)
                             continue;
 
-                        if (this.BGScanlines[BG][x] == 0x8000)
+                        if (this.BGScanlines[BG][x] == Transparent)
                             continue;
 
-                        if (this.SetPixel(ScreenX, this.BGScanlines[BG][x], WindowBlendMode[x], BGTop[BG], BGBottom[BG], WasOBJ))
+                        if (this.SetPixel(ScreenX, this.BGScanlines[BG][x], BGWindowBlendMode[x], BGTop[BG], BGBottom[BG], WasOBJ))
                         {
                             priority = 0xfe;    // break out of priority loop, and signify that we have found a non-transparent pixel
                             break;
@@ -281,7 +287,7 @@ namespace GBAEmulator
 
                 if (priority == 4)  // we found no final non-transparent pixel
                 {
-                    this.SetPixel(ScreenX, Backdrop, WindowBlendMode[x], BDTop, BDBottom, WasOBJ);
+                    this.SetPixel(ScreenX, Backdrop, BGWindowBlendMode[x], BDTop, BDBottom, WasOBJ);
                 }
 
                 ScreenX++;
@@ -302,8 +308,14 @@ namespace GBAEmulator
             for (int dx = 0; dx < 4; dx++)  // we need to look at nibbles here
             {
                 MosaicCorrectedAddress = (uint)(TileLineBaseAddress + dx);
-                for (int ddx = 0; ddx < 2; ddx++)
+                for (int ddx = 0; ddx < 2; ddx++, ScreenX += XSign)
                 {
+                    if (ScreenX < 0 || ScreenX >= width)  // out of bounds render
+                        continue;
+
+                    if (Line[ScreenX] != Transparent)  // there is already a nontransparent pixel at this pixel
+                        continue;
+
                     if (Mosaic && MosaicHSize != 1)
                     {
                         // todo: fix horizontal mosaic
@@ -317,16 +329,9 @@ namespace GBAEmulator
 
                     VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
 
-                    if (0 <= ScreenX && ScreenX < width)  // ScreenX is a byte, so always greater than 0
-                    {
-                        if (Line[ScreenX] == 0x8000)
-                        {
-                            PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
-                            if (PaletteNibble > 0 && (Window?[ScreenX] ?? true))  // non-transparent
-                                Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
-                        }
-                    }
-                    ScreenX += XSign;
+                    PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
+                    if (PaletteNibble > 0 && (Window?[ScreenX] ?? true))  // non-transparent
+                        Line[ScreenX] = this.GetPaletteEntry(PaletteBase + (uint)(2 * PaletteNibble));
                 }
             }
         }
@@ -339,23 +344,21 @@ namespace GBAEmulator
             byte VRAMEntry;
             uint MosaicCorrectedAddress;
 
-            for (int dx = 0; dx < 8; dx++)
+            for (int dx = 0; dx < 8; dx++, ScreenX += XSign)
             {
+                if (ScreenX < 0 || ScreenX >= width)  // out of bounds render
+                    continue;
+
+                if (Line[ScreenX] != Transparent)  // there is already a nontransparent pixel at this pixel
+                    continue;
+
                 MosaicCorrectedAddress = (uint)(TileLineBaseAddress + dx);
                 if (Mosaic)
                     MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize);
 
-                if (0 <= ScreenX && ScreenX < width)
-                {
-                    if (Line[ScreenX] == 0x8000)
-                    {
-                        VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
-                        if (VRAMEntry != 0 && (Window?[ScreenX] ?? true))
-                            Line[ScreenX] = this.GetPaletteEntry(PaletteOffset + 2 * (uint)VRAMEntry);
-                    }
-                }
-
-                ScreenX += XSign;
+                VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
+                if (VRAMEntry != 0 && (Window?[ScreenX] ?? true))
+                    Line[ScreenX] = this.GetPaletteEntry(PaletteOffset + 2 * (uint)VRAMEntry);
             }
         }
 

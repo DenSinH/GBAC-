@@ -47,23 +47,23 @@ namespace GBAEmulator.CPU
             public void TickDirect(int cycles)
             {
                 // countup tick calls
-                this.Data.TickDirect((ushort)cycles);
+                this.Data.TickUnscaled((ushort)cycles);
             }
 
             public void Tick(int cycles)
             {
-                if (this.Control.Enabled && !this.Control.CountUpTiming)
-                {
-                    if (this.Data.Tick((ushort)cycles))  // overflow
-                    {
-                        if (this.Next?.Control.CountUpTiming ?? false)
-                            this.Next?.TickDirect(1);
+                if (!this.Control.Enabled || this.Control.CountUpTiming)
+                    return;
 
-                        if (this.Control.TimerIRQEnable)
-                        {
-                            this.cpu.IO.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
-                        }
-                    }
+                if (!this.Data.Tick((ushort)cycles))  // overflow
+                    return;  // no overflow means no other action
+
+                if (this.Next?.Control.CountUpTiming ?? false)
+                    this.Next?.TickDirect(1);
+
+                if (this.Control.TimerIRQEnable)
+                {
+                    this.cpu.IO.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
                 }
             }
         }

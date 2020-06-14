@@ -24,7 +24,12 @@ namespace GBAEmulator.CPU
         public void TriggerDMA(DMAStartTiming timing)
         {
             for (int i = 0; i < 4; i++)
-                if (!this.IO.DMACNT_H[i].Active) this.IO.DMACNT_H[i].Trigger(timing);
+            {
+                if (!this.IO.DMACNT_H[i].Active)
+                {
+                    this.IO.DMACNT_H[i].Trigger(timing);
+                }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -44,19 +49,16 @@ namespace GBAEmulator.CPU
             this.Log($"DMA: {dmasad.Address.ToString("x8")} -> {dmadad.Address.ToString("x8")}");
 
             uint UnitLength = (uint)(dmacnt_h.DMATransferType ? 4 : 2);  // bytes: 32 / 16 bits
-            uint DMAData;
 
             if (UnitLength == 4)
             {
                 // force alignment happens in memory handler
-                DMAData = this.mem.GetWordAt(dmasad.Address);
-                this.mem.SetWordAt(dmadad.Address, DMAData);
+                this.mem.SetWordAt(dmadad.Address, this.mem.GetWordAt(dmasad.Address));
             }
             else  // 16 bit
             {
                 // force alignment happens in memory handler
-                DMAData = this.mem.GetHalfWordAt(dmasad.Address);
-                this.mem.SetHalfWordAt(dmadad.Address, (ushort)DMAData);
+                this.mem.SetHalfWordAt(dmadad.Address, this.mem.GetHalfWordAt(dmasad.Address));
             }
 
             this.UpdateDMAAddress(dmasad, dmacnt_h.SourceAddrControl, UnitLength);
@@ -107,7 +109,7 @@ namespace GBAEmulator.CPU
             dmacnt_h.Active = false;
         }
 
-        private int HandleDMAs()
+        private void HandleDMAs()
         {
             for (int i = 0; i < 4; i++)
             {
@@ -115,12 +117,8 @@ namespace GBAEmulator.CPU
                 if (this.IO.DMACNT_H[i].Active)
                 {
                     this.DoDMA(i);
-                    // 2N cycles for first, then 2S every cycle after
-                    // Internal time for DMA processing is 2I (normally), or 4I (if both source and destination are in gamepak memory area)
-                    return 0;
                 }
             }
-            return 0;
         }
     }
 }

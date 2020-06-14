@@ -73,11 +73,11 @@ namespace GBAEmulator.CPU
             (GBATek)
              */
             this.SP                 = 0x03007F00;
-            // this.FIQBank[13]        = 0x03007F00;  // mode does not exist
+            // this.FIQBank[13]        = 0x03007F00;
             this.SupervisorBank[13] = 0x03007FE0;
-            // this.AbortBank[13]      = 0x03007F00;  // mode does not exist
+            // this.AbortBank[13]      = 0x03007F00;
             this.IRQBank[13]        = 0x03007FA0;
-            // this.UndefinedBank[13]  = 0x03007F00;  // mode does not exist
+            // this.UndefinedBank[13]  = 0x03007F00;
 
             this.PC = 0x08000000;
             this.CPSR = 0x6000001F;

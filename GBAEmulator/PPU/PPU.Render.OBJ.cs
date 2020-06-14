@@ -15,7 +15,7 @@ namespace GBAEmulator
             {
                 for (int x = 0; x < width; x++)
                 {
-                    OBJLayers[Priority][x] = 0x8000;  // transparent
+                    OBJLayers[Priority][x] = Transparent;  // transparent
                 }
             }
         }
@@ -29,7 +29,7 @@ namespace GBAEmulator
             // used to clear OBJLayers[0] for creating the OBJ window mask
             for (int x = 0; x < width; x++)
             {
-                OBJWindowMask[x] = 0x8000;  // transparent
+                OBJWindowMask[x] = Transparent;  // transparent
             }
         }
 
@@ -100,7 +100,6 @@ namespace GBAEmulator
             for (ushort i = 0; i < 0x400; i += 8)  // 128 objects in OAM
             {
                 /* Fetch all data for object */
-
                 OBJ_ATTR0 = (ushort)(this.gba.mem.OAM[i] | (this.gba.mem.OAM[i + 1] << 8));
 
                 OBJMode = (byte)((OBJ_ATTR0 & 0x0300) >> 8);
@@ -171,7 +170,7 @@ namespace GBAEmulator
                 {
                     // comparison operators are always false comparing to null
                     // only change blending mask value if we have drawn a nontransparent pixel
-                    if (!(Priority >= OBJMaxPriority[StartX + dx]) && this.OBJLayers[Priority][StartX + dx] != 0x8000)
+                    if (!(Priority >= OBJMaxPriority[StartX + dx]) && this.OBJLayers[Priority][StartX + dx] != Transparent)
                     {
                         this.OBJMaxPriority[StartX + dx] = Priority;
                         this.OBJBlendingMask[StartX + dx] |= EnableBlending;
@@ -219,13 +218,13 @@ namespace GBAEmulator
                 SliverBaseAddress += (uint)(4 * (dy & 0x07));   // offset within tile
 
                 // prevent overflow, not sure what is supposed to happen
-                if (SliverBaseAddress + (OBJsz.Width >> 3) * 0x20 > 0x8000)  
+                if (SliverBaseAddress + (OBJsz.Width >> 3) * 0x20 > Transparent)  
                     SliverBaseAddress = 0;
 
                 // base address for sprites is 0x10000 in OAM
                 SliverBaseAddress = (SliverBaseAddress & 0x7fff) | 0x10000;  
 
-                for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
+                for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++, StartX += 8 * XSign)
                 {
                     // foreground palette starts at 0x0500_0200
                     // we can use our same rendering method as for background, as we simply render a tile
@@ -256,8 +255,6 @@ namespace GBAEmulator
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
                     }
-                    
-                    StartX += 8 * XSign;
                 }
             }
             else                // ========================= 8bpp =============================
@@ -269,12 +266,12 @@ namespace GBAEmulator
                 SliverBaseAddress += (uint)(8 * (dy & 0x07));   // offset within tile
 
                 // prevent overflow, not sure what is supposed to happen
-                if (SliverBaseAddress + (OBJsz.Width >> 3) * 0x20 > 0x8000)  
+                if (SliverBaseAddress + (OBJsz.Width >> 3) * 0x20 > Transparent)  
                     SliverBaseAddress = 0;
 
                 SliverBaseAddress = (SliverBaseAddress & 0x7fff) | 0x10000;
 
-                for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++)
+                for (int dTileX = 0; dTileX < (OBJsz.Width >> 3); dTileX++, StartX += 8 * XSign)
                 {
                     // we can use our same rendering method as for background, as we simply render a tile
                     if (UseOBJWindowMask)
@@ -306,8 +303,6 @@ namespace GBAEmulator
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
                     }
-                    
-                    StartX += 8 * XSign;
                 }
             }
         }
@@ -331,7 +326,6 @@ namespace GBAEmulator
             // removed shifting for less arithmetic, like in regular objects
             PixelAddress += (uint)(this.OAM2DMap ? (OBJsz.Width * (py >> 3) * 4) : (32 * 0x20 * (py >> 3)));
 
-
             if (!ColorMode)     // 4bpp
             {
                 PixelAddress += (uint)(4 * (py & 0x07));
@@ -343,8 +337,8 @@ namespace GBAEmulator
 
                 PaletteNibble &= 0x0f;
                 if (PaletteNibble == 0)
-                    return 0x8000;
-                
+                    return Transparent;
+
                 return this.GetPaletteEntry(0x200 + (uint)PaletteBank * 0x20 + (uint)(2 * PaletteNibble));
             }
             else                // 8bpp
@@ -354,7 +348,7 @@ namespace GBAEmulator
 
                 byte VRAMEntry = this.gba.mem.VRAM[PixelAddress + (px & 0x07)];
                 if (VRAMEntry == 0)
-                    return 0x8000;
+                    return Transparent;
                 
                 return this.GetPaletteEntry(0x200 + 2 * (uint)VRAMEntry);
             }
@@ -375,13 +369,11 @@ namespace GBAEmulator
 
             // PA, PB, PC, PD:
             short[] RotateScaleParams = new short[4];
-            for (int di = 0; di < 4; di++)
+            for (int di = 0; di < 4; di++, RotScaleIndex += 8)
             {
                 RotateScaleParams[di] = (short)(this.gba.mem.OAM[RotScaleIndex] | (this.gba.mem.OAM[RotScaleIndex + 1] << 8));
-                RotScaleIndex += 8;
             }
 
-            // todo: SIMD?
             uint px, py;
             uint px0 = (uint)(OBJsz.Width  >> 1);
             uint py0 = (uint)(OBJsz.Height >> 1);
@@ -391,27 +383,25 @@ namespace GBAEmulator
             if (DoubleRendering)
             {
                 dy = (short)(scanline - OBJy - OBJsz.Height);
-                dx = (short)(-OBJsz.Width - 1);             // subtract one because we increment at the start of the loop
+                dx = (short)(-OBJsz.Width);
             }
             else
             {
                 dy = (short)(scanline - OBJy - (OBJsz.Height >> 1));
-                dx = (short)(-(OBJsz.Width >> 1) - 1);      // subtract one because we increment at the start of the loop
+                dx = (short)-(OBJsz.Width >> 1);
             }
 
             // What the object width is to be interpreted as for looping over x coordinates
             byte FictionalOBJWidth = (byte)(DoubleRendering ? 2 * OBJsz.Width : OBJsz.Width);
 
-            for (int ix = 0; ix < FictionalOBJWidth; ix++)
+            for (int ix = 0; ix < FictionalOBJWidth; ix++, dx++)
             {
-                // we started at one less than we should have, so that we could simply increment instead of do the calculation again
-                // we do this here so the continue statements dont mess stuff up
-                dx++;
-
-                if ((StartX + ix < 0) || (StartX + ix) >= width)
+                if ((StartX + ix < 0))
                     continue;
+                else if ((StartX + ix) >= width)
+                    break;
 
-                if (this.OBJLayers[Priority][StartX + ix] != 0x8000)
+                if (this.OBJLayers[Priority][StartX + ix] != Transparent)
                     continue;
 
                 if (!OBJWindow[StartX + ix])
@@ -437,7 +427,7 @@ namespace GBAEmulator
                     // comparison operators are always false comparing to null
                     if (!(Priority >= OBJMaxPriority[StartX + ix]))
                     {
-                        if (this.OBJLayers[Priority][StartX + ix] != 0x8000)
+                        if (this.OBJLayers[Priority][StartX + ix] != Transparent)
                         {
                             this.OBJMaxPriority [StartX + ix] = Priority;
                             this.OBJBlendingMask[StartX + ix] = EnableBlending;
