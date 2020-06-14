@@ -1,12 +1,14 @@
 ﻿using System;
 
 using GBAEmulator.CPU;
+using GBAEmulator.Memory.Sections;
 
 namespace GBAEmulator
 {
     public partial class PPU
     {
-        GBA gba;
+        private readonly GBA gba;
+        private readonly IORAMSection IO;
 
         /*
          The GBA is capable of displaying 16bit colors in a 5.5.5 format. That means 5 bits for red, 5 for green and 5 for blue;
@@ -22,9 +24,10 @@ namespace GBAEmulator
 
         const int ScanlinesPerFrame = 228;
 
-        public PPU(GBA gba, ushort[] display)
+        public PPU(GBA gba, ushort[] display, IORAMSection IO)
         {
             this.gba = gba;
+            this.IO = IO;
             this.Display = display;
 
             this.ResetBGScanlines(0, 1, 2, 3);

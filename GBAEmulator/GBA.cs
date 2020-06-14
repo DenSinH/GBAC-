@@ -3,6 +3,7 @@
 using GBAEmulator.CPU;
 using GBAEmulator.Memory;
 using GBAEmulator.Bus;
+using GBAEmulator.Memory.Sections;
 
 namespace GBAEmulator
 {
@@ -10,6 +11,7 @@ namespace GBAEmulator
     {
         public ARM7TDMI cpu;
         public PPU ppu;
+        private IORAMSection IO;
         public MEM mem;
         public BUS bus;
 
@@ -22,9 +24,11 @@ namespace GBAEmulator
         public GBA(ushort[] display)
         {
             this.cpu = new ARM7TDMI(this);
-            this.ppu = new PPU(this, display);
             this.mem = this.cpu.mem;
             this.bus = this.cpu.bus;
+            this.IO  = this.cpu.IO;
+
+            this.ppu = new PPU(this, display, this.IO);
 
             this.display = display;
         }
@@ -53,7 +57,7 @@ namespace GBAEmulator
             // set VBlank
             if (this.ppu.scanline == 160)
             {
-                this.mem.IORAM.DISPSTAT.SetVBlank(true);
+                this.mem.IO.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(DMAStartTiming.VBlank);
 
                 // refresh screen, vis might have been destroyed because we ended the thread
@@ -69,29 +73,29 @@ namespace GBAEmulator
             // no VBlank in 227
             else if (this.ppu.scanline == 227)
             {
-                this.mem.IORAM.DISPSTAT.SetVBlank(false);
+                this.mem.IO.DISPSTAT.SetVBlank(false);
             }
 
             if (this.ppu.IsVBlank)
             {
-                this.mem.IORAM.BG2X.ResetInternal();
-                this.mem.IORAM.BG2Y.ResetInternal();
-                this.mem.IORAM.BG3X.ResetInternal();
-                this.mem.IORAM.BG3Y.ResetInternal();
+                this.mem.IO.BG2X.ResetInternal();
+                this.mem.IO.BG2Y.ResetInternal();
+                this.mem.IO.BG3X.ResetInternal();
+                this.mem.IO.BG3Y.ResetInternal();
             }
 
             /* NON-HBLANK */
-            this.mem.IORAM.DISPSTAT.SetHBlank(false);
-            this.mem.IORAM.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
+            this.mem.IO.DISPSTAT.SetHBlank(false);
+            this.mem.IO.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
             if (this.ppu.scanline >= 2 && this.ppu.scanline < 162)
             {
                 // DMA 3 video capture mode (special DMA trigger)
                 this.cpu.TriggerDMASpecial(3);
             }
-            else if (this.cpu.mem.IORAM.DMACNT_H[3].StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
+            else if (this.cpu.mem.IO.DMACNT_H[3].StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
             {
                 // this.cpu.mem.IORAM.DMACNT_H[3].Active = false;
-                this.cpu.mem.IORAM.DMACNT_H[3].Disable();
+                this.cpu.mem.IO.DMACNT_H[3].Disable();
             }
 
             this.cycle += NonHBlankCycles;
@@ -99,8 +103,8 @@ namespace GBAEmulator
                 this.cycle -= this.cpu.Step();
 
             /* HBLANK */
-            if (this.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable))
-                this.mem.IORAM.IF.Request(Interrupt.LCDHBlank);
+            if (this.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable))
+                this.mem.IO.IF.Request(Interrupt.LCDHBlank);
 
             if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
             this.ppu.DrawScanline();
@@ -113,16 +117,16 @@ namespace GBAEmulator
             while (this.cycle > 0)
                 this.cycle -= this.cpu.Step();
 
-            this.mem.IORAM.DISPSTAT.SetHBlank(true);
+            this.mem.IO.DISPSTAT.SetHBlank(true);
 
             this.cycle += HBlankWithFlagCycles;
             while (this.cycle > 0)
                 this.cycle -= this.cpu.Step();
 
-            this.mem.IORAM.BG2X.UpdateInternal((uint)this.mem.IORAM.BG2PB.Full);
-            this.mem.IORAM.BG2Y.UpdateInternal((uint)this.mem.IORAM.BG2PD.Full);
-            this.mem.IORAM.BG3X.UpdateInternal((uint)this.mem.IORAM.BG3PB.Full);
-            this.mem.IORAM.BG3Y.UpdateInternal((uint)this.mem.IORAM.BG3PD.Full);
+            this.mem.IO.BG2X.UpdateInternal((uint)this.mem.IO.BG2PB.Full);
+            this.mem.IO.BG2Y.UpdateInternal((uint)this.mem.IO.BG2PD.Full);
+            this.mem.IO.BG3X.UpdateInternal((uint)this.mem.IO.BG3PB.Full);
+            this.mem.IO.BG3Y.UpdateInternal((uint)this.mem.IO.BG3PD.Full);
         }
 
         public void Run()

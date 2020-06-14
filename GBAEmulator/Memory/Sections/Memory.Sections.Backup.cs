@@ -44,7 +44,7 @@ namespace GBAEmulator.Memory.Sections
                     this.Backup = new BackupFLASH();
                     break;
                 case BackupType.EEPROM:
-                    this.Backup = new BackupEEPROM(this.mem.IORAM.DMACNT_H[3], this.mem.IORAM.DMACNT_L[3]);
+                    this.Backup = new BackupEEPROM(this.mem.IO.DMACNT_H[3], this.mem.IO.DMACNT_L[3]);
                     break;
                 default:
                     throw new Exception($"Invalid rom backup type: {this.ROMBackupType}");

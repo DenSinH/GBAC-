@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using GBAEmulator.Memory;
+using GBAEmulator.Memory.Sections;
 using GBAEmulator.Bus;
 
 
@@ -17,9 +18,10 @@ namespace GBAEmulator.CPU
         */
         public State state { get; private set; }
         public readonly cPipeline Pipeline;
-        private GBA gba;
-        public MEM mem;
-        public BUS bus;
+        private readonly GBA gba;
+        public readonly IORAMSection IO;
+        public readonly MEM mem;
+        public readonly BUS bus;
         
         public const int ICycle = 1;
 
@@ -32,8 +34,12 @@ namespace GBAEmulator.CPU
             this.InitTHUMB();
             this.InitTimers();
 
-            // cpu AND bus are required to be initialized before memory is
+            // IO requires bus to be initialized
             this.bus = new BUS(this);
+
+            // mem requires IO to be initialized
+            this.IO = new IORAMSection(this);
+
             this.mem = new MEM(this);
 
             this.SystemBank     = new uint[16];
@@ -88,7 +94,7 @@ namespace GBAEmulator.CPU
             this.PC = 0x08000000;
             this.CPSR = 0x6000001F;
 
-            this.mem.IORAM.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
+            this.mem.IO.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
         }
 
         //bool COMPLOG = true;
@@ -110,7 +116,7 @@ namespace GBAEmulator.CPU
 
             this.HandleIRQs();
 
-            if (this.mem.IORAM.HALTCNT.Halt)
+            if (this.mem.IO.HALTCNT.Halt)
             {
                 this.Log("Halted");
                 InstructionCycles = 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount

@@ -76,10 +76,12 @@ namespace GBAEmulator.Memory.Sections
 
         public readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
 
-        public IORAMSection(ARM7TDMI cpu, MEM mem, BUS bus)
+        public IORAMSection(ARM7TDMI cpu)
         {
-            this.DISPSTAT = new cDISPSTAT(mem);
-            this.VCOUNT = new cVCOUNT(mem);
+            BUS bus = cpu.bus;
+
+            this.DISPSTAT = new cDISPSTAT(this.IF);
+            this.VCOUNT = new cVCOUNT(this.IF, this.DISPSTAT);
             this.BGHOFS = new cBGScrolling[4] { new cBGScrolling(bus, true), new cBGScrolling(bus, false),
                                                 new cBGScrolling(bus, true), new cBGScrolling(bus, false) };
 
@@ -104,10 +106,10 @@ namespace GBAEmulator.Memory.Sections
             this.WINH = new cWindowDimensions[2] { new cWindowDimensions(bus, true), new cWindowDimensions(bus, false) };
             this.WINV = new cWindowDimensions[2] { new cWindowDimensions(bus, true), new cWindowDimensions(bus, false) };
 
-            this.SIOCNT = new cSIOCNT(mem);
+            this.SIOCNT = new cSIOCNT(this.IF);
 
-            this.KEYCNT = new cKeyInterruptControl(mem);
-            this.KEYINPUT = new cKeyInput(this.KEYCNT, mem);
+            this.KEYCNT = new cKeyInterruptControl(this);
+            this.KEYINPUT = new cKeyInput(this.KEYCNT, this.IF);
 
             this.DMASAD = new cDMAAddress[4] { new cDMAAddress(bus, true),  new cDMAAddress(bus, false),
                                                new cDMAAddress(bus, false), new cDMAAddress(bus, false) };
@@ -116,8 +118,10 @@ namespace GBAEmulator.Memory.Sections
 
             this.DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0x3fff),
                                                new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0xffff) };
-            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(mem, 0), new cDMACNT_H(mem, 1),
-                                               new cDMACNT_H(mem, 2), new cDMACNT_H(mem, 3, true) };
+            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(DMASAD[0], DMADAD[0], DMACNT_L[0], 0),
+                                               new cDMACNT_H(DMASAD[1], DMADAD[1], DMACNT_L[1], 1),
+                                               new cDMACNT_H(DMASAD[2], DMADAD[2], DMACNT_L[2], 2),
+                                               new cDMACNT_H(DMASAD[3], DMADAD[3], DMACNT_L[3], 3, true) };
 
             this.MasterUnusedRegister = new UnusedRegister(bus);
 

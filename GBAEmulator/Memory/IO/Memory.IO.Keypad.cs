@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GBAEmulator.Memory.Sections;
+using System;
 
 namespace GBAEmulator.Memory.IO
 {
@@ -7,13 +8,13 @@ namespace GBAEmulator.Memory.IO
     {
         public XInputController xinput = new XInputController();
         public KeyboardController keyboard = new KeyboardController();
-        cKeyInterruptControl KEYCNT;
-        MEM mem;
+        private readonly cKeyInterruptControl KEYCNT;
+        private readonly cIF IF;
 
-        public cKeyInput(cKeyInterruptControl KEYCNT, MEM mem)
+        public cKeyInput(cKeyInterruptControl KEYCNT, cIF IF)
         {
             this.KEYCNT = KEYCNT;
-            this.mem = mem;
+            this.IF = IF;
 
             try
             {
@@ -42,12 +43,12 @@ namespace GBAEmulator.Memory.IO
                 if (this.KEYCNT.IRQCondition)   // AND
                 {
                     if ((state & this.KEYCNT.Mask) == this.KEYCNT.Mask)
-                        this.mem.IORAM.IF.Request(Interrupt.Keypad);
+                        this.IF.Request(Interrupt.Keypad);
                 }
                 else                            // OR
                 {
                     if ((state & this.KEYCNT.Mask) > 0)
-                        this.mem.IORAM.IF.Request(Interrupt.Keypad);
+                        this.IF.Request(Interrupt.Keypad);
                 }
             }
         }
@@ -67,10 +68,10 @@ namespace GBAEmulator.Memory.IO
     #region KEYCNT
     public class cKeyInterruptControl : IORegister2
     {
-        private MEM mem;
-        public cKeyInterruptControl(MEM mem)
+        private readonly IORAMSection IO;
+        public cKeyInterruptControl(IORAMSection IO)
         {
-            this.mem = mem;
+            this.IO = IO;
         }
 
         public ushort Mask
@@ -96,7 +97,7 @@ namespace GBAEmulator.Memory.IO
             // probably never generally used, but AGS does...
             if (this.IRQEnable)
             {
-                this.mem.IORAM.KEYINPUT.CheckInterrupts();
+                this.IO.KEYINPUT.CheckInterrupts();
             }
         }
     }

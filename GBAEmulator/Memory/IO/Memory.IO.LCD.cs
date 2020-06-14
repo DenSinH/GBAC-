@@ -1,6 +1,7 @@
 ﻿using System;
 
 using GBAEmulator.Bus;
+using GBAEmulator.Memory.Sections;
 
 namespace GBAEmulator.Memory.IO
 {
@@ -36,11 +37,11 @@ namespace GBAEmulator.Memory.IO
     #region DISPSTAT
     public class cDISPSTAT : IORegister2
     {
-        MEM mem;
+        private readonly cIF IF;
 
-        public cDISPSTAT(MEM mem) : base()
+        public cDISPSTAT(cIF IF) : base()
         {
-            this.mem = mem;
+            this.IF = IF;
         }
 
         public byte VCountSetting
@@ -66,7 +67,7 @@ namespace GBAEmulator.Memory.IO
                 this._raw |= 1;
                 if (this.IsSet(DISPSTATFlags.VBlankIRQEnable))
                 {
-                    this.mem.IORAM.IF.Request(Interrupt.LCDVBlank);
+                    this.IF.Request(Interrupt.LCDVBlank);
                 }
             }
             else
@@ -88,10 +89,13 @@ namespace GBAEmulator.Memory.IO
     #region VCOUNT
     public class cVCOUNT : IORegister2
     {
-        MEM mem;
-        public cVCOUNT(MEM mem) : base()
+        private readonly cIF IF;
+        private readonly cDISPSTAT DISPSTAT;
+
+        public cVCOUNT(cIF IF, cDISPSTAT DISPSTAT) : base()
         {
-            this.mem = mem;
+            this.IF = IF;
+            this.DISPSTAT = DISPSTAT;
         }
 
         public byte CurrentScanline
@@ -103,17 +107,17 @@ namespace GBAEmulator.Memory.IO
             set
             {
                 this._raw = (ushort)((this._raw & 0xff00) | value);
-                if (value == this.mem.IORAM.DISPSTAT.VCountSetting)
+                if (value == this.DISPSTAT.VCountSetting)
                 {
-                    this.mem.IORAM.DISPSTAT.VCountMatch(true);
-                    if (this.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable))
+                    this.DISPSTAT.VCountMatch(true);
+                    if (this.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable))
                     {
-                        this.mem.IORAM.IF.Request(Interrupt.LCDVCountMatch);
+                        this.IF.Request(Interrupt.LCDVCountMatch);
                     }
                 }
                 else
                 {
-                    this.mem.IORAM.DISPSTAT.VCountMatch(false);
+                    this.DISPSTAT.VCountMatch(false);
                 }
             }
         }

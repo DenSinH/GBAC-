@@ -38,8 +38,8 @@ namespace GBAEmulator
             foreach (byte BG in BGs)
             {
                 this.ResetWindow<bool>(ref BGWindows[BG],
-                    this.gba.mem.IORAM.WININ.WindowBGEnable(Window.Window0, BG), this.gba.mem.IORAM.WININ.WindowBGEnable(Window.Window1, BG),
-                    this.gba.mem.IORAM.WINOUT.WindowBGEnable(Window.OBJ, BG), this.gba.mem.IORAM.WINOUT.WindowBGEnable(Window.Outside, BG), true);
+                    this.IO.WININ.WindowBGEnable(Window.Window0, BG), this.IO.WININ.WindowBGEnable(Window.Window1, BG),
+                    this.IO.WINOUT.WindowBGEnable(Window.OBJ, BG), this.IO.WINOUT.WindowBGEnable(Window.Outside, BG), true);
             }
         }
 
@@ -116,13 +116,13 @@ namespace GBAEmulator
 
             foreach (byte BG in BGs)
             {
-                if (!this.gba.mem.IORAM.DISPCNT.DisplayBG(BG))
+                if (!this.IO.DISPCNT.DisplayBG(BG))
                     // Background disabled, does not need rendering
                     continue;
 
-                HOFS  = this.gba.mem.IORAM.BGHOFS[BG].Offset;
-                VOFS  = this.gba.mem.IORAM.BGVOFS[BG].Offset;
-                BGCNT = this.gba.mem.IORAM.BGCNT[BG];
+                HOFS  = this.IO.BGHOFS[BG].Offset;
+                VOFS  = this.IO.BGVOFS[BG].Offset;
+                BGCNT = this.IO.BGCNT[BG];
 
                 CharBaseBlock   = BGCNT.CharBaseBlock;
                 ScreenBaseBlock = BGCNT.ScreenBaseBlock;
@@ -133,14 +133,14 @@ namespace GBAEmulator
                 // correct address for mosaic
                 EffectiveY = (short)(scanline + VOFS);
                 if (Mosaic)
-                    EffectiveY -= (short)(EffectiveY % this.gba.mem.IORAM.MOSAIC.BGMosaicVSize);
+                    EffectiveY -= (short)(EffectiveY % this.IO.MOSAIC.BGMosaicVSize);
 
                 for (sbyte CourseX = -1; CourseX < 31; CourseX++)
                 {
                     EffectiveX = (short)((CourseX << 3) + HOFS);
 
                     if (Mosaic)
-                        EffectiveX -= (short)(EffectiveX % this.gba.mem.IORAM.MOSAIC.BGMosaicHSize);
+                        EffectiveX -= (short)(EffectiveX % this.IO.MOSAIC.BGMosaicHSize);
 
                     // ScreenEntryIndex is the index of the screenentry for the tile we are currently rendering
                     ScreenEntryIndex = PPU.VRAMIndexRegular((int)(EffectiveX >> 3), (int)((EffectiveY) >> 3), BGSize);
@@ -157,7 +157,7 @@ namespace GBAEmulator
                         CharBaseBlock: CharBaseBlock,
                         ColorMode: ColorMode,
                         Mosaic: Mosaic,
-                        MosaicHSize: this.gba.mem.IORAM.MOSAIC.BGMosaicHSize
+                        MosaicHSize: this.IO.MOSAIC.BGMosaicHSize
                         );
                 }
             }
@@ -188,10 +188,10 @@ namespace GBAEmulator
                             cRotationScaling PA, cRotationScaling PB, cRotationScaling PC, cRotationScaling PD)
         {
             // ! only to be used with BG = 2 or BG = 3 !
-            if (!this.gba.mem.IORAM.DISPCNT.DisplayBG(BG))  // Background disabled, does not need rendering
+            if (!this.IO.DISPCNT.DisplayBG(BG))  // Background disabled, does not need rendering
                 return;
 
-            cBGControl BGCNT = this.gba.mem.IORAM.BGCNT[BG];
+            cBGControl BGCNT = this.IO.BGCNT[BG];
             
             ushort BGSize = AffineSizeTable[BGCNT.ScreenSize];
 

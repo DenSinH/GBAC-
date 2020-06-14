@@ -61,7 +61,7 @@ namespace GBAEmulator.CPU
 
                         if (this.Control.TimerIRQEnable)
                         {
-                            this.cpu.mem.IORAM.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
+                            this.cpu.mem.IO.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
                         }
                     }
                 }

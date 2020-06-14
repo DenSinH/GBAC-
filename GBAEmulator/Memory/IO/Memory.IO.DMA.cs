@@ -99,16 +99,21 @@ namespace GBAEmulator.Memory.IO
         private bool AllowGamePakDRQ;
         public bool Active;
 
-        private MEM mem;
+        private readonly cDMAAddress DMASAD;
+        private readonly cDMAAddress DMADAD;
+        private readonly cDMACNT_L DMACNT_L;
         public readonly int index;
 
-        public cDMACNT_H(MEM mem, int index) : base()
+        public cDMACNT_H(cDMAAddress DMASAD, cDMAAddress DMADAD, cDMACNT_L DMACNT_L, int index) : base()
         {
             this.index = index;
-            this.mem = mem;
+            this.DMASAD = DMASAD;
+            this.DMADAD = DMADAD;
+            this.DMACNT_L = DMACNT_L;
         }
 
-        public cDMACNT_H(MEM mem, int index, bool AllowGamePakDRQ) : this(mem, index)
+        public cDMACNT_H(cDMAAddress DMASAD, cDMAAddress DMADAD, cDMACNT_L DMACNT_L, int index, bool AllowGamePakDRQ)
+            : this(DMASAD, DMADAD, DMACNT_L, index)
         {
             this.AllowGamePakDRQ = AllowGamePakDRQ;
         }
@@ -179,9 +184,9 @@ namespace GBAEmulator.Memory.IO
             base.Set((ushort)(value & 0xfff8), setlow, sethigh);
             if (DoReload && this.DMAEnabled)
             {
-                this.mem.IORAM.DMADAD[this.index].Reload();
-                this.mem.IORAM.DMASAD[this.index].Reload();
-                this.mem.IORAM.DMACNT_L[this.index].Reload();
+                this.DMADAD.Reload();
+                this.DMASAD.Reload();
+                this.DMACNT_L.Reload();
             }
 
             if ((this._raw & 0xb000) == 0x8000)  // DMA Enable set AND DMA start timing immediate

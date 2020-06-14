@@ -97,8 +97,8 @@ namespace GBAEmulator
             this.KeyDown += new KeyEventHandler(Visual_KeyDown);
 
             // Keyboard input handling
-            this.KeyDown += this.gba.mem.IORAM.KEYINPUT.keyboard.KeyDown;
-            this.KeyUp += this.gba.mem.IORAM.KEYINPUT.keyboard.KeyUp;
+            this.KeyDown += this.gba.mem.IO.KEYINPUT.keyboard.KeyDown;
+            this.KeyUp += this.gba.mem.IO.KEYINPUT.keyboard.KeyUp;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -231,7 +231,7 @@ namespace GBAEmulator
             Draw();
 
             // refresh xinput in this thread to save processing power
-            this.gba.mem.IORAM.KEYINPUT.xinput.UpdateState();
+            this.gba.mem.IO.KEYINPUT.xinput.UpdateState();
 
             if (this.gba.mem.Backup.BackupChanged)
             {

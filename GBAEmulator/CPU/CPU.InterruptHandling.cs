@@ -18,11 +18,11 @@ namespace GBAEmulator.CPU
         
         private bool HandleIRQs()
         {
-            if ((this.mem.IORAM.IF.raw & this.mem.IORAM.IE.raw) != 0)
+            if ((this.mem.IO.IF.raw & this.mem.IO.IE.raw) != 0)
             {
-                this.mem.IORAM.HALTCNT.Halt = false;
+                this.mem.IO.HALTCNT.Halt = false;
                 
-                if (this.mem.IORAM.IME.Enabled && (this.I == 0))
+                if (this.mem.IO.IME.Enabled && (this.I == 0))
                 {
                     this.DoIRQ();
                     return true;

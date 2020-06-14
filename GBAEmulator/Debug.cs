@@ -89,25 +89,25 @@ namespace GBAEmulator
 
         private void UpdateDISPCNT()
         {
-            this.BGMode.Text = this.gba.mem.IORAM.DISPCNT.BGMode.ToString();
-            this.DPFrameSelect.Text = this.gba.mem.IORAM.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? "1" : "0";
-            this.HBlankIntervalFree.Text = this.gba.mem.IORAM.DISPCNT.IsSet(DISPCNTFlags.HBlankIntervalFree) ? "1" : "0";
-            this.OBJVRAMMapping.Text = this.gba.mem.IORAM.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping) ? "1" : "0";
-            this.ForcedBlank.Text = this.gba.mem.IORAM.DISPCNT.IsSet(DISPCNTFlags.ForcedBlank) ? "1" : "0";
-            this.Window0Display.Text = this.gba.mem.IORAM.DISPCNT.DisplayBGWindow(0) ? "1" : "0";
-            this.Window1Display.Text = this.gba.mem.IORAM.DISPCNT.DisplayBGWindow(1) ? "1" : "0";
-            this.OBJWindowDisplay.Text = this.gba.mem.IORAM.DISPCNT.DisplayOBJWindow() ? "1" : "0";
+            this.BGMode.Text = this.gba.mem.IO.DISPCNT.BGMode.ToString();
+            this.DPFrameSelect.Text = this.gba.mem.IO.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? "1" : "0";
+            this.HBlankIntervalFree.Text = this.gba.mem.IO.DISPCNT.IsSet(DISPCNTFlags.HBlankIntervalFree) ? "1" : "0";
+            this.OBJVRAMMapping.Text = this.gba.mem.IO.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping) ? "1" : "0";
+            this.ForcedBlank.Text = this.gba.mem.IO.DISPCNT.IsSet(DISPCNTFlags.ForcedBlank) ? "1" : "0";
+            this.Window0Display.Text = this.gba.mem.IO.DISPCNT.DisplayBGWindow(0) ? "1" : "0";
+            this.Window1Display.Text = this.gba.mem.IO.DISPCNT.DisplayBGWindow(1) ? "1" : "0";
+            this.OBJWindowDisplay.Text = this.gba.mem.IO.DISPCNT.DisplayOBJWindow() ? "1" : "0";
         }
 
         private void UpdateDISPSTAT()
         {
-            this.VBlankFlag.Text = this.gba.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.VBlankFlag) ? "1" : "0";
-            this.HBlankFlag.Text = this.gba.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.HBlankFlag) ? "1" : "0";
-            this.VCounterFlag.Text = this.gba.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.VCounterFlag) ? "1" : "0";
-            this.VBlankIRQEnable.Text = this.gba.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.VBlankIRQEnable) ? "1" : "0";
-            this.HBlankIRQEnable.Text = this.gba.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable) ? "1" : "0";
-            this.VCountIRQEnable.Text = this.gba.mem.IORAM.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable) ? "1" : "0";
-            this.VCountSetting.Text = this.gba.mem.IORAM.DISPSTAT.VCountSetting.ToString("d3");
+            this.VBlankFlag.Text = this.gba.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.VBlankFlag) ? "1" : "0";
+            this.HBlankFlag.Text = this.gba.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.HBlankFlag) ? "1" : "0";
+            this.VCounterFlag.Text = this.gba.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.VCounterFlag) ? "1" : "0";
+            this.VBlankIRQEnable.Text = this.gba.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.VBlankIRQEnable) ? "1" : "0";
+            this.HBlankIRQEnable.Text = this.gba.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable) ? "1" : "0";
+            this.VCountIRQEnable.Text = this.gba.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.VCounterIRQEnable) ? "1" : "0";
+            this.VCountSetting.Text = this.gba.mem.IO.DISPSTAT.VCountSetting.ToString("d3");
         }
 
         private void UpdateVCOUNT()

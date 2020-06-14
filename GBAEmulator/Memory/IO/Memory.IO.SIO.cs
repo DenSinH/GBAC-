@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GBAEmulator.Memory.Sections;
+using System;
 
 namespace GBAEmulator.Memory.IO
 {
@@ -15,11 +16,11 @@ namespace GBAEmulator.Memory.IO
     #region SIOCNT
     public class cSIOCNT : IORegister2
     {
-        private MEM mem;
+        private readonly cIF IF;
 
-        public cSIOCNT(MEM mem)
+        public cSIOCNT(cIF IF)
         {
-            this.mem = mem;
+            this.IF = IF;
         }
 
         public bool ShiftClock => (this._raw & 0x0001) > 0;
@@ -42,7 +43,7 @@ namespace GBAEmulator.Memory.IO
 
             // cheese it
             if (this.IRQEnable)
-                this.mem.IORAM.IF.Request(Interrupt.SerialCommunication);
+                this.IF.Request(Interrupt.SerialCommunication);
         }
     }
     #endregion

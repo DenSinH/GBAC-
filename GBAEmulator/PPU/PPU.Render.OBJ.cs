@@ -53,8 +53,8 @@ namespace GBAEmulator
         {
             this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetWindow<bool>(ref OBJWindow,
-                this.gba.mem.IORAM.WININ.WindowOBJEnable(Window.Window0), this.gba.mem.IORAM.WININ.WindowOBJEnable(Window.Window1),
-                this.gba.mem.IORAM.WINOUT.WindowOBJEnable(Window.OBJ), this.gba.mem.IORAM.WINOUT.WindowOBJEnable(Window.Outside), true);
+                this.IO.WININ.WindowOBJEnable(Window.Window0), this.IO.WININ.WindowOBJEnable(Window.Window1),
+                this.IO.WINOUT.WindowOBJEnable(Window.OBJ), this.IO.WINOUT.WindowOBJEnable(Window.Outside), true);
         }
 
         private struct OBJSize
@@ -95,7 +95,7 @@ namespace GBAEmulator
 
             OBJSize OBJsz;
 
-            this.OAM2DMap = this.gba.mem.IORAM.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping);
+            this.OAM2DMap = this.IO.DISPCNT.IsSet(DISPCNTFlags.OBJVRAMMapping);
 
             for (ushort i = 0; i < 0x400; i += 8)  // 128 objects in OAM
             {
@@ -196,7 +196,7 @@ namespace GBAEmulator
 
             byte dy = (byte)(scanline - OBJy);   // between 0 and OBJsz.Height (8, 16, 32, 64)
             if (Mosaic)
-                dy -= (byte)(dy % this.gba.mem.IORAM.MOSAIC.OBJMosaicVSize);
+                dy -= (byte)(dy % this.IO.MOSAIC.OBJMosaicVSize);
 
             if (VFlip)
                 dy = (byte)(OBJsz.Height - dy - 1);
@@ -239,7 +239,7 @@ namespace GBAEmulator
                             (uint)(SliverBaseAddress + (0x20 * dTileX)),
                             (uint)(0x200 + PaletteBank * 0x20),
                             Mosaic,
-                            this.gba.mem.IORAM.MOSAIC.OBJMosaicHSize);
+                            this.IO.MOSAIC.OBJMosaicHSize);
                     }
                     else
                     {
@@ -251,7 +251,7 @@ namespace GBAEmulator
                             (uint)(SliverBaseAddress + (0x20 * dTileX)),
                             (uint)(0x200 + PaletteBank * 0x20),
                             Mosaic,
-                            this.gba.mem.IORAM.MOSAIC.OBJMosaicHSize);
+                            this.IO.MOSAIC.OBJMosaicHSize);
 
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
@@ -286,7 +286,7 @@ namespace GBAEmulator
                             XSign,
                             (uint)(SliverBaseAddress + (0x40 * dTileX)),
                             Mosaic,
-                            this.gba.mem.IORAM.MOSAIC.OBJMosaicHSize,
+                            this.IO.MOSAIC.OBJMosaicHSize,
                             PaletteOffset: 0x200
                             );
                     }
@@ -299,7 +299,7 @@ namespace GBAEmulator
                             XSign,
                             (uint)(SliverBaseAddress + (0x40 * dTileX)),
                             Mosaic,
-                            this.gba.mem.IORAM.MOSAIC.OBJMosaicHSize,
+                            this.IO.MOSAIC.OBJMosaicHSize,
                             PaletteOffset: 0x200
                             );
 

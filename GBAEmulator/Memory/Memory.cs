@@ -12,7 +12,7 @@ namespace GBAEmulator.Memory
         private NonMirroredMemorySection UnusedSection = new NonMirroredMemorySection(0);
         private MirroredMemorySection    eWRAM         = new MirroredMemorySection(0x40000);
         private MirroredMemorySection    iWRAM         = new MirroredMemorySection(0x8000);
-        public  IORAMSection             IORAM;
+        public  IORAMSection             IO;
         public  PALSection               PAL           = new PALSection();
         public  VRAMSection              VRAM;
         public  OAMSection               OAM           = new OAMSection();
@@ -47,11 +47,11 @@ namespace GBAEmulator.Memory
             this.bus = cpu.bus;
 
             this.BIOS       = new BIOSSection(cpu);
-            this.IORAM      = new IORAMSection(cpu, this, cpu.bus);
-            this.VRAM       = new VRAMSection(this.IORAM.DISPCNT);
+            this.IO         = cpu.IO;
+            this.VRAM       = new VRAMSection(this.IO.DISPCNT);
             this.GamePak_L  = new cROMSection(this, false);
             this.GamePak_H  = new cROMSection(this, true);
-            this.Backup = new BackupSection(this);
+            this.Backup     = new BackupSection(this);
 
             this.MemorySections = new IMemorySection[16]
             {
@@ -59,7 +59,7 @@ namespace GBAEmulator.Memory
                 this.UnusedSection,
                 this.eWRAM,
                 this.iWRAM,
-                this.IORAM,
+                this.IO,
                 this.PAL,
                 this.VRAM,
                 this.OAM,
