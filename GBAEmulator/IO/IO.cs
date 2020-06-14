@@ -3,6 +3,7 @@ using GBAEmulator.Bus;
 using System;
 
 using GBAEmulator.Memory.Sections;
+using System.Diagnostics;
 
 namespace GBAEmulator.IO
 {
@@ -335,15 +336,17 @@ namespace GBAEmulator.IO
                 if (this.Storage[i] is null)
                 {
                     this.Error(i.ToString("x4") + " in IORAM not initialized");
+                    Console.ReadKey();
                 }
             }
         }
 
         private void Error(string message)
         {
-
+            Console.Error.WriteLine($"IO Error: {message}");
         }
 
+        [Conditional("DEBUG")]
         private void Log(string message)
         {
 

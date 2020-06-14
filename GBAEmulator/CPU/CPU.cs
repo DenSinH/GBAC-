@@ -94,7 +94,7 @@ namespace GBAEmulator.CPU
             this.PC = 0x08000000;
             this.CPSR = 0x6000001F;
 
-            this.mem.IO.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
+            this.IO.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
         }
 
         //bool COMPLOG = true;
@@ -116,7 +116,7 @@ namespace GBAEmulator.CPU
 
             this.HandleIRQs();
 
-            if (this.mem.IO.HALTCNT.Halt)
+            if (this.IO.HALTCNT.Halt)
             {
                 this.Log("Halted");
                 InstructionCycles = 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
@@ -163,7 +163,7 @@ namespace GBAEmulator.CPU
 
             //if (COMPLOG)
             //{
-            //    if (!this.mem.IORAM.HALTCNT.Halt)
+            //    if (!this.IORAM.HALTCNT.Halt)
             //    {
             //        if (this.Pipeline.Count == 1)
             //        {

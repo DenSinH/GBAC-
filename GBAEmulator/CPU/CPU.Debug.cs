@@ -74,8 +74,8 @@ namespace GBAEmulator.CPU
         public InterruptControlInfo GetInterruptControl()
         {
             return new InterruptControlInfo(
-                this.mem.IO.KEYCNT.Mask.ToString("x4"), this.mem.IO.IME.Enabled ? "1" : "0", this.mem.IO.IE.raw,
-                this.mem.IO.IF.raw, this.mem.IO.HALTCNT.Halt ? "1" : "0"
+                this.IO.KEYCNT.Mask.ToString("x4"), this.IO.IME.Enabled ? "1" : "0", this.IO.IE.raw,
+                this.IO.IF.raw, this.IO.HALTCNT.Halt ? "1" : "0"
             );
         }
 
@@ -86,8 +86,8 @@ namespace GBAEmulator.CPU
 
         public DMAInfo GetDMAInfo(int index)
         {
-            return new DMAInfo(this.mem.IO.DMADAD[index].Address, this.mem.IO.DMASAD[index].Address,
-                this.mem.IO.DMACNT_L[index].UnitCount, this.mem.IO.DMACNT_H[index]);
+            return new DMAInfo(this.IO.DMADAD[index].Address, this.IO.DMASAD[index].Address,
+                this.IO.DMACNT_L[index].UnitCount, this.IO.DMACNT_H[index]);
         }
 
         public void ShowInfo()
@@ -97,8 +97,8 @@ namespace GBAEmulator.CPU
 
         public void InterruptInfo()
         {
-            Console.WriteLine($"HALTCNT: {this.mem.IO.HALTCNT.Halt}, CPSR-I: {this.I}");
-            Console.WriteLine($"IME enabled: {this.mem.IO.IME.Enabled}, IE: {this.mem.IO.IE.raw.ToString("x8")}, IF: {this.mem.IO.IF.raw.ToString("x8")}");
+            Console.WriteLine($"HALTCNT: {this.IO.HALTCNT.Halt}, CPSR-I: {this.I}");
+            Console.WriteLine($"IME enabled: {this.IO.IME.Enabled}, IE: {this.IO.IE.raw.ToString("x8")}, IF: {this.IO.IF.raw.ToString("x8")}");
         }
 
         public void DumpPAL()

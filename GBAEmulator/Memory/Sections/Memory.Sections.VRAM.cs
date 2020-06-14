@@ -1,7 +1,7 @@
-﻿using GBAEmulator.CPU;
-using GBAEmulator.IO;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
+
+using GBAEmulator.IO;
 
 namespace GBAEmulator.Memory.Sections
 {

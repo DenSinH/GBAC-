@@ -65,6 +65,8 @@ namespace GBAEmulator.IO
 
     public class cSIODATA32 : IORegister4<cSIODATA32Half>
     {
+        public cSIODATA32() : base(new cSIODATA32Half(), new cSIODATA32Half()) { }
+
         public uint Data => (uint)((this.upper.Get() << 16) | this.lower.Get());
     }
     #endregion
