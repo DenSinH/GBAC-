@@ -195,8 +195,8 @@ namespace GBAEmulator
 
             byte CharBaseBlock = BGCNT.CharBaseBlock;
             uint ScreenEntryBaseAddress = (uint)BGCNT.ScreenBaseBlock * 0x800;
-            byte Priority      = BGCNT.BGPriority;
-            bool Mosaic        = BGCNT.Mosaic;
+            //byte Priority      = BGCNT.BGPriority;
+            //bool Mosaic        = BGCNT.Mosaic;
 
             uint ScreenEntryIndex;
             byte AffineScreenEntry;

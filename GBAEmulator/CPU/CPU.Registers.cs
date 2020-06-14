@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Runtime.CompilerServices;
 using GBAEmulator.Memory;
 
 namespace GBAEmulator.CPU
@@ -8,64 +8,59 @@ namespace GBAEmulator.CPU
     partial class ARM7TDMI
     {
 		/* ARM / THUMB state */
-        public uint[] Registers = new uint[16];  // active registers; R15 = PC
-        private uint[] SystemBank, FIQBank, SupervisorBank, AbortBank, IRQBank, UndefinedBank;
-        private Dictionary<Mode, uint[]> BankedRegisters;
-        private uint SPSR_fiq, SPSR_svc, SPSR_abt, SPSR_irq, SPSR_und;  // Saved Processor Status Registers
+        public readonly uint[] Registers = new uint[16]; // active registers; R15 = PC
+        private readonly uint[] SystemBank, SupervisorBank, IRQBank; // , FIQBank, AbortBank, UndefinedBank;
+        // private readonly Dictionary<Mode, uint[]> BankedRegisters;
+        private uint SPSR_svc, SPSR_irq;                    //, SPSR_fiq, SPSR_abt, SPSR_und;  // Saved Processor Status Registers
 
         private byte N, Z, C, V, I, F;
         public Mode mode { get; private set; } = Mode.User;
         private uint SR_RESERVED;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private uint[] BankedRegisters(Mode mode)
+        {
+            switch(mode)
+            {
+                case Mode.User:
+                case Mode.System:
+                    return this.SystemBank;
+                case Mode.Supervisor:
+                    return this.SupervisorBank;
+                case Mode.IRQ:
+                    return this.IRQBank;
+                default:
+                    throw new Exception($"Invalid mode {mode}");
+            }
+        }
 
         private void ChangeMode(Mode NewMode)
         {
             if (NewMode == this.mode)
                 return;
 
-            if (!Enum.IsDefined(typeof(Mode), NewMode))
-                throw new Exception($"Invalid mode {NewMode}");
-
-            bool FIQInvolved = (this.mode == Mode.FIQ) || (NewMode == Mode.FIQ);
-
             this.Log("new mode: " + NewMode);
 
             // Bank current registers
-            for (int i = FIQInvolved ? 8 : 13; i <= 14; i++)
+            uint[] OldBank = this.BankedRegisters(this.mode);
+            uint[] NewBank = this.BankedRegisters(NewMode);
+            for (int i = 13; i <= 14; i++)
             {
-                this.BankedRegisters[this.mode][i] = this.Registers[i];
-                this.Registers[i] = this.BankedRegisters[NewMode][i];
+                OldBank[i] = this.Registers[i];
+                this.Registers[i] = NewBank[i];
             }
 
-            switch (this.mode)
-            {
-                case Mode.IRQ:
+            if (this.mode == Mode.IRQ)
                     // return from IRQ
                     this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterIRQ;
-                    break;
-                case Mode.Supervisor:
+            else if (this.mode == Mode.Supervisor)
                     // return from SWI
                     this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterSWI;
-                    break;
-            }
 
-            switch (NewMode)
-            {
-                case Mode.FIQ:
-                    SPSR_fiq = this.CPSR;
-                    break;
-                case Mode.Supervisor:
-                    SPSR_svc = this.CPSR;
-                    break;
-                case Mode.Abort:
-                    SPSR_abt = this.CPSR;
-                    break;
-                case Mode.IRQ:
-                    SPSR_irq = this.CPSR;
-                    break;
-                case Mode.Undefined:
-                    SPSR_und = this.CPSR;
-                    break;
-            }
+            if (NewMode == Mode.Supervisor)
+                SPSR_svc = this.CPSR;
+            else if (NewMode == Mode.IRQ)
+                SPSR_irq = this.CPSR;
             
             this.mode = NewMode;
         }
@@ -108,45 +103,27 @@ namespace GBAEmulator.CPU
         {
             get
             {
-                switch (this.mode)
-                {
-                    case Mode.FIQ:
-                        return SPSR_fiq;
-                    case Mode.Supervisor:
-                        return SPSR_svc;
-                    case Mode.Abort:
-                        return SPSR_abt;
-                    case Mode.IRQ:
-                        return SPSR_irq;
-                    case Mode.Undefined:
-                        return SPSR_und;
-                    default:
-                        this.Error(string.Format("No SPSR for mode {0}", this.mode));
-                        return this.CPSR;
-                }
+                if (this.mode == Mode.Supervisor)
+                    return SPSR_svc;
+                else if (this.mode == Mode.IRQ)
+                    return SPSR_irq;
+
+                this.Error(string.Format("No SPSR for mode {0}", this.mode));
+                return this.CPSR;
             }
             set
             {
-                switch (this.mode)
+                if (this.mode == Mode.Supervisor)
                 {
-                    case Mode.FIQ:
-                        SPSR_fiq = value;
-                        return;
-                    case Mode.Supervisor:
-                        SPSR_svc = value;
-                        return;
-                    case Mode.Abort:
-                        SPSR_abt = value;
-                        return;
-                    case Mode.IRQ:
-                        SPSR_irq = value;
-                        return;
-                    case Mode.Undefined:
-                        SPSR_und = value;
-                        return;
-                    default:
-                        return;
+                    SPSR_svc = value;
+                    return;
                 }
+                else if (this.mode == Mode.IRQ)
+                {
+                    SPSR_irq = value;
+                    return;
+                }
+                return;
             }
         }
 

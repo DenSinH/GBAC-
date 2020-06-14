@@ -131,7 +131,7 @@ namespace GBAEmulator
 
         public void Run()
         {
-            this.mem.LoadRom("../../../roms/KirbyNightmare.gba");
+            this.mem.LoadRom("../../../roms/ZeldaMinishCap.gba");
             // this.mem.LoadRom("../../../Tests/Krom/BIOSRLE.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
