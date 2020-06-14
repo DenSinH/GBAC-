@@ -16,14 +16,14 @@ namespace GBAEmulator
 
             Win0In   = this.IO.WININ .WindowSpecialEffects(Window.Window0)  ? AlphaBlending : BlendMode.Off;
             Win1In   = this.IO.WININ .WindowSpecialEffects(Window.Window1)  ? AlphaBlending : BlendMode.Off;
-            OBJWinIn = this.IO.WINOUT.WindowSpecialEffects(Window.OBJ)     ? AlphaBlending : BlendMode.Off;
-            WinOut   = this.IO.WINOUT.WindowSpecialEffects(Window.Outside) ? AlphaBlending : BlendMode.Off;
+            OBJWinIn = this.IO.WINOUT.WindowSpecialEffects(Window.OBJ)      ? AlphaBlending : BlendMode.Off;
+            WinOut   = this.IO.WINOUT.WindowSpecialEffects(Window.Outside)  ? AlphaBlending : BlendMode.Off;
 
             this.ResetWindow<BlendMode>(ref BGWindowBlendMode, Win0In, Win1In, OBJWinIn, WinOut, AlphaBlending);
             // we don't need to reset OBJWindowBlendMode because we only update the values where a sprite is present anyway
             
             // override for alpha blending objects
-            BlendMode OBJBlendMode = AlphaBlending != BlendMode.Off ? AlphaBlending : BlendMode.Normal;
+            BlendMode OBJBlendMode = AlphaBlending != BlendMode.Off ? BlendMode.Normal : BlendMode.Off;
 
             for (int x = 0; x < width; x++)
             {
