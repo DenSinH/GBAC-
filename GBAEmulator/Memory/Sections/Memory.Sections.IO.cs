@@ -9,8 +9,8 @@ namespace GBAEmulator.Memory.Sections
     public partial class IORAMSection : IMemorySection
     {
         private readonly IORegister[] Storage = new IORegister[0x400];  // 1kB IO RAM
-        private UnusedRegister MasterUnusedRegister;
-        private ZeroRegister MasterZeroRegister = new ZeroRegister();
+        private readonly UnusedRegister MasterUnusedRegister;
+        private readonly ZeroRegister MasterZeroRegister = new ZeroRegister();
         const int AddressMask = 0x00ff_ffff;
 
         public readonly cDISPCNT DISPCNT = new cDISPCNT();
@@ -39,25 +39,34 @@ namespace GBAEmulator.Memory.Sections
         public readonly cRotationScaling BG3PC;
         public readonly cRotationScaling BG3PD;
 
-        public cWindowDimensions[] WINH;
-        public cWindowDimensions[] WINV;
+        public readonly cWindowDimensions[] WINH;
+        public readonly cWindowDimensions[] WINV;
 
-        public cWindowControl WININ = new cWindowControl();
-        public cWindowControl WINOUT = new cWindowControl();
+        public readonly cWindowControl WININ = new cWindowControl();
+        public readonly cWindowControl WINOUT = new cWindowControl();
 
-        public cMosaic MOSAIC = new cMosaic();
+        public readonly cMosaic MOSAIC = new cMosaic();
 
-        public cBLDCNT BLDCNT = new cBLDCNT();
-        public cBLDALPHA BLDALPHA = new cBLDALPHA();
-        public cBLDY BLDY = new cBLDY();
-
-        public cKeyInput KEYINPUT;
-        public cKeyInterruptControl KEYCNT = new cKeyInterruptControl();
+        public readonly cBLDCNT BLDCNT = new cBLDCNT();
+        public readonly cBLDALPHA BLDALPHA = new cBLDALPHA();
+        public readonly cBLDY BLDY = new cBLDY();
 
         public readonly cDMAAddress[] DMASAD;
         public readonly cDMAAddress[] DMADAD;
         public readonly cDMACNT_L[] DMACNT_L;
-        public cDMACNT_H[] DMACNT_H;
+        public readonly cDMACNT_H[] DMACNT_H;
+
+        public readonly cSIODATA32 SIODATA32 = new cSIODATA32();
+        // SIOMULTIx
+        public readonly cSIOCNT SIOCNT;
+        // SIOMLT_SEND
+        public readonly cSIODATA8 SIODATA8 = new cSIODATA8();
+
+        public readonly cKeyInput KEYINPUT;
+        public readonly cKeyInterruptControl KEYCNT;
+
+        public readonly cRCNT RCNT = new cRCNT();
+        // JOY_x registers
 
         public readonly cIME IME = new cIME();
         public readonly cIE IE = new cIE();
@@ -95,6 +104,9 @@ namespace GBAEmulator.Memory.Sections
             this.WINH = new cWindowDimensions[2] { new cWindowDimensions(bus, true), new cWindowDimensions(bus, false) };
             this.WINV = new cWindowDimensions[2] { new cWindowDimensions(bus, true), new cWindowDimensions(bus, false) };
 
+            this.SIOCNT = new cSIOCNT(mem);
+
+            this.KEYCNT = new cKeyInterruptControl(mem);
             this.KEYINPUT = new cKeyInput(this.KEYCNT, mem);
 
             this.DMASAD = new cDMAAddress[4] { new cDMAAddress(bus, true),  new cDMAAddress(bus, false),
@@ -245,11 +257,12 @@ namespace GBAEmulator.Memory.Sections
             }
 
             // Serial Communication (1)
-            for (int i = 0x120; i <= 0x12a; i += 2)
-            {
-                // double length no registers
-                this.Storage[i] = this.Storage[i + 1] = new DefaultRegister();
-            }
+            this.Storage[0x120] = this.Storage[0x121] = this.SIODATA32.lower;  // shared
+            this.Storage[0x122] = this.Storage[0x123] = this.SIODATA32.upper;  // shared
+            this.Storage[0x124] = this.Storage[0x125] = new DefaultRegister();
+            this.Storage[0x126] = this.Storage[0x127] = new DefaultRegister();
+            this.Storage[0x128] = this.Storage[0x129] = this.SIOCNT;
+            this.Storage[0x12a] = this.Storage[0x12b] = this.SIODATA8;  // shared
 
             this.Storage[0x012c] = this.Storage[0x012d] = this.MasterUnusedRegister.lower;
             this.Storage[0x012e] = this.Storage[0x012f] = this.MasterUnusedRegister.upper;
@@ -259,11 +272,28 @@ namespace GBAEmulator.Memory.Sections
             this.Storage[0x0132] = this.Storage[0x0133] = this.KEYCNT;
 
             // Serial Communication (2)
-            for (int i = 0x134; i <= 0x158; i += 2)
+            this.Storage[0x134] = this.Storage[0x135] = this.RCNT;
+
+            this.Storage[0x136] = this.Storage[0x137] = this.MasterUnusedRegister.upper;  // note offset!
+            for (int i = 0x0138; i < 0x140; i += 4)
             {
-                // double length no registers
-                this.Storage[i] = this.Storage[i + 1] = new DefaultRegister();
+                this.Storage[i] = this.Storage[i + 1] = this.MasterUnusedRegister.lower;
+                this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
+
+            this.Storage[0x140] = this.Storage[0x141] = new DefaultRegister();
+
+            for (int i = 0x0142; i < 0x150; i += 4)
+            {
+                this.Storage[i] = this.Storage[i + 1] = this.MasterUnusedRegister.lower;
+                this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
+            }
+
+            this.Storage[0x150] = this.Storage[0x151] = new DefaultRegister();
+            this.Storage[0x152] = this.Storage[0x153] = new DefaultRegister();
+            this.Storage[0x154] = this.Storage[0x155] = new DefaultRegister();
+            this.Storage[0x156] = this.Storage[0x157] = new DefaultRegister();
+            this.Storage[0x158] = this.Storage[0x159] = new DefaultRegister();
 
             this.Storage[0x15a] = this.Storage[0x15b] = this.MasterZeroRegister;
             for (int i = 0x015c; i < 0x200; i += 4)

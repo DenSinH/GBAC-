@@ -12,7 +12,7 @@ namespace GBAEmulator.Memory
             if (section < 8)
             {
                 // no waitstates for other regions
-                cycles = WordAccessCycles[section] << 2;
+                cycles = WordAccessCycles[section];
             }
             else if (section < 16)
             {
