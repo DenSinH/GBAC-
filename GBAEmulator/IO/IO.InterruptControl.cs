@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GBAEmulator.Memory.IO
+namespace GBAEmulator.IO
 {
     #region Interrupt Control
     public class cIME : IORegister2  // Interrupt Master Enable

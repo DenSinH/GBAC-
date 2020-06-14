@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GBAEmulator.Memory.IO
+namespace GBAEmulator.IO
 {
     #region Timer Registers
     public class cTMCNT_L : IORegister2

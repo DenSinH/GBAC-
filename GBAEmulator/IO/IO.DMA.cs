@@ -2,7 +2,7 @@
 
 using GBAEmulator.Bus;
 
-namespace GBAEmulator.Memory.IO
+namespace GBAEmulator.IO
 {
     #region DMAxAD
     public class cDMAAddressHalf : WriteOnlyRegister2

@@ -1,5 +1,5 @@
 ﻿using GBAEmulator.CPU;
-using GBAEmulator.Memory.IO;
+using GBAEmulator.IO;
 using System;
 using System.Runtime.CompilerServices;
 

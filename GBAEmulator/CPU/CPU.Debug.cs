@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 
-using GBAEmulator.Memory.IO;
+using GBAEmulator.IO;
 
 namespace GBAEmulator.CPU
 {

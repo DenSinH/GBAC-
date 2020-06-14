@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 
-using GBAEmulator.CPU;
-using GBAEmulator.Memory.IO;
+using GBAEmulator.IO;
 
 namespace GBAEmulator
 {

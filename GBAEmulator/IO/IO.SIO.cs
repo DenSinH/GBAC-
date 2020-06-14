@@ -1,7 +1,6 @@
-﻿using GBAEmulator.Memory.Sections;
-using System;
+﻿using System;
 
-namespace GBAEmulator.Memory.IO
+namespace GBAEmulator.IO
 {
     #region RCNT
     public class cRCNT : IORegister2

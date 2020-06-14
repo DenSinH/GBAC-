@@ -1,7 +1,7 @@
 ﻿using GBAEmulator.Memory.Sections;
 using System;
 
-namespace GBAEmulator.Memory.IO
+namespace GBAEmulator.IO
 {
     #region KEYINPUT
     public class cKeyInput : IORegister2

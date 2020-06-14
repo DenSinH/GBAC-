@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using GBAEmulator.Memory.IO;
+using GBAEmulator.IO;
 
 namespace GBAEmulator.Memory.Backup
 {

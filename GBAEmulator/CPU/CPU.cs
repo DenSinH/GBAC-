@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using GBAEmulator.Memory;
-using GBAEmulator.Memory.Sections;
+using GBAEmulator.IO;
 using GBAEmulator.Bus;
 
 

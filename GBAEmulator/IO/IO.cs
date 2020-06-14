@@ -2,9 +2,9 @@
 using GBAEmulator.Bus;
 using System;
 
-using GBAEmulator.Memory.IO;
+using GBAEmulator.Memory.Sections;
 
-namespace GBAEmulator.Memory.Sections
+namespace GBAEmulator.IO
 {
     public partial class IORAMSection : IMemorySection
     {

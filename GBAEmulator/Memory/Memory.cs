@@ -1,6 +1,7 @@
 ﻿using System;
 
 using GBAEmulator.Memory.Sections;
+using GBAEmulator.IO;
 using GBAEmulator.CPU;
 using GBAEmulator.Bus;
 

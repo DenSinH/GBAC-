@@ -1,9 +1,8 @@
 ﻿using System;
 
 using GBAEmulator.Bus;
-using GBAEmulator.Memory.Sections;
 
-namespace GBAEmulator.Memory.IO
+namespace GBAEmulator.IO
 {
 
     #region DISPCNT

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GBAEmulator.Memory.IO
+namespace GBAEmulator.IO
 {
     #region WAITCNT
     public class cWAITCNT : IORegister2
