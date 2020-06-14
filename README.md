@@ -13,9 +13,11 @@ Done:
   - Alpha Blending
   
 To do:
-  - fix stuff
   - sound
   - Other registers
-  - open bus
+  - better open bus
   - more accurate cycles
   - windowing in BM rendering modes
+
+Known bugs:
+  - None!
