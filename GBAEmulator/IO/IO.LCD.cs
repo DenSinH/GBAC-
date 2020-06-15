@@ -334,22 +334,22 @@ namespace GBAEmulator.IO
     #region Mosaic Function
     public class cMosaic : IORegister2
     {
-        public byte BGMosaicHSize
+        public byte BGMosaicHStretch
         {
             get => (byte)((this._raw & 0x000f) + 1);
         }
 
-        public byte BGMosaicVSize
+        public byte BGMosaicVStretch
         {
             get => (byte)(((this._raw & 0x00f0) >> 4) + 1);
         }
 
-        public byte OBJMosaicHSize
+        public byte OBJMosaicHStretch
         {
             get => (byte)(((this._raw & 0x0f00) >> 8) + 1);
         }
 
-        public byte OBJMosaicVSize
+        public byte OBJMosaicVStretch
         {
             get => (byte)(((this._raw & 0xf000) >> 12) + 1);
         }

@@ -51,7 +51,6 @@ namespace GBAEmulator
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetOBJWindow()
         {
-            this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetWindow<bool>(ref OBJWindow,
                 this.IO.WININ.WindowOBJEnable(Window.Window0), this.IO.WININ.WindowOBJEnable(Window.Window1),
                 this.IO.WINOUT.WindowOBJEnable(Window.OBJ), this.IO.WINOUT.WindowOBJEnable(Window.Outside), true);
@@ -195,7 +194,7 @@ namespace GBAEmulator
 
             byte dy = (byte)(scanline - OBJy);   // between 0 and OBJsz.Height (8, 16, 32, 64)
             if (Mosaic)
-                dy -= (byte)(dy % this.IO.MOSAIC.OBJMosaicVSize);
+                dy -= (byte)(dy % this.IO.MOSAIC.OBJMosaicVStretch);
 
             if (VFlip)
                 dy = (byte)(OBJsz.Height - dy - 1);
@@ -238,7 +237,7 @@ namespace GBAEmulator
                             (uint)(SliverBaseAddress + (0x20 * dTileX)),
                             (uint)(0x200 + PaletteBank * 0x20),
                             Mosaic,
-                            this.IO.MOSAIC.OBJMosaicHSize);
+                            this.IO.MOSAIC.OBJMosaicHStretch);
                     }
                     else
                     {
@@ -250,7 +249,7 @@ namespace GBAEmulator
                             (uint)(SliverBaseAddress + (0x20 * dTileX)),
                             (uint)(0x200 + PaletteBank * 0x20),
                             Mosaic,
-                            this.IO.MOSAIC.OBJMosaicHSize);
+                            this.IO.MOSAIC.OBJMosaicHStretch);
 
                         // update sprite blending mode override
                         this.UpdateOBJMask(StartX, Priority, EnableBlending);
@@ -283,7 +282,7 @@ namespace GBAEmulator
                             XSign,
                             (uint)(SliverBaseAddress + (0x40 * dTileX)),
                             Mosaic,
-                            this.IO.MOSAIC.OBJMosaicHSize,
+                            this.IO.MOSAIC.OBJMosaicHStretch,
                             PaletteOffset: 0x200
                             );
                     }
@@ -296,7 +295,7 @@ namespace GBAEmulator
                             XSign,
                             (uint)(SliverBaseAddress + (0x40 * dTileX)),
                             Mosaic,
-                            this.IO.MOSAIC.OBJMosaicHSize,
+                            this.IO.MOSAIC.OBJMosaicHStretch,
                             PaletteOffset: 0x200
                             );
 

@@ -88,6 +88,11 @@ namespace GBAEmulator.CPU
 
         private void EndDMA(cDMACNT_H dmacnt_h, cDMACNT_L dmacnt_l, cDMAAddress dmasad, cDMAAddress dmadad)
         {
+            // should actually happen at the start, but it does not matter, timers don't IRQ anyway during a DMA
+            InstructionCycles += 2 * ICycle;
+            if (dmadad.Address > 0x0800_0000 && dmasad.Address > 0x0800_0000)
+                InstructionCycles += 2 * ICycle;
+
             // Immediate DMA transfers should ignore the Repeat bit - Fleroviux
             if (dmacnt_h.DMARepeat && dmacnt_h.StartTiming != DMAStartTiming.Immediately)
             {

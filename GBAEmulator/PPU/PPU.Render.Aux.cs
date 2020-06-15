@@ -70,7 +70,7 @@ namespace GBAEmulator
             }
         }
 
-        private void ResetWindow<T>(ref T[] Window, T Win0In, T Win1In, T OBJWinIn, T WinOut, T Default)
+        private void ResetWindow<T>(ref T[] Window, T Win0In, T Win1In, T OBJWinIn, T WinOut, T Default) where T : IComparable
         {
             if (!this.IO.DISPCNT.DisplayOBJWindow() && 
                 !this.IO.DISPCNT.DisplayBGWindow(0) &&
@@ -85,7 +85,7 @@ namespace GBAEmulator
             byte X1, X2, Y1, Y2;
 
             // OBJ layer lowest priority
-            if (this.IO.DISPCNT.DisplayOBJWindow())
+            if (this.IO.DISPCNT.DisplayOBJWindow() && OBJWinIn.CompareTo(WinOut) != 0)
             {
                 for (int x = 0; x < width; x++)
                 {
@@ -295,19 +295,17 @@ namespace GBAEmulator
         }
 
         private void Render4bpp(ref ushort[] Line, bool[] Window, int StartX, int XSign, uint TileLineBaseAddress,
-            uint PaletteBase, bool Mosaic, byte MosaicHSize)
+            uint PaletteBase, bool Mosaic, byte MosaicHStretch)
         {
             // draw 4bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             // PaletteBase must be PaletteBank * 0x20
             byte PaletteNibble;
             int ScreenX = StartX;
-            uint MosaicCorrectedAddress;
             byte VRAMEntry;
             bool UpperNibble;
 
             for (int dx = 0; dx < 4; dx++)  // we need to look at nibbles here
             {
-                MosaicCorrectedAddress = (uint)(TileLineBaseAddress + dx);
                 for (int ddx = 0; ddx < 2; ddx++, ScreenX += XSign)
                 {
                     if (ScreenX < 0 || ScreenX >= width)  // out of bounds render
@@ -316,18 +314,19 @@ namespace GBAEmulator
                     if (Line[ScreenX] != Transparent)  // there is already a nontransparent pixel at this pixel
                         continue;
 
-                    if (Mosaic && MosaicHSize != 1)
+                    if (Mosaic)
                     {
-                        // todo: fix horizontal mosaic
-                        UpperNibble = (((dx << 1) % MosaicHSize) & 1) == 1;
-                        MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize) >> 1;
-                    }
-                    else
-                    {
-                        UpperNibble = ddx == 1;
+                        // todo: migth go wrong if we HFlip
+                        if (ScreenX % MosaicHStretch != 0)
+                        {
+                            Line[ScreenX] = Line[ScreenX - XSign * (XSign * ScreenX % MosaicHStretch)];
+                            continue;
+                        }
                     }
 
-                    VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
+                    UpperNibble = ddx == 1;
+
+                    VRAMEntry = this.gba.mem.VRAM[TileLineBaseAddress + dx];
 
                     PaletteNibble = (byte)(UpperNibble ? ((VRAMEntry & 0xf0) >> 4) : (VRAMEntry & 0x0f));
                     if (PaletteNibble > 0 && (Window?[ScreenX] ?? true))  // non-transparent
@@ -337,12 +336,11 @@ namespace GBAEmulator
         }
 
         private void Render8bpp(ref ushort[] Line, bool[] Window,
-            int StartX, int XSign, uint TileLineBaseAddress, bool Mosaic, byte MosaicHSize, ushort PaletteOffset = 0)
+            int StartX, int XSign, uint TileLineBaseAddress, bool Mosaic, byte MosaicHStretch, ushort PaletteOffset = 0)
         {
             // draw 8bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             int ScreenX = StartX;
             byte VRAMEntry;
-            uint MosaicCorrectedAddress;
 
             for (int dx = 0; dx < 8; dx++, ScreenX += XSign)
             {
@@ -352,11 +350,17 @@ namespace GBAEmulator
                 if (Line[ScreenX] != Transparent)  // there is already a nontransparent pixel at this pixel
                     continue;
 
-                MosaicCorrectedAddress = (uint)(TileLineBaseAddress + dx);
                 if (Mosaic)
-                    MosaicCorrectedAddress -= (MosaicCorrectedAddress % MosaicHSize);
+                {
+                    // todo: might go wrong if we HFlip
+                    if (ScreenX % MosaicHStretch != 0)
+                    {
+                        Line[ScreenX] = Line[XSign - (XSign * ScreenX % MosaicHStretch)];
+                        continue;
+                    }
+                }
 
-                VRAMEntry = this.gba.mem.VRAM[MosaicCorrectedAddress];
+                VRAMEntry = this.gba.mem.VRAM[TileLineBaseAddress + dx];
                 if (VRAMEntry != 0 && (Window?[ScreenX] ?? true))
                     Line[ScreenX] = this.GetPaletteEntry(PaletteOffset + 2 * (uint)VRAMEntry);
             }

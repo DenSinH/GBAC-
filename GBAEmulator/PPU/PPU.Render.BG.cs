@@ -65,7 +65,7 @@ namespace GBAEmulator
         }
 
         private void DrawRegularScreenEntry(ref ushort[] Line, ref bool[] Window, int StartX, byte dy, ushort ScreenEntry,
-                                            byte CharBaseBlock, bool ColorMode, bool Mosaic, byte MosaicHSize)  // based on y = scanline
+                                            byte CharBaseBlock, bool ColorMode, bool Mosaic, byte MosaicHStretch)  // based on y = scanline
         {
             byte PaletteBank = (byte)((ScreenEntry & 0xf000) >> 12);
             bool VFlip = (ScreenEntry & 0x0800) > 0, HFlip = (ScreenEntry & 0x0400) > 0;
@@ -89,14 +89,14 @@ namespace GBAEmulator
                 Address += (uint)(TileID * 0x20);   // Beginning of tile
                 Address += (uint)(dy * 4);          // Beginning of tile sliver
 
-                this.Render4bpp(ref Line, Window, StartX, XSign, Address, (uint)(PaletteBank * 0x20), Mosaic, MosaicHSize);
+                this.Render4bpp(ref Line, Window, StartX, XSign, Address, (uint)(PaletteBank * 0x20), Mosaic, MosaicHStretch);
             }
             else             // 8bpp
             {
                 Address += (uint)(TileID * 0x40);    // similar to 4bpp
                 Address += (uint)(dy * 8);
 
-                this.Render8bpp(ref Line, Window, StartX, XSign, Address, Mosaic, MosaicHSize);
+                this.Render8bpp(ref Line, Window, StartX, XSign, Address, Mosaic, MosaicHStretch);
             }
         }
 
@@ -131,14 +131,14 @@ namespace GBAEmulator
                 // correct address for mosaic
                 EffectiveY = (short)(scanline + VOFS);
                 if (Mosaic)
-                    EffectiveY -= (short)(EffectiveY % this.IO.MOSAIC.BGMosaicVSize);
+                    EffectiveY -= (short)(EffectiveY % this.IO.MOSAIC.BGMosaicVStretch);
 
                 for (sbyte CourseX = -1; CourseX < 31; CourseX++)
                 {
                     EffectiveX = (short)((CourseX << 3) + HOFS);
 
                     if (Mosaic)
-                        EffectiveX -= (short)(EffectiveX % this.IO.MOSAIC.BGMosaicHSize);
+                        EffectiveX -= (short)(EffectiveX % this.IO.MOSAIC.BGMosaicHStretch);
 
                     // ScreenEntryIndex is the index of the screenentry for the tile we are currently rendering
                     ScreenEntryIndex = PPU.VRAMIndexRegular((int)(EffectiveX >> 3), (int)((EffectiveY) >> 3), BGSize);
@@ -155,7 +155,7 @@ namespace GBAEmulator
                         CharBaseBlock: CharBaseBlock,
                         ColorMode: ColorMode,
                         Mosaic: Mosaic,
-                        MosaicHSize: this.IO.MOSAIC.BGMosaicHSize
+                        MosaicHStretch: this.IO.MOSAIC.BGMosaicHStretch
                         );
                 }
             }
@@ -196,7 +196,7 @@ namespace GBAEmulator
             byte CharBaseBlock = BGCNT.CharBaseBlock;
             uint ScreenEntryBaseAddress = (uint)BGCNT.ScreenBaseBlock * 0x800;
             //byte Priority      = BGCNT.BGPriority;
-            //bool Mosaic        = BGCNT.Mosaic;
+            bool Mosaic        = BGCNT.Mosaic;
 
             uint ScreenEntryIndex;
             byte AffineScreenEntry;
