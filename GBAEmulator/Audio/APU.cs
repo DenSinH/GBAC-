@@ -15,12 +15,15 @@ namespace GBAEmulator.Audio
         private readonly IORAMSection IO;
         private int Timer;
         private int FrameSequencer;
-        private const int FrameSequencerFrequency = 512;
+        private const int FrameSequencerPeriod = 0x8000;
         private cEventQueue EventQueue = new cEventQueue(8);  // how many events at once (1 for each channel, framecounter, etc.)
 
         public readonly SquareChannel sq1 = new SquareChannel();
         public readonly SquareChannel sq2 = new SquareChannel();
         public readonly NoiseChannel noise = new NoiseChannel();
+        public readonly WaveChannel wave = new WaveChannel();
+
+        private readonly Channel[] Channels;
 
         public readonly Speaker speaker = new Speaker();
         private const double Amplitude = 0.05;
@@ -28,13 +31,12 @@ namespace GBAEmulator.Audio
         public APU(IORAMSection IO)
         {
             this.IO = IO;
+            this.Channels = new Channel[] { sq1, sq2, wave, noise };
 
             // todo: add initial EventQueue events
             // initial Frame sequencer event
-            this.EventQueue.Push(new Event(ARM7TDMI.Frequency / FrameSequencerFrequency, this.TickFrameSequencer));
-            this.EventQueue.Push(new Event(ARM7TDMI.Frequency / this.sq1.Frequency, this.sq1.Tick));
-            this.EventQueue.Push(new Event(ARM7TDMI.Frequency / this.sq2.Frequency, this.sq2.Tick));
-            this.EventQueue.Push(new Event(ARM7TDMI.Frequency / this.noise.Frequency, this.noise.Tick));
+            this.EventQueue.Push(new Event(FrameSequencerPeriod, this.TickFrameSequencer));
+            foreach (Channel ch in this.Channels) this.EventQueue.Push(new Event(ch.Period, ch.Tick));
             this.EventQueue.Push(new Event(ARM7TDMI.Frequency / Speaker.SampleFrequency, this.ProvideSample));
         }
 
@@ -52,9 +54,26 @@ namespace GBAEmulator.Audio
         private Event TickFrameSequencer(int time)
         {
             this.FrameSequencer++;
-            // todo: add frame sequencer events
+            switch (this.FrameSequencer & 7)
+            {
+                case 0:
+                case 4:
+                    foreach (Channel ch in this.Channels) ch.TickLengthCounter();
+                    break;
 
-            return new Event(time + ARM7TDMI.Frequency / FrameSequencerFrequency, this.TickFrameSequencer);
+                case 2:
+                    foreach (Channel ch in this.Channels) ch.TickLengthCounter();
+                    break;
+
+                case 6:
+                    foreach (Channel ch in this.Channels) ch.TickLengthCounter();
+                    break;
+
+                case 7:
+                    break;
+            }
+
+            return new Event(time + FrameSequencerPeriod, this.TickFrameSequencer);
         }
 
         private Event ProvideSample(int time)
@@ -64,6 +83,7 @@ namespace GBAEmulator.Audio
             short SampleValue = 0;
             SampleValue += (short)(Amplitude * this.sq1.GetSample());
             SampleValue += (short)(Amplitude * this.sq2.GetSample());
+            SampleValue += (short)(Amplitude * this.wave.GetSample());
             SampleValue += (short)(Amplitude * this.noise.GetSample());
             this.speaker.AddSample(SampleValue, SampleValue);
 

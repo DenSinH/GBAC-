@@ -10,7 +10,7 @@ namespace GBAEmulator.Audio.Channels
 
         public NoiseChannel()
         {
-            this.Frequency = 524288;
+            this.Period = 128 * 2048;
         }
 
         public override short GetSample()
@@ -27,7 +27,7 @@ namespace GBAEmulator.Audio.Channels
             // return (short)((2 * Generator.NextDouble() - 1) * short.MaxValue * this.Volume / 16);
             // Console.Write(this.ShiftRegister & 1);
 
-            return (((~this.ShiftRegister) & 1) == 1) ? (short)(short.MaxValue * this.Volume / 16) : (short)(short.MinValue * this.Volume / 16);
+            return (short)(((((~this.ShiftRegister) & 1) == 1) ? short.MaxValue : short.MinValue)  *this.Volume / 16);
         }
 
         public override void Trigger()

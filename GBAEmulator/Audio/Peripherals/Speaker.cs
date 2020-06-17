@@ -77,13 +77,16 @@ namespace GBAEmulator.Audio.Peripherals
         public bool NeedMoreSamples
         {
             // Longer buffer: more delay, less artifacts
-            get => this.Buffer.BufferedBytes <= 0x10 * TempBuffer.Length;
+            get 
+            {
+                return this.Buffer.BufferedBytes <= 0x8 * TempBuffer.Length || TempBufferedSamples != 0;
+            }
         }
 
         private static void Play(BufferedWaveProvider bf, cShutDownEvent sd)
         {
             WaveOut wo = new WaveOut();
-            // wo.DesiredLatency = 10;
+            wo.DesiredLatency = 20;
             wo.NumberOfBuffers = 50;
             wo.Init(bf);
             wo.Play();

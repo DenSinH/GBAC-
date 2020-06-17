@@ -67,8 +67,9 @@ namespace GBAEmulator.IO
         {
             base.Set(value, setlow, sethigh);
 
-            // square wave channels tick 8 times as fast because of the pulse width setting
-            this.Master.Frequency = 8 * 131072 / (2048 - (this._raw & 0x07ff));
+            // square wave channels tick 8 times as fast because of the pulse width setting,
+            // so 128 / 8 = 16, 128 = ARM7TDMI.Frequency / 131072
+            this.Master.Period = 16 * (2048 - (this._raw & 0x07ff));
             this.Master.LengthFlag = (this._raw & 0x4000) > 0;
             if (this._raw >= 0x8000) this.Master.Trigger();
         }

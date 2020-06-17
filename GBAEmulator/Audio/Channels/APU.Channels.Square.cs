@@ -17,7 +17,7 @@ namespace GBAEmulator.Audio.Channels
         public SquareChannel()
         {
             this.Duty = DutyCycles[0];
-            this.Frequency = 64;  // default value
+            this.Period = 128 * 2048;  // default value
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -37,7 +37,7 @@ namespace GBAEmulator.Audio.Channels
             if (this.Volume == 0)
                 return 0;
 
-            return (((this.Duty >> this.Index) & 1) == 1) ? (short)(short.MaxValue * this.Volume / 16): (short)(short.MinValue * this.Volume / 16);
+            return (short)(((((this.Duty >> this.Index) & 1) == 1) ? short.MaxValue: short.MinValue) * this.Volume / 16);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

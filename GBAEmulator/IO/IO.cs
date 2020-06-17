@@ -128,8 +128,8 @@ namespace GBAEmulator.IO
         }
 
         public void Init(ARM7TDMI cpu, APU apu)
-        { 
-            // LCD I/O Registers
+        {
+            // ========================== LCD Registers ==========================
             this.Storage[0x00] = this.Storage[0x01] = this.DISPCNT;
             this.Storage[0x02] = this.Storage[0x03] = new DefaultRegister();  // green swap
             this.Storage[0x04] = this.Storage[0x05] = this.DISPSTAT;
@@ -192,6 +192,7 @@ namespace GBAEmulator.IO
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
 
+            // ========================== Sound Registers ==========================
             this.Storage[0x60] = this.Storage[0x61] = new SquareCNT_L(apu.sq1);
             this.Storage[0x62] = this.Storage[0x63] = new SquareCNT_H(apu.sq1);
             this.Storage[0x64] = this.Storage[0x65] = new SquareCNT_X(apu.sq1);
@@ -200,25 +201,34 @@ namespace GBAEmulator.IO
             this.Storage[0x68] = this.Storage[0x69] = new SquareCNT_H(apu.sq2);
             this.Storage[0x6a] = this.Storage[0x6b] = this.MasterUnusedRegister.upper;
             this.Storage[0x6c] = this.Storage[0x6d] = new SquareCNT_X(apu.sq1);
+            this.Storage[0x6e] = this.Storage[0x6f] = this.MasterUnusedRegister.upper;
 
-            // Sound Registers
-            for (int i = 0x6e; i <= 0xa6; i += 2)
-            {
-                // double length no registers
-                this.Storage[i] = this.Storage[i + 1] = new DefaultRegister();
-            }
+            this.Storage[0x70] = this.Storage[0x71] = new WaveCNT_L(apu.wave);
+            this.Storage[0x72] = this.Storage[0x73] = new WaveCNT_H(apu.wave);
+            this.Storage[0x74] = this.Storage[0x75] = new WaveCNT_X(apu.wave);
+            this.Storage[0x76] = this.Storage[0x77] = this.MasterUnusedRegister.upper;
 
             this.Storage[0x78] = this.Storage[0x79] = new NoiseCNT_L(apu.noise);
             this.Storage[0x7a] = this.Storage[0x7b] = this.MasterUnusedRegister.upper;
             this.Storage[0x7c] = this.Storage[0x7d] = new NoiseCNT_H(apu.noise);
+            this.Storage[0x7e] = this.Storage[0x7f] = this.MasterUnusedRegister.upper;
 
-            for (int i = 0xa8; i < 0xb0; i += 4)
+            for (int i = 0x80; i < 0x90; i += 2)
+            {
+                // double length default registers
+                this.Storage[i] = this.Storage[i + 1] = new DefaultRegister();
+            }
+
+            for (int i = 0; i < 0x10; i += 2) this.Storage[0x90 + i] = this.Storage[0x91 + i] = new WAVE_RAM(apu.wave, i);
+
+
+            for (int i = 0xa0; i < 0xb0; i += 4)
             {
                 this.Storage[i]     = this.Storage[i + 1] = this.MasterUnusedRegister.lower;
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
 
-            // DMA Transfer Channels
+            // ======================= DMA Transfer Channels =======================
             this.Storage[0xb0] = this.Storage[0xb1] = this.DMASAD[0].lower;
             this.Storage[0xb2] = this.Storage[0xb3] = this.DMASAD[0].upper;
             this.Storage[0xb4] = this.Storage[0xb5] = this.DMADAD[0].lower;
@@ -253,7 +263,7 @@ namespace GBAEmulator.IO
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
 
-            // Timer Registers
+            // ========================== Timer Registers ==========================
             this.Storage[0x100] = this.Storage[0x101] = cpu.Timers[0].Data;
             this.Storage[0x102] = this.Storage[0x103] = cpu.Timers[0].Control;
 
@@ -272,7 +282,7 @@ namespace GBAEmulator.IO
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
 
-            // Serial Communication (1)
+            // ============================ SIO (1) ============================
             this.Storage[0x120] = this.Storage[0x121] = this.SIODATA32.lower;  // shared
             this.Storage[0x122] = this.Storage[0x123] = this.SIODATA32.upper;  // shared
             this.Storage[0x124] = this.Storage[0x125] = new DefaultRegister();
@@ -283,11 +293,11 @@ namespace GBAEmulator.IO
             this.Storage[0x012c] = this.Storage[0x012d] = this.MasterUnusedRegister.lower;
             this.Storage[0x012e] = this.Storage[0x012f] = this.MasterUnusedRegister.upper;
 
-            // Keypad Input
+            // =========================== Keypad Input ========================
             this.Storage[0x0130] = this.Storage[0x0131] = this.KEYINPUT;
             this.Storage[0x0132] = this.Storage[0x0133] = this.KEYCNT;
 
-            // Serial Communication (2)
+            // ============================ SIO (2) ============================
             this.Storage[0x134] = this.Storage[0x135] = this.RCNT;
 
             this.Storage[0x136] = this.Storage[0x137] = this.MasterUnusedRegister.upper;  // note offset!
@@ -318,7 +328,7 @@ namespace GBAEmulator.IO
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
 
-            // Interrupt, Waitstate and Power-Down Control
+            // ========== Interrupt, Waitstate and Power-Down Control ===========
             this.Storage[0x0200] = this.Storage[0x0201] = this.IE;
             this.Storage[0x0202] = this.Storage[0x0203] = this.IF;
             this.Storage[0x0204] = this.Storage[0x0205] = this.WAITCNT;

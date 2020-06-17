@@ -10,7 +10,7 @@ namespace GBAEmulator.Audio.Channels
         public int LengthCounter;
         public bool LengthFlag;
         protected bool Enabled;
-        public int Frequency;
+        public int Period;
         public int Volume;
 
         public abstract short GetSample();
@@ -19,7 +19,7 @@ namespace GBAEmulator.Audio.Channels
         public Event Tick(int Time)
         {
             this.OnTick();
-            return new Event(Time + ARM7TDMI.Frequency / this.Frequency, this.Tick);
+            return new Event(Time + this.Period, this.Tick);
         }
 
         public void TickLengthCounter()
@@ -31,6 +31,7 @@ namespace GBAEmulator.Audio.Channels
         public virtual void Trigger()
         {
             this.Enabled = true;
+            if (this.LengthCounter == 0) this.LengthCounter = 64;
         }
     }
 }

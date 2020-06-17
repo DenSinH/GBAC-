@@ -48,14 +48,15 @@ namespace GBAEmulator.IO
 
             int r = this._raw & 0x0007;
             int s = (this._raw & 0x00f0) >> 4;
+            // ARM7TDMI.Frequency / 524288 = 32
             if (r == 0)
             {
                 // interpret as 0.5 instead
-                this.Master.Frequency = 524288 / (1 << s);
+                this.Master.Period = 32 * 2 * (2 << s);
             }
             else
             {
-                this.Master.Frequency = 524288 / (r * (2 << s));
+                this.Master.Period = 32 * (r * (2 << s));
             }
 
             this.Master.CounterStepWidth = (this._raw & 0x0008) > 0;
