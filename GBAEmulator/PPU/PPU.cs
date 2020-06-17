@@ -2,7 +2,7 @@
 
 using GBAEmulator.IO;
 
-namespace GBAEmulator
+namespace GBAEmulator.Video
 {
     public partial class PPU
     {

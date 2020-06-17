@@ -104,6 +104,7 @@ namespace GBAEmulator
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             this.gba.ShutDown = true;
+            this.gba.apu.speaker.ShutDown();
             this.DebugScreen?.Close();
             base.OnFormClosing(e);
         }

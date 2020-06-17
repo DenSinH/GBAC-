@@ -4,6 +4,8 @@ using System;
 
 using GBAEmulator.Memory.Sections;
 using System.Diagnostics;
+using GBAEmulator.Audio.Channels;
+using GBAEmulator.Audio;
 
 namespace GBAEmulator.IO
 {
@@ -77,10 +79,8 @@ namespace GBAEmulator.IO
 
         public readonly cPOSTFLG_HALTCNT HALTCNT = new cPOSTFLG_HALTCNT();
 
-        public IORAMSection(ARM7TDMI cpu)
+        public IORAMSection(BUS bus)
         {
-            BUS bus = cpu.bus;
-
             this.DISPSTAT = new cDISPSTAT(this.IF);
             this.VCOUNT = new cVCOUNT(this.IF, this.DISPSTAT);
             this.BGHOFS = new cBGScrolling[4] { new cBGScrolling(bus, true), new cBGScrolling(bus, false),
@@ -125,11 +125,9 @@ namespace GBAEmulator.IO
                                                new cDMACNT_H(DMASAD[3], DMADAD[3], DMACNT_L[3], 3, true) };
 
             this.MasterUnusedRegister = new UnusedRegister(bus);
-
-            this.Init(cpu);
         }
 
-        private void Init(ARM7TDMI cpu)
+        public void Init(ARM7TDMI cpu, SquareChannel sq1, SquareChannel sq2)
         { 
             // LCD I/O Registers
             this.Storage[0x00] = this.Storage[0x01] = this.DISPCNT;
@@ -194,8 +192,17 @@ namespace GBAEmulator.IO
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
 
+            this.Storage[0x60] = this.Storage[0x61] = new SquareSOUNDCNT_L(sq1);
+            this.Storage[0x62] = this.Storage[0x63] = new SquareSOUNDCNT_H(sq1);
+            this.Storage[0x64] = this.Storage[0x65] = new SquareSOUNDCNT_X(sq1);
+            this.Storage[0x66] = this.Storage[0x67] = this.MasterUnusedRegister.upper;
+
+            this.Storage[0x68] = this.Storage[0x69] = new SquareSOUNDCNT_H(sq2);
+            this.Storage[0x6a] = this.Storage[0x6b] = this.MasterUnusedRegister.upper;
+            this.Storage[0x6c] = this.Storage[0x6d] = new SquareSOUNDCNT_X(sq1);
+
             // Sound Registers
-            for (int i = 0x60; i <= 0xa6; i += 2)
+            for (int i = 0x6e; i <= 0xa6; i += 2)
             {
                 // double length no registers
                 this.Storage[i] = this.Storage[i + 1] = new DefaultRegister();

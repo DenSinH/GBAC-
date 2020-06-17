@@ -7,7 +7,7 @@ using System.Linq;
 using GBAEmulator.Memory;
 using GBAEmulator.IO;
 using GBAEmulator.Bus;
-
+using GBAEmulator.Audio.Channels;
 
 namespace GBAEmulator.CPU
 {
@@ -16,6 +16,7 @@ namespace GBAEmulator.CPU
         /*
          Emulation of the ARM7TDMI CPU
         */
+        public const int Frequency = 1 << 24;
         public State state { get; private set; }
         public readonly cPipeline Pipeline;
         private readonly GBA gba;
@@ -38,7 +39,7 @@ namespace GBAEmulator.CPU
             this.bus = new BUS(this);
 
             // mem requires IO to be initialized
-            this.IO = new IORAMSection(this);
+            this.IO = new IORAMSection(this.bus);
 
             this.mem = new MEM(this);
 

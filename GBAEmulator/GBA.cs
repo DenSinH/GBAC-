@@ -1,15 +1,19 @@
 ﻿using System;
 
 using GBAEmulator.CPU;
+using GBAEmulator.Video;
 using GBAEmulator.Memory;
 using GBAEmulator.Bus;
 using GBAEmulator.IO;
+using GBAEmulator.Audio;
+using GBAEmulator.Audio.Channels;
 
 namespace GBAEmulator
 {
     public class GBA
     {
         public ARM7TDMI cpu;
+        public APU apu;
         public PPU ppu;
         public IORAMSection IO;
         public MEM mem;
@@ -25,11 +29,14 @@ namespace GBAEmulator
         public GBA(ushort[] display)
         {
             this.cpu = new ARM7TDMI(this);
+            this.IO  = this.cpu.IO;
             this.mem = this.cpu.mem;
             this.bus = this.cpu.bus;
-            this.IO  = this.cpu.IO;
 
+            this.apu = new APU(this.IO);
             this.ppu = new PPU(this, display, this.IO);
+
+            this.IO.Init(this.cpu, this.apu.sq1, this.apu.sq2);
 
             this.display = display;
         }
@@ -101,7 +108,11 @@ namespace GBAEmulator
 
             this.cycle += NonHBlankCycles;
             while (this.cycle > 0)
-                this.cycle -= this.cpu.Step();
+            {
+                int cycles = this.cpu.Step();
+                this.apu.Tick(cycles);
+                this.cycle -= cycles;
+            }
 
             /* HBLANK */
             if (this.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable))
@@ -116,13 +127,21 @@ namespace GBAEmulator
             //   - one where the HBlank flag is set
             this.cycle += HBlankNoFlagCycles;
             while (this.cycle > 0)
-                this.cycle -= this.cpu.Step();
+            {
+                int cycles = this.cpu.Step();
+                this.apu.Tick(cycles);
+                this.cycle -= cycles;
+            }
 
             this.mem.IO.DISPSTAT.SetHBlank(true);
 
             this.cycle += HBlankWithFlagCycles;
             while (this.cycle > 0)
-                this.cycle -= this.cpu.Step();
+            {
+                int cycles = this.cpu.Step();
+                this.apu.Tick(cycles);
+                this.cycle -= cycles;
+            }
 
             this.mem.IO.BG2X.UpdateInternal((uint)this.mem.IO.BG2PB.Full);
             this.mem.IO.BG2Y.UpdateInternal((uint)this.mem.IO.BG2PD.Full);
@@ -132,14 +151,14 @@ namespace GBAEmulator
 
         public void Run()
         {
-            this.mem.LoadRom("../../../roms/PokemonEmerald.gba");
+            this.mem.LoadRom("../../../roms/MMBN6.gba");
             // this.mem.LoadRom("../../../Tests/Krom/BIOSRLE.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
             // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
             // this.mem.LoadRom("../../../Tests/GBASuiteNew/bios.gba");
-            // this.mem.LoadRom("../../../Tests/Tonc/win_demo.gba");
-            // this.mem.LoadRom("../../../Tests/EndriftSuite.gba");
+            // this.mem.LoadRom("../../../Tests/Tonc/snd1_demo.gba");
+            // this.mem.LoadRom("../../../Tests/AgingCard.gba");
 
             // this.cpu.mem.UseNormattsBios();
             cpu.SkipBios();

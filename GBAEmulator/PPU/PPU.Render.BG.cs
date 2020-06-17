@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 using GBAEmulator.IO;
 
-namespace GBAEmulator
+namespace GBAEmulator.Video
 {
     partial class PPU
     {

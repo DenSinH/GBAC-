@@ -3,7 +3,7 @@ using System.Threading;
 
 using GBAEmulator.CPU;
 
-namespace GBAEmulator
+namespace GBAEmulator.Video
 {
     partial class PPU
     {
