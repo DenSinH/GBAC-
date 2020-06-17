@@ -20,9 +20,10 @@ namespace GBAEmulator.Audio
 
         public readonly SquareChannel sq1 = new SquareChannel();
         public readonly SquareChannel sq2 = new SquareChannel();
+        public readonly NoiseChannel noise = new NoiseChannel();
 
         public readonly Speaker speaker = new Speaker();
-        private const double Amplitude = 0.02;
+        private const double Amplitude = 0.05;
 
         public APU(IORAMSection IO)
         {
@@ -33,13 +34,16 @@ namespace GBAEmulator.Audio
             this.EventQueue.Push(new Event(ARM7TDMI.Frequency / FrameSequencerFrequency, this.TickFrameSequencer));
             this.EventQueue.Push(new Event(ARM7TDMI.Frequency / this.sq1.Frequency, this.sq1.Tick));
             this.EventQueue.Push(new Event(ARM7TDMI.Frequency / this.sq2.Frequency, this.sq2.Tick));
+            this.EventQueue.Push(new Event(ARM7TDMI.Frequency / this.noise.Frequency, this.noise.Tick));
             this.EventQueue.Push(new Event(ARM7TDMI.Frequency / Speaker.SampleFrequency, this.ProvideSample));
         }
 
         public void Tick(int cycles)
         {
             this.Timer += cycles;
-            while (this.EventQueue.Count > 0 && this.Timer - this.EventQueue.Peek().Time > 0)
+            // assume only 1 audio event per CPU instruction
+            // even if this is not true, the delay will be minimal
+            if (this.EventQueue.Count > 0 && this.Timer - this.EventQueue.Peek().Time > 0)
             {
                 this.EventQueue.Push(this.EventQueue.Pop().Handle());
             }
@@ -60,6 +64,7 @@ namespace GBAEmulator.Audio
             short SampleValue = 0;
             SampleValue += (short)(Amplitude * this.sq1.GetSample());
             SampleValue += (short)(Amplitude * this.sq2.GetSample());
+            SampleValue += (short)(Amplitude * this.noise.GetSample());
             this.speaker.AddSample(SampleValue, SampleValue);
 
             return new Event(time + ARM7TDMI.Frequency / Speaker.SampleFrequency, this.ProvideSample);

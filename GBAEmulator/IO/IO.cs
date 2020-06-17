@@ -127,7 +127,7 @@ namespace GBAEmulator.IO
             this.MasterUnusedRegister = new UnusedRegister(bus);
         }
 
-        public void Init(ARM7TDMI cpu, SquareChannel sq1, SquareChannel sq2)
+        public void Init(ARM7TDMI cpu, APU apu)
         { 
             // LCD I/O Registers
             this.Storage[0x00] = this.Storage[0x01] = this.DISPCNT;
@@ -192,14 +192,14 @@ namespace GBAEmulator.IO
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;
             }
 
-            this.Storage[0x60] = this.Storage[0x61] = new SquareSOUNDCNT_L(sq1);
-            this.Storage[0x62] = this.Storage[0x63] = new SquareSOUNDCNT_H(sq1);
-            this.Storage[0x64] = this.Storage[0x65] = new SquareSOUNDCNT_X(sq1);
+            this.Storage[0x60] = this.Storage[0x61] = new SquareCNT_L(apu.sq1);
+            this.Storage[0x62] = this.Storage[0x63] = new SquareCNT_H(apu.sq1);
+            this.Storage[0x64] = this.Storage[0x65] = new SquareCNT_X(apu.sq1);
             this.Storage[0x66] = this.Storage[0x67] = this.MasterUnusedRegister.upper;
 
-            this.Storage[0x68] = this.Storage[0x69] = new SquareSOUNDCNT_H(sq2);
+            this.Storage[0x68] = this.Storage[0x69] = new SquareCNT_H(apu.sq2);
             this.Storage[0x6a] = this.Storage[0x6b] = this.MasterUnusedRegister.upper;
-            this.Storage[0x6c] = this.Storage[0x6d] = new SquareSOUNDCNT_X(sq1);
+            this.Storage[0x6c] = this.Storage[0x6d] = new SquareCNT_X(apu.sq1);
 
             // Sound Registers
             for (int i = 0x6e; i <= 0xa6; i += 2)
@@ -207,6 +207,10 @@ namespace GBAEmulator.IO
                 // double length no registers
                 this.Storage[i] = this.Storage[i + 1] = new DefaultRegister();
             }
+
+            this.Storage[0x78] = this.Storage[0x79] = new NoiseCNT_L(apu.noise);
+            this.Storage[0x7a] = this.Storage[0x7b] = this.MasterUnusedRegister.upper;
+            this.Storage[0x7c] = this.Storage[0x7d] = new NoiseCNT_H(apu.noise);
 
             for (int i = 0xa8; i < 0xb0; i += 4)
             {

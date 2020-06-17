@@ -5,11 +5,11 @@ using GBAEmulator.Audio.Channels;
 
 namespace GBAEmulator.IO
 {
-    public class SquareSOUNDCNT_L : IORegister2
+    public class SquareCNT_L : IORegister2
     {
         private readonly SquareChannel Master;
 
-        public SquareSOUNDCNT_L(SquareChannel Master)
+        public SquareCNT_L(SquareChannel Master)
         {
             this.Master = Master;
         }
@@ -22,11 +22,11 @@ namespace GBAEmulator.IO
         }
     }
 
-    public class SquareSOUNDCNT_H : IORegister2
+    public class SquareCNT_H : IORegister2
     {
         private readonly SquareChannel Master;
 
-        public SquareSOUNDCNT_H(SquareChannel Master)
+        public SquareCNT_H(SquareChannel Master)
         {
             this.Master = Master;
         }
@@ -40,8 +40,8 @@ namespace GBAEmulator.IO
         {
             base.Set(value, setlow, sethigh);
 
-            this.Master.SetDuty((this._raw >> 6) & 0x3);
             this.Master.LengthCounter = this._raw & 0x001f;
+            this.Master.SetDuty((this._raw >> 6) & 0x3);
 
             this.Master.Volume = (this._raw & 0xf000) >> 12;
 
@@ -49,11 +49,11 @@ namespace GBAEmulator.IO
         }
     }
 
-    public class SquareSOUNDCNT_X : IORegister2
+    public class SquareCNT_X : IORegister2
     {
         private readonly SquareChannel Master;
 
-        public SquareSOUNDCNT_X(SquareChannel Master)
+        public SquareCNT_X(SquareChannel Master)
         {
             this.Master = Master;
         }
@@ -67,9 +67,10 @@ namespace GBAEmulator.IO
         {
             base.Set(value, setlow, sethigh);
 
-            this.Master.Frequency = 131072 / (2048 - (this._raw & 0x07ff));
+            // square wave channels tick 8 times as fast because of the pulse width setting
+            this.Master.Frequency = 8 * 131072 / (2048 - (this._raw & 0x07ff));
             this.Master.LengthFlag = (this._raw & 0x4000) > 0;
-            if (this._raw > 0x8000) this.Master.Trigger();
+            if (this._raw >= 0x8000) this.Master.Trigger();
         }
     }
 }

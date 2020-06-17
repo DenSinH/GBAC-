@@ -28,7 +28,7 @@ namespace GBAEmulator.Audio.Channels
                 this.LengthCounter--;
         }
 
-        public void Trigger()
+        public virtual void Trigger()
         {
             this.Enabled = true;
         }
