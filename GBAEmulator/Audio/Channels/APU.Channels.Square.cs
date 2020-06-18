@@ -14,6 +14,10 @@ namespace GBAEmulator.Audio.Channels
 
         private int Index = 0;
         private byte Duty;
+
+        public int SweepNumber;
+        public bool SweepDir;
+        public int SweepTime;
         public SquareChannel()
         {
             this.Duty = DutyCycles[0];
@@ -25,18 +29,21 @@ namespace GBAEmulator.Audio.Channels
         {
             this.Duty = DutyCycles[index];
         }
-        
-        public override short GetSample()
+
+        public void DoSweep()
         {
-            if (!this.Enabled)
-                return 0;
+            if (SweepTime > 0)
+            {
+                SweepTime--;
+                int dPeriod = this.Period / (1 + (1 << SweepNumber));
+                if (!SweepDir) dPeriod *= -1;
 
-            if (this.LengthFlag && (this.LengthCounter == 0))
-                return 0;
-
-            if (this.Volume == 0)
-                return 0;
-
+                this.Period += dPeriod;
+            }
+        }
+        
+        protected override short GetSample()
+        {
             return (short)(((((this.Duty >> this.Index) & 1) == 1) ? short.MaxValue: short.MinValue) * this.Volume / 16);
         }
 

@@ -16,6 +16,7 @@ namespace GBAEmulator.Audio
         private int Timer;
         private int FrameSequencer;
         private const int FrameSequencerPeriod = 0x8000;
+        private const int SamplePeriod = ARM7TDMI.Frequency / Speaker.SampleFrequency;
         private cEventQueue EventQueue = new cEventQueue(8);  // how many events at once (1 for each channel, framecounter, etc.)
 
         public readonly SquareChannel sq1 = new SquareChannel();
@@ -23,7 +24,18 @@ namespace GBAEmulator.Audio
         public readonly NoiseChannel noise = new NoiseChannel();
         public readonly WaveChannel wave = new WaveChannel();
 
-        private readonly Channel[] Channels;
+        /* SOUNDCNT_L params */
+        public uint MasterVolumeRight;  // 0 - 7
+        public uint MasterVolumeLeft;   // 0 - 7
+        public bool[] MasterEnableRight = new bool[4];
+        public bool[] MasterEnableLeft = new bool[4];
+
+        /* SOUNDCNT_X params */
+
+        /* SOUNDCNT_H params */
+
+
+        public readonly Channel[] Channels;
 
         public readonly Speaker speaker = new Speaker();
         private const double Amplitude = 0.05;
@@ -62,14 +74,15 @@ namespace GBAEmulator.Audio
                     break;
 
                 case 2:
-                    foreach (Channel ch in this.Channels) ch.TickLengthCounter();
-                    break;
-
                 case 6:
                     foreach (Channel ch in this.Channels) ch.TickLengthCounter();
+                    this.sq1.DoSweep();
                     break;
 
                 case 7:
+                    this.sq1.DoEnvelope();
+                    this.sq2.DoEnvelope();
+                    this.noise.DoEnvelope();
                     break;
             }
 
@@ -79,15 +92,29 @@ namespace GBAEmulator.Audio
         private Event ProvideSample(int time)
         {
             while (!this.speaker.NeedMoreSamples) { }  // prevent buffer overflow
+            int SampleLeft = 0, SampleRight = 0;
+            
+            for (int i = 0; i < 4; i++)
+            {
+                if (this.MasterEnableRight[i])
+                {
+                    SampleRight += this.Channels[i].CurrentSample;
+                }
+                if (this.MasterEnableLeft[i])
+                {
+                    SampleLeft += this.Channels[i].CurrentSample;
+                }
+            }
 
-            short SampleValue = 0;
-            SampleValue += (short)(Amplitude * this.sq1.GetSample());
-            SampleValue += (short)(Amplitude * this.sq2.GetSample());
-            SampleValue += (short)(Amplitude * this.wave.GetSample());
-            SampleValue += (short)(Amplitude * this.noise.GetSample());
-            this.speaker.AddSample(SampleValue, SampleValue);
+            SampleRight = (int)(SampleRight * Amplitude);
+            SampleLeft = (int)(SampleLeft * Amplitude);
 
-            return new Event(time + ARM7TDMI.Frequency / Speaker.SampleFrequency, this.ProvideSample);
+            SampleRight = (int)((SampleRight * this.MasterVolumeRight) / 8);
+            SampleLeft = (int)((SampleLeft * this.MasterVolumeLeft) / 8);
+
+            this.speaker.AddSample((short)SampleLeft, (short)SampleRight);
+
+            return new Event(time + SamplePeriod, this.ProvideSample);
         }
     }
 }

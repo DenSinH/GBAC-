@@ -41,7 +41,7 @@ namespace GBAEmulator.IO
         {
             base.Set((ushort)(value & 0xe0ff), setlow, sethigh);
             if (setlow)
-                this.Master.LengthCounter = this._raw & 0x00ff;
+                this.Master.LengthCounter = (256 - this._raw & 0x00ff);
 
             if (sethigh)
             {

@@ -200,7 +200,7 @@ namespace GBAEmulator.IO
 
             this.Storage[0x68] = this.Storage[0x69] = new SquareCNT_H(apu.sq2);
             this.Storage[0x6a] = this.Storage[0x6b] = this.MasterUnusedRegister.upper;
-            this.Storage[0x6c] = this.Storage[0x6d] = new SquareCNT_X(apu.sq1);
+            this.Storage[0x6c] = this.Storage[0x6d] = new SquareCNT_X(apu.sq2);
             this.Storage[0x6e] = this.Storage[0x6f] = this.MasterUnusedRegister.upper;
 
             this.Storage[0x70] = this.Storage[0x71] = new WaveCNT_L(apu.wave);
@@ -213,11 +213,15 @@ namespace GBAEmulator.IO
             this.Storage[0x7c] = this.Storage[0x7d] = new NoiseCNT_H(apu.noise);
             this.Storage[0x7e] = this.Storage[0x7f] = this.MasterUnusedRegister.upper;
 
-            for (int i = 0x80; i < 0x90; i += 2)
-            {
-                // double length default registers
-                this.Storage[i] = this.Storage[i + 1] = new DefaultRegister();
-            }
+            this.Storage[0x80] = this.Storage[0x81] = new SOUNDCNT_L(apu);
+            this.Storage[0x82] = this.Storage[0x83] = new DefaultRegister();
+            this.Storage[0x84] = this.Storage[0x85] = new SOUNDCNT_X(apu);
+            this.Storage[0x86] = this.Storage[0x87] = this.MasterUnusedRegister.upper;
+            this.Storage[0x88] = this.Storage[0x89] = new DefaultRegister();  // SOUNDBIAS (unnecessary?)
+
+            this.Storage[0x8a] = this.Storage[0x8b] = this.MasterUnusedRegister.lower;
+            this.Storage[0x8c] = this.Storage[0x8d] = this.MasterUnusedRegister.upper;
+            this.Storage[0x8e] = this.Storage[0x8f] = this.MasterUnusedRegister.lower;
 
             for (int i = 0; i < 0x10; i += 2) this.Storage[0x90 + i] = this.Storage[0x91 + i] = new WAVE_RAM(apu.wave, i);
 

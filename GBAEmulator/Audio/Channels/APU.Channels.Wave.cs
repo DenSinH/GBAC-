@@ -33,24 +33,31 @@ namespace GBAEmulator.Audio.Channels
             }
         }
 
-        public override short GetSample()
+        public override bool SoundOn()
         {
             if (!this.Enabled)
-                return 0;
-
-            if (!this.Playback)
-                return 0;
+                return false;
 
             if (this.LengthFlag && (this.LengthCounter == 0))
-                return 0;
+                return false;
 
+            if (!this.ForceVolume && this.Volume == 0)
+                return false;
+
+            if (!this.Playback)
+                return false;
+
+            return true;
+        }
+
+        protected override short GetSample()
+        {
             int TrueVolume = this.ForceVolume ? 12 : this.Volume;
-
-            if (TrueVolume == 0)
-                return 0;
 
             byte Sample = this.WaveRAM[this.BankNumber][this.PositionCounter];
             if (this.HighNibble) Sample >>= 4;
+
+            Sample &= 0xf;
 
             return (short)(short.MaxValue * TrueVolume * Sample / 256);  // 16 * 16, 16 for volume, 16 for sample
         }

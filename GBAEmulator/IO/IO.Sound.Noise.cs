@@ -22,10 +22,10 @@ namespace GBAEmulator.IO
         {
             base.Set((ushort)(value & 0xff1f), setlow, sethigh);
 
-            this.Master.LengthCounter = this._raw & 0x001f;
-
+            this.Master.LengthCounter = (64 - this._raw & 0x001f);
+            this.Master.EnvelopeTime = (this._raw >> 8) & 7;
+            this.Master.EnvelopeDir = (this._raw & 0x0800) > 0;
             this.Master.Volume = (this._raw & 0xf000) >> 12;
-            // todo: handle channel envelope
         }
     }
     public class NoiseCNT_H : IORegister2

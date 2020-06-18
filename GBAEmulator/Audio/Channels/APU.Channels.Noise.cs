@@ -13,20 +13,8 @@ namespace GBAEmulator.Audio.Channels
             this.Period = 128 * 2048;
         }
 
-        public override short GetSample()
+        protected override short GetSample()
         {
-            if (!this.Enabled)
-                return 0;
-
-            if (this.LengthFlag && (this.LengthCounter == 0))
-                return 0;
-
-            if (this.Volume == 0)
-                return 0;
-
-            // return (short)((2 * Generator.NextDouble() - 1) * short.MaxValue * this.Volume / 16);
-            // Console.Write(this.ShiftRegister & 1);
-
             return (short)(((((~this.ShiftRegister) & 1) == 1) ? short.MaxValue : short.MinValue)  *this.Volume / 16);
         }
 
