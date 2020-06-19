@@ -19,6 +19,7 @@ namespace GBAEmulator.IO
         {
             base.Set(value, setlow, sethigh);
             /* !! NOTE !!  This uses the fact that the lower register is always written to first in a 32 bit data transfer */
+
             this.FIFO.Queue.Enqueue((byte)this._raw);
             this.FIFO.Queue.Enqueue((byte)(this._raw >> 8));
         }

@@ -31,6 +31,7 @@ namespace GBAEmulator.CPU
             public readonly cTMCNT_L Data;
             public readonly cTMCNT_H Control;
             public readonly FIFOChannel[] FIFO = new FIFOChannel[2];
+            private readonly bool IsSound;
 
             public cTimer(ARM7TDMI cpu, int index)
             {
@@ -38,6 +39,7 @@ namespace GBAEmulator.CPU
                 this.index = index;
                 this.Data = new cTMCNT_L();
                 this.Control = new cTMCNT_H(this.Data);
+                this.IsSound = index == 0 || index == 1;
             }
 
             public cTimer(ARM7TDMI cpu, int index, cTimer Next) : this(cpu, index)
@@ -62,8 +64,11 @@ namespace GBAEmulator.CPU
                 if (this.Next?.Control.CountUpTiming ?? false)
                     this.Next?.TickDirect(1);
 
-                this.FIFO[0]?.TimerOverflow();
-                this.FIFO[1]?.TimerOverflow();
+                if (this.IsSound)
+                {
+                    this.FIFO[0]?.TimerOverflow();
+                    this.FIFO[1]?.TimerOverflow();
+                }
 
                 if (this.Control.TimerIRQEnable)
                 {

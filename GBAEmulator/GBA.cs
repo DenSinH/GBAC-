@@ -98,7 +98,7 @@ namespace GBAEmulator
             if (this.ppu.scanline >= 2 && this.ppu.scanline < 162)
             {
                 // DMA 3 video capture mode (special DMA trigger)
-                this.cpu.TriggerDMASpecial(3);
+                this.cpu.DMAChannels[3].Trigger(DMAStartTiming.Special);
             }
             else if (this.cpu.mem.IO.DMACNT_H[3].StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
             {
@@ -151,8 +151,8 @@ namespace GBAEmulator
 
         public void Run()
         {
-            this.mem.LoadRom("../../../roms/MMBN6.gba");
-            // this.mem.LoadRom("../../../Tests/Krom/BIOSRLE.gba");
+            this.mem.LoadRom("../../../roms/KirbyNightmare.gba");
+            // this.mem.LoadRom("../../../Tests/Krom/Video/Rick.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
             // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");

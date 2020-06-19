@@ -57,7 +57,7 @@ namespace GBAEmulator.CPU
                 get
                 {
                     if (this.Sound && this.DMACNT_H.StartTiming == DMAStartTiming.Special)
-                        return 4;
+                        return 4;  // always 32 bit
                     return (uint)(this.DMACNT_H.DMATransferType ? 4 : 2);  // 32 bit/16 bit
                 }
             }
@@ -191,12 +191,6 @@ namespace GBAEmulator.CPU
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void TriggerDMASpecial(int i)
-        {
-            this.DMAChannels[i].Trigger(DMAStartTiming.Special);
-        }
-
         private void DoDMA(DMAChannel DMA)
         {
             this.Log($"DMA: {DMA.SAD.ToString("x8")} -> {DMA.DAD.ToString("x8")}");
@@ -220,14 +214,6 @@ namespace GBAEmulator.CPU
 
             if (DMA.Empty)
                 InstructionCycles += DMA.End();
-        }
-
-        private void SoundDMA()
-        {
-            for (int i = 0; i < 2; i++)
-            {
-
-            }
         }
 
         private void HandleDMAs()

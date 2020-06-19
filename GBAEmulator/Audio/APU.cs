@@ -52,14 +52,13 @@ namespace GBAEmulator.Audio
             this.IO = IO;
             this.Channels = new Channel[] { sq1, sq2, wave, noise };
 
-            this.FIFO[1] = this.FIFOB = new FIFOChannel(cpu);
-            this.FIFO[0] = this.FIFOA = new FIFOChannel(cpu);
+            this.FIFO[0] = this.FIFOA = new FIFOChannel(cpu, 0x0400_00a0);
+            this.FIFO[1] = this.FIFOB = new FIFOChannel(cpu, 0x0400_00a4);
 
-            // todo: add initial EventQueue events
-            // initial Frame sequencer event
+            // initial APU events
             this.EventQueue.Push(new Event(FrameSequencerPeriod, this.TickFrameSequencer));
             foreach (Channel ch in this.Channels) this.EventQueue.Push(new Event(ch.Period, ch.Tick));
-            this.EventQueue.Push(new Event(ARM7TDMI.Frequency / Speaker.SampleFrequency, this.ProvideSample));
+            this.EventQueue.Push(new Event(FrameSequencerPeriod, this.ProvideSample));
         }
 
         public void Tick(int cycles)

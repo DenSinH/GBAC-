@@ -108,21 +108,21 @@ namespace GBAEmulator.CPU
                 return 1;
 
             this.HandleIRQs();
-
-            if (this.IO.HALTCNT.Halt)
+            if (DMAActive) this.HandleDMAs();
+            // Handling DMAs automatically causes InstructionCycles to no longer be 0 because of the memory accesses
+            if (InstructionCycles > 0)
+            {
+                this.Log("DMAing");
+            }
+            else if (this.IO.HALTCNT.Halt)
             {
                 this.Log("Halted");
                 InstructionCycles = 1;  // just one to be sure that we do not exceed the amount before HBlank/VBlank/VCount
             }
             else
             {
-                this.HandleDMAs();
-                // Handling DMAs automatically causes InstructionCycles to no longer be 0 because of the memory accesses
-                if (InstructionCycles > 0)
-                {
-                    this.Log("DMAing");
-                }
-                else if (this.state == State.ARM)
+                
+                if (this.state == State.ARM)
                 {
                     this.Pipeline.Enqueue(this.mem.GetWordAt(this.PC));
                     this.PC += 4;
