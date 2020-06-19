@@ -60,7 +60,7 @@ namespace GBAEmulator.Audio
             scheduler.Push(new Event(FrameSequencerPeriod, this.ProvideSample));
         }
 
-        private Event TickFrameSequencer(int time)
+        private void TickFrameSequencer(int time, Scheduler.Scheduler scheduler)
         {
             this.FrameSequencer++;
             switch (this.FrameSequencer & 7)
@@ -83,10 +83,10 @@ namespace GBAEmulator.Audio
                     break;
             }
 
-            return new Event(time + FrameSequencerPeriod, this.TickFrameSequencer);
+            scheduler.Push(new Event(time + FrameSequencerPeriod, this.TickFrameSequencer));
         }
 
-        private Event ProvideSample(int time)
+        private void ProvideSample(int time, Scheduler.Scheduler scheduler)
         {
             while (!this.speaker.NeedMoreSamples) { }  // prevent buffer overflow
             int SampleLeft = 0, SampleRight = 0;
@@ -124,7 +124,7 @@ namespace GBAEmulator.Audio
 
             this.speaker.AddSample((short)SampleLeft, (short)SampleRight);
 
-            return new Event(time + SamplePeriod, this.ProvideSample);
+            scheduler.Push(new Event(time + SamplePeriod, this.ProvideSample));
         }
     }
 }

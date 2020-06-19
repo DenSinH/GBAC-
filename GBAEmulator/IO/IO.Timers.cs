@@ -97,7 +97,10 @@ namespace GBAEmulator.IO
             base.Set(value, setlow, sethigh);
 
             this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
-            if (!WasEnabled && this.Enabled) this.Data.TimerReload();
+            if (!WasEnabled && this.Enabled)
+            {
+                this.Data.TimerReload();
+            }
         }
     }
     #endregion

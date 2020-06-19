@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using GBAEmulator.Audio.Channels;
 using GBAEmulator.IO;
-using GBAEmulator.Scheduler;
 
 namespace GBAEmulator.CPU
 {

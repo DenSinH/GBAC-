@@ -18,7 +18,7 @@ namespace GBAEmulator.Scheduler
         {
             while (this.Count > 0 && GlobalTime - this.Peek().Time > 0)
             {
-                this.Push(this.Pop().Handle());
+                this.Pop().Handle(this);
             }
         }
 

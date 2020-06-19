@@ -19,14 +19,14 @@ namespace GBAEmulator.Audio.Channels
         protected abstract short GetSample();
 
         protected abstract void OnTick();
-        public Event Tick(int Time)
+        public void Tick(int Time, Scheduler.Scheduler scheduler)
         {
             this.OnTick();
             if (!this.SoundOn())
                 this.CurrentSample = 0;
             else
                 this.CurrentSample = this.GetSample();
-            return new Event(Time + this.Period, this.Tick);
+            scheduler.Push(new Event(Time + this.Period, this.Tick));
         }
 
         public virtual bool SoundOn()

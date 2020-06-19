@@ -7,7 +7,7 @@ namespace GBAEmulator.Scheduler
     public struct Event : IComparable<Event>
     {
         public int Time { get; private set; }
-        public delegate Event Handler(int time);
+        public delegate void Handler(int time, Scheduler scheduler);
         private Handler _Handler;
 
         public Event(int Time, Handler _Handler)
@@ -16,9 +16,9 @@ namespace GBAEmulator.Scheduler
             this._Handler = _Handler;
         }
 
-        public Event Handle()
+        public void Handle(Scheduler scheduler)
         {
-            return this._Handler(this.Time);
+            this._Handler(this.Time, scheduler);
         }
 
         public int CompareTo(Event other)
