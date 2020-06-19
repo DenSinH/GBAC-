@@ -1,5 +1,6 @@
 ﻿using System;
 
+using GBAEmulator.CPU;
 using GBAEmulator.Bus;
 
 namespace GBAEmulator.IO
@@ -97,23 +98,14 @@ namespace GBAEmulator.IO
     public class cDMACNT_H : IORegister2
     {
         private bool AllowGamePakDRQ;
-        public bool Active;
+        public bool ValueChanged;
 
-        private readonly cDMAAddress DMASAD;
-        private readonly cDMAAddress DMADAD;
-        private readonly cDMACNT_L DMACNT_L;
-        public readonly int index;
-
-        public cDMACNT_H(cDMAAddress DMASAD, cDMAAddress DMADAD, cDMACNT_L DMACNT_L, int index) : base()
+        public cDMACNT_H() : base()
         {
-            this.index = index;
-            this.DMASAD = DMASAD;
-            this.DMADAD = DMADAD;
-            this.DMACNT_L = DMACNT_L;
+
         }
 
-        public cDMACNT_H(cDMAAddress DMASAD, cDMAAddress DMADAD, cDMACNT_L DMACNT_L, int index, bool AllowGamePakDRQ)
-            : this(DMASAD, DMADAD, DMACNT_L, index)
+        public cDMACNT_H(bool AllowGamePakDRQ) : this()
         {
             this.AllowGamePakDRQ = AllowGamePakDRQ;
         }
@@ -165,36 +157,13 @@ namespace GBAEmulator.IO
             this._raw &= 0x7fff;
         }
 
-        public bool Trigger(DMAStartTiming timing)
-        {
-            if (!this.Active && (this._raw & 0x8000) > 0)  // enabled
-            {
-                if (timing == this.StartTiming)
-                {
-                    this.Active = true;
-                    return true;
-                }
-            }
-            return false;
-        }
-
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            bool DoReload = !this.DMAEnabled;
+            bool Disabled = !this.DMAEnabled;
 
             // bottom 5 bits unused
             base.Set((ushort)(value & 0xfff8), setlow, sethigh);
-            if (DoReload && this.DMAEnabled)
-            {
-                this.DMADAD.Reload();
-                this.DMASAD.Reload();
-                this.DMACNT_L.Reload();
-            }
-
-            if ((this._raw & 0xb000) == 0x8000)  // DMA Enable set AND DMA start timing immediate
-            {
-                this.Active = true;
-            }
+            this.ValueChanged = Disabled && this.DMAEnabled;
         }
     }
     #endregion

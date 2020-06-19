@@ -40,8 +40,12 @@ namespace GBAEmulator.CPU
 
             // mem requires IO to be initialized
             this.IO = new IORAMSection(this.bus);
-
             this.mem = new MEM(this);
+
+            this.DMAChannels[0] = new DMAChannel(this.IO.DMACNT_H[0], this.IO.DMACNT_L[0], this.IO.DMASAD[0], this.IO.DMADAD[0], this.IO.IF, 0);
+            this.DMAChannels[1] = new DMAChannel(this.IO.DMACNT_H[1], this.IO.DMACNT_L[1], this.IO.DMASAD[1], this.IO.DMADAD[1], this.IO.IF, 1);
+            this.DMAChannels[2] = new DMAChannel(this.IO.DMACNT_H[2], this.IO.DMACNT_L[2], this.IO.DMASAD[2], this.IO.DMADAD[2], this.IO.IF, 2);
+            this.DMAChannels[3] = new DMAChannel(this.IO.DMACNT_H[3], this.IO.DMACNT_L[3], this.IO.DMASAD[3], this.IO.DMADAD[3], this.IO.IF, 3);
 
             this.SystemBank     = new uint[16];
             // this.FIQBank        = new uint[16];

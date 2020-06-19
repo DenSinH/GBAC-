@@ -146,7 +146,8 @@ namespace GBAEmulator.Memory.Backup
             if (this.Size == 0 && WriteBitCounter == 0)
             {
                 // 9 bits to set access for 512B EEPROM, 17 for 6kB
-                if (this.DMA3CNT_H.Active && this.DMA3CNT_L.UnitCount > 9)
+                // of course, we don't know if the channel is actually active, but this is a pretty good guess...
+                if (this.DMA3CNT_H.DMAEnabled && this.DMA3CNT_L.UnitCount > 9)
                 {
                     // 8kB
                     Size = 0x2000;

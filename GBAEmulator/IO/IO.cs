@@ -119,10 +119,7 @@ namespace GBAEmulator.IO
 
             this.DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0x3fff),
                                                new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0xffff) };
-            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(DMASAD[0], DMADAD[0], DMACNT_L[0], 0),
-                                               new cDMACNT_H(DMASAD[1], DMADAD[1], DMACNT_L[1], 1),
-                                               new cDMACNT_H(DMASAD[2], DMADAD[2], DMACNT_L[2], 2),
-                                               new cDMACNT_H(DMASAD[3], DMADAD[3], DMACNT_L[3], 3, true) };
+            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(), new cDMACNT_H(), new cDMACNT_H(), new cDMACNT_H(true) };
 
             this.MasterUnusedRegister = new UnusedRegister(bus);
         }

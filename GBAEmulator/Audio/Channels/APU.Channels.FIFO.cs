@@ -4,16 +4,10 @@ using System.Text;
 
 namespace GBAEmulator.Audio.Channels
 {
-    public class FIFOChannel : Channel
+    public class FIFOChannel : IChannel
     {
-        protected override short GetSample()
-        {
-            throw new NotImplementedException();
-        }
+        public short CurrentSample { get; private set; }
+        public Queue<byte> Queue = new Queue<byte>(32);
 
-        protected override void OnTick()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

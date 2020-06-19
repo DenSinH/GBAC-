@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace GBAEmulator.Audio.Channels
 {
@@ -35,8 +36,8 @@ namespace GBAEmulator.Audio.Channels
             if (SweepTime > 0)
             {
                 SweepTime--;
-                int dPeriod = this.Period / (1 + (1 << SweepNumber));
-                if (!SweepDir) dPeriod *= -1;
+                int dPeriod = Period >> SweepNumber;
+                if (SweepDir) dPeriod *= -1;
 
                 this.Period += dPeriod;
             }

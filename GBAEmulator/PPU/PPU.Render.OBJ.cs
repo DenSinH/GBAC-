@@ -51,6 +51,7 @@ namespace GBAEmulator.Video
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetOBJWindow()
         {
+            this.RenderOBJs(true);
             this.ResetWindow<bool>(ref OBJWindow,
                 this.IO.WININ.WindowOBJEnable(Window.Window0), this.IO.WININ.WindowOBJEnable(Window.Window1),
                 this.IO.WINOUT.WindowOBJEnable(Window.OBJ), this.IO.WINOUT.WindowOBJEnable(Window.Outside), true);

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GBAEmulator.Audio.Channels
 {
-    public abstract class Channel
+    public abstract class Channel : IChannel
     {
         public int LengthCounter;
         public bool LengthFlag;

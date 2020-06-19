@@ -7,6 +7,115 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+        private class DMAChannel
+        {
+            public readonly cDMACNT_H DMACNT_H;
+            public readonly cDMACNT_L DMACNT_L;
+            public readonly cDMAAddress DMASAD;
+            public readonly cDMAAddress DMADAD;
+            private readonly cIF IF;
+            private readonly int index;
+
+            public bool Active { get; private set; }
+
+            public DMAChannel(cDMACNT_H DMACNT_H, cDMACNT_L DMACNT_L, cDMAAddress DMASAD, cDMAAddress DMADAD, cIF IF, int index)
+            {
+                this.DMACNT_H = DMACNT_H;
+                this.DMACNT_L = DMACNT_L;
+                this.DMASAD = DMASAD;
+                this.DMADAD = DMADAD;
+                this.IF = IF;
+                this.index = index;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Update()
+            {
+                if (this.DMACNT_H.ValueChanged)
+                {
+                    this.DMACNT_H.ValueChanged = false;
+
+                    this.DMADAD.Reload();
+                    this.DMASAD.Reload();
+                    this.DMACNT_L.Reload();
+
+                    if (this.DMACNT_H.StartTiming == DMAStartTiming.Immediately)
+                    {
+                        // DMA Enable set AND DMA start timing immediate
+                        this.Active = true;
+                    }
+                }
+            }
+
+            public bool Trigger(DMAStartTiming timing)
+            {
+                if (this.DMACNT_H.DMAEnabled && timing == this.DMACNT_H.StartTiming)  // enabled
+                {
+                    this.Active = true;
+                    return true;
+                }
+                return false;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private void UpdateDMAAddress(cDMAAddress dmaxad, AddrControl control)
+            {
+                uint amount = (uint)(this.DMACNT_H.DMATransferType ? 4 : 2);
+                switch (control)
+                {
+                    case AddrControl.IncrementReload:   // 11 (prohibited for DMASAD)
+                    case AddrControl.Increment:         // 00
+                        dmaxad.Address += amount;
+                        break;
+                    case AddrControl.Decrement:         // 01
+                        dmaxad.Address -= amount;
+                        break;
+                    case AddrControl.Fixed:             // 10
+                        break;
+                }
+            }
+
+            public void UpdateDMASAD()
+            {
+                this.UpdateDMAAddress(this.DMASAD, this.DMACNT_H.SourceAddrControl);
+            }
+
+            public void UpdateDMADAD()
+            {
+                this.UpdateDMAAddress(this.DMADAD, this.DMACNT_H.DestAddrControl);
+            }
+
+            public void End()
+            {
+                // should actually happen at the start, but it does not matter, timers don't IRQ anyway during a DMA
+                //InstructionCycles += 2 * ICycle;
+                //if (dmadad.Address > 0x0800_0000 && dmasad.Address > 0x0800_0000)
+                //    InstructionCycles += 2 * ICycle;
+
+                // Immediate DMA transfers should ignore the Repeat bit - Fleroviux
+                if (this.DMACNT_H.DMARepeat && this.DMACNT_H.StartTiming != DMAStartTiming.Immediately)
+                {
+                    this.DMACNT_L.Reload();
+                    if (this.DMACNT_H.DestAddrControl == AddrControl.IncrementReload)
+                    {
+                        this.DMADAD.Reload();
+                    }
+                }
+                else
+                {
+                    // end of the transfer
+                    if (this.DMACNT_H.IRQOnEnd)
+                    {
+                        this.IF.Request((ushort)((ushort)Interrupt.DMA << this.index));
+                    }
+                    this.DMACNT_H.Disable();  // clear enabled bit
+                }
+                this.Active = false;
+            }
+        }
+
+        private readonly DMAChannel[] DMAChannels = new DMAChannel[4];
+
         public bool DMAActive
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -14,7 +123,7 @@ namespace GBAEmulator.CPU
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    if (this.IO.DMACNT_H[i].Active) return true;
+                    if (this.DMAChannels[i].Active) return true;
                 }
                 return false;
             }
@@ -25,9 +134,9 @@ namespace GBAEmulator.CPU
         {
             for (int i = 0; i < 4; i++)
             {
-                if (!this.IO.DMACNT_H[i].Active)
+                if (!this.DMAChannels[i].Active)
                 {
-                    this.IO.DMACNT_H[i].Trigger(timing);
+                    this.DMAChannels[i].Trigger(timing);
                 }
             }
         }
@@ -36,92 +145,44 @@ namespace GBAEmulator.CPU
         public void TriggerDMASpecial(int i)
         {
             // todo: Sound FIFO
-            this.IO.DMACNT_H[i].Trigger(DMAStartTiming.Special);
+            this.DMAChannels[i].Trigger(DMAStartTiming.Special);
         }
 
-        private void DoDMA(int i)
+        private void DoDMA(DMAChannel DMA)
         {
-            cDMACNT_H dmacnt_h = this.IO.DMACNT_H[i];
-            cDMACNT_L dmacnt_l = this.IO.DMACNT_L[i];
-            cDMAAddress dmasad = this.IO.DMASAD[i];
-            cDMAAddress dmadad = this.IO.DMADAD[i];
+            this.Log($"DMA: {DMA.DMASAD.Address.ToString("x8")} -> {DMA.DMADAD.Address.ToString("x8")}");
 
-            this.Log($"DMA: {dmasad.Address.ToString("x8")} -> {dmadad.Address.ToString("x8")}");
-
-            uint UnitLength = (uint)(dmacnt_h.DMATransferType ? 4 : 2);  // bytes: 32 / 16 bits
+            uint UnitLength = (uint)(DMA.DMACNT_H.DMATransferType ? 4 : 2);  // bytes: 32 / 16 bits
 
             if (UnitLength == 4)
             {
                 // force alignment happens in memory handler
-                this.mem.SetWordAt(dmadad.Address, this.mem.GetWordAt(dmasad.Address));
+                this.mem.SetWordAt(DMA.DMADAD.Address, this.mem.GetWordAt(DMA.DMASAD.Address));
             }
             else  // 16 bit
             {
                 // force alignment happens in memory handler
-                this.mem.SetHalfWordAt(dmadad.Address, this.mem.GetHalfWordAt(dmasad.Address));
+                this.mem.SetHalfWordAt(DMA.DMADAD.Address, this.mem.GetHalfWordAt(DMA.DMASAD.Address));
             }
 
-            this.UpdateDMAAddress(dmasad, dmacnt_h.SourceAddrControl, UnitLength);
-            this.UpdateDMAAddress(dmadad, dmacnt_h.DestAddrControl, UnitLength);
-            dmacnt_l.UnitCount--;
+            DMA.UpdateDMASAD();
+            DMA.UpdateDMADAD();
+            DMA.DMACNT_L.UnitCount--;
 
-            if (dmacnt_l.Empty)
-                this.EndDMA(dmacnt_h, dmacnt_l, dmasad, dmadad);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateDMAAddress(cDMAAddress dmaxad, AddrControl control, uint amount)
-        {
-            switch (control)
-            {
-                case AddrControl.IncrementReload:   // 11 (prohibited for DMASAD)
-                case AddrControl.Increment:         // 00
-                    dmaxad.Address += amount;
-                    break;
-                case AddrControl.Decrement:         // 01
-                    dmaxad.Address -= amount;
-                    break;
-                case AddrControl.Fixed:             // 10
-                    break;
-            }
-        }
-
-        private void EndDMA(cDMACNT_H dmacnt_h, cDMACNT_L dmacnt_l, cDMAAddress dmasad, cDMAAddress dmadad)
-        {
-            // should actually happen at the start, but it does not matter, timers don't IRQ anyway during a DMA
-            InstructionCycles += 2 * ICycle;
-            if (dmadad.Address > 0x0800_0000 && dmasad.Address > 0x0800_0000)
-                InstructionCycles += 2 * ICycle;
-
-            // Immediate DMA transfers should ignore the Repeat bit - Fleroviux
-            if (dmacnt_h.DMARepeat && dmacnt_h.StartTiming != DMAStartTiming.Immediately)
-            {
-                dmacnt_l.Reload();
-                if (dmacnt_h.DestAddrControl == AddrControl.IncrementReload)
-                {
-                    dmadad.Reload();
-                }
-            }
-            else
-            {
-                // end of the transfer
-                if (dmacnt_h.IRQOnEnd)
-                {
-                    this.IO.IF.Request((ushort)((ushort)Interrupt.DMA << dmacnt_h.index));
-                }
-                dmacnt_h.Disable();  // clear enabled bit
-            }
-            dmacnt_h.Active = false;
+            if (DMA.DMACNT_L.Empty)
+                DMA.End();
         }
 
         private void HandleDMAs()
         {
             for (int i = 0; i < 4; i++)
             {
+                this.DMAChannels[i].Update();
+
                 // DMA channel 0 has highest priority, 3 the lowest
-                if (this.IO.DMACNT_H[i].Active)
+                if (this.DMAChannels[i].Active)
                 {
-                    this.DoDMA(i);
+                    this.DoDMA(this.DMAChannels[i]);
                 }
             }
         }

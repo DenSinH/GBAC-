@@ -63,7 +63,6 @@ namespace GBAEmulator.Video
             bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(0, 1, 2, 3);
-            this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetBGWindows(0, 1, 2, 3);
             this.ResetOBJWindow();
 
@@ -81,7 +80,6 @@ namespace GBAEmulator.Video
             bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(0, 1, 2);
-            this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetBGWindows(0, 1, 2);
             this.ResetOBJWindow();
 
@@ -101,7 +99,6 @@ namespace GBAEmulator.Video
             bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
             
             this.ResetBGScanlines(2, 3);
-            this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetBGWindows(2, 3);
             this.ResetOBJWindow();
 
@@ -122,7 +119,6 @@ namespace GBAEmulator.Video
             // we render on BG2
             bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
 
-            this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
 
@@ -174,7 +170,6 @@ namespace GBAEmulator.Video
             ushort offset = (ushort)(this.IO.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
             bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
 
-            this.RenderOBJs(true);  // blit all objects with GFXMode 0b10 to priority 0
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
 
