@@ -11,7 +11,6 @@ namespace GBAEmulator.Audio
 {
     public class APU
     {
-        private const int CPUCyclesPerApuSample = ARM7TDMI.Frequency / Speaker.SampleFrequency;
         private readonly IORAMSection IO;
         private int Timer;
         private int FrameSequencer;
@@ -24,26 +23,37 @@ namespace GBAEmulator.Audio
         public readonly NoiseChannel noise = new NoiseChannel();
         public readonly WaveChannel wave = new WaveChannel();
 
+        public readonly Channel[] Channels;
+
+        public readonly FIFOChannel FIFOA;
+        public readonly FIFOChannel FIFOB;
+
+        public readonly FIFOChannel[] FIFO = new FIFOChannel[2];
+
         /* SOUNDCNT_L params */
         public uint MasterVolumeRight;  // 0 - 7
         public uint MasterVolumeLeft;   // 0 - 7
         public bool[] MasterEnableRight = new bool[4];
         public bool[] MasterEnableLeft = new bool[4];
 
-        /* SOUNDCNT_X params */
-
         /* SOUNDCNT_H params */
+        public int Sound1_4Volume;
+        public bool[] DMASoundVolume = new bool[2];
+        public bool[] DMAEnableLeft = new bool[2];
+        public bool[] DMAEnableRight = new bool[2];
 
-
-        public readonly Channel[] Channels;
+        /* SOUNDCNT_X params */
 
         public readonly Speaker speaker = new Speaker();
         private const double Amplitude = 0.05;
 
-        public APU(IORAMSection IO)
+        public APU(IORAMSection IO, ARM7TDMI cpu)
         {
             this.IO = IO;
             this.Channels = new Channel[] { sq1, sq2, wave, noise };
+
+            this.FIFO[1] = this.FIFOB = new FIFOChannel(cpu);
+            this.FIFO[0] = this.FIFOA = new FIFOChannel(cpu);
 
             // todo: add initial EventQueue events
             // initial Frame sequencer event
@@ -103,6 +113,19 @@ namespace GBAEmulator.Audio
                 if (this.MasterEnableLeft[i])
                 {
                     SampleLeft += this.Channels[i].CurrentSample;
+                }
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                if (this.DMAEnableRight[i])
+                {
+                    SampleRight += this.FIFO[i].CurrentSample << (this.DMASoundVolume[i] ? 0 : 1);  // false = 50%, true = 100%
+                }
+
+                if (this.DMAEnableLeft[i])
+                {
+                    SampleLeft += this.FIFO[i].CurrentSample << (this.DMASoundVolume[i] ? 0 : 1);  // false = 50%, true = 100%
                 }
             }
 

@@ -7,14 +7,16 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private class DMAChannel
+        public class DMAChannel
         {
-            public readonly cDMACNT_H DMACNT_H;
-            public readonly cDMACNT_L DMACNT_L;
-            public readonly cDMAAddress DMASAD;
-            public readonly cDMAAddress DMADAD;
+            private readonly cDMACNT_H DMACNT_H;
+            private readonly cDMACNT_L DMACNT_L;
+            private ushort SNDCOUNT = 4;
+            private readonly cDMAAddress DMASAD;
+            private readonly cDMAAddress DMADAD;
             private readonly cIF IF;
             private readonly int index;
+            private readonly bool Sound;
 
             public bool Active { get; private set; }
 
@@ -26,6 +28,48 @@ namespace GBAEmulator.CPU
                 this.DMADAD = DMADAD;
                 this.IF = IF;
                 this.index = index;
+                this.Sound = index == 1 || index == 2;
+            }
+
+            public uint DAD => this.DMADAD.Address;
+
+            public uint SAD => this.DMASAD.Address;
+
+            public ushort UnitCount
+            {
+                get
+                {
+                    if (this.Sound && this.DMACNT_H.StartTiming == DMAStartTiming.Special)
+                        return this.SNDCOUNT;
+                    return this.DMACNT_L.UnitCount;
+                }
+                set
+                {
+                    if (this.Sound && this.DMACNT_H.StartTiming == DMAStartTiming.Special)
+                        this.SNDCOUNT = value;
+                    else 
+                        this.DMACNT_L.UnitCount = value;
+                }
+            }
+
+            public uint UnitLength
+            {
+                get
+                {
+                    if (this.Sound && this.DMACNT_H.StartTiming == DMAStartTiming.Special)
+                        return 4;
+                    return (uint)(this.DMACNT_H.DMATransferType ? 4 : 2);  // 32 bit/16 bit
+                }
+            }
+
+            public bool Empty
+            {
+                get
+                {
+                    if (this.Sound && this.DMACNT_H.StartTiming == DMAStartTiming.Special)
+                        return this.SNDCOUNT == 0;
+                    return this.DMACNT_L.Empty;
+                }
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,16 +126,12 @@ namespace GBAEmulator.CPU
 
             public void UpdateDMADAD()
             {
-                this.UpdateDMAAddress(this.DMADAD, this.DMACNT_H.DestAddrControl);
+                if (!(this.Sound && this.DMACNT_H.StartTiming == DMAStartTiming.Special))
+                    this.UpdateDMAAddress(this.DMADAD, this.DMACNT_H.DestAddrControl);
             }
 
-            public void End()
+            public int End()
             {
-                // should actually happen at the start, but it does not matter, timers don't IRQ anyway during a DMA
-                //InstructionCycles += 2 * ICycle;
-                //if (dmadad.Address > 0x0800_0000 && dmasad.Address > 0x0800_0000)
-                //    InstructionCycles += 2 * ICycle;
-
                 // Immediate DMA transfers should ignore the Repeat bit - Fleroviux
                 if (this.DMACNT_H.DMARepeat && this.DMACNT_H.StartTiming != DMAStartTiming.Immediately)
                 {
@@ -111,10 +151,17 @@ namespace GBAEmulator.CPU
                     this.DMACNT_H.Disable();  // clear enabled bit
                 }
                 this.Active = false;
+
+                if (this.Sound) this.SNDCOUNT = 4;
+
+                // should actually happen at the start, but it does not matter, timers don't IRQ anyway during a DMA
+                if (this.DMADAD.Address > 0x0800_0000 && this.DMASAD.Address > 0x0800_0000)
+                    return 4 * ICycle;
+                return 2 * ICycle;
             }
         }
 
-        private readonly DMAChannel[] DMAChannels = new DMAChannel[4];
+        public readonly DMAChannel[] DMAChannels = new DMAChannel[4];
 
         public bool DMAActive
         {
@@ -123,7 +170,10 @@ namespace GBAEmulator.CPU
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    if (this.DMAChannels[i].Active) return true;
+                    if (this.DMAChannels[i].Active)
+                    {
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -144,33 +194,40 @@ namespace GBAEmulator.CPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void TriggerDMASpecial(int i)
         {
-            // todo: Sound FIFO
             this.DMAChannels[i].Trigger(DMAStartTiming.Special);
         }
 
         private void DoDMA(DMAChannel DMA)
         {
-            this.Log($"DMA: {DMA.DMASAD.Address.ToString("x8")} -> {DMA.DMADAD.Address.ToString("x8")}");
+            this.Log($"DMA: {DMA.SAD.ToString("x8")} -> {DMA.DAD.ToString("x8")}");
 
-            uint UnitLength = (uint)(DMA.DMACNT_H.DMATransferType ? 4 : 2);  // bytes: 32 / 16 bits
+            uint UnitLength = DMA.UnitLength;  // bytes: 32 / 16 bits
 
             if (UnitLength == 4)
             {
                 // force alignment happens in memory handler
-                this.mem.SetWordAt(DMA.DMADAD.Address, this.mem.GetWordAt(DMA.DMASAD.Address));
+                this.mem.SetWordAt(DMA.DAD, this.mem.GetWordAt(DMA.SAD));
             }
             else  // 16 bit
             {
                 // force alignment happens in memory handler
-                this.mem.SetHalfWordAt(DMA.DMADAD.Address, this.mem.GetHalfWordAt(DMA.DMASAD.Address));
+                this.mem.SetHalfWordAt(DMA.DAD, this.mem.GetHalfWordAt(DMA.SAD));
             }
 
             DMA.UpdateDMASAD();
             DMA.UpdateDMADAD();
-            DMA.DMACNT_L.UnitCount--;
+            DMA.UnitCount--;
 
-            if (DMA.DMACNT_L.Empty)
-                DMA.End();
+            if (DMA.Empty)
+                InstructionCycles += DMA.End();
+        }
+
+        private void SoundDMA()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+
+            }
         }
 
         private void HandleDMAs()

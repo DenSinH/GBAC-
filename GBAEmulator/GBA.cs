@@ -33,7 +33,7 @@ namespace GBAEmulator
             this.mem = this.cpu.mem;
             this.bus = this.cpu.bus;
 
-            this.apu = new APU(this.IO);
+            this.apu = new APU(this.IO, this.cpu);
             this.ppu = new PPU(this, display, this.IO);
 
             this.IO.Init(this.cpu, this.apu);

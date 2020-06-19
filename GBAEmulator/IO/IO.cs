@@ -211,7 +211,7 @@ namespace GBAEmulator.IO
             this.Storage[0x7e] = this.Storage[0x7f] = this.MasterUnusedRegister.upper;
 
             this.Storage[0x80] = this.Storage[0x81] = new SOUNDCNT_L(apu);
-            this.Storage[0x82] = this.Storage[0x83] = new DefaultRegister();
+            this.Storage[0x82] = this.Storage[0x83] = new SOUNDCNT_H(apu, cpu.Timers[0], cpu.Timers[1]);
             this.Storage[0x84] = this.Storage[0x85] = new SOUNDCNT_X(apu);
             this.Storage[0x86] = this.Storage[0x87] = this.MasterUnusedRegister.upper;
             this.Storage[0x88] = this.Storage[0x89] = new DefaultRegister();  // SOUNDBIAS (unnecessary?)
@@ -222,8 +222,12 @@ namespace GBAEmulator.IO
 
             for (int i = 0; i < 0x10; i += 2) this.Storage[0x90 + i] = this.Storage[0x91 + i] = new WAVE_RAM(apu.wave, i);
 
+            this.Storage[0xa0] = this.Storage[0xa1] = new FIFO_Data(apu.FIFOA, cpu.bus, true);
+            this.Storage[0xa2] = this.Storage[0xa3] = new FIFO_Data(apu.FIFOA, cpu.bus, false);
+            this.Storage[0xa4] = this.Storage[0xa5] = new FIFO_Data(apu.FIFOB, cpu.bus, true);
+            this.Storage[0xa6] = this.Storage[0xa7] = new FIFO_Data(apu.FIFOB, cpu.bus, false);
 
-            for (int i = 0xa0; i < 0xb0; i += 4)
+            for (int i = 0xa8; i < 0xb0; i += 4)
             {
                 this.Storage[i]     = this.Storage[i + 1] = this.MasterUnusedRegister.lower;
                 this.Storage[i + 2] = this.Storage[i + 3] = this.MasterUnusedRegister.upper;

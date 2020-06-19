@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-
+using GBAEmulator.Audio.Channels;
 using GBAEmulator.IO;
 
 namespace GBAEmulator.CPU
@@ -23,13 +23,14 @@ namespace GBAEmulator.CPU
 
         public class cTimer
         {
-            private cTimer Next;
+            private readonly cTimer Next;
 
-            private ARM7TDMI cpu;
-            private int index;
+            private readonly ARM7TDMI cpu;
+            private readonly int index;
 
-            public cTMCNT_L Data;
-            public cTMCNT_H Control;
+            public readonly cTMCNT_L Data;
+            public readonly cTMCNT_H Control;
+            public readonly FIFOChannel[] FIFO = new FIFOChannel[2];
 
             public cTimer(ARM7TDMI cpu, int index)
             {
@@ -60,6 +61,9 @@ namespace GBAEmulator.CPU
 
                 if (this.Next?.Control.CountUpTiming ?? false)
                     this.Next?.TickDirect(1);
+
+                this.FIFO[0]?.TimerOverflow();
+                this.FIFO[1]?.TimerOverflow();
 
                 if (this.Control.TimerIRQEnable)
                 {
