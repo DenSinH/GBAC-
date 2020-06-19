@@ -25,6 +25,7 @@ namespace GBAEmulator.CPU
         public readonly BUS bus;
         
         public const int ICycle = 1;
+        public int GlobalCycleCount { get; private set; }
 
         public ARM7TDMI(GBA gba)
         {
@@ -180,6 +181,7 @@ namespace GBAEmulator.CPU
             //    }
             //}
 
+            this.GlobalCycleCount += InstructionCycles;
             return InstructionCycles;
         }
     }

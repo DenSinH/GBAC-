@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using GBAEmulator.Scheduler;
+
 namespace GBAEmulator.Audio.Channels
 {
     public abstract class Channel : IChannel

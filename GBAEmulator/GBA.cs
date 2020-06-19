@@ -6,7 +6,7 @@ using GBAEmulator.Memory;
 using GBAEmulator.Bus;
 using GBAEmulator.IO;
 using GBAEmulator.Audio;
-using GBAEmulator.Audio.Channels;
+using GBAEmulator.Scheduler;
 
 namespace GBAEmulator
 {
@@ -18,6 +18,8 @@ namespace GBAEmulator
         public IORAMSection IO;
         public MEM mem;
         public BUS bus;
+
+        private Scheduler.Scheduler EventQueue = new Scheduler.Scheduler(8);  // how many events at once (1 for each channel, framecounter, etc.)
 
         public Visual vis;
         public ushort[] display;
@@ -33,7 +35,7 @@ namespace GBAEmulator
             this.mem = this.cpu.mem;
             this.bus = this.cpu.bus;
 
-            this.apu = new APU(this.IO, this.cpu);
+            this.apu = new APU(this.IO, this.cpu, this.EventQueue);
             this.ppu = new PPU(this, display, this.IO);
 
             this.IO.Init(this.cpu, this.apu);
@@ -110,7 +112,7 @@ namespace GBAEmulator
             while (this.cycle > 0)
             {
                 int cycles = this.cpu.Step();
-                this.apu.Tick(cycles);
+                this.EventQueue.Handle(this.cpu.GlobalCycleCount);
                 this.cycle -= cycles;
             }
 
@@ -129,7 +131,7 @@ namespace GBAEmulator
             while (this.cycle > 0)
             {
                 int cycles = this.cpu.Step();
-                this.apu.Tick(cycles);
+                this.EventQueue.Handle(this.cpu.GlobalCycleCount);
                 this.cycle -= cycles;
             }
 
@@ -139,7 +141,7 @@ namespace GBAEmulator
             while (this.cycle > 0)
             {
                 int cycles = this.cpu.Step();
-                this.apu.Tick(cycles);
+                this.EventQueue.Handle(this.cpu.GlobalCycleCount);
                 this.cycle -= cycles;
             }
 
@@ -151,7 +153,7 @@ namespace GBAEmulator
 
         public void Run()
         {
-            this.mem.LoadRom("../../../roms/KirbyNightmare.gba");
+            this.mem.LoadRom("../../../roms/ZeldaMinishCap.gba");
             // this.mem.LoadRom("../../../Tests/Krom/Video/Rick.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");

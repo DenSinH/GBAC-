@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace GBAEmulator.Audio
+namespace GBAEmulator.Scheduler
 {
     public struct Event : IComparable<Event>
     {

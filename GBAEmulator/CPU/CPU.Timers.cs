@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using GBAEmulator.Audio.Channels;
 using GBAEmulator.IO;
+using GBAEmulator.Scheduler;
 
 namespace GBAEmulator.CPU
 {
@@ -9,6 +10,7 @@ namespace GBAEmulator.CPU
     {
         private void InitTimers()
         {
+            this.Timers = new cTimer[4];
             this.Timers[3] = new cTimer(this, 3);
             this.Timers[2] = new cTimer(this, 2, this.Timers[3]);
             this.Timers[1] = new cTimer(this, 1, this.Timers[2]);
@@ -77,6 +79,6 @@ namespace GBAEmulator.CPU
             }
         }
 
-        public cTimer[] Timers = new cTimer[4];
+        public cTimer[] Timers;
     }
 }

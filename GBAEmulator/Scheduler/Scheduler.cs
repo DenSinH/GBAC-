@@ -2,19 +2,24 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GBAEmulator.Audio
+namespace GBAEmulator.Scheduler
 {
-    /*
-     Basically just a stripped down priority queue to only be used for events
-     */
-    public class cEventQueue
+    public class Scheduler
     {
         private Event[] Storage;
         public int Count { get; private set; } = 0;
 
-        public cEventQueue(int Size)
+        public Scheduler(int Size)
         {
             Storage = new Event[Size];
+        }
+
+        public void Handle(int GlobalTime)
+        {
+            while (this.Count > 0 && GlobalTime - this.Peek().Time > 0)
+            {
+                this.Push(this.Pop().Handle());
+            }
         }
 
         public void Push(Event e)
@@ -23,7 +28,7 @@ namespace GBAEmulator.Audio
             this.TrickleUp(Count);
         }
 
-        public Event Pop()
+        private Event Pop()
         {
             Event root = Storage[1];
             Swap(1, Count--);
@@ -31,7 +36,7 @@ namespace GBAEmulator.Audio
             return root;
         }
 
-        public Event Peek()
+        private Event Peek()
         {
             return Storage[1];
         }

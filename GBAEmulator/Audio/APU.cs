@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+using GBAEmulator.Scheduler;
 using GBAEmulator.IO;
 using GBAEmulator.CPU;
 using GBAEmulator.Audio.Peripherals;
@@ -12,11 +13,9 @@ namespace GBAEmulator.Audio
     public class APU
     {
         private readonly IORAMSection IO;
-        private int Timer;
         private int FrameSequencer;
         private const int FrameSequencerPeriod = 0x8000;
         private const int SamplePeriod = ARM7TDMI.Frequency / Speaker.SampleFrequency;
-        private cEventQueue EventQueue = new cEventQueue(8);  // how many events at once (1 for each channel, framecounter, etc.)
 
         public readonly SquareChannel sq1 = new SquareChannel();
         public readonly SquareChannel sq2 = new SquareChannel();
@@ -47,7 +46,7 @@ namespace GBAEmulator.Audio
         public readonly Speaker speaker = new Speaker();
         private const double Amplitude = 0.05;
 
-        public APU(IORAMSection IO, ARM7TDMI cpu)
+        public APU(IORAMSection IO, ARM7TDMI cpu, Scheduler.Scheduler scheduler)
         {
             this.IO = IO;
             this.Channels = new Channel[] { sq1, sq2, wave, noise };
@@ -56,20 +55,9 @@ namespace GBAEmulator.Audio
             this.FIFO[1] = this.FIFOB = new FIFOChannel(cpu, 0x0400_00a4);
 
             // initial APU events
-            this.EventQueue.Push(new Event(FrameSequencerPeriod, this.TickFrameSequencer));
-            foreach (Channel ch in this.Channels) this.EventQueue.Push(new Event(ch.Period, ch.Tick));
-            this.EventQueue.Push(new Event(FrameSequencerPeriod, this.ProvideSample));
-        }
-
-        public void Tick(int cycles)
-        {
-            this.Timer += cycles;
-            // assume only 1 audio event per CPU instruction
-            // even if this is not true, the delay will be minimal
-            if (this.EventQueue.Count > 0 && this.Timer - this.EventQueue.Peek().Time > 0)
-            {
-                this.EventQueue.Push(this.EventQueue.Pop().Handle());
-            }
+            scheduler.Push(new Event(FrameSequencerPeriod, this.TickFrameSequencer));
+            foreach (Channel ch in this.Channels) scheduler.Push(new Event(ch.Period, ch.Tick));
+            scheduler.Push(new Event(FrameSequencerPeriod, this.ProvideSample));
         }
 
         private Event TickFrameSequencer(int time)
