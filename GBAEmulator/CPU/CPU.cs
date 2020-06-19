@@ -108,7 +108,7 @@ namespace GBAEmulator.CPU
                 return 1;
 
             this.HandleIRQs();
-            if (DMAActive) this.HandleDMAs();
+            this.HandleDMAs();
             // Handling DMAs automatically causes InstructionCycles to no longer be 0 because of the memory accesses
             if (InstructionCycles > 0)
             {

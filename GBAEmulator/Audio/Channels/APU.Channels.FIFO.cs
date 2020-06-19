@@ -34,7 +34,7 @@ namespace GBAEmulator.Audio.Channels
                 }
                 else if (this.cpu.DMAChannels[2].DAD == this.FIFODATAAddr)
                 {
-                    this.cpu.DMAChannels[1].Trigger(DMAStartTiming.Special);
+                    this.cpu.DMAChannels[2].Trigger(DMAStartTiming.Special);
                 }
             }
             else if (this.Queue.Count > 32)
