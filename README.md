@@ -23,5 +23,5 @@ To do:
 Known bugs:
   - Pokemon pinball menu screen popup should be transparent (alphablending issue, used to work)
   - Zelda LTTP does not boot past game selection
-  - WarioWare audio is messed up
+  - WarioWare and Doom audio is messed up (FIFO keeps reading when it shouldn't...)
   
