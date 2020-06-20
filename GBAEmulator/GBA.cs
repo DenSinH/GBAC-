@@ -166,7 +166,7 @@ namespace GBAEmulator
             // this.mem.LoadRom("../../../Tests/EndriftSuite.gba");
 
             // this.mem.UseNormattsBios();
-            // cpu.SkipBios();
+            cpu.SkipBios();
 
             while (!this.ShutDown)
             {

@@ -91,22 +91,10 @@ namespace GBAEmulator.CPU
             this.IO.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
         }
 
-        //bool COMPLOG = true;
-        //StreamReader LOGFILE = new StreamReader("../../../Tests/arm.log");
         public int InstructionCycles;
         public int Step()
         {
             InstructionCycles = 0;
-
-            //if (this.PC == 0x0800_ce54)
-            //{
-            //    Console.WriteLine("Start DMA0 func");
-            //    Console.WriteLine("BREAKPOINT!");
-            //    COMPLOG = true;
-            //}
-
-            if (pause)
-                return 1;
 
             this.HandleIRQs();
             this.HandleDMAs();
@@ -152,32 +140,6 @@ namespace GBAEmulator.CPU
                     }
                 }
             }
-
-            //if (COMPLOG)
-            //{
-            //    if (!this.IORAM.HALTCNT.Halt)
-            //    {
-            //        if (this.Pipeline.Count == 1)
-            //        {
-            //            string Line = LOGFILE.ReadLine();
-            //            Console.WriteLine("LOG " + Line);
-            //            Console.Write(" ACT ");
-            //            this.ShowInfo();
-
-            //            //// all registers
-            //            //if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
-            //            //{
-            //            //    Console.ReadKey();
-            //            //}
-
-            //            // wrong branch
-            //            if (!Line.Contains(this.Registers[15].ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
-            //            {
-            //                Console.ReadKey();
-            //            }
-            //        }
-            //    }
-            //}
 
             this.GlobalCycleCount += InstructionCycles;
             return InstructionCycles;

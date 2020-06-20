@@ -75,9 +75,9 @@ namespace GBAEmulator.CPU
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Update()
             {
-                if (this.DMACNT_H.ValueChanged)
+                if (this.DMACNT_H.Triggered)
                 {
-                    this.DMACNT_H.ValueChanged = false;
+                    this.DMACNT_H.Triggered = false;
 
                     this.DMADAD.Reload();
                     this.DMASAD.Reload();
@@ -93,7 +93,7 @@ namespace GBAEmulator.CPU
 
             public bool Trigger(DMAStartTiming timing)
             {
-                if (this.DMACNT_H.DMAEnabled && timing == this.DMACNT_H.StartTiming)  // enabled
+                if (this.DMACNT_H.Enabled && timing == this.DMACNT_H.StartTiming)  // enabled
                 {
                     this.Active = true;
                     return true;

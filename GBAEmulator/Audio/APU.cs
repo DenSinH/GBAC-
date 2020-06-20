@@ -28,10 +28,10 @@ namespace GBAEmulator.Audio
         public readonly FIFOChannel[] FIFO = new FIFOChannel[2];
 
         /* SOUNDCNT_L params */
-        public uint MasterVolumeRight = 7;  // 0 - 7
-        public uint MasterVolumeLeft = 7;   // 0 - 7
-        public bool[] MasterEnableRight = new bool[4] { true, true, true, true };
-        public bool[] MasterEnableLeft = new bool[4] { true, true, true, true };
+        public uint MasterVolumeRight;  // 0 - 7
+        public uint MasterVolumeLeft;   // 0 - 7
+        public bool[] MasterEnableRight = new bool[4];
+        public bool[] MasterEnableLeft = new bool[4];
 
         /* SOUNDCNT_H params */
         public int Sound1_4Volume;

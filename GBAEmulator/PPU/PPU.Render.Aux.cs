@@ -321,10 +321,12 @@ namespace GBAEmulator.Video
 
                     if (Mosaic)
                     {
-                        // todo: migth go wrong if we HFlip
+                        // todo: might go wrong if we HFlip
                         if (ScreenX % MosaicHStretch != 0)
                         {
-                            Line[ScreenX] = Line[ScreenX - XSign * (XSign * ScreenX % MosaicHStretch)];
+                            uint EffectiveX = (uint)(ScreenX - XSign * (XSign * ScreenX % MosaicHStretch));
+                            if (EffectiveX < width)
+                                Line[ScreenX] = Line[EffectiveX];
                             continue;
                         }
                     }
@@ -358,11 +360,10 @@ namespace GBAEmulator.Video
                 if (Mosaic)
                 {
                     // todo: might go wrong if we HFlip
-                    if (ScreenX % MosaicHStretch != 0)
-                    {
-                        Line[ScreenX] = Line[XSign - (XSign * ScreenX % MosaicHStretch)];
-                        continue;
-                    }
+                    uint EffectiveX = (uint)(ScreenX - XSign * (XSign * ScreenX % MosaicHStretch));
+                    if (EffectiveX < width)
+                        Line[ScreenX] = Line[EffectiveX];
+                    continue;
                 }
 
                 VRAMEntry = this.gba.mem.VRAM[TileLineBaseAddress + dx];

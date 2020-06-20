@@ -98,7 +98,7 @@ namespace GBAEmulator.IO
     public class cDMACNT_H : IORegister2
     {
         private bool AllowGamePakDRQ;
-        public bool ValueChanged;
+        public bool Triggered;
 
         public cDMACNT_H() : base()
         {
@@ -147,7 +147,7 @@ namespace GBAEmulator.IO
             get => (this._raw & 0x4000) > 0;
         }
 
-        public bool DMAEnabled
+        public bool Enabled
         {
             get => (this._raw & 0x8000) > 0;
         }
@@ -159,11 +159,11 @@ namespace GBAEmulator.IO
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            bool Disabled = !this.DMAEnabled;
+            bool Disabled = !this.Enabled;
 
             // bottom 5 bits unused
             base.Set((ushort)(value & 0xfff8), setlow, sethigh);
-            this.ValueChanged = Disabled && this.DMAEnabled;
+            this.Triggered = Disabled && this.Enabled;
         }
     }
     #endregion
