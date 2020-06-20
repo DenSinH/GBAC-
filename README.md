@@ -11,13 +11,19 @@ Done:
   - Timers (though still pretty inacurrate)
   - Windowing
   - Alpha Blending
+  - sound
   
 To do:
-  - sound
-  - Other registers
+  - SIO
   - better open bus
   - more accurate cycles
   - windowing in BM rendering modes
+  - RTC
 
 Known bugs:
-  - None!
+  - Pokemon pinball menu screen popup should be transparent (alphablending issue, used to work)
+  - Frequency sweep seems off (Zelda Minish Cap falling snails are just beeps)
+  - Zelda LTTP does not boot past game selection
+  - WarioWare audio is messed up
+  - Krom's Rickroll rom audio does not work (silent)
+  
