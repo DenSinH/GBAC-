@@ -22,7 +22,6 @@ To do:
 
 Known bugs:
   - Pokemon pinball menu screen popup should be transparent (alphablending issue, used to work)
-  - Frequency sweep seems off (Zelda Minish Cap falling snails are just beeps)
   - Zelda LTTP does not boot past game selection
   - WarioWare audio is messed up
   
