@@ -6,8 +6,8 @@ namespace GBAEmulator.Video
 {
     partial class PPU
     {
-        BlendMode[]  BGWindowBlendMode = new BlendMode[width];
-        BlendMode[] OBJWindowBlendMode = new BlendMode[width];
+        BlendMode[]  BGWindowBlendMode          = new BlendMode[width];
+        BlendMode?[] OBJWindowBlendModeOverride = new BlendMode?[width];
 
         public void ResetWindowBlendMode()
         {
@@ -29,7 +29,11 @@ namespace GBAEmulator.Video
             {
                 if (this.OBJBlendingMask[x] != null)  // null means no sprite present, so don't enable the blendmode
                 {
-                    OBJWindowBlendMode[x] = this.OBJBlendingMask[x] ?? false ? OBJBlendMode : BlendMode.Off;
+                    OBJWindowBlendModeOverride[x] = this.OBJBlendingMask[x] ?? false ? OBJBlendMode : BlendMode.Off;
+                }
+                else
+                {
+                    OBJWindowBlendModeOverride[x] = null;
                 }
             }
         }
@@ -258,7 +262,8 @@ namespace GBAEmulator.Video
                 {
                     if (RenderOBJ && this.OBJLayers[priority][x] != Transparent)
                     {
-                        if (this.SetPixel(ScreenX, this.OBJLayers[priority][x], OBJWindowBlendMode[x], OBJTop, OBJBottom, WasOBJ, IsOBJ: true))
+                        if (this.SetPixel(ScreenX, this.OBJLayers[priority][x], OBJWindowBlendModeOverride[x] ?? BGWindowBlendMode[x],
+                            OBJTop, OBJBottom, WasOBJ, IsOBJ: true))
                         {
                             priority = 0xee;    // break out of priority loop, and signify that we have found a non-transparent pixel
                             break;
