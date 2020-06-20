@@ -25,5 +25,4 @@ Known bugs:
   - Frequency sweep seems off (Zelda Minish Cap falling snails are just beeps)
   - Zelda LTTP does not boot past game selection
   - WarioWare audio is messed up
-  - Krom's Rickroll rom audio does not work (silent)
   
