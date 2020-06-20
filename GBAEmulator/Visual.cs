@@ -74,12 +74,27 @@ namespace GBAEmulator
             ((ToolStripDropDownMenu)(GameMenu.DropDown)).ShowImageMargin = false;
             ((ToolStripDropDownMenu)(GameMenu.DropDown)).ShowCheckMargin = false;
 
+            ToolStripMenuItem EmulationMenu = new ToolStripMenuItem("Emulation");
+            ToolStripMenuItem EmulationPauseItem = new ToolStripMenuItem("Pause", null,
+                new EventHandler((object sender, EventArgs e) => {
+                    this.gba.Pause ^= true;
+                    ((ToolStripMenuItem)sender).Checked ^= true;
+                }));
+            ToolStripMenuItem EmulationMuteItem = new ToolStripMenuItem("Mute", null,
+                new EventHandler((object sender, EventArgs e) => {
+                    this.gba.apu.Enabled = !(((ToolStripMenuItem)sender).Checked ^= true);
+                }));
+
+            EmulationMenu.DropDownItems.Add(EmulationPauseItem);
+            EmulationMenu.DropDownItems.Add(EmulationMuteItem);
+
             // Assign the ToolStripMenuItem that displays 
             // the list of child forms.
             ms.MdiWindowListItem = GameMenu;
 
             // Add the window ToolStripMenuItem to the MenuStrip.
             ms.Items.Add(GameMenu);
+            ms.Items.Add(EmulationMenu);
 
             // Dock the MenuStrip to the top of the form.
             ms.Dock = DockStyle.Top;

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 using GBAEmulator.Scheduler;
-using GBAEmulator.IO;
 using GBAEmulator.CPU;
 using GBAEmulator.Audio.Peripherals;
 using GBAEmulator.Audio.Channels;
@@ -12,6 +9,8 @@ namespace GBAEmulator.Audio
 {
     public class APU
     {
+        public bool Enabled = true;
+
         private int FrameSequencer;
         private const int FrameSequencerPeriod = 0x8000;
         private const int SamplePeriod = ARM7TDMI.Frequency / Speaker.SampleFrequency;
@@ -86,7 +85,6 @@ namespace GBAEmulator.Audio
 
         private void ProvideSample(int time, Scheduler.Scheduler scheduler)
         {
-            while (!this.speaker.NeedMoreSamples) { }  // prevent buffer overflow
             int SampleLeft = 0, SampleRight = 0;
             
             for (int i = 0; i < 4; i++)
@@ -120,7 +118,11 @@ namespace GBAEmulator.Audio
             SampleRight = (int)((SampleRight * this.MasterVolumeRight) / 8);
             SampleLeft = (int)((SampleLeft * this.MasterVolumeLeft) / 8);
 
-            this.speaker.AddSample((short)SampleLeft, (short)SampleRight);
+            if (this.Enabled)
+            {
+                while (!this.speaker.NeedMoreSamples) { }  // prevent buffer overflow
+                this.speaker.AddSample((short)SampleLeft, (short)SampleRight);
+            }
 
             scheduler.Push(new Event(time + SamplePeriod, this.ProvideSample));
         }
