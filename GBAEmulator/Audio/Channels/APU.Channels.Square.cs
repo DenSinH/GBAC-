@@ -18,7 +18,9 @@ namespace GBAEmulator.Audio.Channels
 
         public int SweepNumber;
         public bool SweepDir;
-        public int SweepTime;
+        public int SweepPeriod;
+        private int SweepTimer;
+
         public SquareChannel()
         {
             this.Duty = DutyCycles[0];
@@ -31,15 +33,25 @@ namespace GBAEmulator.Audio.Channels
             this.Duty = DutyCycles[index];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SweepReload()
+        {
+            this.SweepTimer = this.SweepPeriod;
+        }
+
         public void DoSweep()
         {
-            if (SweepTime > 0)
+            if (SweepPeriod > 0)
             {
-                SweepTime--;
-                int dPeriod = Period >> SweepNumber;
-                if (SweepDir) dPeriod *= -1;
+                SweepTimer--;
+                if (SweepTimer == 0)
+                {
+                    int dPeriod = Period >> SweepNumber;
+                    if (!SweepDir) dPeriod *= -1;
 
-                this.Period += dPeriod;
+                    this.Period += dPeriod;
+                    SweepTimer = SweepPeriod;
+                }
             }
         }
         

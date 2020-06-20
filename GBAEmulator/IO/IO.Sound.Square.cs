@@ -20,7 +20,8 @@ namespace GBAEmulator.IO
 
             this.Master.SweepNumber = this._raw & 0x7;
             this.Master.SweepDir = (this._raw & 0x8) > 0;
-            this.Master.SweepTime = (this._raw >> 4) & 0x7;
+            this.Master.SweepPeriod = (this._raw >> 4) & 0x7;
+            this.Master.SweepReload();
         }
     }
 

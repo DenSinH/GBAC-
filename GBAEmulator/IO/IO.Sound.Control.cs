@@ -19,6 +19,7 @@ namespace GBAEmulator.IO
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set((ushort)(value & 0xff77), setlow, sethigh);
+
             if (setlow)
             {
                 this.apu.MasterVolumeRight = (uint)(this._raw & 0x0007);
@@ -50,7 +51,7 @@ namespace GBAEmulator.IO
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set((ushort)(value & 0xff0f), setlow, sethigh);
-
+            
             apu.Sound1_4Volume = this._raw & 0x0003;
             int timer;
             for (int i = 0; i < 2; i++)

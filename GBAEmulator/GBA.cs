@@ -156,7 +156,7 @@ namespace GBAEmulator
 
         public void Run()
         {
-            this.mem.LoadRom("../../../roms/PokemonPinball.gba");
+            this.mem.LoadRom("../../../roms/ZeldaMinishCap.gba");
             // this.mem.LoadRom("../../../Tests/Krom/Video/Rick.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
@@ -165,8 +165,8 @@ namespace GBAEmulator
             // this.mem.LoadRom("../../../Tests/Tonc/snd1_demo.gba");
             // this.mem.LoadRom("../../../Tests/EndriftSuite.gba");
 
-            // this.cpu.mem.UseNormattsBios();
-            cpu.SkipBios();
+            // this.mem.UseNormattsBios();
+            // cpu.SkipBios();
 
             while (!this.ShutDown)
             {

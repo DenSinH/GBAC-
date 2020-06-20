@@ -28,10 +28,10 @@ namespace GBAEmulator.Audio
         public readonly FIFOChannel[] FIFO = new FIFOChannel[2];
 
         /* SOUNDCNT_L params */
-        public uint MasterVolumeRight;  // 0 - 7
-        public uint MasterVolumeLeft;   // 0 - 7
-        public bool[] MasterEnableRight = new bool[4];
-        public bool[] MasterEnableLeft = new bool[4];
+        public uint MasterVolumeRight = 7;  // 0 - 7
+        public uint MasterVolumeLeft = 7;   // 0 - 7
+        public bool[] MasterEnableRight = new bool[4] { true, true, true, true };
+        public bool[] MasterEnableLeft = new bool[4] { true, true, true, true };
 
         /* SOUNDCNT_H params */
         public int Sound1_4Volume;
@@ -42,7 +42,7 @@ namespace GBAEmulator.Audio
         /* SOUNDCNT_X params */
 
         public readonly Speaker speaker = new Speaker();
-        private const double Amplitude = 0.05;
+        private const double Amplitude = 0.03;
 
         public APU(ARM7TDMI cpu, Scheduler.Scheduler scheduler)
         {
@@ -99,24 +99,49 @@ namespace GBAEmulator.Audio
                 }
             }
 
+            // SOUNDCNT_L volume control does not affect FIFO channels
+            SampleRight = (int)((SampleRight * this.MasterVolumeRight) / 8);
+            SampleLeft = (int)((SampleLeft * this.MasterVolumeLeft) / 8);
+
+            switch (this.Sound1_4Volume)
+            {
+                case 0:
+                    // 25%
+                    SampleLeft >>= 2;
+                    SampleRight >>= 2;
+                    break;
+                case 1:
+                    // 50%
+                    SampleLeft >>= 1;
+                    SampleRight >>= 1;
+                    break;
+                default:
+                    // 100% / prohibited
+                    break;
+            }
+
+            /*
+            GBATek:
+             Each of the two FIFOs can span the FULL output range (+/-200h).
+             Each of the four PSGs can span one QUARTER of the output range (+/-80h).
+            So we multiply the output of the FIFO by 4
+            */
+
             for (int i = 0; i < 2; i++)
             {
                 if (this.DMAEnableRight[i])
                 {
-                    SampleRight += this.FIFO[i].CurrentSample << (this.DMASoundVolume[i] ? 0 : 1);  // false = 50%, true = 100%
+                    SampleRight += this.FIFO[i].CurrentSample << (this.DMASoundVolume[i] ? 1 : 2);  // false = 50%, true = 100%
                 }
 
                 if (this.DMAEnableLeft[i])
                 {
-                    SampleLeft += this.FIFO[i].CurrentSample << (this.DMASoundVolume[i] ? 0 : 1);  // false = 50%, true = 100%
+                    SampleLeft += this.FIFO[i].CurrentSample << (this.DMASoundVolume[i] ? 1 : 2);  // false = 50%, true = 100%
                 }
             }
 
             SampleRight = (int)(SampleRight * Amplitude);
             SampleLeft = (int)(SampleLeft * Amplitude);
-
-            SampleRight = (int)((SampleRight * this.MasterVolumeRight) / 8);
-            SampleLeft = (int)((SampleLeft * this.MasterVolumeLeft) / 8);
 
             if (this.Enabled)
             {

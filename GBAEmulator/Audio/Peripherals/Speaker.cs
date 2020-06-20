@@ -87,7 +87,7 @@ namespace GBAEmulator.Audio.Peripherals
         {
             WaveOut wo = new WaveOut();
             wo.DesiredLatency = 20;
-            wo.NumberOfBuffers = 50;
+            wo.NumberOfBuffers = 25;
             wo.Init(bf);
             wo.Play();
             while (wo.PlaybackState == PlaybackState.Playing && !sd.ShutDown)

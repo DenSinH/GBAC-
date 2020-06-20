@@ -76,5 +76,9 @@ namespace GBAEmulator.Memory
             };
         }
 
+        public void UseNormattsBIOS()
+        {
+            this.BIOS.UseNormattsBIOS();
+        }
     }
 }
