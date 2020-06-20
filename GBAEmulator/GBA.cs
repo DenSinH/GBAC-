@@ -19,7 +19,10 @@ namespace GBAEmulator
         public MEM mem;
         public BUS bus;
 
-        private Scheduler.Scheduler EventQueue = new Scheduler.Scheduler(8);  // how many events at once (1 for each channel, framecounter, etc.)
+        // how many events at once:
+        // 1 for each channel, framecounter, Provide sample => 6 for APU
+        // 1 for each timer                                 => 4 for CPU
+        private Scheduler.Scheduler EventQueue = new Scheduler.Scheduler(16);
 
         public Visual vis;
         public ushort[] display;
@@ -30,12 +33,12 @@ namespace GBAEmulator
 
         public GBA(ushort[] display)
         {
-            this.cpu = new ARM7TDMI(this);
+            this.cpu = new ARM7TDMI(this, this.EventQueue);
             this.IO  = this.cpu.IO;
             this.mem = this.cpu.mem;
             this.bus = this.cpu.bus;
 
-            this.apu = new APU(this.IO, this.cpu, this.EventQueue);
+            this.apu = new APU(this.cpu, this.EventQueue);
             this.ppu = new PPU(this, display, this.IO);
 
             this.IO.Init(this.cpu, this.apu);
@@ -153,14 +156,14 @@ namespace GBAEmulator
 
         public void Run()
         {
-            this.mem.LoadRom("../../../roms/ZeldaMinishCap.gba");
+            // this.mem.LoadRom("../../../roms/ZeldaMinishCap.gba");
             // this.mem.LoadRom("../../../Tests/Krom/Video/Rick.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
             // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
             // this.mem.LoadRom("../../../Tests/GBASuiteNew/bios.gba");
             // this.mem.LoadRom("../../../Tests/Tonc/snd1_demo.gba");
-            // this.mem.LoadRom("../../../Tests/AgingCard.gba");
+            this.mem.LoadRom("../../../Tests/EndriftSuite.gba");
 
             // this.cpu.mem.UseNormattsBios();
             cpu.SkipBios();

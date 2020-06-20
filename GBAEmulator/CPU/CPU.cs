@@ -27,14 +27,14 @@ namespace GBAEmulator.CPU
         public const int ICycle = 1;
         public int GlobalCycleCount { get; private set; }
 
-        public ARM7TDMI(GBA gba)
+        public ARM7TDMI(GBA gba, Scheduler.Scheduler scheduler)
         {
             this.gba = gba;
             this.Pipeline = new cPipeline(this);
 
             this.InitARM();
             this.InitTHUMB();
-            this.InitTimers();
+            this.InitTimers(scheduler);
 
             // IO requires bus to be initialized
             this.bus = new BUS(this);
@@ -152,8 +152,6 @@ namespace GBAEmulator.CPU
                     }
                 }
             }
-
-            this.TickTimers(InstructionCycles);
 
             //if (COMPLOG)
             //{

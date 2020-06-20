@@ -12,7 +12,6 @@ namespace GBAEmulator.Audio
 {
     public class APU
     {
-        private readonly IORAMSection IO;
         private int FrameSequencer;
         private const int FrameSequencerPeriod = 0x8000;
         private const int SamplePeriod = ARM7TDMI.Frequency / Speaker.SampleFrequency;
@@ -46,9 +45,8 @@ namespace GBAEmulator.Audio
         public readonly Speaker speaker = new Speaker();
         private const double Amplitude = 0.05;
 
-        public APU(IORAMSection IO, ARM7TDMI cpu, Scheduler.Scheduler scheduler)
+        public APU(ARM7TDMI cpu, Scheduler.Scheduler scheduler)
         {
-            this.IO = IO;
             this.Channels = new Channel[] { sq1, sq2, wave, noise };
 
             this.FIFO[0] = this.FIFOA = new FIFOChannel(cpu, 0x0400_00a0);

@@ -2,24 +2,19 @@
 using System.Runtime.CompilerServices;
 using GBAEmulator.Audio.Channels;
 using GBAEmulator.IO;
+using GBAEmulator.Scheduler;
 
 namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        private void InitTimers()
+        private void InitTimers(Scheduler.Scheduler scheduler)
         {
             this.Timers = new cTimer[4];
-            this.Timers[3] = new cTimer(this, 3);
-            this.Timers[2] = new cTimer(this, 2, this.Timers[3]);
-            this.Timers[1] = new cTimer(this, 1, this.Timers[2]);
-            this.Timers[0] = new cTimer(this, 0, this.Timers[1]);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void TickTimers(int cycles)
-        {
-            for (int i = 0; i < 4; i++) this.Timers[i].Tick(cycles);
+            this.Timers[3] = new cTimer(this, scheduler, 3);
+            this.Timers[2] = new cTimer(this, scheduler, 2, this.Timers[3]);
+            this.Timers[1] = new cTimer(this, scheduler, 1, this.Timers[2]);
+            this.Timers[0] = new cTimer(this, scheduler, 0, this.Timers[1]);
         }
 
         public class cTimer
@@ -27,6 +22,9 @@ namespace GBAEmulator.CPU
             private readonly cTimer Next;
 
             private readonly ARM7TDMI cpu;
+            private readonly Scheduler.Scheduler scheduler;
+            private int NextOverflow;
+            private bool HasOverflowEvent;
             private readonly int index;
 
             public readonly cTMCNT_L Data;
@@ -34,36 +32,55 @@ namespace GBAEmulator.CPU
             public readonly FIFOChannel[] FIFO = new FIFOChannel[2];
             private readonly bool IsSound;
 
-            public cTimer(ARM7TDMI cpu, int index)
+            public cTimer(ARM7TDMI cpu, Scheduler.Scheduler scheduler, int index)
             {
                 this.cpu = cpu;
+                this.scheduler = scheduler;
                 this.index = index;
-                this.Data = new cTMCNT_L();
-                this.Control = new cTMCNT_H(this.Data);
+                this.Data = new cTMCNT_L(cpu);
+                this.Control = new cTMCNT_H(this, this.Data);
                 this.IsSound = index == 0 || index == 1;
             }
 
-            public cTimer(ARM7TDMI cpu, int index, cTimer Next) : this(cpu, index)
+            public cTimer(ARM7TDMI cpu, Scheduler.Scheduler scheduler, int index, cTimer Next) : this(cpu, scheduler, index)
             {
                 this.Next = Next;
             }
 
-            public void TickDirect(int cycles)
+            public void Trigger()
             {
-                // countup tick calls
-                this.Data.TickUnscaled((ushort)cycles);
+                this.NextOverflow = this.cpu.GlobalCycleCount + this.Data.PrescalerLimit * (0x10000 - this.Data.Reload);
+                if (!this.HasOverflowEvent)
+                {
+                    // overflow timing cannot be changed when the timer is still running
+                    this.scheduler.Push(new Event(this.NextOverflow, this.Overflow));
+                    this.HasOverflowEvent = true;
+                }
             }
 
-            public void Tick(int cycles)
+            public void Overflow(int GlobalTime, Scheduler.Scheduler scheduler)
             {
-                if (!this.Control.Enabled || this.Control.CountUpTiming)
+                this.HasOverflowEvent = false;
+                if (!this.Control.Enabled)
+                {
+                    // timer was turned off
+                    return; 
+                }
+
+                if (!this.Control.CountUpTiming && GlobalTime - this.NextOverflow < 0)
+                {
+                    // overflow was changed, should not have happened yet...
+                    this.scheduler.Push(new Event(this.NextOverflow, this.Overflow));
+                    this.HasOverflowEvent = true;
                     return;
+                }
 
-                if (!this.Data.Tick((ushort)cycles))  // overflow
-                    return;  // no overflow means no other action
-
-                if (this.Next?.Control.CountUpTiming ?? false)
-                    this.Next?.TickDirect(1);
+                if (this.Next?.Control.CountUpTiming ?? false && this.Next.Control.Enabled)
+                {
+                    // tick countup timers "normally" (not scheduled)
+                    if (this.Next?.TickDirect(1) ?? false)
+                        this.Next?.Overflow(GlobalTime, scheduler);
+                }
 
                 if (this.IsSound)
                 {
@@ -75,6 +92,14 @@ namespace GBAEmulator.CPU
                 {
                     this.cpu.IO.IF.Request((Interrupt)((ushort)Interrupt.TimerOverflow << this.index));
                 }
+
+                if (!this.Control.CountUpTiming) this.Trigger();
+            }
+
+            public bool TickDirect(int cycles)
+            {
+                // countup tick calls, return if overflow happened
+                return this.Data.TickUnscaled((ushort)cycles);
             }
         }
 

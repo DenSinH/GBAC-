@@ -1,19 +1,31 @@
 ﻿using System;
 
+using GBAEmulator.CPU;
+using GBAEmulator.Scheduler;
+
 namespace GBAEmulator.IO
 {
     #region Timer Registers
     public class cTMCNT_L : IORegister2
     {
-        public ushort Counter { get; private set; }
+        private readonly ARM7TDMI cpu;
+        private bool IsCountUp;  // keep track of whether we are in CountUp mode on triggers
+        private ushort Counter;  // only used for CountUp timers
+        private int TriggerTime; // used for non-CountUp timers
         public ushort Reload { get; private set; }
 
-        private ushort PrescalerCounter;
-        public ushort PrescalerLimit = cTMCNT_H.PrescalerSelection[0];
+        public ushort PrescalerLimit = 1;  // initial value (see TMCNT_H.PrescalerSelection[0])
 
-        public void TimerReload()
+        public cTMCNT_L(ARM7TDMI cpu)
         {
+            this.cpu = cpu;
+        }
+
+        public void TimerReload(bool IsCountUp)
+        {
+            this.IsCountUp = IsCountUp;
             this.Counter = Reload;
+            this.TriggerTime = cpu.GlobalCycleCount;
         }
 
         public bool TickUnscaled(ushort cycles)
@@ -30,26 +42,11 @@ namespace GBAEmulator.IO
             return Overflow;
         }
 
-        public bool Tick(ushort cycles)
-        {
-            bool Overflow = false;
-
-            this.PrescalerCounter += cycles;
-
-            if (this.PrescalerCounter > this.PrescalerLimit)
-            {
-                // assume cycles < 64 (pretty valid assumption)
-                Overflow |= this.TickUnscaled((ushort)(this.PrescalerLimit == 1 ? this.PrescalerCounter : 1));
-
-                this.PrescalerCounter &= (ushort)(this.PrescalerLimit - 1);  // power of 2
-            }
-
-            return Overflow;
-        }
-
         public override ushort Get()
         {
-            return this.Counter;
+            if (this.IsCountUp)
+                return this.Counter;
+            return (ushort)(cpu.GlobalCycleCount - this.TriggerTime);
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
@@ -61,13 +58,15 @@ namespace GBAEmulator.IO
 
     public class cTMCNT_H : IORegister2
     {
-        public static ushort[] PrescalerSelection = new ushort[4] { 1, 64, 256, 1024 };
+        private static ushort[] PrescalerSelection = new ushort[4] { 1, 64, 256, 1024 };
 
-        cTMCNT_L Data;
+        private readonly cTMCNT_L Data;
+        private readonly ARM7TDMI.cTimer Master;
 
-        public cTMCNT_H(cTMCNT_L Data) : base()
+        public cTMCNT_H(ARM7TDMI.cTimer Master, cTMCNT_L Data) : base()
         {
             this.Data = Data;
+            this.Master = Master;
         }
 
         public byte Prescaler
@@ -99,7 +98,8 @@ namespace GBAEmulator.IO
             this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
             if (!WasEnabled && this.Enabled)
             {
-                this.Data.TimerReload();
+                this.Data.TimerReload(this.CountUpTiming);
+                this.Master.Trigger();
             }
         }
     }

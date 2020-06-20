@@ -28,7 +28,7 @@ namespace GBAEmulator.CPU
 
         public TimerInfo(ARM7TDMI.cTimer timer)
         {
-            this.Counter = timer.Data.Counter.ToString("x4");
+            this.Counter = timer.Data.Get().ToString("x4");
             this.Reload = timer.Data.Reload.ToString("x4");
             this.Prescaler = timer.Data.PrescalerLimit.ToString("d4");
             this.IRQEnabled = timer.Control.TimerIRQEnable ? "1" : "0";
