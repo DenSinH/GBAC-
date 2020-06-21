@@ -6,9 +6,9 @@ Done:
   - THUMB instructions
   - Render mode 0, 1, 2, 3, 4 (, 5?)
   - SWI's
-  - Most IRQ handling (ohhh boy was this annoying)
+  - IRQ handling (ohhh boy was this annoying)
   - DMA
-  - Timers (though still pretty inacurrate)
+  - Timers (though not always acurrate)
   - Windowing
   - Alpha Blending
   - sound
@@ -23,5 +23,4 @@ To do:
 Known bugs:
   - Pokemon pinball menu screen popup should be transparent (alphablending issue, used to work)
   - Zelda LTTP does not boot past game selection
-  - Zelda Minish cap minish houses are black inside (alphablending issue?, used to work...)
   
