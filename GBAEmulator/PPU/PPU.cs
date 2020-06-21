@@ -23,6 +23,9 @@ namespace GBAEmulator.Video
         const int ScanlinesPerFrame = 228;
         const ushort Transparent = 0x8000;
 
+        public readonly bool[] ExternalBGEnable = new bool[4] { true, true, true, true };
+        public bool ExternalOBJEnable = true;
+
         public PPU(GBA gba, ushort[] display, IORAMSection IO)
         {
             this.gba = gba;

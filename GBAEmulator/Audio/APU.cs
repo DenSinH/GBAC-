@@ -9,7 +9,7 @@ namespace GBAEmulator.Audio
 {
     public class APU
     {
-        public bool Enabled = true;
+        public bool ExternalEnable = true;
 
         private int FrameSequencer;
         private const int FrameSequencerPeriod = 0x8000;
@@ -143,7 +143,7 @@ namespace GBAEmulator.Audio
             SampleRight = (int)(SampleRight * Amplitude);
             SampleLeft = (int)(SampleLeft * Amplitude);
 
-            if (this.Enabled)
+            if (this.ExternalEnable)
             {
                 while (!this.speaker.NeedMoreSamples) { }  // prevent buffer overflow
                 this.speaker.AddSample((short)SampleLeft, (short)SampleRight);

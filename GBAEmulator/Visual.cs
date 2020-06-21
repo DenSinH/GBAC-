@@ -66,46 +66,7 @@ namespace GBAEmulator
 
             this.FPSTimer = Stopwatch.StartNew();
 
-            ToolStripMenuItem GameMenu = new ToolStripMenuItem("Game");
-            ToolStripMenuItem GameOpenItem = new ToolStripMenuItem("Open", null, new EventHandler(LoadGame));
-            ToolStripMenuItem GameDebugItem = new ToolStripMenuItem("Debug", null, new EventHandler(OpenDebug));
-
-            GameMenu.DropDownItems.Add(GameOpenItem);
-            GameMenu.DropDownItems.Add(GameDebugItem);
-            ((ToolStripDropDownMenu)(GameMenu.DropDown)).ShowImageMargin = false;
-            ((ToolStripDropDownMenu)(GameMenu.DropDown)).ShowCheckMargin = false;
-
-            ToolStripMenuItem EmulationMenu = new ToolStripMenuItem("Emulation");
-            ToolStripMenuItem EmulationPauseItem = new ToolStripMenuItem("Pause", null,
-                new EventHandler((object sender, EventArgs e) => {
-                    this.gba.Pause ^= true;
-                    ((ToolStripMenuItem)sender).Checked ^= true;
-                }));
-            ToolStripMenuItem EmulationMuteItem = new ToolStripMenuItem("Mute", null,
-                new EventHandler((object sender, EventArgs e) => {
-                    this.gba.apu.Enabled = !(((ToolStripMenuItem)sender).Checked ^= true);
-                }));
-
-            EmulationMenu.DropDownItems.Add(EmulationPauseItem);
-            EmulationMenu.DropDownItems.Add(EmulationMuteItem);
-
-            // Assign the ToolStripMenuItem that displays 
-            // the list of child forms.
-            ms.MdiWindowListItem = GameMenu;
-
-            // Add the window ToolStripMenuItem to the MenuStrip.
-            ms.Items.Add(GameMenu);
-            ms.Items.Add(EmulationMenu);
-
-            // Dock the MenuStrip to the top of the form.
-            ms.Dock = DockStyle.Top;
-
-            // The Form.MainMenuStrip property determines the merge target.
-            this.MainMenuStrip = ms;
-
-            // Add the MenuStrip last.
-            // This is important for correct placement in the z-order.
-            this.Controls.Add(ms);
+            this.InitMenustrip(ms);
 
             this.Load += new EventHandler(Visual_CreateBackBuffer);
             this.Paint += new PaintEventHandler(Visual_Paint);

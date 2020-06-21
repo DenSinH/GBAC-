@@ -163,13 +163,6 @@ namespace GBAEmulator
         public void Run(string ROMPath)
         {
             this.mem.LoadRom(ROMPath);
-            // this.mem.LoadRom("../../../Tests/Krom/Video/Rick.gba");
-            // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
-            // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
-            // this.mem.LoadRom("../../../Tests/flero/openbuster.gba");
-            // this.mem.LoadRom("../../../Tests/GBASuiteNew/bios.gba");
-            // this.mem.LoadRom("../../../Tests/Tonc/snd1_demo.gba");
-            // this.mem.LoadRom("../../../Tests/EndriftSuite.gba");
 
             // this.mem.UseNormattsBios();
             cpu.SkipBios();

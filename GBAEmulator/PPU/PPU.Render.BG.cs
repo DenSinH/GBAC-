@@ -118,6 +118,10 @@ namespace GBAEmulator.Video
                     // Background disabled, does not need rendering
                     continue;
 
+                if (!ExternalBGEnable[BG])
+                    // Background disabled externally
+                    continue;
+
                 HOFS  = this.IO.BGHOFS[BG].Offset;
                 VOFS  = this.IO.BGVOFS[BG].Offset;
                 BGCNT = this.IO.BGCNT[BG];
@@ -186,7 +190,12 @@ namespace GBAEmulator.Video
                             cRotationScaling PA, cRotationScaling PB, cRotationScaling PC, cRotationScaling PD)
         {
             // ! only to be used with BG = 2 or BG = 3 !
-            if (!this.IO.DISPCNT.DisplayBG(BG))  // Background disabled, does not need rendering
+            if (!this.IO.DISPCNT.DisplayBG(BG))
+                // Background disabled, does not need rendering
+                return;
+
+            if (!ExternalBGEnable[BG])
+                // Background disabled externally
                 return;
 
             cBGControl BGCNT = this.IO.BGCNT[BG];

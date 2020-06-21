@@ -60,7 +60,7 @@ namespace GBAEmulator.Video
 
         private void Mode0Scanline()
         {
-            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ) && ExternalOBJEnable;
             
             this.ResetBGScanlines(0, 1, 2, 3);
             this.ResetBGWindows(0, 1, 2, 3);
@@ -77,7 +77,7 @@ namespace GBAEmulator.Video
 
         private void Mode1Scanline()
         {
-            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ) && ExternalOBJEnable;
             
             this.ResetBGScanlines(0, 1, 2);
             this.ResetBGWindows(0, 1, 2);
@@ -96,7 +96,7 @@ namespace GBAEmulator.Video
 
         private void Mode2Scanline()
         {
-            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ) && ExternalOBJEnable;
             
             this.ResetBGScanlines(2, 3);
             this.ResetBGWindows(2, 3);
@@ -117,7 +117,7 @@ namespace GBAEmulator.Video
         private void Mode3Scanline()
         {
             // we render on BG2
-            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ) && ExternalOBJEnable;
 
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
@@ -168,7 +168,7 @@ namespace GBAEmulator.Video
         {
             // we render on BG2
             ushort offset = (ushort)(this.IO.DISPCNT.IsSet(DISPCNTFlags.DPFrameSelect) ? 0xa000 : 0);
-            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ);
+            bool DoRenderOBJs = this.IO.DISPCNT.IsSet(DISPCNTFlags.DisplayOBJ) && ExternalOBJEnable;
 
             this.ResetBGWindows(2);
             this.ResetOBJWindow();
