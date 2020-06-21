@@ -10,7 +10,7 @@ namespace GBAEmulator.IO
     {
         private readonly ARM7TDMI cpu;
         private bool IsCountUp;  // keep track of whether we are in CountUp mode on triggers
-        private ushort Counter;  // only used for CountUp timers
+        private ushort CountUpCounter;  // only used for CountUp timers
         private int TriggerTime; // used for non-CountUp timers
         public ushort Reload { get; private set; }
 
@@ -24,20 +24,20 @@ namespace GBAEmulator.IO
         public void TimerReload(bool IsCountUp)
         {
             this.IsCountUp = IsCountUp;
-            this.Counter = Reload;
-            this.TriggerTime = cpu.GlobalCycleCount;
+            this.CountUpCounter = Reload;
+            this.TriggerTime = cpu.GlobalCycleCount + cpu.InstructionCycles;  // timer starts "after" instruction was executed
         }
 
         public bool TickUnscaled(ushort cycles)
         {
             // don't account for the prescaler
             bool Overflow = false;
-            if (this.Counter + cycles > 0xffff)  // overflow
+            if (this.CountUpCounter + cycles > 0xffff)  // overflow
             {
-                this.Counter += this.Reload;
+                this.CountUpCounter += this.Reload;
                 Overflow = true;
             }
-            this.Counter += cycles;
+            this.CountUpCounter += cycles;
 
             return Overflow;
         }
@@ -45,8 +45,8 @@ namespace GBAEmulator.IO
         public override ushort Get()
         {
             if (this.IsCountUp)
-                return this.Counter;
-            return (ushort)(cpu.GlobalCycleCount - this.TriggerTime);
+                return this.CountUpCounter;
+            return (ushort)((cpu.GlobalCycleCount + cpu.InstructionCycles - this.TriggerTime) / this.PrescalerLimit);
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
@@ -96,6 +96,7 @@ namespace GBAEmulator.IO
             base.Set(value, setlow, sethigh);
 
             this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
+
             if (!WasEnabled && this.Enabled)
             {
                 this.Data.TimerReload(this.CountUpTiming);

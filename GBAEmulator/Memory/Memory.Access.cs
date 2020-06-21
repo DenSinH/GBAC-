@@ -74,7 +74,10 @@ namespace GBAEmulator.Memory
             // offset is handled in individual sections (always force align, except SRAM
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetWordAccessCycles(Section, address);
-            if (Section > 15) return this.bus.OpenBus();
+            if (Section > 15)
+            {
+                return this.bus.OpenBus();
+            }
 
             return this.bus.BusValue = (this.MemorySections[Section].GetWordAt(address) ?? this.bus.OpenBus());
         }
@@ -84,7 +87,10 @@ namespace GBAEmulator.Memory
             // offset is handled in individual sections (always force align, except SRAM
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
-            if (Section > 15) return (ushort)this.bus.OpenBus();
+            if (Section > 15)
+            {
+                return (ushort)this.bus.OpenBus();
+            }
 
             ushort value = this.MemorySections[Section].GetHalfWordAt(address) ?? (ushort)this.bus.OpenBus();
 
@@ -97,7 +103,10 @@ namespace GBAEmulator.Memory
         {
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
-            if (Section > 15) return (byte)this.bus.OpenBus();
+            if (Section > 15)
+            {
+                return (byte)this.bus.OpenBus();
+            }
 
             byte value = this.MemorySections[Section].GetByteAt(address) ?? (byte)this.bus.OpenBus();
 

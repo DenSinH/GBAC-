@@ -95,6 +95,7 @@ namespace GBAEmulator.CPU
             {
                 if (this.DMACNT_H.Enabled && timing == this.DMACNT_H.StartTiming)  // enabled
                 {
+                    // Console.WriteLine($"DMA{this.index}: {this.SAD:x8} -> {this.DAD:x8}");
                     this.Active = true;
                     return true;
                 }
@@ -143,14 +144,15 @@ namespace GBAEmulator.CPU
                 }
                 else
                 {
-                    // end of the transfer
-                    if (this.DMACNT_H.IRQOnEnd)
-                    {
-                        this.IF.Request((ushort)((ushort)Interrupt.DMA << this.index));
-                    }
                     this.DMACNT_H.Disable();  // clear enabled bit
                 }
                 this.Active = false;
+
+                // end of the transfer
+                if (this.DMACNT_H.IRQOnEnd)
+                {
+                    this.IF.Request((ushort)((ushort)Interrupt.DMA << this.index));
+                }
 
                 if (this.Sound) this.SNDCOUNT = 4;
 
