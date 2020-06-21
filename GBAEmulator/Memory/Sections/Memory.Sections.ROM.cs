@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
+using GBAEmulator.Memory.GPIO;
+
 
 namespace GBAEmulator.Memory.Sections
 {
     public class cROMSection : MemorySection
     {
         private MEM mem;
+        private GPIO.GPIO gpio;
         public uint ROMSize;
         private bool IsUpper;
         public cROMSection(MEM mem, bool IsUpper) : base(0x0100_0000)
         {
             this.mem = mem;
             this.IsUpper = IsUpper;
+            this.gpio = new GPIO.GPIO(GPIO.GPIO.Chip.Empty);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,6 +54,41 @@ namespace GBAEmulator.Memory.Sections
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private byte? TryGPIORead(uint address)
+        {
+            switch (address)
+            {
+                case 0x0800_00c4:
+                    return this.gpio.GetData();
+                case 0x0800_00c6:
+                    return this.gpio.GetDirection();
+                case 0x0800_00c8:
+                    return this.gpio.GetControl();
+                default:
+                    return null;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void TryGPIOWrite(uint address, byte value)
+        {
+            switch (address)
+            {
+                case 0x0800_00c4:
+                    this.gpio.SetData(value);
+                    return;
+                case 0x0800_00c6:
+                    this.gpio.SetDirection(value);
+                    return;
+                case 0x0800_00c8:
+                    this.gpio.SetControl(value);
+                    return;
+                default:
+                    return;
+            }
+        }
+
         public override byte? GetByteAt(uint address)
         {
             byte? value;
@@ -60,6 +99,11 @@ namespace GBAEmulator.Memory.Sections
 
                 if ((address &= 0x01ff_ffff) > this.ROMSize)
                     return (byte)((address >> 1) & 0xff);
+            }
+            else
+            {
+                value = this.TryGPIORead(address);
+                if (value != null) return value;
             }
             return base.GetByteAt(address);
         }
@@ -77,6 +121,11 @@ namespace GBAEmulator.Memory.Sections
                     return (ushort)((address >> 1) & 0xffff);
                 }
             }
+            else
+            {
+                value = this.TryGPIORead(address);
+                if (value != null) return value;
+            }
             return base.GetHalfWordAt(address);
         }
 
@@ -93,22 +142,36 @@ namespace GBAEmulator.Memory.Sections
                     return ((address >> 1) & 0xfffe) | ((((address >> 1) & 0xfffe) + 1) << 16);
                 }
             }
+            else
+            {
+                value = this.TryGPIORead(address);
+                if (value != null) return value;
+            }
             return base.GetWordAt(address);
         }
 
         public override void SetByteAt(uint address, byte value)
         {
-            this.TryEEPROMWrite(address, value);
+            if (this.IsUpper)
+                this.TryEEPROMWrite(address, value);
+            else
+                this.TryGPIOWrite(address, value);
         }
 
         public override void SetHalfWordAt(uint address, ushort value)
         {
-            this.TryEEPROMWrite(address, (byte)value);
+            if (this.IsUpper)
+                this.TryEEPROMWrite(address, (byte)value);
+            else
+                this.TryGPIOWrite(address, (byte)value);
         }
 
         public override void SetWordAt(uint address, uint value)
         {
-            this.TryEEPROMWrite(address, (byte)value);
+            if (this.IsUpper)
+                this.TryEEPROMWrite(address, (byte)value);
+            else
+                this.TryGPIOWrite(address, (byte)value);
         }
 
         public void Load(byte[] data, uint offset)
