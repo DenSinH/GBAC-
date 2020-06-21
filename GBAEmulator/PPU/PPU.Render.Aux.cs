@@ -83,6 +83,11 @@ namespace GBAEmulator.Video
                 FillWindow<T>(ref Window, Default);
                 return;
             }
+            else if (!this.ExternalWindowingEnable)
+            {
+                FillWindow<T>(ref Window, Default);
+                return;
+            }
 
             FillWindow<T>(ref Window, WinOut);  // clear to WINOUT
 
@@ -147,6 +152,11 @@ namespace GBAEmulator.Video
             bool IsTop, bool IsBottom, bool WasOBJ, bool IsOBJ = false)
         {
             // returns if the pixel has final value
+            if (!this.ExternalBlendingEnable)
+            {
+                this.Display[ScreenX] = Color;
+                return true;
+            }
 
             // Sprites behave in a different way with respect to alpha blending
             // I copied the Tonc text into case BlendMode.White

@@ -25,6 +25,8 @@ namespace GBAEmulator.Video
 
         public readonly bool[] ExternalBGEnable = new bool[4] { true, true, true, true };
         public bool ExternalOBJEnable = true;
+        public bool ExternalWindowingEnable = true;
+        public bool ExternalBlendingEnable = true;
 
         public PPU(GBA gba, ushort[] display, IORAMSection IO)
         {

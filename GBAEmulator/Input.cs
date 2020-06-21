@@ -14,6 +14,7 @@ namespace GBAEmulator
     {
         private SharpDX.XInput.Controller controller;
         private volatile ushort ControllerState;  // updated in different thread as well
+        private const int JoystickThreshold = 1 << 14;  // 2 ** 14
 
         public XInputController()
         {
@@ -22,22 +23,28 @@ namespace GBAEmulator
 
         public virtual void UpdateState()
         {
-            int state = (int)controller.GetState().Gamepad.Buttons;
+            Gamepad gamepad = controller.GetState().Gamepad;
+            int ButtonState = (int)gamepad.Buttons;
+            int JoystickX = gamepad.LeftThumbX;
+            int JoystickY = gamepad.LeftThumbY;
+
             ushort _A, _B, _Start, _Select, _Up, _Down, _Left, _Right, _R, _L;
 
-            _A =        (ushort)(((state &  (int)GamepadButtonFlags.A) > 0) ?           0b00_0000_0001 : 0);
-            _B =        (ushort)(((state & ((int)GamepadButtonFlags.B |
-                                            (int)GamepadButtonFlags.X)) > 0) ?          0b00_0000_0010 : 0);
-            _Select =   (ushort)(((state &  (int)GamepadButtonFlags.Back) > 0) ?        0b00_0000_0100 : 0);
-            _Start =    (ushort)(((state &  (int)GamepadButtonFlags.Start) > 0) ?       0b00_0000_1000 : 0);
-            _Right =    (ushort)(((state &  (int)GamepadButtonFlags.DPadRight) > 0) ?   0b00_0001_0000 : 0);
-            _Left =     (ushort)(((state &  (int)GamepadButtonFlags.DPadLeft) > 0) ?    0b00_0010_0000 : 0);
-            _Up =       (ushort)(((state &  (int)GamepadButtonFlags.DPadUp) > 0) ?      0b00_0100_0000 : 0);
-            _Down =     (ushort)(((state &  (int)GamepadButtonFlags.DPadDown) > 0) ?    0b00_1000_0000 : 0);
-            _R =        (ushort)(((state & ((int)GamepadButtonFlags.RightThumb |
-                                            (int)GamepadButtonFlags.RightShoulder)) > 0) ? 0b01_0000_0000 : 0);
-            _L =        (ushort)(((state & ((int)GamepadButtonFlags.LeftThumb |
-                                            (int)GamepadButtonFlags.LeftShoulder)) > 0) ? 0b10_0000_0000 : 0);
+            _A =        (ushort)(((ButtonState &  (int)GamepadButtonFlags.A) > 0) ?           0b00_0000_0001 : 0);
+            _B =        (ushort)(((ButtonState & ((int)GamepadButtonFlags.B |
+                                            (int)GamepadButtonFlags.X)) > 0) ?                0b00_0000_0010 : 0);
+            _Select =   (ushort)(((ButtonState &  (int)GamepadButtonFlags.Back) > 0) ?        0b00_0000_0100 : 0);
+            _Start =    (ushort)(((ButtonState &  (int)GamepadButtonFlags.Start) > 0) ?       0b00_0000_1000 : 0);
+            _Right =    (ushort)(((ButtonState &  (int)GamepadButtonFlags.DPadRight) > 0) ||
+                                                         JoystickX > JoystickThreshold  ?     0b00_0001_0000 : 0);
+            _Left =     (ushort)(((ButtonState &  (int)GamepadButtonFlags.DPadLeft) > 0) ||
+                                                         JoystickX < -JoystickThreshold ?     0b00_0010_0000 : 0);
+            _Up =       (ushort)(((ButtonState &  (int)GamepadButtonFlags.DPadUp) > 0) ||
+                                                         JoystickY > JoystickThreshold  ?     0b00_0100_0000 : 0);
+            _Down =     (ushort)(((ButtonState &  (int)GamepadButtonFlags.DPadDown) > 0) ||
+                                                         JoystickY < -JoystickThreshold ?     0b00_1000_0000 : 0);
+            _R =        (ushort)(((ButtonState & ((int)GamepadButtonFlags.RightShoulder)) > 0) ? 0b01_0000_0000 : 0);
+            _L =        (ushort)(((ButtonState & ((int)GamepadButtonFlags.LeftShoulder)) > 0) ?  0b10_0000_0000 : 0);
 
             ControllerState = (ushort)(_A | _B | _Start | _Select | _Up | _Down | _Left | _Right | _R | _L);
         }
