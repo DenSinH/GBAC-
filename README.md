@@ -6,14 +6,14 @@ After the wild success of the NES emulator I'm going to attempt to make a GBA em
 |-------------------|----------|----|----|
 | A | Z | -> | A | 
 | B/X | X | -> | B | 
-| LThumb/LShoulder | LShift | -> | L |
-| RThumb/RShoulder | C | -> | R |
+| LShoulder| LShift | -> | L |
+| RShoulder| C | -> | R |
 | Start | A | -> | Start |
 | Back | B | -> | Select |
-| DPad Up | Up | -> | DPad Up |
-| DPad Down | Down | -> | DPad Down |
-| DPad Left | Left | -> | DPad Left |
-| DPad Right | Right | -> | DPad Right |
+| DPad Up / Left Joystick| Up | -> | DPad Up |
+| DPad Down / Left Joystick| Down | -> | DPad Down |
+| DPad Left / Left Joystick| Left | -> | DPad Left |
+| DPad Right / Left Joystick| Right | -> | DPad Right |
 
 Hotkeys:
  - F4: Pause emulation
