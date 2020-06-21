@@ -28,6 +28,7 @@ namespace GBAEmulator
         private const byte interval = 17; // ms
 
         private GBA gba;
+        private Thread PlayThread;
 
         private Debug DebugScreen;
         private bool DebugActive;
@@ -119,7 +120,9 @@ namespace GBAEmulator
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             this.gba.ShutDown = true;
+            this.gba.vis = null;
             this.gba.apu.speaker.ShutDown();
+            this.PlayThread?.Join();
             this.DebugScreen?.Close();
             base.OnFormClosing(e);
         }
@@ -206,7 +209,33 @@ namespace GBAEmulator
 
         private void LoadGame(object sender, EventArgs e)
         {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "../../../roms/";
+                openFileDialog.Filter = "GBA ROMS (*.gba)|*.gba|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
 
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    this.gba.ShutDown = true;
+                    if (this.PlayThread != null)
+                    {
+                        this.PlayThread.Join();
+                        this.gba.Reset();
+                    }
+
+                    this.PlayThread = new Thread(() => Play(openFileDialog.FileName));
+                    this.PlayThread.SetApartmentState(ApartmentState.STA);
+                    this.PlayThread.Start();
+                }
+            }
+        }
+
+        private void Play(string filename)
+        {
+            this.gba.ShutDown = false;
+            this.gba.Run(filename);
         }
 
         private void OpenDebug(object sender, EventArgs e)

@@ -85,10 +85,21 @@ namespace GBAEmulator.CPU
             this.IRQBank[13]        = 0x03007FA0;
             // this.UndefinedBank[13]  = 0x03007F00;
 
-            this.PC = 0x08000000;
-            this.CPSR = 0x6000001F;
+            this.PC = 0x0800_0000;
+            this.CPSR = 0x6000_001F;
 
             this.IO.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
+        }
+
+        public void Reset()
+        {
+            Array.Clear(this.SystemBank, 0, 16);
+            Array.Clear(this.SupervisorBank, 0, 16);
+            Array.Clear(this.IRQBank, 0, 16);
+
+            this.SkipBios();
+
+            this.PipelineFlush();
         }
 
         public int InstructionCycles;

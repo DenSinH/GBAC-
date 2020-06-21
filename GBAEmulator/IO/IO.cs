@@ -367,6 +367,15 @@ namespace GBAEmulator.IO
             }
         }
 
+        public void Reset()
+        {
+            for (uint i = 0; i < 0x400; i += 2)
+            {
+                this.SetHalfWordAt(i, 0);
+            }
+            this.HALTCNT.Halt = false;
+        }
+
         private void Error(string message)
         {
             Console.Error.WriteLine($"IO Error: {message}");

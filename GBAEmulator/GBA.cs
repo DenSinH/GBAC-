@@ -76,7 +76,7 @@ namespace GBAEmulator
                 // refresh screen, vis might have been destroyed because we ended the thread
                 try
                 {
-                    this.vis?.Invoke(this.vis.Tick);
+                    this.vis?.BeginInvoke(this.vis.Tick);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -154,9 +154,15 @@ namespace GBAEmulator
             this.mem.IO.BG3Y.UpdateInternal((uint)this.mem.IO.BG3PD.Full);
         }
 
-        public void Run()
+        public void Reset()
         {
-            this.mem.LoadRom("../../../roms/ZeldaMinishCap.gba");
+            this.IO.Reset();
+            this.cpu.Reset();
+        }
+
+        public void Run(string ROMPath)
+        {
+            this.mem.LoadRom(ROMPath);
             // this.mem.LoadRom("../../../Tests/Krom/Video/Rick.gba");
             // this.mem.LoadRom("../../../Tests/Marie/openbus-test_easy.gba");
             // this.mem.LoadRom("../../../Tests/Organharvester/joypad.gba");
@@ -168,6 +174,7 @@ namespace GBAEmulator
             // this.mem.UseNormattsBios();
             cpu.SkipBios();
 
+            this.Alive = true;
             while (!this.ShutDown)
             {
                 if (!this.Pause) this.RunLine();
