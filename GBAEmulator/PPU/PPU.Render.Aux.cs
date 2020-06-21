@@ -319,7 +319,7 @@ namespace GBAEmulator.Video
                     if (Line[ScreenX] != Transparent)  // there is already a nontransparent pixel at this pixel
                         continue;
 
-                    if (Mosaic)
+                    if (Mosaic && MosaicHStretch > 1)
                     {
                         // todo: might go wrong if we HFlip
                         if (ScreenX % MosaicHStretch != 0)
@@ -357,7 +357,7 @@ namespace GBAEmulator.Video
                 if (Line[ScreenX] != Transparent)  // there is already a nontransparent pixel at this pixel
                     continue;
 
-                if (Mosaic)
+                if (Mosaic && MosaicHStretch > 1)
                 {
                     // todo: might go wrong if we HFlip
                     uint EffectiveX = (uint)(ScreenX - XSign * (XSign * ScreenX % MosaicHStretch));
