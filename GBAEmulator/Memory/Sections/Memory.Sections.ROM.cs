@@ -16,7 +16,7 @@ namespace GBAEmulator.Memory.Sections
         {
             this.mem = mem;
             this.IsUpper = IsUpper;
-            this.gpio = new GPIO.GPIO(GPIO.GPIO.Chip.Empty);
+            this.gpio = new GPIO.GPIO(GPIO.GPIO.Chip.RTC);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

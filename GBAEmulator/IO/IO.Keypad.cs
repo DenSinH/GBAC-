@@ -16,16 +16,14 @@ namespace GBAEmulator.IO
             this.KEYCNT = KEYCNT;
             this.IF = IF;
 
-            try
-            {
-                // attempt to read controller state
-                this.xinput.UpdateState();
-            }
-            catch (SharpDX.SharpDXException)
+            // attempt to update controller state
+            if (!this.xinput.UpdateState())
             {
                 // if there is no controller connected, an exception will be thrown and we can instead
                 // initialize the register with only the keyboardcontroller
                 this.xinput = new NoXInputController();
+
+                // todo: recognize new controller if one is plugged in
             }
         }
 

@@ -12,12 +12,15 @@ namespace GBAEmulator.Memory.GPIO
 
         private IGPIOChip GPIOChip;
         private bool AllowRead;
-        private byte ReadMask;
+        private byte WriteMask = 0x0f;
 
         public GPIO(Chip chip)
         {
             switch (chip)
             {
+                case Chip.RTC:
+                    this.GPIOChip = new RTC();
+                    break;
                 default:
                     this.GPIOChip = new GPIOEmpty();
                     break;
@@ -34,13 +37,13 @@ namespace GBAEmulator.Memory.GPIO
             // Console.WriteLine("GPIO Get Data");
             if (!AllowRead)
                 return null;
-            return this.GPIOChip.Read();
+            return (byte)(this.GPIOChip.Read() & ~WriteMask);
         }
 
         public void SetData(byte value)
         {
             // Console.WriteLine("GPIO Set Data " + value.ToString("x4"));
-            this.GPIOChip.Write(value);
+            this.GPIOChip.Write((byte)(value & WriteMask));
         }
 
         public byte? GetDirection()
@@ -53,13 +56,13 @@ namespace GBAEmulator.Memory.GPIO
             // Console.WriteLine("GPIO Get Direction");
             if (!AllowRead)
                 return null;
-            return ReadMask;
+            return WriteMask;
         }
 
         public void SetDirection(byte value)
         {
             // Console.WriteLine("GPIO Set Direction " + value.ToString("x4"));
-            ReadMask = (byte)(value & 0x000f);
+            WriteMask = (byte)(value & 0x000f);
         }
 
         public byte? GetControl()
