@@ -8,34 +8,64 @@ namespace GBAEmulator.Memory
 {
     partial class MEM
     {
+        private struct ROMData
+        {
+            public BackupType backup;
+            public GPIO.GPIO.Chip chip;
+        }
+
         public string ROMName { get; private set; }
 
-        private BackupType GetBackupType(string FileName)
+        private ROMData GetROMData(string FileName)
         {
+            ROMData data = new ROMData()
+            {
+                backup = BackupType.SRAM,
+                chip = GPIO.GPIO.Chip.Empty
+            };
+
             // search for the type of backup used in ROM file
             using (StreamReader file = new StreamReader(FileName))
             {
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    foreach (BackupType BackupType in Enum.GetValues(typeof(BackupType)))
+                    if (data.backup == BackupType.SRAM)
                     {
-                        if (Regex.Match(line, $"{BackupType}_V\\d\\d\\d").Success)
+                        foreach (BackupType BackupType in Enum.GetValues(typeof(BackupType)))
                         {
-                            return BackupType;
+                            if (Regex.Match(line, $"{BackupType}_V\\d\\d\\d").Success)
+                            {
+                                data.backup = BackupType;
+                            }
+                        }
+                    }
+
+                    if (data.chip == GPIO.GPIO.Chip.Empty)
+                    {
+                        foreach (GPIO.GPIO.Chip chip in Enum.GetValues(typeof(GPIO.GPIO.Chip)))
+                        {
+                            if (Regex.Match(line, $"{chip}_V\\d\\d\\d").Success)
+                            {
+                                data.chip = chip;
+                            }
                         }
                     }
                 }
                 file.Close();
             }
-            this.Error($"Could not find ROM backup type for ROM {FileName}");
-            return BackupType.SRAM;
+            Console.WriteLine($"Read data for ROM {FileName}:");
+            Console.WriteLine($"    Using BackupType {data.backup} for ROM");
+            Console.WriteLine($"    Using GPIO chip {data.chip} for ROM");
+
+            return data;
         }
 
         public void LoadRom(string FileName)
         {
             // Initialize save data
-            this.Backup.ROMBackupType = this.GetBackupType(FileName);
+            ROMData data = this.GetROMData(FileName);
+            this.Backup.ROMBackupType = data.backup;
             this.Backup.Init();
             
             if (File.Exists(Path.ChangeExtension(FileName, BackupSection.SaveExtension)))
@@ -52,8 +82,11 @@ namespace GBAEmulator.Memory
 
             this.GamePak_L.ROMSize = (uint)GamePak.Length;
             this.GamePak_L.Load(GamePak, 0);
+            this.GamePak_L.gpio = new GPIO.GPIO(data.chip);
+
             this.GamePak_H.ROMSize = (uint)GamePak.Length;
             this.GamePak_H.Load(GamePak, 0x0100_0000);
+            // GPIO is in the lower region of the GamePak, we don't need to set it for GamePak_H
         }
     }
 }

@@ -7,7 +7,7 @@ namespace GBAEmulator.Memory.GPIO
         public enum Chip
         {
             Empty,
-            RTC
+            SIIRTC
         }
 
         private IGPIOChip GPIOChip;
@@ -18,7 +18,7 @@ namespace GBAEmulator.Memory.GPIO
         {
             switch (chip)
             {
-                case Chip.RTC:
+                case Chip.SIIRTC:
                     this.GPIOChip = new RTC();
                     break;
                 default:

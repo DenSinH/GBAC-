@@ -9,14 +9,13 @@ namespace GBAEmulator.Memory.Sections
     public class cROMSection : MemorySection
     {
         private MEM mem;
-        private GPIO.GPIO gpio;
+        public GPIO.GPIO gpio;
         public uint ROMSize;
         private bool IsUpper;
         public cROMSection(MEM mem, bool IsUpper) : base(0x0100_0000)
         {
             this.mem = mem;
             this.IsUpper = IsUpper;
-            this.gpio = new GPIO.GPIO(GPIO.GPIO.Chip.RTC);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -26,7 +25,7 @@ namespace GBAEmulator.Memory.Sections
 
             if (this.mem.Backup.ROMBackupType == BackupType.EEPROM)
             {
-                if ((address > 0x00ff_feff) ||
+                if (((address & 0x00ff_ffff) > 0x00ff_feff) ||
                     (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                 {
                     // EEPROM access, might as well call a read directly
@@ -44,7 +43,7 @@ namespace GBAEmulator.Memory.Sections
 
             if (this.mem.Backup.ROMBackupType == BackupType.EEPROM)
             {
-                if ((address > 0x00ff_feff) ||
+                if (((address & 0x00ff_ffff) > 0x00ff_feff) ||
                     (this.ROMSize <= 0x0100_0000 && address >= 0x0d00_0000 && address < 0x0e00_0000))
                 {
                     // EEPROM access, might as well call a read directly
