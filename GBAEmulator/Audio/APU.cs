@@ -27,6 +27,9 @@ namespace GBAEmulator.Audio
 
         public readonly FIFOChannel[] FIFO = new FIFOChannel[2];
 
+        public bool[] ExternalChannelEnable = new bool[4] { true, true, true, true };
+        public bool[] ExternalFIFOEnable = new bool[2] { true, true };
+
         /* SOUNDCNT_L params */
         public uint MasterVolumeRight;  // 0 - 7
         public uint MasterVolumeLeft;   // 0 - 7
@@ -54,7 +57,7 @@ namespace GBAEmulator.Audio
             // initial APU events
             scheduler.Push(new Event(FrameSequencerPeriod, this.TickFrameSequencer));
             foreach (Channel ch in this.Channels) scheduler.Push(new Event(ch.Period, ch.Tick));
-            scheduler.Push(new Event(FrameSequencerPeriod, this.ProvideSample));
+            scheduler.Push(new Event(SamplePeriod, this.ProvideSample));
         }
 
         private void TickFrameSequencer(int time, Scheduler.Scheduler scheduler)
@@ -89,6 +92,9 @@ namespace GBAEmulator.Audio
             
             for (int i = 0; i < 4; i++)
             {
+                if (!ExternalChannelEnable[i])
+                    continue;
+
                 if (this.MasterEnableRight[i])
                 {
                     SampleRight += this.Channels[i].CurrentSample;
@@ -129,6 +135,9 @@ namespace GBAEmulator.Audio
 
             for (int i = 0; i < 2; i++)
             {
+                if (!ExternalFIFOEnable[i])
+                    continue;
+
                 if (this.DMAEnableRight[i])
                 {
                     SampleRight += this.FIFO[i].CurrentSample << (this.DMASoundVolume[i] ? 1 : 2);  // false = 50%, true = 100%

@@ -95,6 +95,9 @@ namespace GBAEmulator.IO
 
             base.Set(value, setlow, sethigh);
 
+            Console.WriteLine($"{this.Master.index} {value:x4} {this.Prescaler}");
+            Console.ReadKey();
+
             this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
 
             if (!WasEnabled && this.Enabled)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace GBAEmulator
@@ -68,6 +69,31 @@ namespace GBAEmulator
             BlendingEnable.Checked = true;
             VideoMenu.DropDownItems.Add(BlendingEnable);
 
+            /* ======================================== Audio Menu ============================================== */
+            ToolStripMenuItem AudioMenu = new ToolStripMenuItem("Audio");
+            string[] ChannelNames = { "Sq1", "Sq2", "Wave", "Noise" };
+            for (int i = 0; i < 4; i++)
+            {
+                int Chno = i;
+                ToolStripMenuItem CHxEnable = new ToolStripMenuItem($"{ChannelNames[i]} Enable", null,
+                new EventHandler((object sender, EventArgs e) => {
+                    this.gba.apu.ExternalChannelEnable[Chno] = (((ToolStripMenuItem)sender).Checked ^= true);
+                }));
+                CHxEnable.Checked = true;
+                AudioMenu.DropDownItems.Add(CHxEnable);
+            }
+            AudioMenu.DropDownItems.Add(new ToolStripSeparator());  // --------------------------
+
+            for (int i = 0; i < 2; i++)
+            {
+                int FIFOno = i;
+                ToolStripMenuItem FIFOxEnable = new ToolStripMenuItem($"FIFO{"AB".ElementAt(i)} Enable", null,
+                new EventHandler((object sender, EventArgs e) => {
+                    this.gba.apu.ExternalFIFOEnable[FIFOno] = (((ToolStripMenuItem)sender).Checked ^= true);
+                }));
+                FIFOxEnable.Checked = true;
+                AudioMenu.DropDownItems.Add(FIFOxEnable);
+            }
 
             // Assign the ToolStripMenuItem that displays 
             // the list of child forms.
@@ -77,6 +103,7 @@ namespace GBAEmulator
             ms.Items.Add(GameMenu);
             ms.Items.Add(EmulationMenu);
             ms.Items.Add(VideoMenu);
+            ms.Items.Add(AudioMenu);
 
             // Dock the MenuStrip to the top of the form.
             ms.Dock = DockStyle.Top;

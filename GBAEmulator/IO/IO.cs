@@ -381,10 +381,10 @@ namespace GBAEmulator.IO
             Console.Error.WriteLine($"IO Error: {message}");
         }
 
-        [Conditional("DEBUG")]
+        // [Conditional("DEBUG")]
         private void Log(string message)
         {
-
+            Console.WriteLine(message);
         }
 
         public byte? GetByteAt(uint address)

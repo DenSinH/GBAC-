@@ -25,7 +25,7 @@ namespace GBAEmulator.CPU
             private readonly Scheduler.Scheduler scheduler;
             private int NextOverflow;
             private bool HasOverflowEvent;
-            private readonly int index;
+            public readonly int index;
 
             public readonly cTMCNT_L Data;
             public readonly cTMCNT_H Control;
@@ -49,12 +49,18 @@ namespace GBAEmulator.CPU
 
             public void Trigger()
             {
+                //Console.WriteLine(this.Data.PrescalerLimit);
+                //Console.WriteLine(this.Data.Reload.ToString("x4"));
                 this.NextOverflow = this.cpu.GlobalCycleCount + this.Data.PrescalerLimit * (0x10000 - this.Data.Reload);
                 if (!this.HasOverflowEvent)
                 {
                     // overflow timing cannot be changed when the timer is still running
                     this.scheduler.Push(new Event(this.NextOverflow, this.Overflow));
                     this.HasOverflowEvent = true;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Timer {this.index} Error: Already triggered...");
                 }
             }
 
@@ -64,6 +70,7 @@ namespace GBAEmulator.CPU
                 if (!this.Control.Enabled)
                 {
                     // timer was turned off
+                    Console.Error.WriteLine($"Timer {this.index} Error: Invalid overflow: Disabled");
                     return; 
                 }
 
@@ -72,6 +79,7 @@ namespace GBAEmulator.CPU
                     // overflow was changed, should not have happened yet...
                     this.scheduler.Push(new Event(this.NextOverflow, this.Overflow));
                     this.HasOverflowEvent = true;
+                    Console.Error.WriteLine($"Timer {this.index} Error: Invalid overflow: Timing changed");
                     return;
                 }
 
