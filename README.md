@@ -30,13 +30,14 @@ Hotkeys:
   - Alpha Blending
   - Sound
   - Debugging options (viewing some registers / charblocks, enabling rendering layers/GFX)
+  - RTC
   
 #### To do:
   - SIO
   - better open bus
   - more accurate cycles
   - windowing in BM rendering modes
-  - RTC
+  - More GPIO Ports
   - Controls mapping
 
 #### Known bugs:
