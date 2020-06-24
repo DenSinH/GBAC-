@@ -43,5 +43,4 @@ Hotkeys:
 #### Known bugs:
   - Pokemon pinball menu screen popup should be transparent (alphablending issue, used to work)
   - Zelda LTTP does not boot past game selection
-  - Pokemon games FIFO music channels get the wrong prescaler sent to them...
   
