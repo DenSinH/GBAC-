@@ -41,8 +41,8 @@ namespace GBAEmulator.IO
             base.Set((ushort)(value & 0x7f0f), setlow, sethigh);
 
             // cheese it
-            if (this.IRQEnable)
-                this.IF.Request(Interrupt.SerialCommunication);
+            //if (this.IRQEnable)
+            //    this.IF.Request(Interrupt.SerialCommunication);
         }
     }
     #endregion
