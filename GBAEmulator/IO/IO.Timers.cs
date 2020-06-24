@@ -1,17 +1,17 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 using GBAEmulator.CPU;
-using GBAEmulator.Scheduler;
 
 namespace GBAEmulator.IO
 {
     public class cTMCNT_L : IORegister2
     {
         private readonly ARM7TDMI cpu;
-        private bool IsCountUp;         // keep track of whether we are in CountUp mode on triggers
-        private int TriggerTime;        // used for non-CountUp timers
+        private bool IsCountUp;            // keep track of whether we are in CountUp mode on triggers
+        private long TriggerTime;         // used for non-CountUp timers
         private bool Active;
-        private ushort Counter;         // only used for CountUp/Disabled timers
+        private ushort Counter;            // only used for CountUp/Disabled timers
         public ushort Reload { get; private set; }
 
         public ushort PrescalerLimit = 1;  // initial value (see TMCNT_H.PrescalerSelection[0])
@@ -21,16 +21,23 @@ namespace GBAEmulator.IO
             this.cpu = cpu;
         }
 
-        public void ReTrigger(bool IsCountUp)
+        public void Restart(bool IsCountUp)
         {
             this.IsCountUp = IsCountUp;
             this.Active = true;
             this.Counter = Reload;
             this.TriggerTime = cpu.GlobalCycleCount + cpu.InstructionCycles;  // timer starts "after" instruction was executed
         }
-        public void Disable()
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private ushort ExtrapolateTimer() 
         {
-            this.Counter = (ushort)(this.Reload + ((cpu.GlobalCycleCount + cpu.InstructionCycles - this.TriggerTime) / this.PrescalerLimit));
+            return (ushort)(this.Reload + ((cpu.GlobalCycleCount + cpu.InstructionCycles - this.TriggerTime) / this.PrescalerLimit));
+        }
+
+        public void Stop()
+        {
+            this.Counter = this.ExtrapolateTimer();
             this.Active = false;
         }
 
@@ -53,7 +60,7 @@ namespace GBAEmulator.IO
             if (this.IsCountUp || !this.Active)
                 return this.Counter;
 
-            return (ushort)(this.Reload + ((cpu.GlobalCycleCount + cpu.InstructionCycles - this.TriggerTime) / this.PrescalerLimit));
+            return this.ExtrapolateTimer();
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
@@ -67,7 +74,7 @@ namespace GBAEmulator.IO
 
     public class cTMCNT_H : IORegister2
     {
-        private static ushort[] PrescalerSelection = new ushort[4] { 1, 64, 256, 1024 };
+        private static readonly ushort[] PrescalerSelection = new ushort[4] { 1, 64, 256, 1024 };
 
         private readonly cTMCNT_L Data;
         private readonly ARM7TDMI.cTimer Master;
@@ -105,7 +112,6 @@ namespace GBAEmulator.IO
             base.Set(value, setlow, sethigh);
 
             this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
-
             if (!WasEnabled && this.Enabled)
             {
                 this.Master.Trigger();

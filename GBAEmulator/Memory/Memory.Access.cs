@@ -43,7 +43,7 @@ namespace GBAEmulator.Memory
                 // GBATek:
                 // GamePak uses 16bit data bus, so that a 32bit access is split into TWO 16bit accesses 
                 // (of which, the second fragment is always sequential, even if the first fragment was non-sequential).
-                cycles += 1 + this.IO.WAITCNT.GetWaitStateSCycles(section);
+                cycles += this.IO.WAITCNT.GetWaitStateSCycles(section);
             }
             // else: out of bounds! (how many cycles?)
 
@@ -66,12 +66,12 @@ namespace GBAEmulator.Memory
                 if ((address - this.PreviousAddress == 2 || address - this.PreviousAddress == 1) && (address & 0x1_ffff) != 0)
                 {
                     // S access
-                    cycles = 1 + this.IO.WAITCNT.GetWaitStateSCycles(section);
+                    cycles = this.IO.WAITCNT.GetWaitStateSCycles(section);
                 }
                 else
                 {
                     // N access
-                    cycles = 1 + this.IO.WAITCNT.GetWaitStateNCycles(section);
+                    cycles = this.IO.WAITCNT.GetWaitStateNCycles(section);
                 }
             }
             // else: out of bounds! (how many cycles?)

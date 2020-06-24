@@ -22,7 +22,7 @@ namespace GBAEmulator
 
         private readonly Stopwatch FPSTimer;
         private int FramesUntilSaveDump = 0;
-        const int SaveDumpFrameDelay = 10;
+        private const int SaveDumpFrameDelay = 10;
 
         public TickDelegate Tick;
         private const byte interval = 17; // ms

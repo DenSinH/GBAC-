@@ -12,22 +12,22 @@ namespace GBAEmulator
 {
     public class GBA
     {
-        public ARM7TDMI cpu;
-        public APU apu;
-        public PPU ppu;
-        public IORAMSection IO;
-        public MEM mem;
-        public BUS bus;
+        public readonly ARM7TDMI cpu;
+        public readonly APU apu;
+        public readonly PPU ppu;
+        public readonly IORAMSection IO;
+        public readonly MEM mem;
+        public readonly BUS bus;
 
         // how many events at once:
         // 1 for each channel, framecounter, Provide sample => 6 for APU
         // 1 for each timer                                 => 4 for CPU
-        private Scheduler.Scheduler EventQueue = new Scheduler.Scheduler();
+        private readonly Scheduler.Scheduler EventQueue = new Scheduler.Scheduler();
 
         public Visual vis;
-        public ushort[] display;
+        public readonly ushort[] display;
 
-        public bool ShutDown;
+        public bool ShutDown { private get; set; }
         public bool Pause;
         public bool Alive { get; private set; } = true;
 
@@ -46,11 +46,11 @@ namespace GBAEmulator
             this.display = display;
         }
 
-        const int NonHBlankCycles = 960;
-        const int HBlankNoFlagCycles = 46;
-        const int HBlankWithFlagCycles = 226;
+        private const int NonHBlankCycles = 960;
+        private const int HBlankNoFlagCycles = 46;
+        private const int HBlankWithFlagCycles = 226;
 
-        long cycle;
+        private long cycle;
 
         private void RunLine()
         {
@@ -66,6 +66,10 @@ namespace GBAEmulator
 
             from: https://www.coranac.com/tonc/text/video.htm
              */
+
+            // We don't have to normalize the event queue, since we are using ulongs to store the time, this makes it so we can play
+            // games for up to 2 ** 63 / 2 ** 24 = 2 ** 39 seconds, or ~16 300 years
+            // We are probably dead before the EventQueue messes up
 
             // set VBlank
             if (this.ppu.scanline == 160)
@@ -114,9 +118,8 @@ namespace GBAEmulator
             this.cycle += NonHBlankCycles;
             while (this.cycle > 0)
             {
-                int cycles = this.cpu.Step();
+                this.cycle -= this.cpu.Step();
                 this.EventQueue.Handle(this.cpu.GlobalCycleCount);
-                this.cycle -= cycles;
             }
 
             /* HBLANK */
@@ -133,9 +136,8 @@ namespace GBAEmulator
             this.cycle += HBlankNoFlagCycles;
             while (this.cycle > 0)
             {
-                int cycles = this.cpu.Step();
+                this.cycle -= this.cpu.Step();
                 this.EventQueue.Handle(this.cpu.GlobalCycleCount);
-                this.cycle -= cycles;
             }
 
             this.mem.IO.DISPSTAT.SetHBlank(true);
@@ -143,9 +145,8 @@ namespace GBAEmulator
             this.cycle += HBlankWithFlagCycles;
             while (this.cycle > 0)
             {
-                int cycles = this.cpu.Step();
+                this.cycle -= this.cpu.Step();
                 this.EventQueue.Handle(this.cpu.GlobalCycleCount);
-                this.cycle -= cycles;
             }
 
             this.mem.IO.BG2X.UpdateInternal((uint)this.mem.IO.BG2PB.Full);

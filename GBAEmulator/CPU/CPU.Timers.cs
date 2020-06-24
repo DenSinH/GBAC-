@@ -51,16 +51,18 @@ namespace GBAEmulator.CPU
 
             public void Trigger()
             {
-                this.OverflowEvent.Time = this.cpu.GlobalCycleCount + this.Data.PrescalerLimit * (0x10000 - this.Data.Reload);
-                this.Data.ReTrigger(this.Control.CountUpTiming);
+                this.Data.Restart(this.Control.CountUpTiming);
                 if (!this.HasOverflowEvent)
                 {
-                    // overflow timing cannot be changed when the timer is still running
                     this.HasOverflowEvent = true;
+                    this.OverflowEvent.Time = this.cpu.GlobalCycleCount + (this.Data.PrescalerLimit * (0x10000 - this.Data.Reload));
                     this.scheduler.Push(this.OverflowEvent);
                 }
                 else
                 {
+                    // this can only be the case if our timer was already triggered, so we can just increment the OverflowEvent.Time instead of
+                    // recalculating it is not necessary (and wrong even!) so we
+                    this.OverflowEvent.Time += this.Data.PrescalerLimit * (0x10000 - this.Data.Reload);
                     this.scheduler.EventChanged(this.OverflowEvent);
                 }
             }
@@ -71,28 +73,16 @@ namespace GBAEmulator.CPU
                 {
                     this.HasOverflowEvent = false;
                     this.scheduler.Remove(this.OverflowEvent);
-                    this.Data.Disable();
+                    this.Data.Stop();
                 }
             }
 
             public void Overflow(Event sender, Scheduler.Scheduler scheduler)
             {
                 this.HasOverflowEvent = false;
-                this.Data.ReTrigger(this.Control.CountUpTiming);
-                if (!this.Control.Enabled)
-                {
-                    // timer was turned off
-                    return; 
-                }
+                this.Data.Restart(this.Control.CountUpTiming);
 
-                //if (!this.Control.CountUpTiming && sender.Time - this.NextOverflow < 0)
-                //{
-                //    // overflow was changed, should not have happened yet...
-                //    this.scheduler.Push(this.OverflowEvent);
-                //    this.HasOverflowEvent = true;
-                //    Console.Error.WriteLine($"Timer {this.index} Error: Invalid overflow: Timing changed");
-                //    return;
-                //}
+                // with event handling, we have already covered timers being turned off / countup
 
                 if (this.Next?.Control.CountUpTiming ?? false && this.Next.Control.Enabled)
                 {
