@@ -4,8 +4,6 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-        // todo: SWI, Coprocessor instructions, Undefined
-
         private delegate int ARMInstruction(uint Instruction);
         private ARMInstruction[] ARMInstructions = new ARMInstruction[0x1000];  // 12 bits determine the instruction
 

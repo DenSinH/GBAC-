@@ -34,7 +34,7 @@ namespace GBAEmulator.CPU
         // public to allow for manual IRQ throwing for testing (unstable)
         public void DoIRQ()
         {
-            // this.Log("Doing IRQ: " + (this.mem.IF.raw & this.mem.IE.raw).ToString("x8"));
+            this.Log("Doing IRQ: " + (this.IO.IF.raw & this.IO.IE.raw).ToString("x8"));
             this.ChangeMode(Mode.IRQ);
             this.I = 1;
 

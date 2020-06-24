@@ -4,11 +4,11 @@ using System.Text;
 
 namespace GBAEmulator.Scheduler
 {
-    public struct Event : IComparable<Event>
+    public class Event : IComparable<Event>
     {
-        public int Time { get; private set; }
-        public delegate void Handler(int time, Scheduler scheduler);
-        private Handler _Handler;
+        public int Time;
+        public delegate void Handler(Event sender, Scheduler scheduler);
+        private readonly Handler _Handler;
 
         public Event(int Time, Handler _Handler)
         {
@@ -18,7 +18,7 @@ namespace GBAEmulator.Scheduler
 
         public void Handle(Scheduler scheduler)
         {
-            this._Handler(this.Time, scheduler);
+            this._Handler(this, scheduler);
         }
 
         public int CompareTo(Event other)

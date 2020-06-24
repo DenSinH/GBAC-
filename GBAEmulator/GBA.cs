@@ -22,7 +22,7 @@ namespace GBAEmulator
         // how many events at once:
         // 1 for each channel, framecounter, Provide sample => 6 for APU
         // 1 for each timer                                 => 4 for CPU
-        private Scheduler.Scheduler EventQueue = new Scheduler.Scheduler(16);
+        private Scheduler.Scheduler EventQueue = new Scheduler.Scheduler();
 
         public Visual vis;
         public ushort[] display;

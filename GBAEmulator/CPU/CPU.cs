@@ -88,7 +88,7 @@ namespace GBAEmulator.CPU
             this.PC = 0x0800_0000;
             this.CPSR = 0x6000_001F;
 
-            this.IO.SetHalfWordAt(0x134, 0x8000);  // set RCNT to 8000 to prevent Sonic glitch
+            this.IO.RCNT.Set(0x8000, true, true);  // set RCNT to 8000 to prevent Sonic glitch
         }
 
         public void Reset()

@@ -49,7 +49,6 @@ namespace GBAEmulator.CPU
                 else if ((i & 0b111100) == 0b111100)
                     this.THUMBInstructions[i] = this.LongBranchWithLink;
                 else
-                    // todo: undefined
                     this.THUMBInstructions[i] = (ushort _) => throw new NotImplementedException("Undefined THUMB instruction: " + _.ToString("x4"));
             }
         }

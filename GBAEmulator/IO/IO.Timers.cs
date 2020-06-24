@@ -5,13 +5,13 @@ using GBAEmulator.Scheduler;
 
 namespace GBAEmulator.IO
 {
-    #region Timer Registers
     public class cTMCNT_L : IORegister2
     {
         private readonly ARM7TDMI cpu;
-        private bool IsCountUp;  // keep track of whether we are in CountUp mode on triggers
-        private ushort CountUpCounter;  // only used for CountUp timers
-        private int TriggerTime; // used for non-CountUp timers
+        private bool IsCountUp;         // keep track of whether we are in CountUp mode on triggers
+        private int TriggerTime;        // used for non-CountUp timers
+        private bool Active;
+        private ushort Counter;         // only used for CountUp/Disabled timers
         public ushort Reload { get; private set; }
 
         public ushort PrescalerLimit = 1;  // initial value (see TMCNT_H.PrescalerSelection[0])
@@ -21,37 +21,46 @@ namespace GBAEmulator.IO
             this.cpu = cpu;
         }
 
-        public void TimerReload(bool IsCountUp)
+        public void ReTrigger(bool IsCountUp)
         {
             this.IsCountUp = IsCountUp;
-            this.CountUpCounter = Reload;
+            this.Active = true;
+            this.Counter = Reload;
             this.TriggerTime = cpu.GlobalCycleCount + cpu.InstructionCycles;  // timer starts "after" instruction was executed
+        }
+        public void Disable()
+        {
+            this.Counter = (ushort)(this.Reload + ((cpu.GlobalCycleCount + cpu.InstructionCycles - this.TriggerTime) / this.PrescalerLimit));
+            this.Active = false;
         }
 
         public bool TickUnscaled(ushort cycles)
         {
             // don't account for the prescaler
             bool Overflow = false;
-            if (this.CountUpCounter + cycles > 0xffff)  // overflow
+            if (this.Counter + cycles > 0xffff)  // overflow
             {
-                this.CountUpCounter += this.Reload;
+                this.Counter += this.Reload;
                 Overflow = true;
             }
-            this.CountUpCounter += cycles;
+            this.Counter += cycles;
 
             return Overflow;
         }
 
         public override ushort Get()
         {
-            if (this.IsCountUp)
-                return this.CountUpCounter;
-            return (ushort)((cpu.GlobalCycleCount + cpu.InstructionCycles - this.TriggerTime) / this.PrescalerLimit);
+            if (this.IsCountUp || !this.Active)
+                return this.Counter;
+
+            return (ushort)(this.Reload + ((cpu.GlobalCycleCount + cpu.InstructionCycles - this.TriggerTime) / this.PrescalerLimit));
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set(value, setlow, sethigh);
+            // Console.WriteLine($"CNT_L {value:x4} {this.Reload:x4}");
+            // Console.ReadKey();
             this.Reload = value;
         }
     }
@@ -95,17 +104,16 @@ namespace GBAEmulator.IO
 
             base.Set(value, setlow, sethigh);
 
-            Console.WriteLine($"{this.Master.index} {value:x4} {this.Prescaler}");
-            Console.ReadKey();
-
             this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
 
             if (!WasEnabled && this.Enabled)
             {
-                this.Data.TimerReload(this.CountUpTiming);
                 this.Master.Trigger();
+            }
+            else if (WasEnabled && !this.Enabled)
+            {
+                this.Master.Disable();
             }
         }
     }
-    #endregion
 }

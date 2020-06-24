@@ -1,9 +1,20 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace GBAEmulator.Memory
 {
     partial class MEM
     {
+        [Conditional("DEBUG")]
+        private void LogAccess(uint address, uint? value = null)
+        {
+            if (address == 0x03004FC4)
+            {
+                Console.WriteLine(this.iWRAM.GetWordAt(0x03004FC4)?.ToString("x8") + " -> " + value?.ToString("x8"));
+                Console.ReadLine();
+            }
+        }
+
         private uint PreviousAddress;
         private int GetWordAccessCycles(uint section, uint address)
         {
@@ -72,6 +83,7 @@ namespace GBAEmulator.Memory
         public uint GetWordAt(uint address)
         {
             // offset is handled in individual sections (always force align, except SRAM
+            this.LogAccess(address);
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetWordAccessCycles(Section, address);
             if (Section > 15)
@@ -85,6 +97,7 @@ namespace GBAEmulator.Memory
         public ushort GetHalfWordAt(uint address)
         {
             // offset is handled in individual sections (always force align, except SRAM
+            this.LogAccess(address);
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
             if (Section > 15)
@@ -101,6 +114,7 @@ namespace GBAEmulator.Memory
 
         public byte GetByteAt(uint address)
         {
+            this.LogAccess(address);
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
             if (Section > 15)
@@ -117,6 +131,7 @@ namespace GBAEmulator.Memory
 
         public void SetWordAt(uint address, uint value)
         {
+            this.LogAccess(address, value);
             // offset is handled in individual sections (always force align, except SRAM
             this.bus.BusValue = value;
             uint Section = (address & 0xff00_0000) >> 24;
@@ -128,6 +143,7 @@ namespace GBAEmulator.Memory
 
         public void SetHalfWordAt(uint address, ushort value)
         {
+            this.LogAccess(address, value);
             // offset is handled in individual sections (always force align, except SRAM
             uint BusMask = ((address & 3) > 1) ? 0x0000_ffff : 0xffff_0000;
             this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (((address & 3) > 1) ? 16 : 0));
@@ -141,6 +157,7 @@ namespace GBAEmulator.Memory
 
         public void SetByteAt(uint address, byte value)
         {
+            this.LogAccess(address, value);
             uint BusMask = (uint)(0x0000_00ff << (int)(8 * (address & 3)));
             this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (int)(8 * (address & 3)));
 

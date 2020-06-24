@@ -23,9 +23,7 @@ namespace GBAEmulator.Memory
 
         private IMemorySection[] MemorySections;
 
-        // todo: waitstates / N & S cycles
         // Byte access cycles are equal to halfword access cycles
-
         private static readonly int[] NonWordAccessCycles = new int[16]
         {
             1, 1, 3, 1, 1, 1, 1, 1,

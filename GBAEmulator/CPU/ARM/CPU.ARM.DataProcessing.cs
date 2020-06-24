@@ -20,7 +20,6 @@ namespace GBAEmulator.CPU
 
             byte Rn = (byte)((Instruction & 0x000f_0000) >> 16);
             uint Op1 = Registers[Rn];
-            byte Target = (byte)((Instruction & 0x0000_f000) >> 12);
             uint Op2;
 
             byte OldC = this.C;
@@ -91,7 +90,7 @@ namespace GBAEmulator.CPU
             uint Result;
             ulong temp;
             
-            switch ((Instruction & 0x01e0_0000) >> 21)
+            switch (OpCode)
             {
                 case 0b0000:  // AND
                     this.Log(string.Format("{0:x8} AND {1:x8} -> R{2}", Op1, Op2, Rd));
