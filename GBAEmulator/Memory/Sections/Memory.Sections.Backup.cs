@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-
+using GBAEmulator.CPU;
 using GBAEmulator.Memory.Backup;
 
 namespace GBAEmulator.Memory.Sections
@@ -23,11 +23,11 @@ namespace GBAEmulator.Memory.Sections
 
         private IBackup Backup;
         public BackupType ROMBackupType;
-        private MEM mem;
+        private ARM7TDMI.DMAChannel DMA3;
 
-        public BackupSection(MEM mem)
+        public BackupSection(ARM7TDMI.DMAChannel DMA3)
         {
-            this.mem = mem;
+            this.DMA3 = DMA3;
             this.ROMBackupType = BackupType.SRAM;
         }
 
@@ -44,7 +44,7 @@ namespace GBAEmulator.Memory.Sections
                     this.Backup = new BackupFLASH();
                     break;
                 case BackupType.EEPROM:
-                    this.Backup = new BackupEEPROM(this.mem.IO.DMACNT_H[3], this.mem.IO.DMACNT_L[3]);
+                    this.Backup = new BackupEEPROM(this.DMA3.DMACNT_H, this.DMA3.DMACNT_L);
                     break;
                 default:
                     throw new Exception($"Invalid rom backup type: {this.ROMBackupType}");

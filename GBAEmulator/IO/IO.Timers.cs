@@ -66,8 +66,6 @@ namespace GBAEmulator.IO
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set(value, setlow, sethigh);
-            // Console.WriteLine($"CNT_L {value:x4} {this.Reload:x4}");
-            // Console.ReadKey();
             this.Reload = value;
         }
     }

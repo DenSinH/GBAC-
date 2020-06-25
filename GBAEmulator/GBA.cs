@@ -109,10 +109,10 @@ namespace GBAEmulator
                 // DMA 3 video capture mode (special DMA trigger)
                 this.cpu.DMAChannels[3].Trigger(DMAStartTiming.Special);
             }
-            else if (this.cpu.mem.IO.DMACNT_H[3].StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
+            else if (this.cpu.DMAChannels[3].DMACNT_H.StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
             {
                 // this.cpu.mem.IORAM.DMACNT_H[3].Active = false;
-                this.cpu.mem.IO.DMACNT_H[3].Disable();
+                this.cpu.DMAChannels[3].DMACNT_H.Disable();
             }
 
             this.cycle += NonHBlankCycles;

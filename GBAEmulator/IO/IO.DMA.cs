@@ -97,15 +97,15 @@ namespace GBAEmulator.IO
     #region DMACNT_H
     public class cDMACNT_H : IORegister2
     {
+        private readonly ARM7TDMI.DMAChannel Master;
         private bool AllowGamePakDRQ;
-        public bool Triggered;
 
-        public cDMACNT_H() : base()
+        public cDMACNT_H(ARM7TDMI.DMAChannel Master) : base()
         {
-
+            this.Master = Master;
         }
 
-        public cDMACNT_H(bool AllowGamePakDRQ) : this()
+        public cDMACNT_H(ARM7TDMI.DMAChannel Master, bool AllowGamePakDRQ) : this(Master)
         {
             this.AllowGamePakDRQ = AllowGamePakDRQ;
         }
@@ -163,7 +163,11 @@ namespace GBAEmulator.IO
 
             // bottom 5 bits unused
             base.Set((ushort)(value & 0xfff8), setlow, sethigh);
-            this.Triggered = Disabled && this.Enabled;
+            if (Disabled && this.Enabled)
+            {
+                this.Master.Reload();
+                this.Master.Trigger(DMAStartTiming.Immediately);
+            }
         }
     }
     #endregion

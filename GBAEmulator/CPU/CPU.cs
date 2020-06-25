@@ -38,15 +38,16 @@ namespace GBAEmulator.CPU
 
             // IO requires bus to be initialized
             this.bus = new BUS(this);
-
-            // mem requires IO to be initialized
             this.IO = new IORAMSection(this.bus);
-            this.mem = new MEM(this);
 
-            this.DMAChannels[0] = new DMAChannel(this.IO.DMACNT_H[0], this.IO.DMACNT_L[0], this.IO.DMASAD[0], this.IO.DMADAD[0], this.IO.IF, 0);
-            this.DMAChannels[1] = new DMAChannel(this.IO.DMACNT_H[1], this.IO.DMACNT_L[1], this.IO.DMASAD[1], this.IO.DMADAD[1], this.IO.IF, 1);
-            this.DMAChannels[2] = new DMAChannel(this.IO.DMACNT_H[2], this.IO.DMACNT_L[2], this.IO.DMASAD[2], this.IO.DMADAD[2], this.IO.IF, 2);
-            this.DMAChannels[3] = new DMAChannel(this.IO.DMACNT_H[3], this.IO.DMACNT_L[3], this.IO.DMASAD[3], this.IO.DMADAD[3], this.IO.IF, 3);
+            // DMAChannels require bus AND IO to be initialized
+            this.DMAChannels[0] = new DMAChannel(this, 0);
+            this.DMAChannels[1] = new DMAChannel(this, 1);
+            this.DMAChannels[2] = new DMAChannel(this, 2);
+            this.DMAChannels[3] = new DMAChannel(this, 3);
+
+            // mem requires IO AND DMAChannels to be initialized
+            this.mem = new MEM(this);
 
             this.SystemBank     = new uint[16];
             // this.FIQBank        = new uint[16];
@@ -108,11 +109,10 @@ namespace GBAEmulator.CPU
             InstructionCycles = 0;
 
             this.HandleIRQs();
-            this.HandleDMAs();
-            // Handling DMAs automatically causes InstructionCycles to no longer be 0 because of the memory accesses
-            if (InstructionCycles > 0)
+            if (this.DMAActive)
             {
                 this.Log("DMAing");
+                this.HandleDMAs();
             }
             else if (this.IO.HALTCNT.Halt)
             {

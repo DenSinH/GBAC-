@@ -54,11 +54,6 @@ namespace GBAEmulator.IO
         public readonly cBLDALPHA BLDALPHA = new cBLDALPHA();
         public readonly cBLDY BLDY = new cBLDY();
 
-        public readonly cDMAAddress[] DMASAD;
-        public readonly cDMAAddress[] DMADAD;
-        public readonly cDMACNT_L[] DMACNT_L;
-        public readonly cDMACNT_H[] DMACNT_H;
-
         public readonly cSIODATA32 SIODATA32 = new cSIODATA32();
         // SIOMULTIx
         public readonly cSIOCNT SIOCNT;
@@ -111,15 +106,6 @@ namespace GBAEmulator.IO
 
             this.KEYCNT = new cKeyInterruptControl(this);
             this.KEYINPUT = new cKeyInput(this.KEYCNT, this.IF);
-
-            this.DMASAD = new cDMAAddress[4] { new cDMAAddress(bus, true),  new cDMAAddress(bus, false),
-                                               new cDMAAddress(bus, false), new cDMAAddress(bus, false) };
-            this.DMADAD = new cDMAAddress[4] { new cDMAAddress(bus, true), new cDMAAddress(bus, true),
-                                               new cDMAAddress(bus, true), new cDMAAddress(bus, false) };
-
-            this.DMACNT_L = new cDMACNT_L[4] { new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0x3fff),
-                                               new cDMACNT_L(bus, 0x3fff), new cDMACNT_L(bus, 0xffff) };
-            this.DMACNT_H = new cDMACNT_H[4] { new cDMACNT_H(), new cDMACNT_H(), new cDMACNT_H(), new cDMACNT_H(true) };
 
             this.MasterUnusedRegister = new UnusedRegister(bus);
         }
@@ -234,33 +220,33 @@ namespace GBAEmulator.IO
             }
 
             // ======================= DMA Transfer Channels =======================
-            this.Storage[0xb0] = this.Storage[0xb1] = this.DMASAD[0].lower;
-            this.Storage[0xb2] = this.Storage[0xb3] = this.DMASAD[0].upper;
-            this.Storage[0xb4] = this.Storage[0xb5] = this.DMADAD[0].lower;
-            this.Storage[0xb6] = this.Storage[0xb7] = this.DMADAD[0].upper;
-            this.Storage[0xb8] = this.Storage[0xb9] = this.DMACNT_L[0];
-            this.Storage[0xba] = this.Storage[0xbb] = this.DMACNT_H[0];
+            this.Storage[0xb0] = this.Storage[0xb1] = cpu.DMAChannels[0].DMASAD.lower;
+            this.Storage[0xb2] = this.Storage[0xb3] = cpu.DMAChannels[0].DMASAD.upper;
+            this.Storage[0xb4] = this.Storage[0xb5] = cpu.DMAChannels[0].DMADAD.lower;
+            this.Storage[0xb6] = this.Storage[0xb7] = cpu.DMAChannels[0].DMADAD.upper;
+            this.Storage[0xb8] = this.Storage[0xb9] = cpu.DMAChannels[0].DMACNT_L;
+            this.Storage[0xba] = this.Storage[0xbb] = cpu.DMAChannels[0].DMACNT_H;
 
-            this.Storage[0xbc] = this.Storage[0xbd] = this.DMASAD[1].lower;
-            this.Storage[0xbe] = this.Storage[0xbf] = this.DMASAD[1].upper;
-            this.Storage[0xc0] = this.Storage[0xc1] = this.DMADAD[1].lower;
-            this.Storage[0xc2] = this.Storage[0xc3] = this.DMADAD[1].upper;
-            this.Storage[0xc4] = this.Storage[0xc5] = this.DMACNT_L[1];
-            this.Storage[0xc6] = this.Storage[0xc7] = this.DMACNT_H[1];
+            this.Storage[0xbc] = this.Storage[0xbd] = cpu.DMAChannels[1].DMASAD.lower;
+            this.Storage[0xbe] = this.Storage[0xbf] = cpu.DMAChannels[1].DMASAD.upper;
+            this.Storage[0xc0] = this.Storage[0xc1] = cpu.DMAChannels[1].DMADAD.lower;
+            this.Storage[0xc2] = this.Storage[0xc3] = cpu.DMAChannels[1].DMADAD.upper;
+            this.Storage[0xc4] = this.Storage[0xc5] = cpu.DMAChannels[1].DMACNT_L;
+            this.Storage[0xc6] = this.Storage[0xc7] = cpu.DMAChannels[1].DMACNT_H;
 
-            this.Storage[0xc8] = this.Storage[0xc9] = this.DMASAD[2].lower;
-            this.Storage[0xca] = this.Storage[0xcb] = this.DMASAD[2].upper;
-            this.Storage[0xcc] = this.Storage[0xcd] = this.DMADAD[2].lower;
-            this.Storage[0xce] = this.Storage[0xcf] = this.DMADAD[2].upper;
-            this.Storage[0xd0] = this.Storage[0xd1] = this.DMACNT_L[2];
-            this.Storage[0xd2] = this.Storage[0xd3] = this.DMACNT_H[2];
+            this.Storage[0xc8] = this.Storage[0xc9] = cpu.DMAChannels[2].DMASAD.lower;
+            this.Storage[0xca] = this.Storage[0xcb] = cpu.DMAChannels[2].DMASAD.upper;
+            this.Storage[0xcc] = this.Storage[0xcd] = cpu.DMAChannels[2].DMADAD.lower;
+            this.Storage[0xce] = this.Storage[0xcf] = cpu.DMAChannels[2].DMADAD.upper;
+            this.Storage[0xd0] = this.Storage[0xd1] = cpu.DMAChannels[2].DMACNT_L;
+            this.Storage[0xd2] = this.Storage[0xd3] = cpu.DMAChannels[2].DMACNT_H;
 
-            this.Storage[0xd4] = this.Storage[0xd5] = this.DMASAD[3].lower;
-            this.Storage[0xd6] = this.Storage[0xd7] = this.DMASAD[3].upper;
-            this.Storage[0xd8] = this.Storage[0xd9] = this.DMADAD[3].lower;
-            this.Storage[0xda] = this.Storage[0xdb] = this.DMADAD[3].upper;
-            this.Storage[0xdc] = this.Storage[0xdd] = this.DMACNT_L[3];
-            this.Storage[0xde] = this.Storage[0xdf] = this.DMACNT_H[3];
+            this.Storage[0xd4] = this.Storage[0xd5] = cpu.DMAChannels[3].DMASAD.lower;
+            this.Storage[0xd6] = this.Storage[0xd7] = cpu.DMAChannels[3].DMASAD.upper;
+            this.Storage[0xd8] = this.Storage[0xd9] = cpu.DMAChannels[3].DMADAD.lower;
+            this.Storage[0xda] = this.Storage[0xdb] = cpu.DMAChannels[3].DMADAD.upper;
+            this.Storage[0xdc] = this.Storage[0xdd] = cpu.DMAChannels[3].DMACNT_L;
+            this.Storage[0xde] = this.Storage[0xdf] = cpu.DMAChannels[3].DMACNT_H;
 
             for (int i = 0xe0; i < 0x100; i += 4)
             {

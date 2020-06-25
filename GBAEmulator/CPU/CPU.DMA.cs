@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
+using GBAEmulator.Bus;
 using GBAEmulator.IO;
 
 namespace GBAEmulator.CPU
@@ -9,24 +10,26 @@ namespace GBAEmulator.CPU
     {
         public class DMAChannel
         {
-            private readonly cDMACNT_H DMACNT_H;
-            private readonly cDMACNT_L DMACNT_L;
+            public readonly cDMACNT_H DMACNT_H;
+            public readonly cDMACNT_L DMACNT_L;
             private ushort SNDCOUNT = 4;
-            private readonly cDMAAddress DMASAD;
-            private readonly cDMAAddress DMADAD;
+            public readonly cDMAAddress DMASAD;
+            public readonly cDMAAddress DMADAD;
             private readonly cIF IF;
+            private readonly ARM7TDMI cpu;
             private readonly int index;
             private readonly bool Sound;
 
             public bool Active { get; private set; }
 
-            public DMAChannel(cDMACNT_H DMACNT_H, cDMACNT_L DMACNT_L, cDMAAddress DMASAD, cDMAAddress DMADAD, cIF IF, int index)
+            public DMAChannel(ARM7TDMI cpu, int index)
             {
-                this.DMACNT_H = DMACNT_H;
-                this.DMACNT_L = DMACNT_L;
-                this.DMASAD = DMASAD;
-                this.DMADAD = DMADAD;
-                this.IF = IF;
+                this.DMACNT_H = new cDMACNT_H(this, index == 3);
+                this.DMACNT_L = new cDMACNT_L(cpu.bus, (ushort)(index == 3 ? 0xffff : 0x3fff));
+                this.DMASAD = new cDMAAddress(cpu.bus, index == 0);
+                this.DMADAD = new cDMAAddress(cpu.bus, index != 3);
+                this.cpu = cpu;
+                this.IF = cpu.IO.IF;
                 this.index = index;
                 this.Sound = index == 1 || index == 2;
             }
@@ -72,23 +75,11 @@ namespace GBAEmulator.CPU
                 }
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Update()
+            public void Reload()
             {
-                if (this.DMACNT_H.Triggered)
-                {
-                    this.DMACNT_H.Triggered = false;
-
-                    this.DMADAD.Reload();
-                    this.DMASAD.Reload();
-                    this.DMACNT_L.Reload();
-
-                    if (this.DMACNT_H.StartTiming == DMAStartTiming.Immediately)
-                    {
-                        // DMA Enable set AND DMA start timing immediate
-                        this.Active = true;
-                    }
-                }
+                this.DMADAD.Reload();
+                this.DMASAD.Reload();
+                this.DMACNT_L.Reload();
             }
 
             public bool Trigger(DMAStartTiming timing)
@@ -96,7 +87,7 @@ namespace GBAEmulator.CPU
                 if (this.DMACNT_H.Enabled && timing == this.DMACNT_H.StartTiming)  // enabled
                 {
                     // Console.WriteLine($"DMA{this.index}: {this.SAD:x8} -> {this.DAD:x8}");
-                    this.Active = true;
+                    this.cpu.DMAActive = this.Active = true;
                     return true;
                 }
                 return false;
@@ -147,6 +138,7 @@ namespace GBAEmulator.CPU
                     this.DMACNT_H.Disable();  // clear enabled bit
                 }
                 this.Active = false;
+                this.cpu.ResetDMAActive();
 
                 // end of the transfer
                 if (this.DMACNT_H.IRQOnEnd)
@@ -165,20 +157,18 @@ namespace GBAEmulator.CPU
 
         public readonly DMAChannel[] DMAChannels = new DMAChannel[4];
 
-        public bool DMAActive
+        public bool DMAActive;
+        public void ResetDMAActive()
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
+            for (int i = 0; i < 4; i++)
             {
-                for (int i = 0; i < 4; i++)
+                if (DMAChannels[i].Active)
                 {
-                    if (this.DMAChannels[i].Active)
-                    {
-                        return true;
-                    }
+                    DMAActive = true;
+                    return;
                 }
-                return false;
             }
+            DMAActive = false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -195,7 +185,7 @@ namespace GBAEmulator.CPU
 
         private void DoDMA(DMAChannel DMA)
         {
-            this.Log($"DMA: {DMA.SAD.ToString("x8")} -> {DMA.DAD.ToString("x8")}");
+            this.Log($"DMA: {DMA.SAD:x8} -> {DMA.DAD:x8}");
 
             uint UnitLength = DMA.UnitLength;  // bytes: 32 / 16 bits
 
@@ -222,8 +212,6 @@ namespace GBAEmulator.CPU
         {
             for (int i = 0; i < 4; i++)
             {
-                this.DMAChannels[i].Update();
-
                 // DMA channel 0 has highest priority, 3 the lowest
                 if (this.DMAChannels[i].Active)
                 {

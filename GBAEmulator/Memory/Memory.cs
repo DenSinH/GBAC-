@@ -50,7 +50,7 @@ namespace GBAEmulator.Memory
             this.VRAM       = new VRAMSection(this.IO.DISPCNT);
             this.GamePak_L  = new cROMSection(this, false);
             this.GamePak_H  = new cROMSection(this, true);
-            this.Backup     = new BackupSection(this);
+            this.Backup     = new BackupSection(cpu.DMAChannels[3]);
 
             this.MemorySections = new IMemorySection[16]
             {

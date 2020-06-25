@@ -83,7 +83,6 @@ namespace GBAEmulator.CPU
                 this.Data.Restart(this.Control.CountUpTiming);
 
                 // with event handling, we have already covered timers being turned off / countup
-
                 if (this.Next?.Control.CountUpTiming ?? false && this.Next.Control.Enabled)
                 {
                     // tick countup timers "normally" (not scheduled)

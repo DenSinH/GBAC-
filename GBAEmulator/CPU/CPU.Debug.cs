@@ -84,8 +84,8 @@ namespace GBAEmulator.CPU
 
         public DMAInfo GetDMAInfo(int index)
         {
-            return new DMAInfo(this.IO.DMADAD[index].Address, this.IO.DMASAD[index].Address,
-                this.IO.DMACNT_L[index].UnitCount, this.IO.DMACNT_H[index]);
+            return new DMAInfo(this.DMAChannels[index].DMADAD.Address, this.DMAChannels[index].DMASAD.Address,
+                this.DMAChannels[index].DMACNT_L.UnitCount, this.DMAChannels[index].DMACNT_H);
         }
 
         public void ShowInfo()
