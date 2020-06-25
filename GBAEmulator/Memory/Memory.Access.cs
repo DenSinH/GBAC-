@@ -107,8 +107,8 @@ namespace GBAEmulator.Memory
 
             ushort value = this.MemorySections[Section].GetHalfWordAt(address) ?? (ushort)this.bus.OpenBus();
 
-            uint BusMask = ((address & 3) > 1) ? 0x0000_ffff : 0xffff_0000;
-            this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (((address & 3) > 1) ? 16 : 0));
+            uint BusMask = ((address & 2) > 0) ? 0x0000_ffff : 0xffff_0000;
+            this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (((address & 2) > 0) ? 16 : 0));
             return value;
         }
 
@@ -124,7 +124,7 @@ namespace GBAEmulator.Memory
 
             byte value = this.MemorySections[Section].GetByteAt(address) ?? (byte)this.bus.OpenBus();
 
-            uint BusMask = (uint)(0x0000_00ff << (int)(8*(address & 3)));
+            uint BusMask = ~(uint)(0x0000_00ff << (int)(8 * (address & 3)));
             this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (int)(8 * (address & 3)));
             return value;
         }
@@ -145,8 +145,8 @@ namespace GBAEmulator.Memory
         {
             this.LogAccess(address, value);
             // offset is handled in individual sections (always force align, except SRAM
-            uint BusMask = ((address & 3) > 1) ? 0x0000_ffff : 0xffff_0000;
-            this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (((address & 3) > 1) ? 16 : 0));
+            uint BusMask = ((address & 2) > 0) ? 0x0000_ffff : 0xffff_0000;
+            this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (((address & 2) > 0) ? 16 : 0));
 
             uint Section = (address & 0xff00_0000) >> 24;
             this.cpu.InstructionCycles += this.GetNonWordAccessCycles(Section, address);
@@ -158,7 +158,7 @@ namespace GBAEmulator.Memory
         public void SetByteAt(uint address, byte value)
         {
             this.LogAccess(address, value);
-            uint BusMask = (uint)(0x0000_00ff << (int)(8 * (address & 3)));
+            uint BusMask = ~(uint)(0x0000_00ff << (int)(8 * (address & 3)));
             this.bus.BusValue = (this.bus.BusValue & BusMask) | (uint)(value << (int)(8 * (address & 3)));
 
             uint Section = (address & 0xff00_0000) >> 24;

@@ -99,7 +99,7 @@ namespace GBAEmulator.Memory.Sections
                 if ((address &= 0x01ff_ffff) > this.ROMSize)
                     return (byte)((address >> 1) & 0xff);
             }
-            else
+            else if (address <= 0x0800_00c8 && address >= 0x0800_00c4)
             {
                 value = this.TryGPIORead(address);
                 if (value != null) return value;
@@ -120,7 +120,7 @@ namespace GBAEmulator.Memory.Sections
                     return (ushort)((address >> 1) & 0xffff);
                 }
             }
-            else
+            else if (address <= 0x0800_00c8 && address >= 0x0800_00c4)
             {
                 value = this.TryGPIORead(address);
                 if (value != null) return value;
@@ -141,7 +141,7 @@ namespace GBAEmulator.Memory.Sections
                     return ((address >> 1) & 0xfffe) | ((((address >> 1) & 0xfffe) + 1) << 16);
                 }
             }
-            else
+            else if (address <= 0x0800_00c8 && address >= 0x0800_00c4)  // more likely to be over 0x0800_00c8, so faster check this way
             {
                 value = this.TryGPIORead(address);
                 if (value != null) return value;

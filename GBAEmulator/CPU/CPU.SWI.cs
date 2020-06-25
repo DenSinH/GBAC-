@@ -6,13 +6,14 @@ namespace GBAEmulator.CPU
     {
         private int SWIInstruction(uint Instruction)
         {
+            Console.WriteLine(Instruction.ToString("x8"));
             this.Log(string.Format("SWI: {0:x8}", Instruction));
 
             this.ChangeMode(Mode.Supervisor);
             this.I = 1;
             LR = this.PC - (uint)((this.state == State.THUMB) ? 2 : 4);  // which is now LR_svc
-            this.state = State.ARM;
 
+            this.state = State.ARM;
             this.PC = SWIVector;
             this.PipelineFlush();
 

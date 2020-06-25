@@ -7,11 +7,11 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-		/* ARM / THUMB state */
+        /* ARM / THUMB state */
         public readonly uint[] Registers = new uint[16]; // active registers; R15 = PC
-        private readonly uint[] SystemBank, SupervisorBank, IRQBank; // , FIQBank, AbortBank, UndefinedBank;
+        private readonly uint[] SystemBank, SupervisorBank, IRQBank, FIQBank; // , FIQBank, AbortBank, UndefinedBank;
         // private readonly Dictionary<Mode, uint[]> BankedRegisters;
-        private uint SPSR_svc, SPSR_irq;                    //, SPSR_fiq, SPSR_abt, SPSR_und;  // Saved Processor Status Registers
+        private uint SPSR_svc, SPSR_irq, SPSR_fiq;                    //, SPSR_fiq, SPSR_abt, SPSR_und;  // Saved Processor Status Registers
 
         private byte N, Z, C, V, I, F;
         public Mode mode { get; private set; } = Mode.User;
@@ -20,7 +20,7 @@ namespace GBAEmulator.CPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private uint[] BankedRegisters(Mode mode)
         {
-            switch(mode)
+            switch (mode)
             {
                 case Mode.User:
                 case Mode.System:
@@ -29,6 +29,8 @@ namespace GBAEmulator.CPU
                     return this.SupervisorBank;
                 case Mode.IRQ:
                     return this.IRQBank;
+                case Mode.FIQ:
+                    return this.FIQBank;
                 default:
                     throw new Exception($"Invalid mode {mode}");
             }
@@ -41,27 +43,36 @@ namespace GBAEmulator.CPU
 
             this.Log("new mode: " + NewMode);
 
+            bool FIQInvolved = this.mode == Mode.FIQ || NewMode == Mode.FIQ;
             // Bank current registers
             uint[] OldBank = this.BankedRegisters(this.mode);
             uint[] NewBank = this.BankedRegisters(NewMode);
-            for (int i = 13; i <= 14; i++)
+            for (int i = FIQInvolved ? 8 : 13; i <= 14; i++)
             {
                 OldBank[i] = this.Registers[i];
                 this.Registers[i] = NewBank[i];
             }
 
             if (this.mode == Mode.IRQ)
-                    // return from IRQ
-                    this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterIRQ;
+                // return from IRQ
+                this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterIRQ;
             else if (this.mode == Mode.Supervisor)
-                    // return from SWI
-                    this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterSWI;
+                // return from SWI
+                this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterSWI;
 
-            if (NewMode == Mode.Supervisor)
-                SPSR_svc = this.CPSR;
-            else if (NewMode == Mode.IRQ)
-                SPSR_irq = this.CPSR;
-            
+            switch (NewMode)
+            {
+                case Mode.Supervisor:
+                    SPSR_svc = this.CPSR;
+                    break;
+                case Mode.IRQ:
+                    SPSR_irq = this.CPSR;
+                    break;
+                case Mode.FIQ:
+                    SPSR_fiq = this.CPSR;
+                    break;
+            }
+
             this.mode = NewMode;
         }
 
@@ -103,27 +114,33 @@ namespace GBAEmulator.CPU
         {
             get
             {
-                if (this.mode == Mode.Supervisor)
-                    return SPSR_svc;
-                else if (this.mode == Mode.IRQ)
-                    return SPSR_irq;
+                switch (this.mode)
+                {
+                    case Mode.Supervisor:
+                        return SPSR_svc;
+                    case Mode.IRQ:
+                        return SPSR_irq;
+                    case Mode.FIQ:
+                        return SPSR_fiq;
+                }
 
                 this.Error(string.Format("No SPSR for mode {0}", this.mode));
                 return this.CPSR;
             }
             set
             {
-                if (this.mode == Mode.Supervisor)
+                switch (this.mode)
                 {
-                    SPSR_svc = value;
-                    return;
+                    case Mode.Supervisor:
+                        SPSR_svc = value;
+                        break;
+                    case Mode.IRQ:
+                        SPSR_irq = value;
+                        break;
+                    case Mode.FIQ:
+                        SPSR_fiq = value;
+                        break;
                 }
-                else if (this.mode == Mode.IRQ)
-                {
-                    SPSR_irq = value;
-                    return;
-                }
-                return;
             }
         }
 
@@ -150,11 +167,11 @@ namespace GBAEmulator.CPU
             set => Registers[13] = value;
         }
 
-		private uint LR
+        private uint LR
         {
             get => Registers[14];
             set => Registers[14] = value;
         }
-		
+
     }
 }

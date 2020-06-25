@@ -40,12 +40,9 @@ namespace GBAEmulator.CPU
 
             this.mem.CurrentBIOSReadState = MEM.BIOSReadState.DuringIRQ;
 
-            if (this.Pipeline.Count == 0)
-                this.PC += (uint)((this.state == State.ARM) ? 4 : 2);
-
             // store address of instruction that did not get executed + 4
             // we check for IRQ before filling the pipeline, so we are 2 (in THUMB) or 4 (ARM) ahead
-            LR = this.PC + (uint)((this.state == State.THUMB) ? 2 : 0);  // which is now LR_irq
+            LR = this.PC - (uint)((this.state == State.ARM) ? 4 : 0);  // which is now LR_irq
             this.state = State.ARM;
 
             this.PC = IRQVector;

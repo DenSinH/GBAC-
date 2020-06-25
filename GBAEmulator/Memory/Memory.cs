@@ -17,7 +17,7 @@ namespace GBAEmulator.Memory
         public  PALSection               PAL           = new PALSection();
         public  VRAMSection              VRAM;
         public  OAMSection               OAM           = new OAMSection();
-        private cROMSection              GamePak_L;
+        public cROMSection              GamePak_L;
         private cROMSection              GamePak_H;
         public  BackupSection            Backup;
 

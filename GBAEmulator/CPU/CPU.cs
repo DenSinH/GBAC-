@@ -50,7 +50,7 @@ namespace GBAEmulator.CPU
             this.mem = new MEM(this);
 
             this.SystemBank     = new uint[16];
-            // this.FIQBank        = new uint[16];
+            this.FIQBank        = new uint[16];
             this.SupervisorBank = new uint[16];
             // this.AbortBank      = new uint[16];
             this.IRQBank        = new uint[16];
@@ -59,11 +59,28 @@ namespace GBAEmulator.CPU
 
             // need banked registers for CPSR initialization
             this.CPSR = 0x0000005F;
+
+            this.PipelineFlush();
+            this.PC += 4;
+
+            LOGFILE.ReadLine();
         }
 
         private void PipelineFlush()
         {
+            // Console.WriteLine($"PipelineFlush from {PC:x8}");
             this.Pipeline.Clear();
+
+            if (this.state == State.ARM)
+            {
+                this.Pipeline.Enqueue(this.mem.GetWordAt(this.PC));
+                this.Pipeline.Enqueue(this.mem.GetWordAt(this.PC += 4));
+            }
+            else
+            {
+                this.Pipeline.Enqueue(this.mem.GetHalfWordAt(this.PC));
+                this.Pipeline.Enqueue(this.mem.GetHalfWordAt(this.PC += 2));
+            }
         }
         
         public void SkipBios()
@@ -80,7 +97,7 @@ namespace GBAEmulator.CPU
             (GBATek)
              */
             this.SP                 = 0x03007F00;
-            // this.FIQBank[13]        = 0x03007F00;
+            this.FIQBank[13]        = 0x03007F00;
             this.SupervisorBank[13] = 0x03007FE0;
             // this.AbortBank[13]      = 0x03007F00;
             this.IRQBank[13]        = 0x03007FA0;
@@ -90,6 +107,9 @@ namespace GBAEmulator.CPU
             this.CPSR = 0x6000_001F;
 
             this.IO.RCNT.Set(0x8000, true, true);  // set RCNT to 8000 to prevent Sonic glitch
+
+            this.PipelineFlush();
+            this.PC += 4;
         }
 
         public void Reset()
@@ -99,10 +119,10 @@ namespace GBAEmulator.CPU
             Array.Clear(this.IRQBank, 0, 16);
 
             this.SkipBios();
-
-            this.PipelineFlush();
         }
 
+        bool COMPLOG = true;
+        StreamReader LOGFILE = new StreamReader("../../../Tests/thumb.log");
         public int InstructionCycles;
         public int Step()
         {
@@ -121,36 +141,61 @@ namespace GBAEmulator.CPU
             }
             else
             {
-                
                 if (this.state == State.ARM)
                 {
+                    //Console.WriteLine($"Fetch from {this.PC:x8}");
+                    //Console.ReadKey();
                     this.Pipeline.Enqueue(this.mem.GetWordAt(this.PC));
-                    this.PC += 4;
 
-                    if (this.Pipeline.Count == 2)
+                    if (this.Pipeline.Count != 3)
                     {
-                        InstructionCycles += this.ExecuteARM(this.Pipeline.Dequeue());
+                        Console.WriteLine($"Something is wrong: {this.Pipeline.Count} in pipeline");
+                        Console.ReadKey();
                     }
-                    else
-                    {
-                        // cycles already accounted for
-                    }
+                    InstructionCycles += this.ExecuteARM(this.Pipeline.Dequeue());
                 }
                 else
                 {
+                    //Console.WriteLine($"Fetch from {this.PC:x8}");
+                    //Console.ReadKey();
                     this.Pipeline.Enqueue(this.mem.GetHalfWordAt(this.PC));
-                    this.PC += 2;
 
-                    if (this.Pipeline.Count == 2)
+                    if (this.Pipeline.Count != 3)
                     {
-                        InstructionCycles += this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
+                        Console.WriteLine($"Something is wrong: {this.Pipeline.Count} in pipeline");
+                        Console.ReadKey();
                     }
-                    else
-                    {
-                        // cycles already accounted for
-                    }
+                    InstructionCycles += this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
                 }
+
+                this.PC += (uint)((this.state == State.ARM) ? 4 : 2);
             }
+
+            //if (COMPLOG)
+            //{
+            //    if (!this.IO.HALTCNT.Halt)
+            //    {
+            //        if (this.Pipeline.Count == 2)
+            //        {
+            //            string Line = LOGFILE.ReadLine();
+            //            Console.WriteLine("LOG " + Line);
+            //            Console.Write(" ACT ");
+            //            this.ShowInfo();
+
+            //            //// all registers
+            //            //if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            //{
+            //            //    Console.ReadKey();
+            //            //}
+
+            //            // wrong branch
+            //            if (!Line.Contains((this.Registers[15] - (uint)((this.state == State.ARM) ? 4 : 2)).ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
+            //            {
+            //                Console.ReadKey();
+            //            }
+            //        }
+            //    }
+            //}
 
             this.GlobalCycleCount += InstructionCycles;
             return InstructionCycles;

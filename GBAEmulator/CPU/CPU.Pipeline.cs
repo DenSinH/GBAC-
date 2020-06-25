@@ -14,8 +14,8 @@ namespace GBAEmulator.CPU
          */
     public class cPipeline
     {
-        const int PipelineMask = 3;
-        private uint[] storage = new uint[4];
+        const int PipelineMask = 7;
+        private uint[] storage = new uint[PipelineMask + 1];
         private uint offset = 0;
         public int Count { get; private set; }
 
@@ -34,11 +34,13 @@ namespace GBAEmulator.CPU
         public uint Dequeue()
         {
             Count--;
+            // Console.WriteLine($"Dequeue {storage[offset & PipelineMask]:x8}");
             return storage[offset++ & PipelineMask];
         }
 
         public void Enqueue(uint value)
         {
+            // Console.WriteLine($"Enqueue {value:x8}");
             storage[(offset + Count++) & PipelineMask] = value;
         }
 
