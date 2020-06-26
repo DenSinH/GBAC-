@@ -9,19 +9,19 @@ namespace GBAEmulator.Memory
 {
     public partial class MEM
     {
-        private BIOSSection              BIOS;
-        private NonMirroredMemorySection UnusedSection = new NonMirroredMemorySection(0);
-        private MirroredMemorySection    eWRAM         = new MirroredMemorySection(0x40000);
-        private MirroredMemorySection    iWRAM         = new MirroredMemorySection(0x8000);
-        public  IORAMSection             IO;
-        public  PALSection               PAL           = new PALSection();
-        public  VRAMSection              VRAM;
-        public  OAMSection               OAM           = new OAMSection();
-        public cROMSection              GamePak_L;
-        private cROMSection              GamePak_H;
-        public  BackupSection            Backup;
+        private readonly BIOSSection              BIOS;
+        private readonly NonMirroredMemorySection UnusedSection = new NonMirroredMemorySection(0);
+        private readonly MirroredMemorySection    eWRAM         = new MirroredMemorySection(0x40000);
+        private readonly MirroredMemorySection    iWRAM         = new MirroredMemorySection(0x8000);
+        public readonly  IORAMSection             IO;
+        public readonly  PALSection               PAL           = new PALSection();
+        public readonly  VRAMSection              VRAM;
+        public readonly  OAMSection               OAM           = new OAMSection();
+        private readonly cROMSection              GamePak_L;
+        private readonly cROMSection              GamePak_H;
+        public readonly  BackupSection            Backup;
 
-        private IMemorySection[] MemorySections;
+        private readonly IMemorySection[] MemorySections;
 
         // Byte access cycles are equal to halfword access cycles
         private static readonly int[] NonWordAccessCycles = new int[16]

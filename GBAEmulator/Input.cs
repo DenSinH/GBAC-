@@ -53,6 +53,8 @@ namespace GBAEmulator
             }
             catch (SharpDX.SharpDXException)
             {
+                // otherwise our keys will be stuck on disconnection...
+                ControllerState = 0;
                 return false;
             }
         }
@@ -85,7 +87,7 @@ namespace GBAEmulator
             // Can be used to map keys to other keys later
             A =      Keys.Z;
             B =      Keys.X;
-            L =      Keys.LShiftKey;
+            L =      Keys.ShiftKey;
             R =      Keys.C;
             Start =  Keys.A;
             Select = Keys.S;
@@ -97,6 +99,8 @@ namespace GBAEmulator
 
         private ushort KeyMask(Keys KeyPressed)
         {
+            // switch cases don't allow dynamic keys
+            // todo: dict
             if      (KeyPressed == A)       return 0b00_0000_0001;
             else if (KeyPressed == B)       return 0b00_0000_0010;
             else if (KeyPressed == Select)  return 0b00_0000_0100;

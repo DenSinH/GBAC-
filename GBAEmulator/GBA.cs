@@ -43,6 +43,8 @@ namespace GBAEmulator
 
             this.IO.Init(this.cpu, this.apu);
 
+            // this.mem.UseNormattsBIOS();
+
             this.display = display;
         }
 
@@ -165,7 +167,6 @@ namespace GBAEmulator
         {
             this.mem.LoadRom(ROMPath);
 
-            // this.mem.UseNormattsBios();
             cpu.SkipBios();
 
             this.Alive = true;

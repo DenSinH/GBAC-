@@ -16,7 +16,10 @@ namespace GBAEmulator.IO
         private static readonly int[] WaitState1SCycles = new int[2] { 4, 1 };
         private static readonly int[] WaitState2SCycles = new int[2] { 8, 1 };
 
-        public int GetWaitStateNCycles(uint section)
+        public readonly int[] NCycles = new int[8] { 4, 4, 4, 4, 4, 4, 4, 4 };
+        public readonly int[] SCycles = new int[8] { 2, 2, 4, 4, 8, 8, 0, 0 };
+
+        private int GetWaitStateNCycles(uint section)
         {
             switch (section)
             {
@@ -40,7 +43,7 @@ namespace GBAEmulator.IO
                     throw new IndexOutOfRangeException($"Waitstate {section} is invalid");
             }
         }
-        public int GetWaitStateSCycles(uint section)
+        private int GetWaitStateSCycles(uint section)
         {
             switch (section)
             {
@@ -69,6 +72,11 @@ namespace GBAEmulator.IO
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set((ushort)(value & 0xdfff), setlow, sethigh);
+            for (uint i = 0; i < 8; i++)
+            {
+                this.NCycles[i] = this.GetWaitStateNCycles(8 + i);
+                this.SCycles[i] = this.GetWaitStateSCycles(8 + i);
+            }
         }
     }
     #endregion

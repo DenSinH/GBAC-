@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace GBAEmulator.Memory.Sections
@@ -23,17 +24,20 @@ namespace GBAEmulator.Memory.Sections
             set => this.Storage[address] = value; 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual byte? GetByteAt(uint address)
         {
             return Storage[address & AddressMask];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual ushort? GetHalfWordAt(uint address)
         {
             address &= AddressMask & 0x00ff_fffe;  // force align
             return (ushort)((Storage[address + 1] << 8) | Storage[address]);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual uint? GetWordAt(uint address)
         {
             address &= AddressMask & 0x00ff_fffc;  // force align
@@ -45,12 +49,14 @@ namespace GBAEmulator.Memory.Sections
                     );
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual void SetByteAt(uint address, byte value)
         {
             address &= AddressMask;
             Storage[address] = value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual void SetHalfWordAt(uint address, ushort value)
         {
             address &= AddressMask & 0x00ff_fffe;  // force align
@@ -58,6 +64,7 @@ namespace GBAEmulator.Memory.Sections
             Storage[address] = (byte)(value & 0x00ff);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual void SetWordAt(uint address, uint value)
         {
             address &= AddressMask & 0x00ff_fffc;  // force align

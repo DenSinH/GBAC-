@@ -33,7 +33,7 @@ namespace GBAEmulator.IO
 
         public cDMAAddress(BUS bus, bool InternalMemory) : base(
             new cDMAAddressHalf(bus, true, 0xffff),
-            new cDMAAddressHalf(bus, false, (ushort)(InternalMemory ? 0x07ff : 0xffff)))
+            new cDMAAddressHalf(bus, false, (ushort)(InternalMemory ? 0x07ff : 0x0fff)))
         {
             this.InternalMemory = InternalMemory;
         }
