@@ -112,7 +112,7 @@ namespace GBAEmulator
 
         private void UpdateVCOUNT()
         {
-            // this.VCOUNT.Text = this.gba.mem.VCOUNT.CurrentScanline.ToString("d3");
+            this.VCOUNT.Text = this.gba.IO.VCOUNT.CurrentScanline.ToString("d3");
         }
 
         private void UpdateInterruptControl()

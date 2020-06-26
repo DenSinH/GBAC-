@@ -47,6 +47,7 @@ namespace GBAEmulator.CPU
 
             this.PC = IRQVector;
             this.PipelineFlush();
+            this.PC += 4;  // get ready to receive next instruction
         }
     }
 }

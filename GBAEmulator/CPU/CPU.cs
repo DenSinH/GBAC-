@@ -159,6 +159,11 @@ namespace GBAEmulator.CPU
                         Console.ReadKey();
                     }
 #endif
+                    if ((this.Pipeline.Peek() & 0xffff_0000) != 0)
+                    {
+                        Console.Error.WriteLine("ARM instruction as THUMB!");
+                        Console.ReadKey();
+                    }
                     InstructionCycles += this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
                 }
 
