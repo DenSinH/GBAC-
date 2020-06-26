@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 using GBAEmulator.CPU;
 using GBAEmulator.Video;
@@ -24,10 +25,14 @@ namespace GBAEmulator
         // 1 for each timer                                 => 4 for CPU
         private readonly Scheduler.Scheduler EventQueue = new Scheduler.Scheduler();
 
+#if THREADED_RENDERING
+        private readonly Thread RenderThread;
+#endif
+
         public Visual vis;
         public readonly ushort[] display;
 
-        public bool ShutDown { private get; set; }
+        public bool ShutDown;
         public bool Pause;
         public bool Alive { get; private set; } = true;
 
@@ -46,6 +51,10 @@ namespace GBAEmulator
             // this.mem.UseNormattsBIOS();
 
             this.display = display;
+#if THREADED_RENDERING
+            this.RenderThread = new Thread(() => ppu.Mainloop());
+            this.RenderThread.Start();
+#endif
         }
 
         private const int NonHBlankCycles = 960;
@@ -129,7 +138,7 @@ namespace GBAEmulator
                 this.mem.IO.IF.Request(Interrupt.LCDHBlank);
 
             if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
-            this.ppu.DrawScanline();
+            this.ppu.Trigger();
 
             // Although the drawing time is only 960 cycles (240*4), the H-Blank flag is "0" for a total of 1006 cycles.
             // we split up the HBlank period into 2 smaller periods:
@@ -155,6 +164,19 @@ namespace GBAEmulator
             this.mem.IO.BG2Y.UpdateInternal((uint)this.mem.IO.BG2PD.Full);
             this.mem.IO.BG3X.UpdateInternal((uint)this.mem.IO.BG3PB.Full);
             this.mem.IO.BG3Y.UpdateInternal((uint)this.mem.IO.BG3PD.Full);
+        }
+
+        public void PowerOff()
+        {
+#if THREADED_RENDERING
+            // safely end RenderThread
+            this.ppu.ShutDown = true;
+            this.RenderThread.Join();
+            
+            // set the DoneDrawing event so Wait() won't last forever
+            this.ppu.DoneDrawing.Set();
+#endif
+            this.ShutDown = true;
         }
 
         public void Reset()

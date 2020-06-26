@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 using GBAEmulator.IO;
 
@@ -27,6 +30,12 @@ namespace GBAEmulator.Video
         public bool ExternalOBJEnable = true;
         public bool ExternalWindowingEnable = true;
         public bool ExternalBlendingEnable = true;
+#if THREADED_RENDERING
+        public readonly ManualResetEventSlim StartDrawing = new ManualResetEventSlim(false);
+        public readonly ManualResetEventSlim DoneDrawing = new ManualResetEventSlim(true);
+        public bool ShutDown;
+        public volatile bool Drawing = false;
+#endif
 
         public PPU(GBA gba, ushort[] display, IORAMSection IO)
         {
@@ -37,5 +46,52 @@ namespace GBAEmulator.Video
             this.ResetBGScanlines(0, 1, 2, 3);
             this.ResetOBJScanlines();
         }
+
+        public void Trigger()
+        {
+#if THREADED_RENDERING
+            this.Wait();
+            this.DoneDrawing.Reset();
+            scanline++;
+            if (scanline == 228)
+            {
+                scanline = 0;
+                frame++;
+            }
+            this.Drawing = true;
+            this.StartDrawing.Set();
+#else
+            this.DrawScanline();
+            scanline++;
+            if (scanline == 228)
+            {
+                scanline = 0;
+                frame++;
+            }
+#endif
+        }
+
+        [Conditional("THREADED_RENDERING")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Wait()
+        {
+#if THREADED_RENDERING
+            if (this.Drawing) DoneDrawing.Wait();
+#endif
+        }
+
+#if THREADED_RENDERING
+        public void Mainloop()
+        {
+            while (!this.ShutDown)
+            {
+                StartDrawing.Wait();
+                StartDrawing.Reset();
+                this.DrawScanline();
+                this.Drawing = false;
+                DoneDrawing.Set();
+            }
+        }
+#endif
     }
 }

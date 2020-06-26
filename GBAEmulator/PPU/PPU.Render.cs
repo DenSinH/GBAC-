@@ -49,13 +49,6 @@ namespace GBAEmulator.Video
                         throw new Exception("Invalid Rendering Mode");
                 }
             }
-            
-            scanline++;
-            if (scanline == 228)
-            {
-                scanline = 0;
-                frame++;
-            }
         }
 
         private void Mode0Scanline()

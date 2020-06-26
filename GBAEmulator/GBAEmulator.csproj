@@ -12,6 +12,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <DefineConstants>THREADED_RENDERING</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

@@ -80,7 +80,7 @@ namespace GBAEmulator
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            this.gba.ShutDown = true;
+            this.gba.PowerOff();
             this.gba.vis = null;
             this.gba.apu.speaker.ShutDown();
             this.PlayThread?.Join();
