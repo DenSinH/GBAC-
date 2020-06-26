@@ -1,15 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
+using GBAEmulator.Video;
 
 namespace GBAEmulator.Memory.Sections
 {
     public class PALSection : MirroredMemorySection
     {
+        private PPU ppu;
         public PALSection() : base(0x400) { }
+
+        public void Init(PPU ppu)
+        {
+            this.ppu = ppu;
+        }
 
         public override void SetByteAt(uint address, byte value)
         {
+            this.ppu.Wait();
             /*
              GBATek:
                 Writing 8bit Data to Video Memory
@@ -24,6 +31,18 @@ namespace GBAEmulator.Memory.Sections
             */
             this.Storage[address & 0x3fe] = value;
             this.Storage[(address & 0x3fe) + 1] = value;
+        }
+
+        public override void SetHalfWordAt(uint address, ushort value)
+        {
+            this.ppu.Wait();
+            base.SetHalfWordAt(address, value);
+        }
+
+        public override void SetWordAt(uint address, uint value)
+        {
+            this.ppu.Wait();
+            base.SetWordAt(address, value);
         }
     }
 }

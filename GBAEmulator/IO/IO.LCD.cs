@@ -1,6 +1,7 @@
 ﻿using System;
 
 using GBAEmulator.Bus;
+using GBAEmulator.Video;
 
 namespace GBAEmulator.IO
 {
@@ -8,6 +9,12 @@ namespace GBAEmulator.IO
     #region DISPCNT
     public class cDISPCNT : IORegister2
     {
+        private readonly PPU ppu;
+        public cDISPCNT(PPU ppu)
+        {
+            this.ppu = ppu;
+        }
+
         public byte BGMode
         {
             get => (byte)(this._raw & 0x07);
@@ -30,6 +37,12 @@ namespace GBAEmulator.IO
         {
             return (this._raw & 0x8000) > 0;
         }
+
+        public override void Set(ushort value, bool setlow, bool sethigh)
+        {
+            this.ppu.Wait();
+            base.Set(value, setlow, sethigh);
+        }
     }
     #endregion
 
@@ -37,10 +50,12 @@ namespace GBAEmulator.IO
     public class cDISPSTAT : IORegister2
     {
         private readonly cIF IF;
+        private readonly PPU ppu;
 
-        public cDISPSTAT(cIF IF) : base()
+        public cDISPSTAT(cIF IF, PPU ppu) : base()
         {
             this.IF = IF;
+            this.ppu = ppu;
         }
 
         public byte VCountSetting
@@ -81,6 +96,12 @@ namespace GBAEmulator.IO
             }
             else
                 this._raw &= 0xfffd;
+        }
+
+        public override void Set(ushort value, bool setlow, bool sethigh)
+        {
+            this.ppu.Wait();
+            base.Set(value, setlow, sethigh);
         }
     }
     #endregion
@@ -129,14 +150,15 @@ namespace GBAEmulator.IO
     #endregion
 
     #region BGControl
-
     public class cBGControl : IORegister2
     {
         // BG0/1 have bit 13 unused
+        private readonly PPU ppu;
         private readonly ushort BitMask;
 
-        public cBGControl(ushort BitMask) : base()
+        public cBGControl(PPU ppu, ushort BitMask) : base()
         {
+            this.ppu = ppu;
             this.BitMask = BitMask;
         }
 
@@ -178,6 +200,8 @@ namespace GBAEmulator.IO
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
+            // todo: only when necessary
+            this.ppu.Wait();
             base.Set((ushort)(value & BitMask), setlow, sethigh);
         }
     }
@@ -186,10 +210,16 @@ namespace GBAEmulator.IO
     #region BGScrolling
     public class cBGScrolling : WriteOnlyRegister2
     {
-        public cBGScrolling(BUS bus, bool IsLower) : base(bus, IsLower) { }
+        private readonly PPU ppu;
+        public cBGScrolling(PPU ppu, BUS bus, bool IsLower) : base(bus, IsLower)
+        {
+            this.ppu = ppu;
+        }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
+            // todo: only when necessary
+            this.ppu.Wait();
             base.Set((ushort)(value & 0x01ff), setlow, sethigh);
         }
 
@@ -203,11 +233,13 @@ namespace GBAEmulator.IO
     #region BG Rotation/Scaling
     public class cReferencePointHalf : WriteOnlyRegister2
     {
+        private readonly PPU ppu;
         private cReferencePoint parent;
         private ushort BitMask;
 
-        public cReferencePointHalf(cReferencePoint parent, BUS bus, bool IsLower, ushort BitMask) : base(bus, IsLower)
+        public cReferencePointHalf(cReferencePoint parent, PPU ppu, BUS bus, bool IsLower, ushort BitMask) : base(bus, IsLower)
         {
+            this.ppu = ppu;
             this.parent = parent;
             this.BitMask = BitMask;
         }
@@ -219,6 +251,8 @@ namespace GBAEmulator.IO
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
+            // todo: only when necessary
+            this.ppu.Wait();
             base.Set((ushort)(value & this.BitMask), setlow, sethigh);
             this.parent.ResetInternal();
         }
@@ -226,11 +260,11 @@ namespace GBAEmulator.IO
 
     public class cReferencePoint : IORegister4<cReferencePointHalf>
     {
-        public cReferencePoint(BUS bus)
+        public cReferencePoint(PPU ppu, BUS bus)
         {
-            this.lower = new cReferencePointHalf(this, bus, true, 0xffff);
+            this.lower = new cReferencePointHalf(this, ppu, bus, true, 0xffff);
             // top 4 bits unused
-            this.upper = new cReferencePointHalf(this, bus, false, 0x0fff);
+            this.upper = new cReferencePointHalf(this, ppu, bus, false, 0x0fff);
         }
 
         public uint InternalRegister { get; private set; }
@@ -278,7 +312,11 @@ namespace GBAEmulator.IO
     #region Window Feature
     public class cWindowDimensions : WriteOnlyRegister2
     {
-        public cWindowDimensions(BUS bus, bool IsLower) : base(bus, IsLower) { }
+        private readonly PPU ppu;
+        public cWindowDimensions(PPU ppu, BUS bus, bool IsLower) : base(bus, IsLower)
+        {
+            this.ppu = ppu;
+        }
 
         public byte HighCoord
         {
@@ -288,6 +326,12 @@ namespace GBAEmulator.IO
         public byte LowCoord
         {
             get => (byte)(this._raw >> 8);
+        }
+
+        public override void Set(ushort value, bool setlow, bool sethigh)
+        {
+            this.ppu.Wait();
+            base.Set(value, setlow, sethigh);
         }
     }
 
@@ -334,6 +378,12 @@ namespace GBAEmulator.IO
     #region Mosaic Function
     public class cMosaic : IORegister2
     {
+        private readonly PPU ppu;
+        public cMosaic(PPU ppu)
+        {
+            this.ppu = ppu;
+        }
+
         public byte BGMosaicHStretch
         {
             get => (byte)((this._raw & 0x000f) + 1);
@@ -353,12 +403,25 @@ namespace GBAEmulator.IO
         {
             get => (byte)(((this._raw & 0xf000) >> 12) + 1);
         }
+
+        public override void Set(ushort value, bool setlow, bool sethigh)
+        {
+            this.ppu.Wait();
+            base.Set(value, setlow, sethigh);
+        }
     }
     #endregion
 
     #region Color Special Effects
     public class cBLDCNT : IORegister2
     {
+        private readonly PPU ppu;
+
+        public cBLDCNT(PPU ppu)
+        {
+            this.ppu = ppu;
+        }
+
         public bool BGIsTop(byte BG)
         {
             return (this._raw & (1 << BG)) > 0;
@@ -384,6 +447,8 @@ namespace GBAEmulator.IO
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
+            // todo: only when necessary
+            this.ppu.Wait();
             // top 2 bits unused
             base.Set((ushort)(value & 0x3fff), setlow, sethigh);
         }
@@ -391,6 +456,13 @@ namespace GBAEmulator.IO
 
     public class cBLDALPHA : IORegister2
     {
+        private readonly PPU ppu;
+
+        public cBLDALPHA(PPU ppu)
+        {
+            this.ppu = ppu;
+        }
+
         public byte EVA
         {
             // allow up to 0x10 (1.4 fixed point)
@@ -413,12 +485,20 @@ namespace GBAEmulator.IO
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
+            // todo: only when necessary
+            this.ppu.Wait();
             base.Set((ushort)(value & 0x1f1f), setlow, sethigh);
         }
     }
 
     public class cBLDY : IORegister2
     {
+        private readonly PPU ppu;
+        public cBLDY(PPU ppu)
+        {
+            this.ppu = ppu;
+        }
+
         public byte EY
         {
             // allow up to 0x10 (1.4 fixed point)
@@ -431,6 +511,8 @@ namespace GBAEmulator.IO
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
+            // todo: only when necessary
+            this.ppu.Wait();
             base.Set((ushort)(value & 0x001f), setlow, sethigh);
         }
     }

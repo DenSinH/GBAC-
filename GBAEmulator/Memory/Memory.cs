@@ -4,6 +4,7 @@ using GBAEmulator.Memory.Sections;
 using GBAEmulator.IO;
 using GBAEmulator.CPU;
 using GBAEmulator.Bus;
+using GBAEmulator.Video;
 
 namespace GBAEmulator.Memory
 {
@@ -72,6 +73,13 @@ namespace GBAEmulator.Memory
                 this.Backup,
                 this.Backup
             };
+        }
+
+        public void Init(PPU ppu)
+        {
+            this.OAM.Init(ppu);
+            this.PAL.Init(ppu);
+            this.VRAM.Init(ppu);
         }
 
         public void UseNormattsBIOS()

@@ -1,10 +1,19 @@
 ﻿using System;
 
+using GBAEmulator.Video;
+
 namespace GBAEmulator.Memory.Sections
 {
     public class OAMSection : MirroredMemorySection
     {
+        private PPU ppu;
+
         public OAMSection() : base(0x400) { }
+
+        public void Init(PPU ppu)
+        {
+            this.ppu = ppu;
+        }
 
         public override void SetByteAt(uint address, byte value)
         {
@@ -17,6 +26,18 @@ namespace GBAEmulator.Memory.Sections
             Writes ... 
             to OAM (7000000h-70003FFh) are ignored, the memory content remains unchanged.
             */
+        }
+
+        public override void SetHalfWordAt(uint address, ushort value)
+        {
+            this.ppu.Wait();
+            base.SetHalfWordAt(address, value);
+        }
+
+        public override void SetWordAt(uint address, uint value)
+        {
+            this.ppu.Wait();
+            base.SetWordAt(address, value);
         }
     }
 }

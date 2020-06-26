@@ -46,7 +46,9 @@ namespace GBAEmulator
             this.apu = new APU(this.cpu, this.EventQueue);
             this.ppu = new PPU(this, display, this.IO);
 
-            this.IO.Init(this.cpu, this.apu);
+            this.mem.Init(this.ppu);
+            this.IO.Init(this.ppu, this.bus);
+            this.IO.Layout(this.cpu, this.apu);
 
             // this.mem.UseNormattsBIOS();
 
@@ -160,8 +162,14 @@ namespace GBAEmulator
                 this.EventQueue.Handle(this.cpu.GlobalCycleCount);
             }
 
+#if THREADED_RENDERING
+            if (this.IO.DISPCNT.BGMode == 1 || this.IO.DISPCNT.BGMode == 2) this.ppu.Wait();
+#endif
             this.mem.IO.BG2X.UpdateInternal((uint)this.mem.IO.BG2PB.Full);
             this.mem.IO.BG2Y.UpdateInternal((uint)this.mem.IO.BG2PD.Full);
+#if THREADED_RENDERING
+            if (this.IO.DISPCNT.BGMode == 2) this.ppu.Wait();
+#endif
             this.mem.IO.BG3X.UpdateInternal((uint)this.mem.IO.BG3PB.Full);
             this.mem.IO.BG3Y.UpdateInternal((uint)this.mem.IO.BG3PD.Full);
         }

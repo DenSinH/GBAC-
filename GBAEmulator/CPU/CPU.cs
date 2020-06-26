@@ -38,7 +38,7 @@ namespace GBAEmulator.CPU
 
             // IO requires bus to be initialized
             this.bus = new BUS(this);
-            this.IO = new IORAMSection(this.bus);
+            this.IO = new IORAMSection();
 
             // DMAChannels require bus AND IO to be initialized
             this.DMAChannels[0] = new DMAChannel(this, 0);

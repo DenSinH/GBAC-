@@ -65,6 +65,9 @@ namespace GBAEmulator.Video
             }
 
             this.RenderRegularBGScanlines(0, 1, 2, 3);
+#if THREADED_RENDERING
+
+#endif
             this.MergeBGs(DoRenderOBJs, 0, 1, 2, 3);
         }
 
@@ -84,6 +87,9 @@ namespace GBAEmulator.Video
             this.RenderRegularBGScanlines(0, 1);
             this.RenderAffineBGScanline(2, this.IO.BG2X, this.IO.BG2Y,
                 this.IO.BG2PA, this.IO.BG2PB, this.IO.BG2PC, this.IO.BG2PD);
+#if THREADED_RENDERING
+
+#endif
             this.MergeBGs(DoRenderOBJs, 0, 1, 2);
         }
 
@@ -104,6 +110,9 @@ namespace GBAEmulator.Video
                 this.IO.BG2PA, this.IO.BG2PB, this.IO.BG2PC, this.IO.BG2PD);
             this.RenderAffineBGScanline(3, this.IO.BG3X, this.IO.BG3Y,
                 this.IO.BG3PA, this.IO.BG3PB, this.IO.BG3PC, this.IO.BG3PD);
+#if THREADED_RENDERING
+
+#endif
             this.MergeBGs(DoRenderOBJs, 2, 3);
         }
 
@@ -155,8 +164,11 @@ namespace GBAEmulator.Video
                     this.Display[width * scanline + x] = 0;
                 }
             }
+#if THREADED_RENDERING
+
+#endif
         }
-        
+
         private void Mode4Scanline()
         {
             // we render on BG2
@@ -205,6 +217,9 @@ namespace GBAEmulator.Video
                     this.Display[width * scanline + x] = 0;
                 }
             }
+#if THREADED_RENDERING
+
+#endif
         }
 
         private void Mode5Scanline()
@@ -233,6 +248,9 @@ namespace GBAEmulator.Video
                     this.Display[width * scanline + x] = 0;
                 }
             }
+#if THREADED_RENDERING
+
+#endif
         }
     }
 }

@@ -58,8 +58,11 @@ namespace GBAEmulator.Video
                 scanline = 0;
                 frame++;
             }
-            this.Drawing = true;
-            this.StartDrawing.Set();
+            if (!this.IsVBlank)
+            {
+                this.Drawing = true;
+                this.StartDrawing.Set();
+            }
 #else
             this.DrawScanline();
             scanline++;
@@ -76,7 +79,10 @@ namespace GBAEmulator.Video
         public void Wait()
         {
 #if THREADED_RENDERING
-            if (this.Drawing) DoneDrawing.Wait();
+            if (this.Drawing)
+            {
+                DoneDrawing.Wait();
+            }
 #endif
         }
 

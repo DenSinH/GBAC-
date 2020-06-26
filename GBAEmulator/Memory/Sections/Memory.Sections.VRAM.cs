@@ -2,15 +2,23 @@
 using System.Runtime.CompilerServices;
 
 using GBAEmulator.IO;
+using GBAEmulator.Video;
 
 namespace GBAEmulator.Memory.Sections
 {
     public class VRAMSection : MemorySection
     {
         private readonly cDISPCNT DISPCNT;
+        private PPU ppu;
+
         public VRAMSection(cDISPCNT DISPCNT) : base(0x18000) 
         {
             this.DISPCNT = DISPCNT;
+        }
+
+        public void Init(PPU ppu)
+        {
+            this.ppu = ppu;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,6 +37,7 @@ namespace GBAEmulator.Memory.Sections
 
         public override void SetByteAt(uint address, byte value)
         {
+            this.ppu.Wait();
             /*
              GBATek:
             Writing 8bit Data to Video Memory
@@ -55,9 +64,17 @@ namespace GBAEmulator.Memory.Sections
             this.Storage[(address & 0x00ff_fffe) + 1] = value;
         }
 
-        public override void SetHalfWordAt(uint address, ushort value) => base.SetHalfWordAt(MaskAddress(address), value);
+        public override void SetHalfWordAt(uint address, ushort value)
+        {
+            this.ppu.Wait();
+            base.SetHalfWordAt(MaskAddress(address), value);
+        }
 
-        public override void SetWordAt(uint address, uint value) => base.SetWordAt(MaskAddress(address), value);
+        public override void SetWordAt(uint address, uint value)
+        {
+            this.ppu.Wait();
+            base.SetWordAt(MaskAddress(address), value);
+        }
     }
 
 }
