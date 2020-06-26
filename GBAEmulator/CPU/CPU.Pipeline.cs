@@ -14,7 +14,7 @@ namespace GBAEmulator.CPU
          */
     public class cPipeline
     {
-        const int PipelineMask = 7;
+        const int PipelineMask = 3;
         private uint[] storage = new uint[PipelineMask + 1];
         private uint offset = 0;
         public int Count { get; private set; }

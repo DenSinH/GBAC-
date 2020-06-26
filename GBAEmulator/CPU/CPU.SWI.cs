@@ -6,7 +6,6 @@ namespace GBAEmulator.CPU
     {
         private int SWIInstruction(uint Instruction)
         {
-            Console.WriteLine(Instruction.ToString("x8"));
             this.Log(string.Format("SWI: {0:x8}", Instruction));
 
             this.ChangeMode(Mode.Supervisor);

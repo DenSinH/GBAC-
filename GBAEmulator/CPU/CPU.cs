@@ -62,8 +62,6 @@ namespace GBAEmulator.CPU
 
             this.PipelineFlush();
             this.PC += 4;
-
-            LOGFILE.ReadLine();
         }
 
         private void PipelineFlush()
@@ -121,8 +119,6 @@ namespace GBAEmulator.CPU
             this.SkipBios();
         }
 
-        bool COMPLOG = true;
-        StreamReader LOGFILE = new StreamReader("../../../Tests/thumb.log");
         public int InstructionCycles;
         public int Step()
         {
@@ -143,59 +139,31 @@ namespace GBAEmulator.CPU
             {
                 if (this.state == State.ARM)
                 {
-                    //Console.WriteLine($"Fetch from {this.PC:x8}");
-                    //Console.ReadKey();
                     this.Pipeline.Enqueue(this.mem.GetWordAt(this.PC));
-
+#if DEBUG
                     if (this.Pipeline.Count != 3)
                     {
                         Console.WriteLine($"Something is wrong: {this.Pipeline.Count} in pipeline");
                         Console.ReadKey();
                     }
+#endif
                     InstructionCycles += this.ExecuteARM(this.Pipeline.Dequeue());
                 }
                 else
                 {
-                    //Console.WriteLine($"Fetch from {this.PC:x8}");
-                    //Console.ReadKey();
                     this.Pipeline.Enqueue(this.mem.GetHalfWordAt(this.PC));
-
+#if DEBUG
                     if (this.Pipeline.Count != 3)
                     {
                         Console.WriteLine($"Something is wrong: {this.Pipeline.Count} in pipeline");
                         Console.ReadKey();
                     }
+#endif
                     InstructionCycles += this.ExecuteTHUMB((ushort)this.Pipeline.Dequeue());
                 }
 
                 this.PC += (uint)((this.state == State.ARM) ? 4 : 2);
             }
-
-            //if (COMPLOG)
-            //{
-            //    if (!this.IO.HALTCNT.Halt)
-            //    {
-            //        if (this.Pipeline.Count == 2)
-            //        {
-            //            string Line = LOGFILE.ReadLine();
-            //            Console.WriteLine("LOG " + Line);
-            //            Console.Write(" ACT ");
-            //            this.ShowInfo();
-
-            //            //// all registers
-            //            //if (!Line.StartsWith(string.Join(" ", this.Registers.Select(x => x.ToString("X8")).ToArray()) + $" cpsr: {this.CPSR.ToString("X8")}"))
-            //            //{
-            //            //    Console.ReadKey();
-            //            //}
-
-            //            // wrong branch
-            //            if (!Line.Contains((this.Registers[15] - (uint)((this.state == State.ARM) ? 4 : 2)).ToString("X8") + $" cpsr: {this.CPSR.ToString("X8")}"))
-            //            {
-            //                Console.ReadKey();
-            //            }
-            //        }
-            //    }
-            //}
 
             this.GlobalCycleCount += InstructionCycles;
             return InstructionCycles;

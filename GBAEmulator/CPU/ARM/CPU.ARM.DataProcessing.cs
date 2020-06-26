@@ -197,14 +197,14 @@ namespace GBAEmulator.CPU
             }
             else if (Rd == 15)
             {
-                // Setconditions is always false if Rd == 15
-                this.PipelineFlush();
-
                 // Special cases for writing to PC
                 if ((Instruction & 0x0010_0000) > 0)  // S bit
                 {
                     this.CPSR = this.SPSR;
                 }
+
+                // Setconditions is always false if Rd == 15
+                this.PipelineFlush();
             }
                 
             /*
