@@ -8,12 +8,12 @@ namespace GBAEmulator.Memory.Sections
 {
     public class VRAMSection : MemorySection
     {
-        private readonly cDISPCNT DISPCNT;
+        private readonly IORAMSection IO;
         private PPU ppu;
 
-        public VRAMSection(cDISPCNT DISPCNT) : base(0x18000) 
+        public VRAMSection(IORAMSection IO) : base(0x18000) 
         {
-            this.DISPCNT = DISPCNT;
+            this.IO = IO;
         }
 
         public void Init(PPU ppu)
@@ -54,11 +54,11 @@ namespace GBAEmulator.Memory.Sections
             lower 8bits of the addressed halfword, ie. "[addr AND NOT 1]=data*101h".
              */
             address = MaskAddress(address);
-            if (this.DISPCNT.BGMode >= 3 && address >= 0x14000)
+            if (this.IO.DISPCNT.BGMode >= 3 && address >= 0x14000)
             {
                 return;
             }
-            else if (this.DISPCNT.BGMode < 3 && address >= 0x10000)
+            else if (this.IO.DISPCNT.BGMode < 3 && address >= 0x10000)
             {
                 return;
             }
