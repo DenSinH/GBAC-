@@ -16,6 +16,14 @@ namespace GBAEmulator.IO
             this.ppu = ppu;
         }
 
+#if !THREADED_RENDERING
+        public override void Set(ushort value, bool setlow, bool sethigh)
+        {
+            base.Set(value, setlow, sethigh);
+            this._PPUraw = this._raw;
+        }
+#endif
+
         public void UpdatePPU()
         {
             this._PPUraw = this._raw;
@@ -38,9 +46,9 @@ namespace GBAEmulator.IO
             return (ushort)this.bus.OpenBus();
         }
     }
-    #endregion
+#endregion
 
-    #region DISPCNT
+#region DISPCNT
     public class cDISPCNT : LCDRegister2
     {
         public cDISPCNT(PPU ppu) : base(ppu)
@@ -71,9 +79,9 @@ namespace GBAEmulator.IO
             return (this._PPUraw & 0x8000) > 0;
         }
     }
-    #endregion
+#endregion
 
-    #region DISPSTAT
+#region DISPSTAT
     public class cDISPSTAT : LCDRegister2
     {
         private readonly cIF IF;
@@ -123,9 +131,9 @@ namespace GBAEmulator.IO
                 this._raw &= 0xfffd;
         }
     }
-    #endregion
+#endregion
 
-    #region VCOUNT
+#region VCOUNT
     public class cVCOUNT : LCDRegister2
     {
         private readonly cIF IF;
@@ -166,9 +174,9 @@ namespace GBAEmulator.IO
             
         }
     }
-    #endregion
+#endregion
 
-    #region BGControl
+#region BGControl
     public class cBGControl : LCDRegister2
     {
         // BG0/1 have bit 13 unused
@@ -215,9 +223,9 @@ namespace GBAEmulator.IO
             get => (byte)((this._PPUraw & 0xc000) >> 14);
         }
     }
-    #endregion
+#endregion
 
-    #region BGScrolling
+#region BGScrolling
     public class cBGScrolling : WriteOnlyLCDRegister2
     {
         public cBGScrolling(PPU ppu, BUS bus, bool IsLower) : base(ppu, bus, IsLower)
@@ -230,9 +238,9 @@ namespace GBAEmulator.IO
             get => (ushort)(this._PPUraw & 0x01ff);  // 9 bit value
         }
     }
-    #endregion
+#endregion
 
-    #region BG Rotation/Scaling
+#region BG Rotation/Scaling
     public class cReferencePointHalf : WriteOnlyLCDRegister2
     {
         private cReferencePoint parent;
@@ -316,9 +324,9 @@ namespace GBAEmulator.IO
             return (ushort)this.bus.OpenBus();
         }
     }
-    #endregion
+#endregion
 
-    #region Window Feature
+#region Window Feature
     public class cWindowDimensions : WriteOnlyLCDRegister2
     {
         private readonly PPU ppu;
@@ -381,9 +389,9 @@ namespace GBAEmulator.IO
             return (ushort)(0x3f3f & this._raw);
         }
     }
-    #endregion
+#endregion
 
-    #region Mosaic Function
+#region Mosaic Function
     public class cMosaic : LCDRegister2
     {
         public cMosaic(PPU ppu) : base(ppu)
@@ -411,9 +419,9 @@ namespace GBAEmulator.IO
             get => (byte)(((this._PPUraw & 0xf000) >> 12) + 1);
         }
     }
-    #endregion
+#endregion
 
-    #region Color Special Effects
+#region Color Special Effects
     public class cBLDCNT : LCDRegister2
     {
         public cBLDCNT(PPU ppu) : base(ppu)
@@ -506,5 +514,5 @@ namespace GBAEmulator.IO
             base.Set((ushort)(value & 0x001f), setlow, sethigh);
         }
     }
-    #endregion
+#endregion
 }

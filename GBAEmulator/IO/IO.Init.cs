@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 using GBAEmulator.CPU;
 using GBAEmulator.Bus;
@@ -301,6 +302,7 @@ namespace GBAEmulator.IO
             this.InitLCD();
         }
 
+        [Conditional("THREADED_RENDERING")]
         public void InitLCD()
         {
             this.LCDRegisters = new LCDRegister2[]

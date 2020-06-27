@@ -1,6 +1,4 @@
-﻿using GBAEmulator.CPU;
-using GBAEmulator.Bus;
-using System;
+﻿using System;
 using System.Diagnostics;
 
 using GBAEmulator.Memory.Sections;
@@ -76,6 +74,7 @@ namespace GBAEmulator.IO
 
         }
 
+        [Conditional("THREADED_RENDERING")]
         public void UpdateLCD()
         {
             foreach (LCDRegister2 lcd in this.LCDRegisters)

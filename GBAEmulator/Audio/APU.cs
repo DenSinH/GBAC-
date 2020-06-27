@@ -4,6 +4,7 @@ using GBAEmulator.Scheduler;
 using GBAEmulator.CPU;
 using GBAEmulator.Audio.Peripherals;
 using GBAEmulator.Audio.Channels;
+using System.Threading;
 
 namespace GBAEmulator.Audio
 {
@@ -41,8 +42,6 @@ namespace GBAEmulator.Audio
         public bool[] DMASoundVolume = new bool[2];
         public bool[] DMAEnableLeft = new bool[2];
         public bool[] DMAEnableRight = new bool[2];
-
-        /* SOUNDCNT_X params */
 
         public readonly Speaker speaker = new Speaker();
         private const double Amplitude = 0.03;
@@ -155,7 +154,7 @@ namespace GBAEmulator.Audio
 
             if (this.ExternalEnable)
             {
-                while (!this.speaker.NeedMoreSamples) { }  // prevent buffer overflow
+                SpinWait.SpinUntil(() => this.speaker.NeedMoreSamples);  // prevent buffer overflow
                 this.speaker.AddSample((short)SampleLeft, (short)SampleRight);
             }
 

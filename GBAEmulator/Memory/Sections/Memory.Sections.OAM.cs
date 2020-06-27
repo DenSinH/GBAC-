@@ -30,13 +30,17 @@ namespace GBAEmulator.Memory.Sections
 
         public override void SetHalfWordAt(uint address, ushort value)
         {
-            this.ppu.Wait();
+#if !UNSAFE_RENDERING
+            this.ppu.BusyWait();
+#endif
             base.SetHalfWordAt(address, value);
         }
 
         public override void SetWordAt(uint address, uint value)
         {
-            this.ppu.Wait();
+#if !UNSAFE_RENDERING
+            this.ppu.BusyWait();
+#endif
             base.SetWordAt(address, value);
         }
     }

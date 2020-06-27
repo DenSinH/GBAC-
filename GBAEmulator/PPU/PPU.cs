@@ -50,13 +50,19 @@ namespace GBAEmulator.Video
 
         public void Trigger()
         {
-            this.IO.UpdateLCD();
 #if THREADED_RENDERING
             if (this.Drawing)
             {
                 this.DoneDrawing.Wait();
             }
             this.DoneDrawing.Reset();
+#endif
+            this.IO.BG2X.UpdateInternal((uint)this.IO.BG2PB.Full);
+            this.IO.BG2Y.UpdateInternal((uint)this.IO.BG2PD.Full);
+            this.IO.BG3X.UpdateInternal((uint)this.IO.BG3PB.Full);
+            this.IO.BG3Y.UpdateInternal((uint)this.IO.BG3PD.Full);
+            this.IO.UpdateLCD();
+#if THREADED_RENDERING
             scanline++;
             if (scanline == 228)
             {
@@ -81,7 +87,7 @@ namespace GBAEmulator.Video
 
         [Conditional("THREADED_RENDERING")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Wait()
+        public void BusyWait()
         {
 #if THREADED_RENDERING
             while (this.Drawing)
@@ -96,7 +102,7 @@ namespace GBAEmulator.Video
         {
             Console.WriteLine($"Drawing {this.gba.ppu.Drawing}");
             Console.WriteLine($"StartDrawing {this.gba.ppu.StartDrawing.Wait(0)}");
-            Console.WriteLine($"DoneDrawing {this.gba.ppu.DoneDrawing.Wait(0)}");
+            // Console.WriteLine($"DoneDrawing {this.gba.ppu.DoneDrawing.Wait(0)}");
             Console.WriteLine();
         }
 
@@ -108,7 +114,7 @@ namespace GBAEmulator.Video
             this.StartDrawing.Set();
 
             // wait for the PPU to die
-            while (this.Alive) { Thread.Sleep(1); }
+            while (this.Alive) { Thread.Sleep(10); }
         }
 
         public void Mainloop()

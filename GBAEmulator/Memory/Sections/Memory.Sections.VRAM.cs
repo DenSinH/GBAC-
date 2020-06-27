@@ -37,7 +37,9 @@ namespace GBAEmulator.Memory.Sections
 
         public override void SetByteAt(uint address, byte value)
         {
-            this.ppu.Wait();
+#if !UNSAFE_RENDERING
+            this.ppu.BusyWait();
+#endif
             /*
              GBATek:
             Writing 8bit Data to Video Memory
@@ -66,13 +68,17 @@ namespace GBAEmulator.Memory.Sections
 
         public override void SetHalfWordAt(uint address, ushort value)
         {
-            this.ppu.Wait();
+#if !UNSAFE_RENDERING
+            this.ppu.BusyWait();
+#endif
             base.SetHalfWordAt(MaskAddress(address), value);
         }
 
         public override void SetWordAt(uint address, uint value)
         {
-            this.ppu.Wait();
+#if !UNSAFE_RENDERING
+            this.ppu.BusyWait();
+#endif
             base.SetWordAt(MaskAddress(address), value);
         }
     }

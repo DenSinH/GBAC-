@@ -55,7 +55,6 @@ namespace GBAEmulator
             this.display = display;
 #if THREADED_RENDERING
             this.RenderThread = new Thread(() => ppu.Mainloop());
-            this.RenderThread.Start();
 #endif
         }
 
@@ -161,14 +160,6 @@ namespace GBAEmulator
                 this.cycle -= this.cpu.Step();
                 this.EventQueue.Handle(this.cpu.GlobalCycleCount);
             }
-
-#if THREADED_RENDERING
-            if (this.IO.DISPCNT.BGMode == 1 || this.IO.DISPCNT.BGMode == 2) this.ppu.Wait();
-#endif
-            this.mem.IO.BG2X.UpdateInternal((uint)this.mem.IO.BG2PB.Full);
-            this.mem.IO.BG2Y.UpdateInternal((uint)this.mem.IO.BG2PD.Full);
-            this.mem.IO.BG3X.UpdateInternal((uint)this.mem.IO.BG3PB.Full);
-            this.mem.IO.BG3Y.UpdateInternal((uint)this.mem.IO.BG3PD.Full);
         }
 
         public void PowerOff()
@@ -191,6 +182,10 @@ namespace GBAEmulator
 
         public void Run(string ROMPath)
         {
+#if THREADED_RENDERING
+            if (this.RenderThread.ThreadState == ThreadState.Unstarted)
+                this.RenderThread.Start();
+#endif
             this.mem.LoadRom(ROMPath);
 
             cpu.SkipBios();
