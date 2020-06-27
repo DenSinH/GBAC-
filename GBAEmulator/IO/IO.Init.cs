@@ -297,6 +297,64 @@ namespace GBAEmulator.IO
                     Console.ReadKey();
                 }
             }
+
+            this.InitLCD();
         }
+
+        public void InitLCD()
+        {
+            this.LCDRegisters = new LCDRegister2[]
+            {
+                this.DISPCNT,
+                this.DISPSTAT,
+                this.VCOUNT,
+
+                this.BGCNT[0],
+                this.BGCNT[1],
+                this.BGCNT[2],
+                this.BGCNT[3],
+
+                this.BGHOFS[0],
+                this.BGVOFS[0],
+                this.BGHOFS[1],
+                this.BGVOFS[1],
+                this.BGHOFS[2],
+                this.BGVOFS[2],
+                this.BGHOFS[3],
+                this.BGVOFS[3],
+
+                this.BG2PA,
+                this.BG2PB,
+                this.BG2PC,
+                this.BG2PD,
+                this.BG2X.lower,
+                this.BG2X.upper,
+                this.BG2Y.lower,
+                this.BG2Y.upper,
+
+                this.BG3PA,
+                this.BG3PB,
+                this.BG3PC,
+                this.BG3PD,
+                this.BG3X.lower,
+                this.BG3X.upper,
+                this.BG3Y.lower,
+                this.BG3Y.upper,
+
+                this.WINH[0],
+                this.WINH[1],
+                this.WINV[0],
+                this.WINV[1],
+                this.WININ,
+                this.WINOUT,
+
+                this.MOSAIC,
+
+                this.BLDCNT,
+                this.BLDALPHA,
+                this.BLDY
+            };
+        }
+
     }
 }

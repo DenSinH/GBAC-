@@ -26,6 +26,7 @@ namespace GBAEmulator.Audio.Channels
                 this.CurrentSample = 0;
             else
                 this.CurrentSample = this.GetSample();
+
             sender.Time += this.Period;
             scheduler.Push(sender);
         }

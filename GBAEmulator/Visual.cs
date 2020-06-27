@@ -98,7 +98,11 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.F1)
             {
-
+#if THREADED_RENDERING
+                this.gba.ppu.GetRenderStatus();
+#else
+                Console.WriteLine("Threaded rendering is turned off...");
+#endif
             }
             else if (e.KeyCode == Keys.F2)
             {

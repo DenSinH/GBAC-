@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GBAEmulator.CPU;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace GBAEmulator.Audio.Channels
@@ -50,6 +51,17 @@ namespace GBAEmulator.Audio.Channels
                     if (!SweepDir) dPeriod *= -1;
 
                     this.Period += dPeriod;
+
+                    // prevent underflow, don't allow channel events to take longer than 1s
+                    if (this.Period < 1)
+                    {
+                        this.Period = ARM7TDMI.Frequency;
+                    }
+                    else if (this.Period > ARM7TDMI.Frequency)
+                    {
+                        this.Period = ARM7TDMI.Frequency;
+                    }
+
                     SweepTimer = SweepPeriod;
                 }
             }

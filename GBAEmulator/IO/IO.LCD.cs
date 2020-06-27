@@ -5,57 +5,82 @@ using GBAEmulator.Video;
 
 namespace GBAEmulator.IO
 {
-
-    #region DISPCNT
-    public class cDISPCNT : IORegister2
+    #region base
+    public class LCDRegister2 : IORegister2
     {
         private readonly PPU ppu;
-        public cDISPCNT(PPU ppu)
+        protected ushort _PPUraw;
+
+        public LCDRegister2(PPU ppu)
         {
             this.ppu = ppu;
         }
 
-        public byte BGMode
+        public void UpdatePPU()
         {
-            get => (byte)(this._raw & 0x07);
+            this._PPUraw = this._raw;
+        }
+    }
+
+    public class WriteOnlyLCDRegister2 : LCDRegister2
+    {
+        private readonly BUS bus;
+        private readonly bool IsLower;
+
+        public WriteOnlyLCDRegister2(PPU ppu, BUS bus, bool IsLower) : base(ppu)
+        {
+            this.bus = bus;
+            this.IsLower = IsLower;
         }
 
-        public bool IsSet(DISPCNTFlags flag) => (this._raw & (ushort)flag) > 0;
+        public override ushort Get()
+        {
+            return (ushort)this.bus.OpenBus();
+        }
+    }
+    #endregion
+
+    #region DISPCNT
+    public class cDISPCNT : LCDRegister2
+    {
+        public cDISPCNT(PPU ppu) : base(ppu)
+        {
+
+        }
+
+        public byte BGMode
+        {
+            get => (byte)(this._PPUraw & 0x07);
+        }
+
+        public bool IsSet(DISPCNTFlags flag) => (this._PPUraw & (ushort)flag) > 0;
 
         public bool DisplayBG(byte BG)
         {
-            return (this._raw & (0x0100 << BG)) > 0;
+            return (this._PPUraw & (0x0100 << BG)) > 0;
         }
 
         public bool DisplayBGWindow(byte Window)
         {
-            if (Window == 0) return (this._raw & 0x2000) > 0;
-            return (this._raw & 0x4000) > 0;
+            if (Window == 0) return (this._PPUraw & 0x2000) > 0;
+            return (this._PPUraw & 0x4000) > 0;
         }
 
         public bool DisplayOBJWindow()
         {
-            return (this._raw & 0x8000) > 0;
-        }
-
-        public override void Set(ushort value, bool setlow, bool sethigh)
-        {
-            this.ppu.Wait();
-            base.Set(value, setlow, sethigh);
+            return (this._PPUraw & 0x8000) > 0;
         }
     }
     #endregion
 
     #region DISPSTAT
-    public class cDISPSTAT : IORegister2
+    public class cDISPSTAT : LCDRegister2
     {
         private readonly cIF IF;
-        private readonly PPU ppu;
 
-        public cDISPSTAT(cIF IF, PPU ppu) : base()
+        public cDISPSTAT(cIF IF, PPU ppu) : base(ppu)
         {
             this.IF = IF;
-            this.ppu = ppu;
         }
 
         public byte VCountSetting
@@ -97,22 +122,16 @@ namespace GBAEmulator.IO
             else
                 this._raw &= 0xfffd;
         }
-
-        public override void Set(ushort value, bool setlow, bool sethigh)
-        {
-            this.ppu.Wait();
-            base.Set(value, setlow, sethigh);
-        }
     }
     #endregion
 
     #region VCOUNT
-    public class cVCOUNT : IORegister2
+    public class cVCOUNT : LCDRegister2
     {
         private readonly cIF IF;
         private readonly cDISPSTAT DISPSTAT;
 
-        public cVCOUNT(cIF IF, cDISPSTAT DISPSTAT) : base()
+        public cVCOUNT(cIF IF, cDISPSTAT DISPSTAT) : base(null)
         {
             this.IF = IF;
             this.DISPSTAT = DISPSTAT;
@@ -144,115 +163,94 @@ namespace GBAEmulator.IO
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            // this.mem.Error("Cannot write to VCOUNT register");
+            
         }
     }
     #endregion
 
     #region BGControl
-    public class cBGControl : IORegister2
+    public class cBGControl : LCDRegister2
     {
         // BG0/1 have bit 13 unused
-        private readonly PPU ppu;
         private readonly ushort BitMask;
 
-        public cBGControl(PPU ppu, ushort BitMask) : base()
+        public cBGControl(PPU ppu, ushort BitMask) : base(ppu)
         {
-            this.ppu = ppu;
             this.BitMask = BitMask;
         }
 
         public byte BGPriority
         {
-            get => (byte)(this._raw & 0x03);
+            get => (byte)(this._PPUraw & 0x03);
         }
 
         public byte CharBaseBlock
         {
-            get => (byte)((this._raw & 0x0c) >> 2);
+            get => (byte)((this._PPUraw & 0x0c) >> 2);
         }
 
         public bool Mosaic
         {
-            get => (this._raw & 0x40) > 0;
+            get => (this._PPUraw & 0x40) > 0;
         }
 
         public bool ColorMode
         {
-            get => (this._raw & 0x80) > 0;
+            get => (this._PPUraw & 0x80) > 0;
         }
 
         public byte ScreenBaseBlock
         {
-            get => (byte)((this._raw & 0x1f00) >> 8);
+            get => (byte)((this._PPUraw & 0x1f00) >> 8);
         }
 
         public bool DisplayAreaOverflow
         {
             // not used for BG0 and BG1
-            get => (this._raw & 0x2000) > 0;
+            get => (this._PPUraw & 0x2000) > 0;
         }
 
         public byte ScreenSize
         {
-            get => (byte)((this._raw & 0xc000) >> 14);
-        }
-
-        public override void Set(ushort value, bool setlow, bool sethigh)
-        {
-            // todo: only when necessary
-            this.ppu.Wait();
-            base.Set((ushort)(value & BitMask), setlow, sethigh);
+            get => (byte)((this._PPUraw & 0xc000) >> 14);
         }
     }
     #endregion
 
     #region BGScrolling
-    public class cBGScrolling : WriteOnlyRegister2
+    public class cBGScrolling : WriteOnlyLCDRegister2
     {
-        private readonly PPU ppu;
-        public cBGScrolling(PPU ppu, BUS bus, bool IsLower) : base(bus, IsLower)
+        public cBGScrolling(PPU ppu, BUS bus, bool IsLower) : base(ppu, bus, IsLower)
         {
-            this.ppu = ppu;
-        }
 
-        public override void Set(ushort value, bool setlow, bool sethigh)
-        {
-            // todo: only when necessary
-            this.ppu.Wait();
-            base.Set((ushort)(value & 0x01ff), setlow, sethigh);
         }
 
         public ushort Offset
         {
-            get => (ushort)(this._raw & 0x01ff);  // 9 bit value
+            get => (ushort)(this._PPUraw & 0x01ff);  // 9 bit value
         }
     }
     #endregion
 
     #region BG Rotation/Scaling
-    public class cReferencePointHalf : WriteOnlyRegister2
+    public class cReferencePointHalf : WriteOnlyLCDRegister2
     {
-        private readonly PPU ppu;
         private cReferencePoint parent;
         private ushort BitMask;
 
-        public cReferencePointHalf(cReferencePoint parent, PPU ppu, BUS bus, bool IsLower, ushort BitMask) : base(bus, IsLower)
+        public cReferencePointHalf(cReferencePoint parent, PPU ppu, BUS bus, bool IsLower, ushort BitMask) : base(ppu, bus, IsLower)
         {
-            this.ppu = ppu;
             this.parent = parent;
             this.BitMask = BitMask;
         }
 
-        public ushort raw
+        public ushort PPUraw
         {
-            get => this._raw;
+            get => this._PPUraw;
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            // todo: only when necessary
-            this.ppu.Wait();
             base.Set((ushort)(value & this.BitMask), setlow, sethigh);
             this.parent.ResetInternal();
         }
@@ -281,7 +279,7 @@ namespace GBAEmulator.IO
 
         public bool Sign
         {
-            get => (this.upper.raw & 0x0800) > 0;
+            get => (this.upper.PPUraw & 0x0800) > 0;
         }
 
         public int Full
@@ -289,76 +287,86 @@ namespace GBAEmulator.IO
             get
             {
                 if (this.Sign)  // negative
-                    return (int)(this.lower.raw | ((this.upper.raw & 0x07ff) << 16) | 0xf800_0000);
-                return (this.lower.raw | ((this.upper.raw & 0x07ff) << 16));
+                    return (int)(this.lower.PPUraw | ((this.upper.PPUraw & 0x07ff) << 16) | 0xf800_0000);
+                return (this.lower.PPUraw | ((this.upper.PPUraw & 0x07ff) << 16));
             }
         }
     }
 
-    public class cRotationScaling : WriteOnlyRegister2
+    public class cRotationScaling : LCDRegister2  // + write only
     {
-        public cRotationScaling(BUS bus, bool IsLower) : base(bus, IsLower) { }
+        private readonly BUS bus;
+        private readonly bool IsLower;
+        public cRotationScaling(BUS bus, bool IsLower) : base(null)
+        {
+            this.bus = bus;
+            this.IsLower = IsLower;
+        }
 
         public short Full
         {
             get
             {
-                return (short)this._raw;
+                return (short)this._PPUraw;
             }
+        }
+
+        public override ushort Get()
+        {
+            return (ushort)this.bus.OpenBus();
         }
     }
     #endregion
 
     #region Window Feature
-    public class cWindowDimensions : WriteOnlyRegister2
+    public class cWindowDimensions : WriteOnlyLCDRegister2
     {
         private readonly PPU ppu;
-        public cWindowDimensions(PPU ppu, BUS bus, bool IsLower) : base(bus, IsLower)
+        public cWindowDimensions(PPU ppu, BUS bus, bool IsLower) : base(ppu, bus, IsLower)
         {
             this.ppu = ppu;
         }
 
         public byte HighCoord
         {
-            get => (byte)(this._raw & 0x00ff);
+            get => (byte)(this._PPUraw & 0x00ff);
         }
 
         public byte LowCoord
         {
-            get => (byte)(this._raw >> 8);
-        }
-
-        public override void Set(ushort value, bool setlow, bool sethigh)
-        {
-            this.ppu.Wait();
-            base.Set(value, setlow, sethigh);
+            get => (byte)(this._PPUraw >> 8);
         }
     }
 
-    public class cWindowControl : IORegister2
+    public class cWindowControl : LCDRegister2
     {
+        public cWindowControl() : base(null)
+        {
+
+        }
+
         public bool WindowBGEnable(Window window, byte BG)
         {
             if ((byte)window == 0)
-                return (this._raw & (0x0001 << BG)) > 0;
+                return (this._PPUraw & (0x0001 << BG)) > 0;
             else
-                return (this._raw & (0x0100 << BG)) > 0;
+                return (this._PPUraw & (0x0100 << BG)) > 0;
         }
 
         public bool WindowOBJEnable(Window window)
         {
             if ((byte)window == 0)
-                return (this._raw & 0x0010) > 0;
+                return (this._PPUraw & 0x0010) > 0;
             else
-                return (this._raw & 0x1000) > 0;
+                return (this._PPUraw & 0x1000) > 0;
         }
 
         public bool WindowSpecialEffects(Window window)
         {
             if ((byte)window == 0)
-                return (this._raw & 0x0020) > 0;
+                return (this._PPUraw & 0x0020) > 0;
             else
-                return (this._raw & 0x2000) > 0;
+                return (this._PPUraw & 0x2000) > 0;
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
@@ -376,91 +384,78 @@ namespace GBAEmulator.IO
     #endregion
 
     #region Mosaic Function
-    public class cMosaic : IORegister2
+    public class cMosaic : LCDRegister2
     {
-        private readonly PPU ppu;
-        public cMosaic(PPU ppu)
+        public cMosaic(PPU ppu) : base(ppu)
         {
-            this.ppu = ppu;
+
         }
 
         public byte BGMosaicHStretch
         {
-            get => (byte)((this._raw & 0x000f) + 1);
+            get => (byte)((this._PPUraw & 0x000f) + 1);
         }
 
         public byte BGMosaicVStretch
         {
-            get => (byte)(((this._raw & 0x00f0) >> 4) + 1);
+            get => (byte)(((this._PPUraw & 0x00f0) >> 4) + 1);
         }
 
         public byte OBJMosaicHStretch
         {
-            get => (byte)(((this._raw & 0x0f00) >> 8) + 1);
+            get => (byte)(((this._PPUraw & 0x0f00) >> 8) + 1);
         }
 
         public byte OBJMosaicVStretch
         {
-            get => (byte)(((this._raw & 0xf000) >> 12) + 1);
-        }
-
-        public override void Set(ushort value, bool setlow, bool sethigh)
-        {
-            this.ppu.Wait();
-            base.Set(value, setlow, sethigh);
+            get => (byte)(((this._PPUraw & 0xf000) >> 12) + 1);
         }
     }
     #endregion
 
     #region Color Special Effects
-    public class cBLDCNT : IORegister2
+    public class cBLDCNT : LCDRegister2
     {
-        private readonly PPU ppu;
-
-        public cBLDCNT(PPU ppu)
+        public cBLDCNT(PPU ppu) : base(ppu)
         {
-            this.ppu = ppu;
+
         }
 
         public bool BGIsTop(byte BG)
         {
-            return (this._raw & (1 << BG)) > 0;
+            return (this._PPUraw & (1 << BG)) > 0;
         }
 
-        public bool OBJIsTop() => (this._raw & 0x10) > 0;
+        public bool OBJIsTop() => (this._PPUraw & 0x10) > 0;
 
-        public bool BDIsTop() => (this._raw & 0x20) > 0;
+        public bool BDIsTop() => (this._PPUraw & 0x20) > 0;
 
         public BlendMode BlendMode
         {
-            get => (BlendMode)((this._raw & 0xc0) >> 6);
+            get => (BlendMode)((this._PPUraw & 0xc0) >> 6);
         }
 
         public bool BGIsBottom(byte BG)
         {
-            return (this._raw & (0x100 << BG)) > 0;
+            return (this._PPUraw & (0x100 << BG)) > 0;
         }
 
-        public bool OBJIsBottom() => (this._raw & 0x1000) > 0;
+        public bool OBJIsBottom() => (this._PPUraw & 0x1000) > 0;
 
-        public bool BDIsBottom() => (this._raw & 0x2000) > 0;
+        public bool BDIsBottom() => (this._PPUraw & 0x2000) > 0;
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            // todo: only when necessary
-            this.ppu.Wait();
             // top 2 bits unused
             base.Set((ushort)(value & 0x3fff), setlow, sethigh);
         }
     }
 
-    public class cBLDALPHA : IORegister2
+    public class cBLDALPHA : LCDRegister2
     {
-        private readonly PPU ppu;
-
-        public cBLDALPHA(PPU ppu)
+        public cBLDALPHA(PPU ppu) : base(ppu)
         {
-            this.ppu = ppu;
+
         }
 
         public byte EVA
@@ -468,7 +463,7 @@ namespace GBAEmulator.IO
             // allow up to 0x10 (1.4 fixed point)
             get
             {
-                byte value = (byte)(this._raw & 0x001f);
+                byte value = (byte)(this._PPUraw & 0x001f);
                 return (byte)(value > 0x10 ? 0x10 : value);
             }
         }
@@ -478,25 +473,22 @@ namespace GBAEmulator.IO
             // allow up to 0x10 (1.4 fixed point)
             get
             {
-                byte value = (byte)((this._raw & 0x1f00) >> 8);
+                byte value = (byte)((this._PPUraw & 0x1f00) >> 8);
                 return (byte)(value > 0x10 ? 0x10 : value);
             }
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            // todo: only when necessary
-            this.ppu.Wait();
             base.Set((ushort)(value & 0x1f1f), setlow, sethigh);
         }
     }
 
-    public class cBLDY : IORegister2
+    public class cBLDY : LCDRegister2
     {
-        private readonly PPU ppu;
-        public cBLDY(PPU ppu)
+        public cBLDY(PPU ppu) : base(ppu)
         {
-            this.ppu = ppu;
+
         }
 
         public byte EY
@@ -504,15 +496,13 @@ namespace GBAEmulator.IO
             // allow up to 0x10 (1.4 fixed point)
             get
             {
-                byte value = (byte)(this._raw & 0x1f);
+                byte value = (byte)(this._PPUraw & 0x1f);
                 return (byte)(value > 0x10 ? 0x10 : value);
             }
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            // todo: only when necessary
-            this.ppu.Wait();
             base.Set((ushort)(value & 0x001f), setlow, sethigh);
         }
     }

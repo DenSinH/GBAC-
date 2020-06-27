@@ -31,10 +31,11 @@ namespace GBAEmulator.Video
         public bool ExternalWindowingEnable = true;
         public bool ExternalBlendingEnable = true;
 #if THREADED_RENDERING
-        public readonly ManualResetEventSlim StartDrawing = new ManualResetEventSlim(false);
-        public readonly ManualResetEventSlim DoneDrawing = new ManualResetEventSlim(true);
-        public bool ShutDown;
-        public volatile bool Drawing = false;
+        private readonly ManualResetEventSlim StartDrawing = new ManualResetEventSlim(false);
+        private readonly ManualResetEventSlim DoneDrawing = new ManualResetEventSlim(true);
+        private bool ShutDown;
+        private bool Alive = true;
+        private volatile bool Drawing = false;
 #endif
 
         public PPU(GBA gba, ushort[] display, IORAMSection IO)
@@ -49,8 +50,12 @@ namespace GBAEmulator.Video
 
         public void Trigger()
         {
+            this.IO.UpdateLCD();
 #if THREADED_RENDERING
-            this.Wait();
+            if (this.Drawing)
+            {
+                this.DoneDrawing.Wait();
+            }
             this.DoneDrawing.Reset();
             scanline++;
             if (scanline == 228)
@@ -79,14 +84,33 @@ namespace GBAEmulator.Video
         public void Wait()
         {
 #if THREADED_RENDERING
-            if (this.Drawing)
+            while (this.Drawing)
             {
-                DoneDrawing.Wait();
+                // this.DoneDrawing.Wait();
             }
 #endif
         }
 
 #if THREADED_RENDERING
+        public void GetRenderStatus()
+        {
+            Console.WriteLine($"Drawing {this.gba.ppu.Drawing}");
+            Console.WriteLine($"StartDrawing {this.gba.ppu.StartDrawing.Wait(0)}");
+            Console.WriteLine($"DoneDrawing {this.gba.ppu.DoneDrawing.Wait(0)}");
+            Console.WriteLine();
+        }
+
+        public void PowerOff()
+        {
+            this.ShutDown = true;
+
+            // allow the ppu to start drawing one last time so that the mainloop can end
+            this.StartDrawing.Set();
+
+            // wait for the PPU to die
+            while (this.Alive) { Thread.Sleep(1); }
+        }
+
         public void Mainloop()
         {
             while (!this.ShutDown)
@@ -97,6 +121,8 @@ namespace GBAEmulator.Video
                 this.Drawing = false;
                 DoneDrawing.Set();
             }
+
+            this.Alive = false;
         }
 #endif
     }

@@ -34,7 +34,7 @@ namespace GBAEmulator
 
         public bool ShutDown;
         public bool Pause;
-        public bool Alive { get; private set; } = true;
+        public bool Alive { get; private set; } = false;
 
         public GBA(ushort[] display)
         {
@@ -167,24 +167,20 @@ namespace GBAEmulator
 #endif
             this.mem.IO.BG2X.UpdateInternal((uint)this.mem.IO.BG2PB.Full);
             this.mem.IO.BG2Y.UpdateInternal((uint)this.mem.IO.BG2PD.Full);
-#if THREADED_RENDERING
-            if (this.IO.DISPCNT.BGMode == 2) this.ppu.Wait();
-#endif
             this.mem.IO.BG3X.UpdateInternal((uint)this.mem.IO.BG3PB.Full);
             this.mem.IO.BG3Y.UpdateInternal((uint)this.mem.IO.BG3PD.Full);
         }
 
         public void PowerOff()
         {
+            this.ShutDown = true;
 #if THREADED_RENDERING
             // safely end RenderThread
-            this.ppu.ShutDown = true;
+            while (this.Alive) { Thread.Sleep(1); };
+
+            this.ppu.PowerOff();
             this.RenderThread.Join();
-            
-            // set the DoneDrawing event so Wait() won't last forever
-            this.ppu.DoneDrawing.Set();
 #endif
-            this.ShutDown = true;
         }
 
         public void Reset()

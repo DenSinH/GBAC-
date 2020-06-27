@@ -1,20 +1,18 @@
 ﻿using GBAEmulator.CPU;
 using GBAEmulator.Bus;
 using System;
+using System.Diagnostics;
 
 using GBAEmulator.Memory.Sections;
-using System.Diagnostics;
-using GBAEmulator.Audio.Channels;
-using GBAEmulator.Audio;
-using GBAEmulator.Video;
 
 namespace GBAEmulator.IO
 {
     public partial class IORAMSection : IMemorySection
     {
-        private IORegister[] Storage = new IORegister[0x400];  // 1kB IO RAM
+        private readonly IORegister[] Storage = new IORegister[0x400];  // 1kB IO RAM
+        private LCDRegister2[] LCDRegisters;
         private UnusedRegister MasterUnusedRegister;
-        private ZeroRegister MasterZeroRegister = new ZeroRegister();
+        private readonly ZeroRegister MasterZeroRegister = new ZeroRegister();
         const uint AddressMask = 0x00ff_ffff;
 
         public cDISPCNT DISPCNT;
@@ -78,6 +76,14 @@ namespace GBAEmulator.IO
 
         }
 
+        public void UpdateLCD()
+        {
+            foreach (LCDRegister2 lcd in this.LCDRegisters)
+            {
+                lcd.UpdatePPU();
+            }
+        }
+
         public void Reset()
         {
             for (uint i = 0; i < 0x400; i += 2)
@@ -95,7 +101,7 @@ namespace GBAEmulator.IO
         [Conditional("DEBUG")]
         private void Log(string message)
         {
-            Console.WriteLine(message);
+            // Console.WriteLine(message);
         }
 
         public byte? GetByteAt(uint address)

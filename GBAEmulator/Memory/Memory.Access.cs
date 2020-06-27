@@ -8,11 +8,7 @@ namespace GBAEmulator.Memory
         [Conditional("DEBUG")]
         private void LogAccess(uint address, uint? value = null)
         {
-            if (address == 0x03004FC4)
-            {
-                Console.WriteLine(this.iWRAM.GetWordAt(0x03004FC4)?.ToString("x8") + " -> " + value?.ToString("x8"));
-                Console.ReadLine();
-            }
+            
         }
 
         private uint PreviousAddress;
