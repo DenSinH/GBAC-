@@ -175,8 +175,11 @@ namespace GBAEmulator
             // safely end RenderThread
             while (this.Alive) { Thread.Sleep(1); };
 
-            this.ppu.PowerOff();
-            this.RenderThread.Join();
+            if (this.RenderThread.ThreadState != ThreadState.Unstarted)
+            {
+                this.ppu.PowerOff();
+                this.RenderThread.Join();
+            }
 #endif
         }
 

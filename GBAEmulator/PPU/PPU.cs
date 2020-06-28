@@ -65,8 +65,8 @@ namespace GBAEmulator.Video
             this.IO.BG2Y.UpdateInternal((uint)this.IO.BG2PD.Full);
             this.IO.BG3X.UpdateInternal((uint)this.IO.BG3PB.Full);
             this.IO.BG3Y.UpdateInternal((uint)this.IO.BG3PD.Full);
-            this.IO.UpdateLCD();
 #if THREADED_RENDERING
+            this.IO.UpdateLCD();
             this.DrawState = DRAW_BUSY;
             this.StartDrawing.Set();
 #else
@@ -84,6 +84,7 @@ namespace GBAEmulator.Video
         public void BusyWait()
         {
 #if THREADED_RENDERING
+            // wait until state is DRAW_MERGE or DRAW_READY
             while (Interlocked.CompareExchange(ref DrawState, DRAW_BUSY, DRAW_BUSY) == DRAW_BUSY)
             {
                 // this.DoneDrawing.Wait();
