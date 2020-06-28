@@ -11,7 +11,7 @@ namespace GBAEmulator.Memory
     public partial class MEM
     {
         private readonly BIOSSection              BIOS;
-        private readonly NonMirroredMemorySection UnusedSection = new NonMirroredMemorySection(0);
+        private readonly UnusedMemorySection      UnusedSection = new UnusedMemorySection();
         private readonly MirroredMemorySection    eWRAM         = new MirroredMemorySection(0x40000);
         private readonly MirroredMemorySection    iWRAM         = new MirroredMemorySection(0x8000);
         public readonly  IORAMSection             IO;

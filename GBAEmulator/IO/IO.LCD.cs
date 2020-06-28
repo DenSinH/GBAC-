@@ -17,6 +17,7 @@ namespace GBAEmulator.IO
         }
 
 #if !THREADED_RENDERING
+        // Immediately "UpdatePPU" if we are not in THREADED_RENDERING mode
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set(value, setlow, sethigh);
@@ -43,7 +44,9 @@ namespace GBAEmulator.IO
 
         public override ushort Get()
         {
-            return (ushort)this.bus.OpenBus();
+            // if (IsLower)
+                return (ushort)this.bus.OpenBus();
+            // return (ushort)(this.bus.OpenBus() >> 16);
         }
     }
 #endregion
@@ -221,6 +224,11 @@ namespace GBAEmulator.IO
         public byte ScreenSize
         {
             get => (byte)((this._PPUraw & 0xc000) >> 14);
+        }
+
+        public override void Set(ushort value, bool setlow, bool sethigh)
+        {
+            base.Set((ushort)(value & BitMask), setlow, sethigh);
         }
     }
 #endregion

@@ -81,7 +81,6 @@ namespace GBAEmulator
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             this.gba.PowerOff();
-            this.gba.vis = null;
             this.gba.apu.speaker.ShutDown();
             this.PlayThread?.Join();
             this.DebugScreen?.Close();
@@ -106,7 +105,7 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.F2)
             {
-
+                Console.WriteLine(this.gba.bus.BusValue.ToString("x8"));
             }
             else if (e.KeyCode == Keys.F3)
             {

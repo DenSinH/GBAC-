@@ -7,7 +7,7 @@ namespace GBAEmulator.Video
 {
     partial class PPU
     {
-        public byte scanline = 0;
+        private byte scanline = 0;
         public volatile uint frame = 0;  // reset in different thread as well
 
         public void DrawScanline()
@@ -22,7 +22,7 @@ namespace GBAEmulator.Video
               4     Yes      --2-   240x160            2     256/1        --MABP
               5     Yes      --2-   160x128            2     32768        --MABP
              */
-            if (!IsVBlank)
+            if (scanline < height)
             {
                 // Console.WriteLine(this.gba.mem.DISPCNT.BGMode);
                 switch (this.IO.DISPCNT.BGMode)
@@ -66,7 +66,7 @@ namespace GBAEmulator.Video
 
             this.RenderRegularBGScanlines(0, 1, 2, 3);
 #if THREADED_RENDERING
-
+            DrawState = DRAW_MERGING;
 #endif
             this.MergeBGs(DoRenderOBJs, 0, 1, 2, 3);
         }
@@ -88,7 +88,7 @@ namespace GBAEmulator.Video
             this.RenderAffineBGScanline(2, this.IO.BG2X, this.IO.BG2Y,
                 this.IO.BG2PA, this.IO.BG2PB, this.IO.BG2PC, this.IO.BG2PD);
 #if THREADED_RENDERING
-
+            DrawState = DRAW_MERGING;
 #endif
             this.MergeBGs(DoRenderOBJs, 0, 1, 2);
         }
@@ -111,7 +111,7 @@ namespace GBAEmulator.Video
             this.RenderAffineBGScanline(3, this.IO.BG3X, this.IO.BG3Y,
                 this.IO.BG3PA, this.IO.BG3PB, this.IO.BG3PC, this.IO.BG3PD);
 #if THREADED_RENDERING
-
+            DrawState = DRAW_MERGING;
 #endif
             this.MergeBGs(DoRenderOBJs, 2, 3);
         }

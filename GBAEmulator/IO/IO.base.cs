@@ -41,7 +41,9 @@ namespace GBAEmulator.IO
 
         public override ushort Get()
         {
-            return (ushort)this.bus.OpenBus();
+            // if (IsLower)
+                return (ushort)this.bus.OpenBus();
+            // return (ushort)(this.bus.OpenBus() >> 16);
         }
     }
 

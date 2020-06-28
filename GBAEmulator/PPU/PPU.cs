@@ -35,7 +35,11 @@ namespace GBAEmulator.Video
         private readonly ManualResetEventSlim DoneDrawing = new ManualResetEventSlim(true);
         private bool ShutDown;
         private bool Alive = true;
-        private volatile bool Drawing = false;
+
+        private const int DRAW_READY = 0;
+        private const int DRAW_MERGING = 1;
+        private const int DRAW_BUSY = 2;
+        private volatile int DrawState = DRAW_READY;
 #endif
 
         public PPU(GBA gba, ushort[] display, IORAMSection IO)
@@ -51,7 +55,7 @@ namespace GBAEmulator.Video
         public void Trigger()
         {
 #if THREADED_RENDERING
-            if (this.Drawing)
+            if (Interlocked.CompareExchange(ref DrawState, DRAW_READY, DRAW_READY) != DRAW_READY)
             {
                 this.DoneDrawing.Wait();
             }
@@ -63,21 +67,11 @@ namespace GBAEmulator.Video
             this.IO.BG3Y.UpdateInternal((uint)this.IO.BG3PD.Full);
             this.IO.UpdateLCD();
 #if THREADED_RENDERING
-            scanline++;
-            if (scanline == 228)
-            {
-                scanline = 0;
-                frame++;
-            }
-            if (!this.IsVBlank)
-            {
-                this.Drawing = true;
-                this.StartDrawing.Set();
-            }
+            this.DrawState = DRAW_BUSY;
+            this.StartDrawing.Set();
 #else
             this.DrawScanline();
-            scanline++;
-            if (scanline == 228)
+            if (++scanline == 228)
             {
                 scanline = 0;
                 frame++;
@@ -90,7 +84,7 @@ namespace GBAEmulator.Video
         public void BusyWait()
         {
 #if THREADED_RENDERING
-            while (this.Drawing)
+            while (Interlocked.CompareExchange(ref DrawState, DRAW_BUSY, DRAW_BUSY) == DRAW_BUSY)
             {
                 // this.DoneDrawing.Wait();
             }
@@ -100,9 +94,9 @@ namespace GBAEmulator.Video
 #if THREADED_RENDERING
         public void GetRenderStatus()
         {
-            Console.WriteLine($"Drawing {this.gba.ppu.Drawing}");
+            Console.WriteLine($"Drawing state {this.gba.ppu.DrawState}");
             Console.WriteLine($"StartDrawing {this.gba.ppu.StartDrawing.Wait(0)}");
-            // Console.WriteLine($"DoneDrawing {this.gba.ppu.DoneDrawing.Wait(0)}");
+            Console.WriteLine($"DoneDrawing {this.gba.ppu.DoneDrawing.Wait(0)}");
             Console.WriteLine();
         }
 
@@ -123,9 +117,16 @@ namespace GBAEmulator.Video
             {
                 StartDrawing.Wait();
                 StartDrawing.Reset();
+
                 this.DrawScanline();
-                this.Drawing = false;
+                if (++scanline == 228)
+                {
+                    scanline = 0;
+                    frame++;
+                }
+
                 DoneDrawing.Set();
+                this.DrawState = DRAW_READY;
             }
 
             this.Alive = false;

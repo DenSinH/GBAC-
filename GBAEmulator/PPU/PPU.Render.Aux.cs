@@ -231,6 +231,7 @@ namespace GBAEmulator.Video
             // determine what blend mode to use per pixel
             this.ResetWindowBlendMode();
 
+
             ushort Backdrop = this.Backdrop;
 
             // figure out which backgrounds we actually need to draw
@@ -262,8 +263,8 @@ namespace GBAEmulator.Video
             byte priority;
             bool WasOBJ;  // signify that a nontransparent OBJ pixel was present
             int ScreenX = width * scanline;
-            
-            for (int x = 0; x < width; x++)
+
+            for (int x = 0; x < width; x++, ScreenX++)
             {
                 this.Display[ScreenX] = Transparent;  // reset 1 pixel at a time to prevent artifacts
                 WasOBJ = false;
@@ -304,8 +305,6 @@ namespace GBAEmulator.Video
                 {
                     this.SetPixel(ScreenX, Backdrop, BGWindowBlendMode[x], BDTop, BDBottom, WasOBJ);
                 }
-
-                ScreenX++;
             }
         }
 
@@ -318,6 +317,14 @@ namespace GBAEmulator.Video
             int ScreenX = StartX;
             byte VRAMEntry;
             bool UpperNibble;
+
+#if UNSAFE_RENDERING
+            if (TileLineBaseAddress > 0x1_7ffc)  // prevent OOB VRAM reads in unsafe rendering
+            {
+                Console.Error.WriteLine("4bpp out of bounds tile sliver");
+                TileLineBaseAddress = 0;
+            }
+#endif
 
             for (int dx = 0; dx < 4; dx++)  // we need to look at nibbles here
             {
@@ -358,6 +365,14 @@ namespace GBAEmulator.Video
             // draw 8bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             int ScreenX = StartX;
             byte VRAMEntry;
+#if UNSAFE_RENDERING
+            // todo: no unsafe rendering
+            if (TileLineBaseAddress > 0x1_7ff8)  // prevent OOB VRAM reads in unsafe rendering
+            {
+                Console.Error.WriteLine("8bpp out of bounds tile sliver");
+                TileLineBaseAddress = 0;
+            }
+#endif
 
             for (int dx = 0; dx < 8; dx++, ScreenX += XSign)
             {

@@ -28,6 +28,7 @@ namespace GBAEmulator
 #if THREADED_RENDERING
         private readonly Thread RenderThread;
 #endif
+        private byte scanline;
 
         public Visual vis;
         public readonly ushort[] display;
@@ -84,7 +85,7 @@ namespace GBAEmulator
             // We are probably dead before the EventQueue messes up
 
             // set VBlank
-            if (this.ppu.scanline == 160)
+            if (scanline == 160)
             {
                 this.mem.IO.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(DMAStartTiming.VBlank);
@@ -98,9 +99,13 @@ namespace GBAEmulator
                 {
                     // disgusting I know... 
                 }
+                catch (InvalidOperationException)
+                {
+                    // closing the console window first
+                }
             }
             // no VBlank in 227
-            else if (this.ppu.scanline == 227)
+            else if (scanline == 227)
             {
                 this.mem.IO.DISPSTAT.SetVBlank(false);
             }
@@ -115,13 +120,13 @@ namespace GBAEmulator
 
             /* NON-HBLANK */
             this.mem.IO.DISPSTAT.SetHBlank(false);
-            this.mem.IO.VCOUNT.CurrentScanline = this.ppu.scanline;  // we also check for IRQ's this way
-            if (this.ppu.scanline >= 2 && this.ppu.scanline < 162)
+            this.mem.IO.VCOUNT.CurrentScanline = scanline;  // we also check for IRQ's this way
+            if (scanline >= 2 && scanline < 162)
             {
                 // DMA 3 video capture mode (special DMA trigger)
                 this.cpu.DMAChannels[3].Trigger(DMAStartTiming.Special);
             }
-            else if (this.cpu.DMAChannels[3].DMACNT_H.StartTiming == DMAStartTiming.Special && this.ppu.scanline == 162)
+            else if (this.cpu.DMAChannels[3].DMACNT_H.StartTiming == DMAStartTiming.Special && scanline == 162)
             {
                 // this.cpu.mem.IORAM.DMACNT_H[3].Active = false;
                 this.cpu.DMAChannels[3].DMACNT_H.Disable();
@@ -140,6 +145,7 @@ namespace GBAEmulator
 
             if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
             this.ppu.Trigger();
+            if (++scanline == 228) scanline = 0;
 
             // Although the drawing time is only 960 cycles (240*4), the H-Blank flag is "0" for a total of 1006 cycles.
             // we split up the HBlank period into 2 smaller periods:

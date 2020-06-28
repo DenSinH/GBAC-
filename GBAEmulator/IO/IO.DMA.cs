@@ -8,17 +8,17 @@ namespace GBAEmulator.IO
     #region DMAxAD
     public class cDMAAddressHalf : WriteOnlyRegister2
     {
-        private ushort BitMask;
+        public readonly ushort AddressMask;
         public ushort InternalRegister;
 
         public cDMAAddressHalf(BUS bus, bool IsLower, ushort BitMask) : base(bus, IsLower)
         {
-            this.BitMask = BitMask;
+            this.AddressMask = BitMask;
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
-            base.Set((ushort)(value & this.BitMask), setlow, sethigh);
+            base.Set((ushort)(value & this.AddressMask), setlow, sethigh);
         }
 
         public void Reload()
@@ -29,13 +29,12 @@ namespace GBAEmulator.IO
 
     public class cDMAAddress : IORegister4<cDMAAddressHalf>
     {
-        private bool InternalMemory;
-
         public cDMAAddress(BUS bus, bool InternalMemory) : base(
             new cDMAAddressHalf(bus, true, 0xffff),
-            new cDMAAddressHalf(bus, false, (ushort)(InternalMemory ? 0x07ff : 0x0fff)))
+            new cDMAAddressHalf(bus, false, (ushort)(InternalMemory ? 0x07ff : 0x0fff))
+            )
         {
-            this.InternalMemory = InternalMemory;
+
         }
 
         public uint Address
@@ -44,8 +43,7 @@ namespace GBAEmulator.IO
             get => (uint)(this.upper.InternalRegister << 16 | this.lower.InternalRegister);
             set
             {
-                // todo: can upper overflow (upper 4/5 bits unused)
-                this.upper.InternalRegister = (ushort)(value >> 16);
+                this.upper.InternalRegister = (ushort)((value >> 16) & this.upper.AddressMask);
                 this.lower.InternalRegister = (ushort)(value & 0xffff);
             }
         }
@@ -85,6 +83,12 @@ namespace GBAEmulator.IO
         public void Reload()
         {
             this.InternalRegister = this._raw;
+        }
+
+        public override ushort Get()
+        {
+            // Write only register, top half used
+            return 0;
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
@@ -162,7 +166,7 @@ namespace GBAEmulator.IO
             bool Disabled = !this.Enabled;
 
             // bottom 5 bits unused
-            base.Set((ushort)(value & 0xfff8), setlow, sethigh);
+            base.Set((ushort)(value & 0xffe0), setlow, sethigh);
             if (Disabled && this.Enabled)
             {
                 this.Master.Reload();
