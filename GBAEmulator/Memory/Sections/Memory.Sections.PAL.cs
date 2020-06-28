@@ -17,7 +17,7 @@ namespace GBAEmulator.Memory.Sections
         public override void SetByteAt(uint address, byte value)
         {
 #if !UNSAFE_RENDERING
-            this.ppu.BusyWait();
+            if (this.GetByteAt(address) != value) this.ppu.BusyWait();
 #endif
             /*
              GBATek:
@@ -38,7 +38,7 @@ namespace GBAEmulator.Memory.Sections
         public override void SetHalfWordAt(uint address, ushort value)
         {
 #if !UNSAFE_RENDERING
-            this.ppu.BusyWait();
+            if (this.GetHalfWordAt(address) != value) this.ppu.BusyWait();
 #endif
             base.SetHalfWordAt(address, value);
         }
@@ -46,7 +46,7 @@ namespace GBAEmulator.Memory.Sections
         public override void SetWordAt(uint address, uint value)
         {
 #if !UNSAFE_RENDERING
-            this.ppu.BusyWait();
+            if (this.GetWordAt(address) != value) this.ppu.BusyWait();
 #endif
             base.SetWordAt(address, value);
         }

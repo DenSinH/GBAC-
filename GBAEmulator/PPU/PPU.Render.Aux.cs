@@ -365,6 +365,7 @@ namespace GBAEmulator.Video
             // draw 8bpp tile sliver on screen based on tile base address (corrected for course AND fine y)
             int ScreenX = StartX;
             byte VRAMEntry;
+
 #if UNSAFE_RENDERING
             // todo: no unsafe rendering
             if (TileLineBaseAddress > 0x1_7ff8)  // prevent OOB VRAM reads in unsafe rendering
@@ -396,6 +397,5 @@ namespace GBAEmulator.Video
                     Line[ScreenX] = this.GetPaletteEntry(PaletteOffset + 2 * (uint)VRAMEntry);
             }
         }
-
     }
 }

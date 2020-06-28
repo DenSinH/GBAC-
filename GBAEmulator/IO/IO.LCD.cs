@@ -7,7 +7,7 @@ using GBAEmulator.Video;
 
 namespace GBAEmulator.IO
 {
-    #region base
+#region base
     public class LCDRegister2 : IORegister2
     {
         private readonly PPU ppu;
