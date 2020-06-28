@@ -17,6 +17,11 @@ After the wild success of the NES emulator I'm going to attempt to make a GBA em
 
 Hotkeys:
  - F4: Pause emulation
+ 
+### Rendering modes:
+I added 2 modes of rendering, threaded and not threaded. Threaded rendering will give a performance boost in general. Then for threaded rendering you can enable unsafe rendering, where VRAM/OAM/PAL changes are executed whether the PPU was rendering or not. These can be toggled in the .csproj file, by adding the compiler symbols `THREADED_RENDERING` and `UNSAFE_RENDERING`. For `UNSAFE_RENDERING` to work, `THREADED_RENDERING` has to be enabled as well. 
+
+I have not noticed any differences between `UNSAFE_RENDERING` and not, except it _has_ crashed in unsafe mode (when it tried to read an out of bounds VRAM entry while rendering, which probably got changed in a different thread). I have prevented the crash as well as I could, but in case it happens, a pixel might be off. It could also happen that PAL/OAM writes happen, but I do not think they will be of much hinderance. There is some performance gain in turning on `UNSAFE_RENDERING`.
 
 #### Done:
   - ARM instructions
