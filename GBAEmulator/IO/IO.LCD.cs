@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 
 using GBAEmulator.Bus;
 using GBAEmulator.Video;
@@ -25,7 +27,7 @@ namespace GBAEmulator.IO
         }
 #endif
 
-        public void UpdatePPU()
+        public virtual void UpdatePPU()
         {
             this._PPUraw = this._raw;
         }
@@ -253,6 +255,9 @@ namespace GBAEmulator.IO
     {
         private cReferencePoint parent;
         private ushort BitMask;
+#if THREADED_RENDERING
+        private bool DoReset = false;
+#endif
 
         public cReferencePointHalf(cReferencePoint parent, PPU ppu, BUS bus, bool IsLower, ushort BitMask) : base(ppu, bus, IsLower)
         {
@@ -260,9 +265,9 @@ namespace GBAEmulator.IO
             this.BitMask = BitMask;
         }
 
-        public ushort PPUraw
+        public ushort raw
         {
-            get => this._PPUraw;
+            get => this._raw;
         }
 
         public override void Set(ushort value, bool setlow, bool sethigh)
@@ -282,7 +287,7 @@ namespace GBAEmulator.IO
         }
 
         public uint InternalRegister { get; private set; }
-
+        
         public void ResetInternal()
         {
             this.InternalRegister = (uint)this.Full;
@@ -293,18 +298,19 @@ namespace GBAEmulator.IO
             this.InternalRegister += dm_;
         }
 
-        public bool Sign
+
+        private bool Sign
         {
-            get => (this.upper.PPUraw & 0x0800) > 0;
+            get => (this.upper.raw & 0x0800) > 0;
         }
 
-        public int Full
+        private int Full
         {
             get
             {
                 if (this.Sign)  // negative
-                    return (int)(this.lower.PPUraw | ((this.upper.PPUraw & 0x07ff) << 16) | 0xf800_0000);
-                return (this.lower.PPUraw | ((this.upper.PPUraw & 0x07ff) << 16));
+                    return (int)(this.lower.raw | ((this.upper.raw & 0x07ff) << 16) | 0xf800_0000);
+                return (this.lower.raw | ((this.upper.raw & 0x07ff) << 16));
             }
         }
     }

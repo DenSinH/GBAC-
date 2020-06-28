@@ -11,6 +11,24 @@ namespace GBAEmulator.Video
             get { return (scanline >= 160) && (scanline < ScanlinesPerFrame); }
         }
 
+        public void UpdateRotationScalingParams()
+        {
+            if (this.IsVBlank)
+            {
+                this.IO.BG2X.ResetInternal();
+                this.IO.BG2Y.ResetInternal();
+                this.IO.BG3X.ResetInternal();
+                this.IO.BG3Y.ResetInternal();
+            }
+            else
+            {
+                this.IO.BG2X.UpdateInternal((uint)this.IO.BG2PB.Full);
+                this.IO.BG2Y.UpdateInternal((uint)this.IO.BG2PD.Full);
+                this.IO.BG3X.UpdateInternal((uint)this.IO.BG3PB.Full);
+                this.IO.BG3Y.UpdateInternal((uint)this.IO.BG3PD.Full);
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ushort GetPaletteEntry(uint Address)
         {

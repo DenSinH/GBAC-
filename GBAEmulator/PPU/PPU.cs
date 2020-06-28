@@ -60,12 +60,7 @@ namespace GBAEmulator.Video
                 this.DoneDrawing.Wait();
             }
             this.DoneDrawing.Reset();
-#endif
-            this.IO.BG2X.UpdateInternal((uint)this.IO.BG2PB.Full);
-            this.IO.BG2Y.UpdateInternal((uint)this.IO.BG2PD.Full);
-            this.IO.BG3X.UpdateInternal((uint)this.IO.BG3PB.Full);
-            this.IO.BG3Y.UpdateInternal((uint)this.IO.BG3PD.Full);
-#if THREADED_RENDERING
+
             this.IO.UpdateLCD();
             this.DrawState = DRAW_BUSY;
             this.StartDrawing.Set();
@@ -125,6 +120,8 @@ namespace GBAEmulator.Video
                     scanline = 0;
                     frame++;
                 }
+
+                this.UpdateRotationScalingParams();
 
                 DoneDrawing.Set();
                 this.DrawState = DRAW_READY;

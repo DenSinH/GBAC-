@@ -110,13 +110,9 @@ namespace GBAEmulator
                 this.mem.IO.DISPSTAT.SetVBlank(false);
             }
 
-            if (this.ppu.IsVBlank)
-            {
-                this.mem.IO.BG2X.ResetInternal();
-                this.mem.IO.BG2Y.ResetInternal();
-                this.mem.IO.BG3X.ResetInternal();
-                this.mem.IO.BG3Y.ResetInternal();
-            }
+#if !THREADED_RENDERING
+            this.ppu.UpdateRotationScalingParams();
+#endif
 
             /* NON-HBLANK */
             this.mem.IO.DISPSTAT.SetHBlank(false);
