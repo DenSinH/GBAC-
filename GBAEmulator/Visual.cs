@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Media;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -99,7 +100,11 @@ namespace GBAEmulator
 
         private void ScreenShot()
         {
-            this.Backbuffer.Save($"{ScreenshotFolder}/{this.gba.mem.ROMName}_{DateTime.Now.ToString("dd/MM/yyyy T")}.png", ImageFormat.Png);
+            this.Backbuffer.Save($"{ScreenshotFolder}/{this.gba.mem.ROMName}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}.png", ImageFormat.Png);
+            using (SoundPlayer snd = new SoundPlayer(Properties.Resources.camera_shutter))
+            {
+                snd.Play();
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
