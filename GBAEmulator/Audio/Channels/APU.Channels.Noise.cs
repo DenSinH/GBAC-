@@ -24,7 +24,6 @@ namespace GBAEmulator.Audio.Channels
             this.ShiftRegister = (uint)(this.CounterStepWidth ? 0x4000 : 0x40);
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected override void OnTick()
         {
@@ -41,7 +40,6 @@ namespace GBAEmulator.Audio.Channels
 
             if (carry == 1)
             {
-
                 if (this.CounterStepWidth)
                 {
                     this.ShiftRegister ^= 0x6000;

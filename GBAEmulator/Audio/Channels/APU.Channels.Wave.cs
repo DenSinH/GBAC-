@@ -16,7 +16,6 @@ namespace GBAEmulator.Audio.Channels
         public bool Playback;
         public bool ForceVolume;
 
-
         public WaveChannel()
         {
             this.Period = 8 * 2048;

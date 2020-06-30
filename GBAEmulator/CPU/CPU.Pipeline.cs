@@ -73,5 +73,4 @@ namespace GBAEmulator.CPU
             return result;
         }
     }
-
 }

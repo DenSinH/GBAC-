@@ -216,6 +216,5 @@ namespace GBAEmulator.CPU
              */
             return this.DataProcessingTimings(ImmediateOperand);
         }
-
     }
 }

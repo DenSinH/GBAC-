@@ -230,7 +230,6 @@ namespace GBAEmulator.Video
             // determine what blend mode to use per pixel
             this.ResetWindowBlendMode();
 
-
             ushort Backdrop = this.Backdrop;
 
             // figure out which backgrounds we actually need to draw

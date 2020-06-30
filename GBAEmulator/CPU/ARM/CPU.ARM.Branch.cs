@@ -4,7 +4,6 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-
         private int BX(uint Instruction)
         {
             // Branch & Exchange instruction
@@ -38,7 +37,6 @@ namespace GBAEmulator.CPU
 
             this.PC = (uint)(this.PC + TrueOffset);
             this.PipelineFlush();
-
 
             this.Log(string.Format("ARM branch (with link?) Offset {0:x8}", TrueOffset));
 

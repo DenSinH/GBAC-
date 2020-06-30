@@ -57,7 +57,6 @@ namespace GBAEmulator.CPU
 
             if (LoadFromMemory)
             {
-
                 this.Log(string.Format("Single Data Transfer: Mem{0:x8} -> R{1}", Address, Rd));
                 if (ByteQuantity)
                 {

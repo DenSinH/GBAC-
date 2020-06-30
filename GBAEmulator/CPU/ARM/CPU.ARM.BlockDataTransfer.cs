@@ -159,7 +159,6 @@ namespace GBAEmulator.CPU
                         // PC is 8 ahead, while it should be 12
                         this.mem.SetWordAt(CurrentAddress - (uint)((!PreIndex) ? 4 : 0), this.Registers[15] + 4);
                 }
-                    
             }
 
             if (PSR_ForceUser)

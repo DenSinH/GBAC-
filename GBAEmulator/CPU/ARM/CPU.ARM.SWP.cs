@@ -4,7 +4,6 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
-
         private int SWP(uint Instruction)
         {
             bool ByteQuantity;
@@ -41,6 +40,5 @@ namespace GBAEmulator.CPU
             // Swap instructions take 1S + 2N +1I incremental cycles to execute
             return ICycle;
         }
-
     }
 }

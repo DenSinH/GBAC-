@@ -162,6 +162,5 @@ namespace GBAEmulator.CPU
             get => Registers[14];
             set => Registers[14] = value;
         }
-
     }
 }
