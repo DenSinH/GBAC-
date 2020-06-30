@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.IO;
 
 namespace GBAEmulator
 {
@@ -32,6 +33,8 @@ namespace GBAEmulator
 
         private Debug DebugScreen;
         private bool DebugActive;
+
+        private const string ScreenshotFolder = "./Screenshots";
 
         public Visual(GBA gba)
         {
@@ -76,6 +79,10 @@ namespace GBAEmulator
             // Keyboard input handling
             this.KeyDown += this.gba.mem.IO.KEYINPUT.keyboard.KeyDown;
             this.KeyUp += this.gba.mem.IO.KEYINPUT.keyboard.KeyUp;
+
+
+            if (!Directory.Exists(ScreenshotFolder))
+                Directory.CreateDirectory(ScreenshotFolder);
         }
 
         private void LoadBeeg()
@@ -88,6 +95,11 @@ namespace GBAEmulator
             {
                 Console.WriteLine("The background file could not be loaded");
             }
+        }
+
+        private void ScreenShot()
+        {
+            this.Backbuffer.Save($"{ScreenshotFolder}/{this.gba.mem.ROMName}_{DateTime.Now.ToString("dd/MM/yyyy T")}.png", ImageFormat.Png);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -130,6 +142,10 @@ namespace GBAEmulator
             else if (e.KeyCode == Keys.F5)
             {
                 
+            }
+            else if (e.KeyCode == Keys.F12)
+            {
+                this.ScreenShot();
             }
         }
 
