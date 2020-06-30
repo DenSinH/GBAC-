@@ -52,3 +52,5 @@ I have not noticed any differences between `UNSAFE_RENDERING` and not, except it
   - Pokemon pinball menu screen popup should be transparent (alphablending issue, used to work)
   - Mario & Luigi Superstar Saga video is messed up
   
+  
+ <sub><sup>Screenshot sound effect from (https://www.soundjay.com/camera-sound-effect.html)</sup></sub>
