@@ -16,6 +16,15 @@ namespace GBAEmulator.Audio.Channels
         public int Volume;
         public short CurrentSample { get; protected set; }
 
+        public void Reset()
+        {
+            this.LengthCounter = 0;
+            this.LengthFlag = false;
+            this.Enabled = false;
+            this.Period = 128 * 2048;  // square channel default value (does not matter much)
+            this.Volume = 0;
+        }
+
         protected abstract short GetSample();
 
         protected abstract void OnTick();

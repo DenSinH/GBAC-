@@ -95,6 +95,8 @@ namespace GBAEmulator.IO
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set((ushort)(value & 0x00f0), setlow, sethigh);  // other bits unused / readonly
+            if ((value & 0x0080) == 0)
+                this.apu.ResetAll();
         }
     }
 }

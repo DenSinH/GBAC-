@@ -59,6 +59,15 @@ namespace GBAEmulator.Audio
             scheduler.Push(new Event(SamplePeriod, this.ProvideSample));
         }
 
+        public void ResetAll()
+        {
+            this.sq1.Reset();
+            this.sq2.Reset();
+            this.wave.Reset();
+            this.noise.Reset();
+            // todo: FIFO?
+        }
+
         private void TickFrameSequencer(Event sender, Scheduler.Scheduler scheduler)
         {
             this.FrameSequencer++;
