@@ -1,4 +1,5 @@
 # GBAC-
+[![CodeFactor](https://www.codefactor.io/repository/github/densinh/gbac-/badge)](https://www.codefactor.io/repository/github/densinh/gbac-)
 After the wild success of the NES emulator I'm going to attempt to make a GBA emulator
 
 ### Controls:
