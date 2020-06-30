@@ -15,8 +15,11 @@ After the wild success of the NES emulator I'm going to attempt to make a GBA em
 | DPad Left / Left Joystick| Left | -> | DPad Left |
 | DPad Right / Left Joystick| Right | -> | DPad Right |
 
-Hotkeys:
+#### Hotkeys:
+ - I: Current CPU register info (debugging)
+ - F1: Current PPU Render status (debugging)
  - F4: Pause emulation
+ - F12: Screenshot
  
 ### Rendering modes:
 I added 2 modes of rendering, threaded and not threaded. Threaded rendering will give a performance boost in general. Then for threaded rendering you can enable unsafe rendering, where VRAM/OAM/PAL changes are executed whether the PPU was rendering or not. These can be toggled in the .csproj file, by adding the compiler symbols `THREADED_RENDERING` and `UNSAFE_RENDERING`. For `UNSAFE_RENDERING` to work, `THREADED_RENDERING` has to be enabled as well. 
