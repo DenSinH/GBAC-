@@ -8,6 +8,7 @@ namespace GBAEmulator.CPU
         {
             this.Log(string.Format("SWI: {0:x8}", Instruction));
 
+            this.SPSR_svc = this.CPSR;
             this.ChangeMode(Mode.Supervisor);
             this.I = 1;
             LR = this.PC - (uint)((this.state == State.THUMB) ? 2 : 4);  // which is now LR_svc

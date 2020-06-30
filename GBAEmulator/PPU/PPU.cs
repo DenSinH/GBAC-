@@ -23,7 +23,7 @@ namespace GBAEmulator.Video
         const int width = 240;
         const int height = 160;
 
-        const int ScanlinesPerFrame = 228;
+        public const int ScanlinesPerFrame = 228;
         const ushort Transparent = 0x8000;
 
         public readonly bool[] ExternalBGEnable = new bool[4] { true, true, true, true };
@@ -119,6 +119,10 @@ namespace GBAEmulator.Video
                 {
                     scanline = 0;
                     frame++;
+                }
+                else if (scanline == height)
+                {
+                    this.gba.ScreenRefresh();
                 }
 
                 this.UpdateRotationScalingParams();

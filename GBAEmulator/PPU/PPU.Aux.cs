@@ -6,7 +6,7 @@ namespace GBAEmulator.Video
 {
     partial class PPU
     {
-        public bool IsVBlank
+        private bool IsVBlank
         {
             get { return (scanline >= 160) && (scanline < ScanlinesPerFrame); }
         }

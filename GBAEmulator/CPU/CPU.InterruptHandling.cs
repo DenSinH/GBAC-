@@ -35,6 +35,7 @@ namespace GBAEmulator.CPU
         public void DoIRQ()
         {
             this.Log("Doing IRQ: " + (this.IO.IF.raw & this.IO.IE.raw).ToString("x8"));
+            this.SPSR_irq = this.CPSR;
             this.ChangeMode(Mode.IRQ);
             this.I = 1;
 

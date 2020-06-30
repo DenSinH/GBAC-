@@ -59,6 +59,28 @@ namespace GBAEmulator
 #endif
         }
 
+        private bool IsVBlank
+        {
+            get { return (scanline >= 160) && (scanline < PPU.ScanlinesPerFrame); }
+        }
+
+        public void ScreenRefresh()
+        {
+            // refresh screen, vis might have been destroyed because we ended the thread
+            try
+            {
+                this.vis?.BeginInvoke(this.vis.Tick);
+            }
+            catch (ObjectDisposedException)
+            {
+                // disgusting I know... 
+            }
+            catch (InvalidOperationException)
+            {
+                // closing the console window first
+            }
+        }
+
         private const int NonHBlankCycles = 960;
         private const int HBlankNoFlagCycles = 46;
         private const int HBlankWithFlagCycles = 226;
@@ -90,19 +112,9 @@ namespace GBAEmulator
                 this.mem.IO.DISPSTAT.SetVBlank(true);
                 this.cpu.TriggerDMA(DMAStartTiming.VBlank);
 
-                // refresh screen, vis might have been destroyed because we ended the thread
-                try
-                {
-                    this.vis?.BeginInvoke(this.vis.Tick);
-                }
-                catch (ObjectDisposedException)
-                {
-                    // disgusting I know... 
-                }
-                catch (InvalidOperationException)
-                {
-                    // closing the console window first
-                }
+#if !THREADED_RENDERING
+                this.ScreenRefresh();
+#endif
             }
             // no VBlank in 227
             else if (scanline == 227)
@@ -139,7 +151,7 @@ namespace GBAEmulator
             if (this.mem.IO.DISPSTAT.IsSet(DISPSTATFlags.HBlankIRQEnable))
                 this.mem.IO.IF.Request(Interrupt.LCDHBlank);
 
-            if (!ppu.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
+            if (!this.IsVBlank) this.cpu.TriggerDMA(DMAStartTiming.HBlank);
             this.ppu.Trigger();
             if (++scanline == 228) scanline = 0;
 

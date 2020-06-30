@@ -60,18 +60,8 @@ namespace GBAEmulator.CPU
                 // return from SWI
                 this.mem.CurrentBIOSReadState = MEM.BIOSReadState.AfterSWI;
 
-            switch (NewMode)
-            {
-                case Mode.Supervisor:
-                    SPSR_svc = this.CPSR;
-                    break;
-                case Mode.IRQ:
-                    SPSR_irq = this.CPSR;
-                    break;
-                case Mode.FIQ:
-                    SPSR_fiq = this.CPSR;
-                    break;
-            }
+            if (NewMode == Mode.FIQ)
+                SPSR_fiq = this.CPSR;
 
             this.mode = NewMode;
         }

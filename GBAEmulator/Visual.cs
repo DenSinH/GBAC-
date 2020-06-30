@@ -78,6 +78,18 @@ namespace GBAEmulator
             this.KeyUp += this.gba.mem.IO.KEYINPUT.keyboard.KeyUp;
         }
 
+        private void LoadBeeg()
+        {
+            try
+            {
+                this.CreateGraphics().DrawImage(Properties.Resources.DillonBeeg, 0, 0, (int)(scale * width), (int)(scale * height));
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("The background file could not be loaded");
+            }
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             this.gba.PowerOff();

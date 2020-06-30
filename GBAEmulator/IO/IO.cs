@@ -105,7 +105,7 @@ namespace GBAEmulator.IO
 
         public byte? GetByteAt(uint address)
         {
-            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return null; }
+            if ((address & 0xfffc) == 0x0800) { return null; }  // mirrored register
             else if ((address &= AddressMask) >= this.Storage.Length) return null;
 
             this.Log("Get register byte at address " + address.ToString("x3"));
@@ -120,7 +120,7 @@ namespace GBAEmulator.IO
 
         public void SetByteAt(uint address, byte value)
         {
-            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return; }
+            if ((address & 0xfffc) == 0x0800) { return; }  // mirrored register
             else if ((address &= AddressMask) >= this.Storage.Length) return;
 
             this.Log("Set register byte at address " + address.ToString("x3") + " " + value.ToString("x"));
@@ -135,7 +135,7 @@ namespace GBAEmulator.IO
         
         public ushort? GetHalfWordAt(uint address)
         {
-            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return null; }
+            if ((address & 0xfffc) == 0x0800) { return null; }  // mirrored register
             else if((address &= AddressMask) >= this.Storage.Length) return null;
             address &= 0x00ff_fffe;  // force align
 
@@ -148,7 +148,7 @@ namespace GBAEmulator.IO
 
         public void SetHalfWordAt(uint address, ushort value)
         {
-            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return; }
+            if ((address & 0xfffc) == 0x0800) { return; }  // mirrored register
             else if((address &= AddressMask) >= this.Storage.Length) return;
             address &= 0x00ff_fffe;  // force align
 
@@ -161,7 +161,7 @@ namespace GBAEmulator.IO
 
         public uint? GetWordAt(uint address)
         {
-            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return null; }
+            if ((address & 0xfffc) == 0x0800) { return null; }  // mirrored register
             else if((address &= AddressMask) >= this.Storage.Length) return null;
             address &= 0x00ff_fffc;  // force align
 
@@ -175,7 +175,7 @@ namespace GBAEmulator.IO
 
         public void SetWordAt(uint address, uint value)
         {
-            if ((address & 0xfffc) == 0x0800) { Console.WriteLine(address.ToString("x4")); return; }
+            if ((address & 0xfffc) == 0x0800) { return; }  // mirrored register
             else if((address &= AddressMask) >= this.Storage.Length) return;
             address &= 0x00ff_fffc;  // force align
 
