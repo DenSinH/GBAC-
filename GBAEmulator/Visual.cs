@@ -84,6 +84,7 @@ namespace GBAEmulator
 
             if (!Directory.Exists(ScreenshotFolder))
                 Directory.CreateDirectory(ScreenshotFolder);
+            this.Icon = Properties.Resources.dillonbeeg_icon;
         }
 
         private void LoadBeeg()

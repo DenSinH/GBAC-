@@ -58,7 +58,6 @@ namespace GBAEmulator.CPU
             if (DMA.Empty)
                 InstructionCycles += DMA.End();
         }
-
         private void HandleDMAs()
         {
             for (int i = 0; i < 4; i++)

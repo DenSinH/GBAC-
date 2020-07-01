@@ -55,14 +55,14 @@ namespace GBAEmulator.CPU
                 if (!this.HasOverflowEvent)
                 {
                     this.HasOverflowEvent = true;
-                    this.OverflowEvent.Time = this.cpu.GlobalCycleCount + (this.Data.PrescalerLimit * (0x10000 - this.Data.Reload));
+                    this.OverflowEvent.Time = this.cpu.GlobalCycleCount + (this.Data.NextPrescalerLimit * (0x10000 - this.Data.Reload));
                     this.scheduler.Push(this.OverflowEvent);
                 }
                 else
                 {
                     // this can only be the case if our timer was already triggered, so we can just increment the OverflowEvent.Time instead of
                     // recalculating it is not necessary (and wrong even!) so we
-                    this.OverflowEvent.Time += this.Data.PrescalerLimit * (0x10000 - this.Data.Reload);
+                    this.OverflowEvent.Time += this.Data.NextPrescalerLimit * (0x10000 - this.Data.Reload);
                     this.scheduler.EventChanged(this.OverflowEvent);
                 }
             }

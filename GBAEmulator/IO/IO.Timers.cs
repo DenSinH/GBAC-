@@ -12,9 +12,12 @@ namespace GBAEmulator.IO
         private long TriggerTime;         // used for non-CountUp timers
         private bool Active;
         private ushort Counter;            // only used for CountUp/Disabled timers
+
+        private ushort NextReload;
         public ushort Reload { get; private set; }
 
-        public ushort PrescalerLimit = 1;  // initial value (see TMCNT_H.PrescalerSelection[0])
+        public ushort NextPrescalerLimit = 1;  // initial value (see TMCNT_H.PrescalerSelection[0])
+        private ushort PrescalerLimit = 1;
 
         public cTMCNT_L(ARM7TDMI cpu)
         {
@@ -25,6 +28,9 @@ namespace GBAEmulator.IO
         {
             this.IsCountUp = IsCountUp;
             this.Active = true;
+            this.Reload = NextReload;
+            this.PrescalerLimit = NextPrescalerLimit;
+
             this.Counter = Reload;
             this.TriggerTime = cpu.GlobalCycleCount + cpu.InstructionCycles;  // timer starts "after" instruction was executed
         }
@@ -48,6 +54,7 @@ namespace GBAEmulator.IO
             if (this.Counter + cycles > 0xffff)  // overflow
             {
                 this.Counter += this.Reload;
+                this.Reload = this.NextReload;
                 Overflow = true;
             }
             this.Counter += cycles;
@@ -66,7 +73,7 @@ namespace GBAEmulator.IO
         public override void Set(ushort value, bool setlow, bool sethigh)
         {
             base.Set(value, setlow, sethigh);
-            this.Reload = value;
+            this.NextReload = value;
         }
     }
 
@@ -109,7 +116,7 @@ namespace GBAEmulator.IO
 
             base.Set(value, setlow, sethigh);
 
-            this.Data.PrescalerLimit = PrescalerSelection[this.Prescaler];
+            this.Data.NextPrescalerLimit = PrescalerSelection[this.Prescaler];
             if (!WasEnabled && this.Enabled)
             {
                 this.Master.Trigger();
