@@ -13,7 +13,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	  <DefineConstants>THREADED_RENDERING, BIOS_HLE</DefineConstants>
+	  <DefineConstants>THREADED_RENDERING</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

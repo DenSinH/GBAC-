@@ -7,7 +7,9 @@ namespace GBAEmulator.CPU
 {
     partial class ARM7TDMI
     {
+#if BIOS_HLE
         const int SWIHandlerCycles = 43;
+#endif
 
         private int SWIInstruction(uint Instruction)
         {
@@ -20,7 +22,7 @@ namespace GBAEmulator.CPU
                 uint r2  = this.Registers[2];
                 uint r11 = this.Registers[11];
                 uint r12 = this.Registers[12];
-                int cycles = HLE.Functions[SWICode](this.Registers);
+                int cycles = HLE.Functions[SWICode](this.Registers, this);
 
                 // POP AFTER
                 this.Registers[2]  = r2;

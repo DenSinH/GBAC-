@@ -3,7 +3,7 @@
 *                    SWI CODES + ADDRESSES                   *
 **************************************************************
 
-0x0 (@0x1c8 = 0xb4)           SoftReset                                     DONE
+0x0 (@0x1c8 = 0xb4)           SoftReset
 0x1 (@0x1cc = 0x9c3)          RegisterRamReset
 0x2 (@0x1d0 = 0x1a0)          Halt
 0x3 (@0x1d4 = 0x1a8)          Stop/Sleep
@@ -13,7 +13,7 @@
 0x7 (@0x1e4 = 0x3a8)          DivArm                                        DONE
 0x8 (@0x1e8 = 0x404)          Sqrt                                          DONE
 0x9 (@0x1ec = 0x474)          ArcTan                                        DONE
-0xa (@0x1f0 = 0x4fd)          ArcTan2
+0xa (@0x1f0 = 0x4fd)          ArcTan2                                       DONE
 0xb (@0x1f4 = 0xb4d)          CpuSet
 0xc (@0x1f8 = 0xbc4)          CpuFastSet
 0xd (@0x1fc = 0x378)          GetBiosChecksum
