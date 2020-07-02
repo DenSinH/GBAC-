@@ -1,0 +1,89 @@
+﻿        
+                             **************************************************************
+                             *                         SoftReset                          *
+                             **************************************************************
+
+        000000b4 01 43 a0 e3     mov        r4,#0x4000000
+        000000b8 06 20 54 e5     ldrb       r2,[r4,#-0x6]=>DAT_03fffffa
+        000000bc 07 00 00 eb     bl         FUN_000000e0                                     undefined FUN_000000e0()
+        000000c0 00 00 52 e3     cmp        r2,#0x0
+        000000c4 ff 1f 14 e9     ldmdb      r4,{ r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12
+        000000c8 02 e4 a0 13     movne      lr,#0x2000000
+        000000cc 02 e3 a0 03     moveq      lr,#0x8000000
+        000000d0 1f 00 a0 e3     mov        r0,#0x1f
+        000000d4 00 f0 29 e1     msr        cpsr_cf,r0
+        000000d8 00 00 a0 e3     mov        r0,#0x0
+        000000dc 1e ff 2f e1     bx         lr
+
+                             **************************************************************
+                             *                          FUNCTION                          *
+                             **************************************************************
+                             undefined FUN_000000e0()
+             undefined         r0:1           <RETURN>
+                             FUN_000000e0                                    XREF[2]:     FUN_00000068:0000009c(c), 
+                                                                                          000000bc(c)  
+        000000e0 d3 00 a0 e3     mov        r0,#0xd3
+        000000e4 00 f0 29 e1     msr        cpsr_cf,r0
+        000000e8 d0 d0 9f e5     ldr        sp,[DAT_000001c0]                                = 03007FE0h
+        000000ec 00 e0 a0 e3     mov        lr,#0x0
+        000000f0 0e f0 69 e1     msr        spsr_cf,lr
+        000000f4 d2 00 a0 e3     mov        r0,#0xd2
+        000000f8 00 f0 29 e1     msr        cpsr_cf,r0
+        000000fc b8 d0 9f e5     ldr        sp,[DAT_000001bc]                                = 03007FA0h
+        00000100 00 e0 a0 e3     mov        lr,#0x0
+        00000104 0e f0 69 e1     msr        spsr_cf,lr
+        00000108 5f 00 a0 e3     mov        r0,#0x5f
+        0000010c 00 f0 29 e1     msr        cpsr_cf,r0
+        00000110 a0 d0 9f e5     ldr        sp,[DAT_000001b8]                                = 03007F00h
+        00000114 01 00 8f e2     adr        r0,0x11d
+        00000118 10 ff 2f e1     bx         r0=>LAB_0000011c
+
+                             LAB_0000011c                                    XREF[1]:     00000118(j)  
+        0000011c 00 20           mov        r0,#0x0
+        0000011e 58 49           ldr        r1,[DAT_00000280]                                = FFFFFE00h
+                             LAB_00000120                                    XREF[1]:     00000124(j)  
+        00000120 60 50           str        r0,[r4,r1]
+        00000122 09 1d           add        r1,r1,#0x4
+        00000124 fc db           blt        LAB_00000120
+        00000126 70 47           bx         lr
+
+
+
+
+            r4 = 0x4000_0000
+            r2 = MEM[r4 - 0x06] = MEM[0x3ff_fffa]
+
+            FUN_0000_00e0():  // reset all SP/LR/SPSR s
+                using r0:
+                    CPSR = 0xd3 (Supervisor mode, set I and F bits)
+                    SP_svc = MEM[0000_01c0] = 03007FE0h
+                    LR_svc = 0
+                    SPSR_svc = LR_svc (= 0)
+                    CPSR = 0xd2 (IRQ mode, set I and F bits)
+                    SP_irq = MEM[0000_01bc] = 03007FA0h
+                    LR_irq = 0
+                    SPSR_irq = LR_irq (= 0)
+                    CPSR = 0x5f (System mode, I bit set)
+                    SP = MEM[000001b8] = 03007F00h
+                    
+                    bx 0x11d (LAB_0000011c, thumb mode)
+                        // Clear 0x100 word section starting from r4 (= 0x400_0000), so clear IORAM
+                        r0 = 0
+                        r1 = MEM[00000280] = FFFFFE00h
+                        while r1 < 0:    (blt LAB_00000120)
+                            MEM[r4 + r1] = r0
+                            r1 += 4
+                        bx (RETURN)
+            
+            bool r2_was_0 = r2 == 0;  // cmp r2, 0
+            r0 = r1 = r2 = ... = r12 = 0 (loaded from r4, but this whole section was reset)
+            if (r2_was_0)
+                LR = 0x0800_0000
+            else
+                LR = 0x0200_0000
+            
+            CPSR = 0x1f (System mode, clear I flag)
+            bx (RETURN)
+
+
+        In short: clear all SP/LR/SPSR s, clear IORAM, clear registers and return to either ROM or iWRAM (depending on r2's initial value)

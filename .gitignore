@@ -266,3 +266,4 @@ paket-files/
 __pycache__/
 *.pyc
 /GBAEmulator/Properties/PublishProfiles
+/GBAEmulator/CPU/SWI/Analysis/BIOS decomp.asm

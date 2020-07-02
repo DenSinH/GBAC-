@@ -1,0 +1,55 @@
+﻿                             **************************************************************
+                             *                         SWI HANDLER                        *
+                             **************************************************************
+                             FUN_00000140                                    XREF[1]:     SupervisorCall:00000008(T), 
+                                                                                          SupervisorCall:00000008(j)  
+        00000140 00 58 2d e9     stmdb      sp!,{ r11 r12 lr }                  4 cycles
+        00000144 02 c0 5e e5     ldrb       r12,[lr,#-0x2]                      2 cycles
+        00000148 78 b0 8f e2     adr        r11,0x1c8                           1 cycle
+        0000014c 0c c1 9b e7     ldr        r12,[r11,r12,lsl #0x2]              3 cycles
+        00000150 00 b0 4f e1     mrs        r11,spsr                            1 cycle
+        00000154 00 08 2d e9     stmdb      sp!,{ r11 }                         2 cycles
+        00000158 80 b0 0b e2     and        r11,r11,#0x80                       1 cycle
+        0000015c 1f b0 8b e3     orr        r11,r11,#0x1f                       1 cycle
+        00000160 0b f0 29 e1     msr        cpsr_cf,r11                         1 cycle
+        00000164 04 40 2d e9     stmdb      sp!,{ r2 lr }                       3 cycles
+        00000168 00 e0 8f e2     adr        lr,0x170                            3 cycles
+        0000016c 1c ff 2f e1     bx         r12                                 3 cycles
+                                                                            +  25 cycles
+
+               PUSH r11, r12, LR
+               r12 = (byte)MEM[lr - 2] (SWI code)
+       
+               using r11:
+                   r11 = 0x1c8
+                   r12 = MEM[0x1c8 + (r12 << 4)]
+       
+                   PUSH SPSR_svc
+                   CPSR_cf = ((SPSR_svc) & 0x80) | 0x1f        (set I bit, change mode to 0x1f = System, keep CPSR flags)
+       
+               PUSH r2, LR
+               LR = 0x170
+               BRANCH r12 (= MEM[0x1c8 + (SWI code << 4)])
+                             
+                             **************************************************************
+                             *                         SWI RETURN                         *
+                             **************************************************************
+
+
+                             -- Flow Override: CALL (COMPUTED_CALL)
+        00000170 04 40 bd e8     ldmia      sp!,{ r2 lr }=>local_18             4 cycles
+        00000174 d3 c0 a0 e3     mov        r12,#0xd3                           1 cycle
+        00000178 0c f0 29 e1     msr        cpsr_cf,r12                         1 cycle
+        0000017c 00 08 bd e8     ldmia      sp!,{ r11 }=>local_10               3 cycles
+        00000180 0b f0 69 e1     msr        spsr_cf,r11                         1 cycle
+        00000184 00 58 bd e8     ldmia      sp!,{ r11 r12 lr }=>local_c         5 cycles
+        00000188 0e f0 b0 e1     movs       pc,lr                               3 cycles
+                                                                             + 18 cycles
+
+                POP r2, LR
+                using r12:
+                    CPSR = 0xd3 (forget flags, switch mode to supervisor, set I and F bits)
+                POP r11
+                SPSR_svc = r11
+                POP r11, r12, LR
+                BX (RETURN)
