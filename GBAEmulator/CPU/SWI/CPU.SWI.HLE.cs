@@ -259,38 +259,49 @@ namespace GBAEmulator.CPU.SWI
             void FUN_03b4(uint[] r)
             {
                 r[3] = 0x3b4;
-                cycles += Div(r) + 1;
+                // also account for assignment of r3 and branches
+                cycles += Div(r) + 3;
             }
 
             void FUN_0470(uint[] r) 
             {
                 r[3] = 0x474;
-                cycles += ArcTan(r) + 1;
+                // also account for assignment of r3 and branches
+                cycles += ArcTan(r) + 3;
             }
 
             //  PUSH r[4], r[5], r[6], r[7], lr
-            uint pushed_r4 = r[4], pushed_r5 = r[5], pushed_r6 = r[6], pushed_r7 = r[7], pushed_lr = r[14];
+            //  We came from the SWI handler, so lr is always 0x170
+            uint pushed_r4 = r[4], pushed_r5 = r[5], pushed_r6 = r[6], pushed_r7 = r[7], pushed_lr = 0x170;
+            cycles += 7;
 
             if (r[1] != 0)
             {
+                cycles += 3;
                 //  LAB_510:
                 if (r[0] != 0)
                 {
+                    cycles += 3;
                     //  LAB_524:
                     r[2] = r[0] << 14;  //  2 ops
-                    r[3] = r[0] << 14;  //  2 ops
+                    r[3] = r[1] << 14;  //  2 ops
                     r[4] = (uint)-r[0];
-                    r[5] = (uint)-r[0];
-                    r[6] = 0x400;  //  2 ops
-                    r[7] = 0x800;  //  (r[6] lsl 1)
+                    r[5] = (uint)-r[1];
+                    r[6] = 0x4000;  //  2 ops
+                    r[7] = 0x8000;  //  (r[6] lsl 1)
+
+                    cycles += 9;
                     if ((int)r[1] < 0)
                     {
+                        cycles += 3;
                         //  LAB_572:
                         if ((int)r[0] > 0)
                         {
+                            cycles += 3;
                             //  LAB_58a:
-                            if (r[0] < r[5])
+                            if ((int)r[0] < (int)r[5])
                             {
+                                cycles += 3;
                                 //  LAB_57a:
                                 r[0] = r[2];
                                 FUN_03b4(r);
@@ -298,9 +309,11 @@ namespace GBAEmulator.CPU.SWI
                                 r[6] += r[7];
                                 r[0] = r[6] - r[0];
                                 //  LAB_59e ...
+                                cycles += 3;
                             }
                             else
                             {
+                                cycles += 3;
                                 // else omitted in asm with branch LAB_59e
                                 r[1] = r[0];
                                 r[0] = r[3];
@@ -309,10 +322,12 @@ namespace GBAEmulator.CPU.SWI
                                 r[7] += r[7];
                                 r[0] += r[7];
                                 //  LAB_59e ...
+                                cycles += 4;
                             }
                         }
                         else if ((int)r[4] > (int)r[5])
                         {
+                            cycles += 5;
                             // else omitted in asm with branch LAB_59e
                             //  LAB_562:
                             r[1] = r[0];
@@ -321,9 +336,11 @@ namespace GBAEmulator.CPU.SWI
                             FUN_0470(r);
                             r[0] += r[7];
                             // LAB_59e ...
+                            cycles += 3;
                         }
                         else
                         {
+                            cycles += 7;  // _with_ branch
                             // else omitted in asm with branch LAB_59e
                             // LAB_57a
                             r[0] = r[2];
@@ -332,23 +349,28 @@ namespace GBAEmulator.CPU.SWI
                             r[6] += r[7];
                             r[0] = r[6] - r[0];
                             // LAB_59e ...
+                            cycles += 3;
                         }
                     }
                     else if ((int)r[0] < 0)
                     {
+                        cycles += 5;
                         // else omitted in asm with branch LAB_59e
                         //  LAB_55e:
-                        if (r[4] < r[1])
+                        if ((int)r[4] < (int)r[1])
                         {
+                            cycles += 3;
                             //  LAB_550:
                             r[0] = r[2];
                             FUN_03b4(r);
                             FUN_0470(r);
                             r[0] = r[6] - r[0];
                             //  LAB_59e ...
+                            cycles += 2;
                         }
                         else
                         {
+                            cycles += 3;  // no branch
                             // else omitted in asm with branch LAB_59e
                             //  LAB_562:
                             r[1] = r[0];
@@ -357,10 +379,12 @@ namespace GBAEmulator.CPU.SWI
                             FUN_0470(r);
                             r[0] += r[7];
                             //  LAB_59e ...
+                            cycles += 3;
                         }
                     }
                     else if ((int)r[0] < (int)r[1])
                     {
+                        cycles += 7;
                         // else omitted in asm with branch LAB_59e
                         //  LAB_550:
                         r[0] = r[2];
@@ -368,9 +392,11 @@ namespace GBAEmulator.CPU.SWI
                         FUN_0470(r);
                         r[0] = r[6] - r[0];
                         //  LAB_59e ...
+                        cycles += 2;
                     }
                     else
                     {
+                        cycles += 7;  // no branch
                         // else omitted in asm with branch LAB_59e
                         r[1] = r[0];
                         r[0] = r[3];
@@ -378,46 +404,60 @@ namespace GBAEmulator.CPU.SWI
                         FUN_03b4(r);
                         FUN_0470(r);
                         //  LAB_59e ...
+                        cycles += 2;
                     }
                 }
                 else if ((int)r[1] < 0)
                 {
+                    cycles += 5;
                     // else omitted in asm with branch LAB_59e
                     //  LAB_51e:
                     r[0] = 0xc000;  //  with LSL
                     //  LAB_59e ...
+                    cycles += 2;
                 }
                 else
                 {
+                    cycles += 5;  // no branch
                     // else omitted in asm with branch LAB_59e
                     r[0] = 0x4000;  //  with LSL
                     //  LAB_59e ...
+                    cycles += 2;
                 }
             }
             else if ((int)r[0] < 0)
             {
+                cycles += 5;
                 // else omitted in asm with branch LAB_59e
                 //  LAB_50a:
                 r[0] = 0x8000;  //  with LSL
                 //  LAB_59e ...
+                cycles += 2;
             }
             else
             {
+                cycles += 5;  // no branch
                 // else omitted in asm with branch LAB_59e
                 r[0] = 0;
                 //  LAB_59e ...
+                cycles += 1;
             }
 
 
             //  LAB_59e:
+            cycles += 2;  // branch in general
             //  POP r[4], r[5], r[6], r[7]
-            //  POP r[3]
             r[4] = pushed_r4;
             r[5] = pushed_r5;
             r[6] = pushed_r6;
             r[7] = pushed_r7;
+            cycles += 7;
+            //  POP r[3]
             r[3] = pushed_lr;
+            cycles += 3;
             //  bx (return)
+
+            cycles += 2;
             return cycles;
         }
     }
