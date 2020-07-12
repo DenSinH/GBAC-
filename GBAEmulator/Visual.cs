@@ -31,6 +31,7 @@ namespace GBAEmulator
 
         private GBA gba;
         private Thread PlayThread;
+        private string PrevRomFile = null;
 
         private Debug DebugScreen;
         private bool DebugActive;
@@ -149,6 +150,11 @@ namespace GBAEmulator
             {
                 
             }
+            else if (e.KeyCode == Keys.F9)
+            {
+                if (this.PrevRomFile != null)
+                    this.StartPlay(this.PrevRomFile);
+            }
             else if (e.KeyCode == Keys.F12)
             {
                 this.ScreenShot();
@@ -216,18 +222,23 @@ namespace GBAEmulator
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    this.gba.ShutDown = true;
-                    if (this.PlayThread != null)
-                    {
-                        this.PlayThread.Join();
-                        this.gba.Reset();
-                    }
-
-                    this.PlayThread = new Thread(() => Play(openFileDialog.FileName));
-                    this.PlayThread.SetApartmentState(ApartmentState.STA);
-                    this.PlayThread.Start();
+                    this.StartPlay(openFileDialog.FileName);
                 }
             }
+        }
+
+        private void StartPlay(string filename)
+        {
+            this.gba.ShutDown = true;
+            if (this.PlayThread != null)
+            {
+                this.PlayThread.Join();
+                this.gba.Reset();
+            }
+
+            this.PlayThread = new Thread(() => Play(this.PrevRomFile = filename));
+            this.PlayThread.SetApartmentState(ApartmentState.STA);
+            this.PlayThread.Start();
         }
 
         private void Play(string filename)

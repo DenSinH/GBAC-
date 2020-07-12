@@ -60,7 +60,7 @@ namespace GBAEmulator.CPU
                     this.Log(string.Format("R{0} SBC R{1} -> R{1}", Rs, Rd));
                     uint temp = Op2 - C + 1;
                     Result = (uint)(Op1 - temp);
-                    this.SetCVSub(Op1, temp, Result);
+                    this.SetCVSubC(Op1, Op2, C, Result);
                     this.Registers[Rd] = Result;
                     break;
                 case 0b0111:  // ROR

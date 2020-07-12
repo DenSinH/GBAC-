@@ -124,6 +124,9 @@ namespace GBAEmulator.CPU
         {
             InstructionCycles = 0;
 
+            // this.ShowInfo();
+            //Console.ReadKey();
+
             this.HandleIRQs();
             if (this.DMAActive)
             {
