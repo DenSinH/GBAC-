@@ -218,8 +218,10 @@ namespace GBAEmulator.Video
                 SliverBaseAddress += (uint)(4 * (dy & 0x07));   // offset within tile
 
                 // prevent overflow, not sure what is supposed to happen
-                if (SliverBaseAddress + (OBJsz.Width >> 3) * 0x20 > Transparent)  
+                if (SliverBaseAddress + ((OBJsz.Width >> 3) - 1) * 0x20 > 0x8000)
+                {
                     SliverBaseAddress = 0;
+                }
 
                 // base address for sprites is 0x10000 in OAM
                 SliverBaseAddress = (SliverBaseAddress & 0x7fff) | 0x10000;  
@@ -228,6 +230,7 @@ namespace GBAEmulator.Video
                 {
                     // foreground palette starts at 0x0500_0200
                     // we can use our same rendering method as for background, as we simply render a tile
+
                     if (UseOBJWindowMask)
                     {
                         this.Render4bpp(

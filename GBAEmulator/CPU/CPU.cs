@@ -110,6 +110,13 @@ namespace GBAEmulator.CPU
             this.PC += 4;
         }
 
+        public void DontSkipBios()
+        {
+            this.PC = 0;
+            this.PipelineFlush();
+            this.PC += 4;
+        }
+
         public void Reset()
         {
             Array.Clear(this.SystemBank, 0, 16);
@@ -123,9 +130,6 @@ namespace GBAEmulator.CPU
         public int Step()
         {
             InstructionCycles = 0;
-
-            // this.ShowInfo();
-            //Console.ReadKey();
 
             this.HandleIRQs();
             if (this.DMAActive)
