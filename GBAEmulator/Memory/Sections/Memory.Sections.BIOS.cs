@@ -26,7 +26,9 @@ namespace GBAEmulator.Memory.Sections
             FileStream fs;
             try
             {
-                fs = File.OpenRead("../../../Memory/bios/gba_bios.bin");
+                // fs = File.OpenRead("../../../Memory/bios/gba_bios.bin");
+                // test BIOS
+                fs = File.OpenRead("D:/GBABIOS/gba-bios/bios.bin");
             }
             catch
             {

@@ -11,9 +11,21 @@ namespace GBAEmulator.CPU
         const int SWIHandlerCycles = 43;
 #endif
 
+        bool pause;
         private int SWIInstruction(uint Instruction)
         {
             this.Log(string.Format("SWI: {0:x8}", Instruction));
+            byte SWICode = (byte)(Instruction >> 16);
+            Console.WriteLine(string.Format("SWI: {0:x8}", Instruction));
+            this.ShowInfo();
+            if (SWICode == 0x13 || SWICode == 0x20 || SWICode == 0x19)
+            {
+                
+                // this.ShowInfo();
+                Console.ReadKey();
+                // pause = true;
+            }
+
 #if BIOS_HLE
             byte SWICode = (byte)(Instruction >> 16);
             if (SWICode < 0x2b && HLE.Functions[SWICode] != null)

@@ -205,7 +205,8 @@ namespace GBAEmulator
 #endif
             this.mem.LoadRom(ROMPath);
 
-            cpu.SkipBios();
+            // cpu.SkipBios();
+            cpu.DontSkipBios();
 
             this.Alive = true;
             while (!this.ShutDown)

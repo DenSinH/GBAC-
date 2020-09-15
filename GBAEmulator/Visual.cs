@@ -140,7 +140,7 @@ namespace GBAEmulator
             }
             else if (e.KeyCode == Keys.F3)
             {
-
+                this.gba.mem.DumpEWRAMStart();
             }
             else if (e.KeyCode == Keys.F4)
             {

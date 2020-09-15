@@ -79,6 +79,18 @@ namespace GBAEmulator.Memory.Backup
             }
         }
 
+        private void EraseAll()
+        {
+            // Backup storage is cleared with 0xff instead of 0x00
+            for (uint b = 0; b < 2; b++)
+            {
+                for (uint i = 0; i < this.Banks[b].Length; i++)
+                {
+                    this.Banks[b][i] = 0xff;
+                }
+            }
+        }
+
         public byte Read(uint address)
         {
             // Console.WriteLine($"Read from {address:x4}");
@@ -148,7 +160,7 @@ namespace GBAEmulator.Memory.Backup
                         case 0x10:  // Erase entire chip
                             if (ExpectErase)
                             {
-                                this.Erase(this.Banks[ActiveBank], 0, 0x10000);
+                                this.EraseAll();
                                 ExpectErase = false;
                                 return true;
                             }
