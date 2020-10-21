@@ -31,7 +31,7 @@ namespace GBAEmulator.CPU
                             // Single Data Swap
                             this.ARMInstructions[Instruction] = this.SWP;
                         }
-                        else if ((Instruction & 0xfff_fff) == 0x12f_ff1)
+                        else if ((Instruction & 0xfff) == 0x121)
                         {
                             // Branch and Exchange
                             this.ARMInstructions[Instruction] = this.BX;
